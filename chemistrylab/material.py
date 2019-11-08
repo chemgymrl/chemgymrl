@@ -47,7 +47,7 @@ class Material:
 
 class Air(Material):
     def __init__(self):
-        super().__init__(name='C6H14',
+        super().__init__(name='Air',
                          color=0.45
                          )
 
