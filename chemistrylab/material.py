@@ -61,7 +61,7 @@ class H2O(Material):
     def __init__(self):
         super().__init__(name='H2O',
                          density=0.997,
-                         polarity=2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0)),
+                         polarity=abs(2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0))),
                          temperature=298,
                          pressure=1,
                          phase='l',
@@ -70,6 +70,70 @@ class H2O(Material):
                          charge=0.0
                          )
 
+class H(Material):
+    def __init__(self):
+        super().__init__(name='H',
+                         density=8.9e-5,
+                         polarity=0,
+                         temperature=298,
+                         pressure=1,
+                         phase='g',
+                         molar_mass=1.008,
+                         color=0.1,
+                         charge=0.0
+                         )
+
+class H2(Material):
+    def __init__(self):
+        super().__init__(name='H2',
+                         density=8.9e-5,
+                         polarity=0,
+                         temperature=298,
+                         pressure=1,
+                         phase='g',
+                         molar_mass=2.016,
+                         color=0.1,
+                         charge=0.0
+                         )
+
+class O(Material):
+    def __init__(self):
+        super().__init__(name='O',
+                         density=1.429e-3,
+                         polarity=0,
+                         temperature=298,
+                         pressure=1,
+                         phase='g',
+                         molar_mass=15.999,
+                         color=0.15,
+                         charge=0.0
+                         )
+
+class O2(Material):
+    def __init__(self):
+        super().__init__(name='O2',
+                         density=1.429e-3,
+                         polarity=0,
+                         temperature=298,
+                         pressure=1,
+                         phase='g',
+                         molar_mass=31.999,
+                         color=0.1,
+                         charge=0.0
+                         )
+
+class O3(Material):
+    def __init__(self):
+        super().__init__(name='O3',
+                         density=2.144e-3,
+                         polarity=abs(1 + 2 * -1 * np.cos((116.8 / 2) * (np.pi / 180.0))),
+                         temperature=298,
+                         pressure=1,
+                         phase='g',
+                         molar_mass=47.998,
+                         color=0.1,
+                         charge=-1.0
+                         )
 
 class C6H14(Material):
     def __init__(self):
