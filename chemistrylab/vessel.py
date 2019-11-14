@@ -1,6 +1,6 @@
 import numpy as np
 import math
-import lab.material as material
+from chemistrylab import *
 
 
 class Vessel:
@@ -11,7 +11,10 @@ class Vessel:
                  v_max=1,
                  p_max=1.5,
                  open_vessel=True,  # True means no lid
-                 max_feedback_iteration=1
+                 max_feedback_iteration=1,
+                 passive_settling=True,
+                 passive_dissolving=True,
+                 passive_heat_transfer=True,
                  ):
         self.label = label
         self.w2v = None
@@ -21,6 +24,12 @@ class Vessel:
         self.p_max = p_max
         self.open_vessel = open_vessel
         self.max_feedback_iteration = max_feedback_iteration
+
+        # switches for passive actions
+        self.passive_settling = passive_settling
+        self.passive_dissolving = passive_dissolving
+        self.passive_heat_transfer = passive_heat_transfer
+
         self.air = material.Air()
 
         self._material_dict = {}  # material.name: material()
@@ -37,9 +46,8 @@ class Vessel:
         self._event_dict = {'temperature change': self._update_temperature,
                             }
         self._event_queue = []  # [['event', parameters], ['event', parameters] ... ]
-        self._feedback_queue = []  # [[same structure as event queue][same structure as event queue]]
-        for i in range(self.max_feedback_iteration):
-            self._feedback_queue.append([])
+        self._feedback_queue = []  # [same structure as event queue]
+
 
     def open_lid(self):
         if self.open_vessel:
@@ -57,9 +65,10 @@ class Vessel:
             # followed by several updates
 
     def push_event_to_queue(self,
-                            events,  # a list of event tuples(['event', parameters])
+                            events,  # a list of event tuples(['event', parameters]), the last parameters is dt
                             ):
-        self._event_queue.extend(events)
+        if events is not None:
+            self._event_queue.extend(events)
         self._update_materials()
 
     def _update_materials(self,
@@ -68,32 +77,31 @@ class Vessel:
             event = self._event_queue.pop(0)
             action = self._event_dict[event[0]]
             for i in self._material_dict.values():
-                action(material=i, parameters=event[1:], feedback_counter=0)
-            for feedback_counter in range(self.max_feedback_iteration):
-                if not self._feedback_queue[feedback_counter]:  # no more feedback
-                    break
-                merged = self.merge_event_queue(self._feedback_queue[feedback_counter])
-                while merged:
-                    feedback_event = merged.pop(0)
-                    action = self._event_dict[feedback_event[0]]
-                    for j in self._material_dict.values():
-                        action(material=j, parameters=event[1:], feedback_counter=feedback_counter + 1)
+                action(material=i, parameters=event[1:])
+        merged = self.merge_event_queue(self._feedback_queue)
+        while merged:
+            feedback_event = merged.pop(0)
+            action = self._event_dict[feedback_event[0]]
+            for j in self._material_dict.values():
+                action(material=j, parameters=feedback_event[1:])
 
     def merge_event_queue(self,  # need to be added
                           event_queue,
                           ):
+        merged = []
+        # merge events in the list, append merged and pop event_queue
         return merged
 
+    # event functions
     def _update_temperature(self,  # this is an example,
                             material,
-                            parameters,
-                            feedback_counter,
+                            parameters,  # [target_temperature, dt]
                             ):
         self.temperature += parameters[0]
-        events = material.update_temperature(d_temperature=parameters[0])
-        if feedback_counter < self.max_feedback_iteration:
-            self._feedback_queue[feedback_counter].extend(events)
+        events = material.update_temperature(target_temperature=parameters[0], dt=parameters[-1])
+        self._feedback_queue.extend(events)
 
+    # functions to access private properties
     def get_material_amount(self,
                             material_name=None):
         """

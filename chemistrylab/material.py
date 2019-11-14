@@ -16,13 +16,13 @@ class Material:
                  ):
         self.name = name
         self.w2d = None
-        self.density = density # g/mL
+        self.density = density  # g/mL
         self.polarity = polarity
-        self.temperature = temperature # K
-        self.pressure = pressure # kPa
+        self.temperature = temperature  # K
+        self.pressure = pressure  # kPa
         self.phase = phase
         self.charge = charge
-        self.molar_mass = molar_mass # g/mol
+        self.molar_mass = molar_mass  # g/mol
         self.color = color
 
     def _update_properties(self,
@@ -33,14 +33,21 @@ class Material:
                            # phase,
                            ):
         feedback = []
+        # called by event functions
         # update the rest of properties
         # check if any feedback is generated, if so feedback.append(['event', parameter])
+        # return feedback
         return feedback
 
-    def update_temperature(self, d_temperature):  # this is an example
+    # event functions
+    def update_temperature(self, target_temperature, dt):  # this is an example
         feedback = []
-        self.temperature += d_temperature
-        # check if a feedback is generated, if so feedback.append(['event', parameter])
+
+        # update the material's temperature based on the target_temperature and dt
+        # check if a feedback is generated
+        # if generated, current_feedback.append(['feedback_event', parameter])
+        # if target is not reached re-append this event to feedback
+
         feedback.extend(self._update_properties())
         return feedback
 
@@ -70,6 +77,7 @@ class H2O(Material):
                          charge=0.0
                          )
 
+
 class H(Material):
     def __init__(self):
         super().__init__(name='H',
@@ -82,6 +90,7 @@ class H(Material):
                          color=0.1,
                          charge=0.0
                          )
+
 
 class H2(Material):
     def __init__(self):
@@ -96,6 +105,7 @@ class H2(Material):
                          charge=0.0
                          )
 
+
 class O(Material):
     def __init__(self):
         super().__init__(name='O',
@@ -108,6 +118,7 @@ class O(Material):
                          color=0.15,
                          charge=0.0
                          )
+
 
 class O2(Material):
     def __init__(self):
@@ -122,6 +133,7 @@ class O2(Material):
                          charge=0.0
                          )
 
+
 class O3(Material):
     def __init__(self):
         super().__init__(name='O3',
@@ -134,6 +146,7 @@ class O3(Material):
                          color=0.1,
                          charge=-1.0
                          )
+
 
 class C6H14(Material):
     def __init__(self):
@@ -148,6 +161,7 @@ class C6H14(Material):
                          charge=0.0
                          )
 
+
 class NaCl(Material):
     def __init__(self):
         super().__init__(name='NaCl',
@@ -160,6 +174,7 @@ class NaCl(Material):
                          color=0.9,
                          charge=0.0
                          )
+
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
@@ -175,6 +190,7 @@ class Na(Material):
                          charge=0.0
                          )
 
+
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
     def __init__(self):
@@ -189,6 +205,7 @@ class Cl(Material):
                          charge=0.0
                          )
 
+
 class Cl2(Material):
     def __init__(self):
         super().__init__(name='Cl2',
@@ -201,6 +218,7 @@ class Cl2(Material):
                          color=0.8,
                          charge=0.0
                          )
+
 
 class LiF(Material):
     def __init__(self):
@@ -215,6 +233,7 @@ class LiF(Material):
                          charge=0.0
                          )
 
+
 class Li(Material):
     def __init__(self):
         super().__init__(name='Li',
@@ -227,6 +246,7 @@ class Li(Material):
                          color=0.95,
                          charge=0.0
                          )
+
 
 # Note: F is very unstable when not an aqueous ion
 class F(Material):
@@ -242,6 +262,7 @@ class F(Material):
                          charge=0.0
                          )
 
+
 class F2(Material):
     def __init__(self):
         super().__init__(name='F2',
@@ -254,6 +275,7 @@ class F2(Material):
                          color=0.8,
                          charge=0.0
                          )
+
 
 class T1(Material):
     def __init__(self):
