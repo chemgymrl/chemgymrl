@@ -12,6 +12,7 @@ class Vessel:
                  p_max=1.5,
                  open_vessel=True,  # True means no lid
                  max_feedback_iteration=1,
+                 dt=0.05,
                  passive_settling=True,
                  passive_dissolving=True,
                  passive_heat_transfer=True,
@@ -24,6 +25,7 @@ class Vessel:
         self.p_max = p_max
         self.open_vessel = open_vessel
         self.max_feedback_iteration = max_feedback_iteration
+        self.dt = dt
 
         # switches for passive actions
         self.passive_settling = passive_settling
@@ -32,9 +34,7 @@ class Vessel:
 
         self.air = material.Air()
 
-        self._material_dict = {}  # material.name: material()
-        self._material_amount_dict = {}  # material.name: amount
-
+        self._material_dict = {}  # material.name: [material(), amount]
         self._solute_dict = {}  # solute.name: {solvent.name: percentage}
 
         # for vessel's pixel representation
@@ -44,10 +44,10 @@ class Vessel:
 
         # event queues
         self._event_dict = {'temperature change': self._update_temperature,
+                            'dissolve': self._dissolve,
                             }
         self._event_queue = []  # [['event', parameters], ['event', parameters] ... ]
         self._feedback_queue = []  # [same structure as event queue]
-
 
     def open_lid(self):
         if self.open_vessel:
@@ -65,41 +65,59 @@ class Vessel:
             # followed by several updates
 
     def push_event_to_queue(self,
-                            events,  # a list of event tuples(['event', parameters]), the last parameters is dt
+                            events,  # a list of event tuples(['event', parameters])
+                            dt,
                             ):
         if events is not None:
             self._event_queue.extend(events)
-        self._update_materials()
+        self._update_materials(dt)
 
     def _update_materials(self,
+                          dt
                           ):
         while self._event_queue:
             event = self._event_queue.pop(0)
             action = self._event_dict[event[0]]
-            for i in self._material_dict.values():
-                action(material=i, parameters=event[1:])
-        merged = self.merge_event_queue(self._feedback_queue)
+            action(parameters=event[1:], dt=dt)
+
+        merged = self.merge_event_queue(self._feedback_queue, dt)
         while merged:
             feedback_event = merged.pop(0)
             action = self._event_dict[feedback_event[0]]
-            for j in self._material_dict.values():
-                action(material=j, parameters=feedback_event[1:])
+            action(parameters=feedback_event[1:], dt=dt)
 
     def merge_event_queue(self,  # need to be added
                           event_queue,
+                          dt,
                           ):
         merged = []
-        # merge events in the list, append merged and pop event_queue
+        if self.passive_dissolving: merged.append(['dissolve'])
+        # if any action that needs to be performed or checked each step, it can be added here
+
+        # merge events in the list, append merged and pop the input event_queue
         return merged
 
     # event functions
     def _update_temperature(self,  # this is an example,
-                            material,
                             parameters,  # [target_temperature, dt]
+                            dt,
                             ):
-        self.temperature += parameters[0]
-        events = material.update_temperature(target_temperature=parameters[0], dt=parameters[-1])
-        self._feedback_queue.extend(events)
+        feedback = []
+        self.temperature += parameters[0]  # update vessel's property
+        for i in self._material_dict.values():  # loop over all the materials
+            feedback = i[0].update_temperature(target_temperature=parameters[0], dt=dt)
+            self._feedback_queue.extend(feedback)
+
+    def _dissolve(self,
+                  dt):
+
+    # a dissolve function that can figure out how materials are dissolved in others
+    # solutes that are not fully dissolved will have a instance of that class stay in the self._material_dict
+    # for the dissolved solute will be added to the self._solute_dict
+    # example: NaCl dissolved in water and oil:
+    # if not fully dissolved there will be NaCl in self._material_dict, if fully dissolved NaCl will be removed from it
+    # and Na(charge=1), Cl(charge=-1) will be added to self._material_dict
+    # and in the self._solute_dict, there should be {'Na': {'H2O': 0.8, 'C6H14': 0.2}, 'Cl':{'H2O': 0.8, 'C6H14': 0.2}}
 
     # functions to access private properties
     def get_material_amount(self,
@@ -113,13 +131,13 @@ class Vessel:
             amount = []
             for i in material_name:
                 try:
-                    amount.append(self._material_amount_dict[i])
+                    amount.append(self._material_dict[i][1])
                 except KeyError:
                     amount.append(0.0)
             return amount
         else:
             try:
-                return self._material_amount_dict[material_name]
+                return self._material_dict[material_name][1]
             except KeyError:
                 return 0.0
 

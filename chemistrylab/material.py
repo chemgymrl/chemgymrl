@@ -51,6 +51,11 @@ class Material:
         feedback.extend(self._update_properties())
         return feedback
 
+    def dissolve(self):
+        # should be able to return how this material is dissolved
+        # for NaCl this should at least return Na(charge=1) and Cl(charge=-1)
+        # for the rest, like how Na and Cl dissolve in solvent, can be handled by the vessel's dissolve function
+
 
 class Air(Material):
     def __init__(self):
