@@ -1,6 +1,5 @@
 import numpy as np
 import math
-from chemistrylab import *
 
 
 class Shelf:

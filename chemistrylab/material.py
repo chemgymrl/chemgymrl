@@ -13,17 +13,21 @@ class Material:
                  charge=None,
                  molar_mass=None,
                  color=None,
+                 solute=False,
+                 solvent=False,
                  ):
-        self.name = name
+        self._name = name
         self.w2d = None
-        self.density = density  # g/mL
-        self.polarity = polarity
-        self.temperature = temperature  # K
-        self.pressure = pressure  # kPa
-        self.phase = phase
-        self.charge = charge
-        self.molar_mass = molar_mass  # g/mol
-        self.color = color
+        self._density = density  # g/mL
+        self._polarity = polarity
+        self._temperature = temperature  # K
+        self._pressure = pressure  # kPa
+        self._phase = phase
+        self._charge = charge
+        self._molar_mass = molar_mass  # g/mol
+        self._color = color
+        self.solute = solute
+        self.solvent = solvent
 
     def _update_properties(self,
                            # temperature,
@@ -55,6 +59,53 @@ class Material:
         # should be able to return how this material is dissolved
         # for NaCl this should at least return Na(charge=1) and Cl(charge=-1)
         # for the rest, like how Na and Cl dissolve in solvent, can be handled by the vessel's dissolve function
+        pass
+
+    # functions to access material's properties
+    def get_name(self):
+        return self._name
+
+    def get_density(self):
+        return self._density
+
+    def get_molar_mass(self):
+        return self._molar_mass
+
+    def get_color(self):
+        return self._color
+
+    def get_charge(self):
+        return self._charge
+
+    def get_phase(self):
+        return self._phase
+
+    def get_polarity(self):
+        return self._polarity
+
+    def is_solute(self):
+        return self.solute
+
+    def set_solute_flag(self,
+                        flag,
+                        ):
+        if flag:
+            self.solute = True
+            self.solvent = False
+        elif not flag:
+            self.solute = False
+
+    def is_solvent(self):
+        return self.solvent
+
+    def set_solvent_flag(self,
+                         flag,
+                         ):
+        if flag:
+            self.solvent = True
+            self.solute = False
+        elif not flag:
+            self.solvent = False
 
 
 class Air(Material):
@@ -79,7 +130,9 @@ class H2O(Material):
                          phase='l',
                          molar_mass=18.015,
                          color=0.2,
-                         charge=0.0
+                         charge=0.0,
+                         solvent=True,
+
                          )
 
 
@@ -163,7 +216,8 @@ class C6H14(Material):
                          phase='l',
                          molar_mass=86.175,
                          color=0.65,
-                         charge=0.0
+                         charge=0.0,
+                         solvent=True,
                          )
 
 
