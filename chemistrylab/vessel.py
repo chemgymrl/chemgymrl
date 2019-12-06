@@ -610,8 +610,14 @@ class Vessel:
     def get_solute_dict(self):
         return copy.deepcopy(self._solute_dict)
 
-    def get_position_and_variance(self):
-        return copy.deepcopy(self._layers_position_dict), self._layers_variance
+    def get_position_and_variance(self,
+                                  dict_or_list = None):
+        if dict_or_list == 'dict' or dict_or_list is None:
+            return copy.deepcopy(self._layers_position_dict), self._layers_variance
+        elif dict_or_list == 'list':
+            position_list = []
+            for L in self._layers_position_dict:
+                position_list.append(self._layers_position_dict[L])
 
     def get_max_volume(self):
         return self.v_max
