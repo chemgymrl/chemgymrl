@@ -86,6 +86,10 @@ class Material:
     def is_solute(self):
         return self.solute
 
+    def is_solvent(self):
+        return self.solvent
+
+    # functions to change material's properties
     def set_solute_flag(self,
                         flag,
                         ):
@@ -95,9 +99,6 @@ class Material:
         elif not flag:
             self.solute = False
 
-    def is_solvent(self):
-        return self.solvent
-
     def set_solvent_flag(self,
                          flag,
                          ):
@@ -106,6 +107,10 @@ class Material:
             self.solute = False
         elif not flag:
             self.solvent = False
+
+    def set_charge(self,
+                   charge):
+        self._charge = charge
 
 
 class Air(Material):

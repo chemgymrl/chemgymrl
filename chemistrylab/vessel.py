@@ -10,7 +10,7 @@ class Vessel:
                  label,
                  temperature=297,  # C
                  pressure=1,  # atm
-                 v_max=1,
+                 v_max=1000,
                  p_max=1.5,
                  default_dt=0.05,
                  n_pixels=100,
@@ -64,7 +64,7 @@ class Vessel:
         if events is not None:
             self._event_queue.extend(events)
         if feedback is not None:
-            self._feedback_queue.extend(events)
+            self._feedback_queue.extend(feedback)
         reward = self._update_materials(dt)
         return reward
 
@@ -75,14 +75,14 @@ class Vessel:
         while self._event_queue:
             event = self._event_queue.pop(0)
             action = self._event_dict[event[0]]
-            reward += action(parameters=event[1:], dt=dt)
+            reward += action(parameter=event[1:], dt=dt)
 
         merged = self._merge_event_queue(self._feedback_queue, dt)
         self._feedback_queue = []
         while merged:
             feedback_event = merged.pop(0)
             action = self._event_dict[feedback_event[0]]
-            action(parameters=feedback_event[1:], dt=dt)
+            action(parameter=feedback_event[1:], dt=dt)
         return reward
 
     def _merge_event_queue(self,  # need to be added
@@ -192,23 +192,24 @@ class Vessel:
                         target_solute_dict[Solute][Solvent] = d_mole
                 self._solute_dict.pop(Solute)
 
-        # organize the target_solute_dict so it includes all solute and solvent
-        target_solute_dict = util.organize_solute_dict(material_dict=target_material_dict,
-                                                       solute_dict=target_solute_dict)
-
         # deal with overflow
-        target_volume_dict, target_total_volume = util.convert_material_dict_to_volume(target_material_dict)
-        target_v_max = target_vessel.get_max_volume()
-        overflow = target_total_volume - target_v_max
-        if overflow > 1e-6:
-            reward = -10  # punishment
-            d_percentage = target_v_max / target_total_volume
-            for M in target_material_dict:
-                target_material_dict[M][1] *= d_percentage
-            # solute dict
-            for Solute in target_solute_dict:
-                for Solvent in target_solute_dict[Solute]:
-                    target_solute_dict[Solute][Solvent] *= d_percentage
+        v_max = target_vessel.get_max_volume()
+        target_material_dict, target_solute_dict = util.check_overflow(material_dict=target_material_dict,
+                                                                       solute_dict=target_solute_dict,
+                                                                       v_max=v_max,
+                                                                       )
+        # target_volume_dict, target_total_volume = util.convert_material_dict_to_volume(target_material_dict)
+        # target_v_max = target_vessel.get_max_volume()
+        # overflow = target_total_volume - target_v_max
+        # if overflow > 1e-6:
+        #     reward = -10  # punishment
+        #     d_percentage = target_v_max / target_total_volume
+        #     for M in target_material_dict:
+        #         target_material_dict[M][1] *= d_percentage
+        #     # solute dict
+        #     for Solute in target_solute_dict:
+        #         for Solvent in target_solute_dict[Solute]:
+        #             target_solute_dict[Solute][Solvent] *= d_percentage
 
         # update target vessel's material amount
         event_1 = ['update material dict', target_material_dict]
@@ -217,7 +218,7 @@ class Vessel:
         event_2 = ['update solute dict', target_solute_dict]
 
         # reset this vessel's position and variance (fully mix)
-        self._fully_mix(dt)
+        self._fully_mix(parameter=[], dt=dt)
 
         # create a event to reset material's position and variance in target vessel
         event_3 = ['fully mix']
@@ -347,22 +348,24 @@ class Vessel:
                     target_material_dict[M] = [copy.deepcopy(self._material_dict[M][0]), d_mole]
                 self._material_dict.pop(M)
 
-        # organize the target_solute_dict so it includes all solute and solvent
-        target_solute_dict = util.organize_solute_dict(material_dict=target_material_dict,
-                                                       solute_dict=target_solute_dict)
         # deal with overflow
-        target_volume_dict, target_total_volume = util.convert_material_dict_to_volume(target_material_dict)
-        target_v_max = target_vessel.get_max_volume()
-        overflow = target_total_volume - target_v_max
-        if overflow > 1e-6:
-            reward = -10  # punishment
-            d_percentage = target_v_max / target_total_volume
-            for M in target_material_dict:
-                target_material_dict[M][1] *= d_percentage
-            # solute dict
-            for Solute in target_solute_dict:
-                for Solvent in target_solute_dict[Solute]:
-                    target_solute_dict[Solute][Solvent] *= d_percentage
+        v_max = target_vessel.get_max_volume()
+        target_material_dict, target_solute_dict = util.check_overflow(material_dict=target_material_dict,
+                                                                       solute_dict=target_solute_dict,
+                                                                       v_max=v_max,
+                                                                       )
+        # target_volume_dict, target_total_volume = util.convert_material_dict_to_volume(target_material_dict)
+        # target_v_max = target_vessel.get_max_volume()
+        # overflow = target_total_volume - target_v_max
+        # if overflow > 1e-6:
+        #     reward = -10  # punishment
+        #     d_percentage = target_v_max / target_total_volume
+        #     for M in target_material_dict:
+        #         target_material_dict[M][1] *= d_percentage
+        #     # solute dict
+        #     for Solute in target_solute_dict:
+        #         for Solvent in target_solute_dict[Solute]:
+        #             target_solute_dict[Solute][Solvent] *= d_percentage
 
         # update target vessel's material amount
         event_1 = ['update material dict', target_material_dict]
@@ -371,7 +374,7 @@ class Vessel:
         event_2 = ['update solute dict', target_solute_dict]
 
         # reset this vessel's position and variance (fully mix)
-        self._fully_mix(dt)
+        self._fully_mix(parameter=[], dt=dt)
 
         # create a event to reset material's position and variance in target vessel
         event_3 = ['fully mix']
@@ -400,10 +403,12 @@ class Vessel:
         self._material_dict = parameter[0]
 
     def _update_solute_dict(self,
-                            parameter,  # [new_material_dict]
+                            parameter,  # [new_solute_dict]
                             dt,
                             ):
-        self._solute_dict = parameter[0]
+        # organize the target_solute_dict so it includes all solute and solvent
+        self._solute_dict = util.organize_solute_dict(material_dict=self._material_dict,
+                                                      solute_dict=parameter[0])
 
     def _mix(self,
              parameter,
@@ -420,6 +425,7 @@ class Vessel:
 
         # collect data:
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
+        print(self._material_dict)
         solvent_volume = []
         layers_position = []
         layers_variance = self._layers_variance
@@ -437,6 +443,8 @@ class Vessel:
             solute_polarity.append(0.0)
 
         for M in self._layers_position_dict:
+            if M == 'Air':  # skip Air
+                continue
             if self._material_dict[M][0].is_solvent():
                 solvent_volume.append(self_volume_dict[M])  # solvent amount
                 solvent_polarity.append(self._material_dict[M][0].get_polarity())
@@ -450,6 +458,18 @@ class Vessel:
 
             layers_position.append(self._layers_position_dict[M])  # layers position
             layers_density.append(self._material_dict[M][0].get_density())  # layers density
+        # Add Air
+        layers_position.append(self._layers_position_dict['Air'])
+        layers_density.append(self.air.get_density())
+        #
+        # print(solvent_volume)
+        # print(layers_position)
+        # print(solute_amount)
+        # print(layers_variance)
+        # print(layers_density)
+        # print(solute_polarity)
+        # print(solvent_polarity)
+        # print('\n')
 
         new_layers_position, self._layers_variance, new_solute_amount, _ = separate.mix(A=np.array(solvent_volume),
                                                                                         B=np.array(layers_position),
@@ -460,10 +480,15 @@ class Vessel:
                                                                                         S=np.array(solute_amount),
                                                                                         mixing=mixing_parameter)
 
+        # print(new_layers_position)
+        # print(new_solute_amount)
+
         # use results returned from 'mix' to update self._layers_position_dict and self._solute_dict
         layers_counter = 0  # count position for layers in new_layers_position
         solvent_counter = 0  # count position for solvent in new_solute_amount for each solute
         for M in self._layers_position_dict:
+            if M == 'Air':  # skip Air
+                continue
             self._layers_position_dict[M] = new_layers_position[layers_counter]
             if self._solute_dict:
                 layers_counter += 1  # count position for solute in new_solute_amount
@@ -473,6 +498,9 @@ class Vessel:
                         self._solute_dict[Solute][M] = new_solute_amount[solute_counter][solvent_counter]
                         solute_counter += 1
                     solvent_counter += 1
+        # deal with Air
+        self._layers_position_dict['Air'] = new_layers_position[layers_counter]
+        print(self._layers_position_dict)
 
     def _update_layers(self,
                        parameter,
@@ -481,23 +509,28 @@ class Vessel:
         # collect data
         layers_amount = []
         layers_position = []
+        layers_color = []
         layers_variance = self._layers_variance
+        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
 
         for M in self._layers_position_dict:
-            if self._material_dict[M][0].get_phase() != 'g':
-                layers_amount.append(self._material_dict[M][1])
-                layers_position.append((self._layers_position_dict[M]))
+            if M == 'Air':
+                continue
+            layers_amount.append(self_volume_dict[M])
+            layers_position.append((self._layers_position_dict[M]))
+            layers_color.append(self._material_dict[M][0].get_color())
 
         # calculate air
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
         air_volume = self.v_max - self_total_volume
         if air_volume > 1e-6:
             layers_amount.append(air_volume)
-            layers_position.append(self._layers_position_dict['air'])
+            layers_position.append(self._layers_position_dict['Air'])
+            layers_color.append(self.air.get_color())
 
         self._layers = separate.map_to_state(A=np.array(layers_amount),
                                              B=np.array(layers_position),
                                              C=layers_variance,
+                                             colors=layers_color,
                                              x=separate.x,
                                              )
 
