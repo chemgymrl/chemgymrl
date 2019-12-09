@@ -32,14 +32,14 @@ class Vessel:
         self.settling_switch = settling_switch
         self.layer_switch = layer_switch
 
-        self.air = material.Air()
+        self.Air = material.Air()
 
         self._material_dict = {}  # material.name: [material(), amount]
         self._solute_dict = {}  # solute.name: {solvent.name: amount}
 
         # for vessel's pixel representation
-        self._layers = np.zeros(self.n_pixels, dtype=np.float32) + self.air.get_color()
-        self._layers_position_dict = {self.air.get_name(): 0.0}  # material.name: position
+        self._layers = np.zeros(self.n_pixels, dtype=np.float32) + self.Air.get_color()
+        self._layers_position_dict = {self.Air.get_name(): 0.0}  # material.name: position
         self._layers_variance = 2.0
 
         # event queues
@@ -57,14 +57,14 @@ class Vessel:
 
     def push_event_to_queue(self,
                             events=None,  # a list of event tuples(['event', parameters])
-                            feedback=None,
+                            feedbacks=None,
                             dt=0.05,
                             ):
         reward = 0
         if events is not None:
             self._event_queue.extend(events)
-        if feedback is not None:
-            self._feedback_queue.extend(feedback)
+        if feedbacks is not None:
+            self._feedback_queue.extend(feedbacks)
         reward = self._update_materials(dt)
         return reward
 
@@ -143,7 +143,7 @@ class Vessel:
 
         # if this vessel is empty
         if abs(self_total_volume - 0.0) < 1e-6:
-            target_vessel.push_event_to_queue(event=None, feedback=None, dt=dt)
+            target_vessel.push_event_to_queue(event=None, feedbacks=None, dt=dt)
             return reward
 
         # if this vessel has enough volume of material to pour
@@ -224,7 +224,7 @@ class Vessel:
         event_3 = ['fully mix']
 
         # push event to target vessel
-        target_vessel.push_event_to_queue(event=None, feedback=[event_1, event_2, event_3], dt=dt)
+        target_vessel.push_event_to_queue(events=None, feedbacks=[event_1, event_2, event_3], dt=dt)
 
         return reward
 
@@ -243,7 +243,7 @@ class Vessel:
         reward = -1
 
         if abs(self_total_volume - 0.0) < 1e-6:
-            target_vessel.push_event_to_queue(event=None, feedback=None, dt=dt)
+            target_vessel.push_event_to_queue(event=None, feedbacks=None, dt=dt)
             return reward
 
         # calculate pixels
@@ -380,7 +380,7 @@ class Vessel:
         event_3 = ['fully mix']
 
         # push event to target vessel
-        target_vessel.push_event_to_queue(event=None, feedback=[event_1, event_2, event_3], dt=dt)
+        target_vessel.push_event_to_queue(event=None, feedbacks=[event_1, event_2, event_3], dt=dt)
 
         return reward
 
@@ -392,7 +392,7 @@ class Vessel:
         for M in self._material_dict:
             if not self._material_dict[M][0].is_solute():  # not solute
                 new_layers_position_dict[M] = 0.0
-        new_layers_position_dict[self.air.get_name()] = 0.0
+        new_layers_position_dict[self.Air.get_name()] = 0.0
         self._layers_variance = 2.0
         self._layers_position_dict = new_layers_position_dict
 
@@ -460,7 +460,7 @@ class Vessel:
             layers_density.append(self._material_dict[M][0].get_density())  # layers density
         # Add Air
         layers_position.append(self._layers_position_dict['Air'])
-        layers_density.append(self.air.get_density())
+        layers_density.append(self.Air.get_density())
         #
         # print(solvent_volume)
         # print(layers_position)
@@ -525,7 +525,7 @@ class Vessel:
         if air_volume > 1e-6:
             layers_amount.append(air_volume)
             layers_position.append(self._layers_position_dict['Air'])
-            layers_color.append(self.air.get_color())
+            layers_color.append(self.Air.get_color())
 
         self._layers = separate.map_to_state(A=np.array(layers_amount),
                                              B=np.array(layers_position),
@@ -565,12 +565,16 @@ class Vessel:
                 try:
                     amount.append(self_volume_dict[i])
                 except KeyError:
+                    if material_name == 'Air':
+                        return self.v_max - self_total_volume
                     amount.append(0.0)
             return amount
         else:
             try:
                 return self_volume_dict[material_name]
             except KeyError:
+                if material_name == 'Air':
+                    return self.v_max - self_total_volume
                 return 0.0
 
     def get_material_position(self,
@@ -604,6 +608,10 @@ class Vessel:
     def get_layers(self):
         return np.copy(self._layers)
 
+    def get_material_color(self,
+                           material):
+        return self._material_dict[material][0].get_color()
+
     def get_material_dict(self):
         return copy.deepcopy(self._material_dict)
 
@@ -611,8 +619,8 @@ class Vessel:
         return copy.deepcopy(self._solute_dict)
 
     def get_position_and_variance(self,
-                                  dict_or_list = None):
-        if dict_or_list == 'dict' or dict_or_list is None:
+                                  dict_or_list='dict'):
+        if dict_or_list == 'dict':
             return copy.deepcopy(self._layers_position_dict), self._layers_variance
         elif dict_or_list == 'list':
             position_list = []
