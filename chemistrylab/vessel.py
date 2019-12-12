@@ -45,7 +45,7 @@ class Vessel:
         # event queues
         self._event_dict = {'temperature change': self._update_temperature,
                             'pour by volume': self._pour_by_volume,
-                            'drain by volume': self._drain_by_volume,
+                            'drain by pixel': self._drain_by_pixel,
                             'fully mix': self._fully_mix,
                             'update material dict': self._update_material_dict,
                             'update solute dict': self._update_solute_dict,
@@ -57,30 +57,34 @@ class Vessel:
 
     def push_event_to_queue(self,
                             events=None,  # a list of event tuples(['event', parameters])
-                            feedbacks=None,
+                            feedback=None,
                             dt=0.05,
+                            check_flags=True,
                             ):
         reward = 0
         if events is not None:
             self._event_queue.extend(events)
-        if feedbacks is not None:
-            self._feedback_queue.extend(feedbacks)
-        reward = self._update_materials(dt)
+        if feedback is not None:
+            self._feedback_queue.extend(feedback)
+        reward = self._update_materials(dt, check_flags)
         return reward
 
     def _update_materials(self,
-                          dt
+                          dt,
+                          check_flags,
                           ):
         reward = 0
+        print('-----------------{}----------------------'.format(self.label))
         while self._event_queue:
             event = self._event_queue.pop(0)
+            print(event[0])
             action = self._event_dict[event[0]]
             reward += action(parameter=event[1:], dt=dt)
-
-        merged = self._merge_event_queue(self._feedback_queue, dt)
+        merged = self._merge_event_queue(self._feedback_queue, dt, check_flags)
         self._feedback_queue = []
         while merged:
             feedback_event = merged.pop(0)
+            print(feedback_event[0])
             action = self._event_dict[feedback_event[0]]
             action(parameter=feedback_event[1:], dt=dt)
         return reward
@@ -88,14 +92,16 @@ class Vessel:
     def _merge_event_queue(self,  # need to be added
                            event_queue,
                            dt,
+                           check_flags,
                            ):
         # TBD: settle, state
 
         merged = copy.deepcopy(event_queue)
-        if self.settling_switch:
-            merged.append(['mix', None])
-        if self.layer_switch:
-            merged.append(['update_layer'])
+        if check_flags:
+            if self.settling_switch:
+                merged.append(['mix', None])
+            if self.layer_switch:
+                merged.append(['update_layer'])
         # if any action that needs to be performed or checked each step, it can be added here
 
         # merge events in the list, append merged and pop the input event_queue
@@ -143,14 +149,14 @@ class Vessel:
 
         # if this vessel is empty
         if abs(self_total_volume - 0.0) < 1e-6:
-            target_vessel.push_event_to_queue(event=None, feedbacks=None, dt=dt)
+            target_vessel.push_event_to_queue(event=None, feedback=None, dt=dt)
             return reward
 
         # if this vessel has enough volume of material to pour
         if self_total_volume - d_volume > 1e-6:
             # update material_dict for both vessels
             d_percentage = d_volume / self_total_volume
-            for M in self._material_dict:
+            for M in copy.deepcopy(self._material_dict):
                 d_mole = self._material_dict[M][1] * d_percentage
                 self._material_dict[M][1] -= d_mole
                 if M in target_material_dict:
@@ -158,7 +164,7 @@ class Vessel:
                 else:
                     target_material_dict[M] = [copy.deepcopy(self._material_dict[M][0]), d_mole]
             # update solute_dict for both vessels
-            for Solute in self._solute_dict:
+            for Solute in copy.deepcopy(self._solute_dict):
                 if Solute not in target_solute_dict:
                     target_solute_dict[Solute] = {}
                 for Solvent in self._solute_dict[Solute]:
@@ -170,7 +176,7 @@ class Vessel:
                         target_solute_dict[Solute][Solvent] = d_mole
         else:  # if this vessel has less liquid than calculated amount then everything gets poured out
             # update material_dict for both vessels
-            for M in self._material_dict:
+            for M in copy.deepcopy(self._material_dict):
                 d_mole = self._material_dict[M][1]
                 if M in target_material_dict:
                     target_material_dict[M][1] += d_mole
@@ -180,7 +186,7 @@ class Vessel:
                 if M in self._layers_position_dict:
                     self._layers_position_dict.pop(M)
             # update solute_dict for both vessels
-            for Solute in self._solute_dict:
+            for Solute in copy.deepcopy(self._solute_dict):
                 if Solute not in target_solute_dict:
                     target_solute_dict[Solute] = {}
                 for Solvent in self._solute_dict[Solute]:
@@ -217,21 +223,18 @@ class Vessel:
         # update target vessel's solute dict
         event_2 = ['update solute dict', target_solute_dict]
 
-        # reset this vessel's position and variance (fully mix)
-        self._fully_mix(parameter=[], dt=dt)
-
         # create a event to reset material's position and variance in target vessel
         event_3 = ['fully mix']
 
         # push event to target vessel
-        target_vessel.push_event_to_queue(events=None, feedbacks=[event_1, event_2, event_3], dt=dt)
+        target_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=dt)
 
         return reward
 
-    def _drain_by_volume(self,
-                         parameter,  # [target_vessel, n_pixel]
-                         dt,
-                         ):
+    def _drain_by_pixel(self,
+                        parameter,  # [target_vessel, n_pixel]
+                        dt,
+                        ):
         target_vessel = parameter[0]
         n_pixel = parameter[1]
 
@@ -243,29 +246,30 @@ class Vessel:
         reward = -1
 
         if abs(self_total_volume - 0.0) < 1e-6:
-            target_vessel.push_event_to_queue(event=None, feedbacks=None, dt=dt)
+            target_vessel.push_event_to_queue(event=None, feedback=None, dt=dt)
             return reward
 
         # calculate pixels
         color_to_pixel = {}  # float as key may not be a good idea! maybe change this later
         (decimal, integer) = math.modf(n_pixel)
         for i in range(int(integer)):
-            if self._layers[i] not in color_to_pixel:
-                color_to_pixel[self._layers[i]] = 1
+            color = round(self._layers[i].item(), 3)  # convert to float and round to 3 decimal
+            if color not in color_to_pixel:
+                color_to_pixel[color] = 1
             else:
-                color_to_pixel[self._layers[i]] += 1
+                color_to_pixel[color] += 1
         if decimal > 0:
-            if self._layers[int(integer)] not in color_to_pixel:
-                color_to_pixel[self._layers[int(integer)]] = decimal
+            color = round(self._layers[int(integer)].item(), 3)
+            if color not in color_to_pixel:
+                color_to_pixel[color] = decimal
             else:
-                color_to_pixel[self._layers[int(integer)]] += decimal
+                color_to_pixel[color] += decimal
 
         # create a dict to calculate the change of each solute for updating the material dict
         d_solute = {}
         for Solute in self._solute_dict:
             d_solute[Solute] = 0.0
-
-        for M in self._material_dict:  # M is the solvent that's drained out
+        for M in copy.deepcopy(self._material_dict):  # M is the solvent that's drained out
             if self._material_dict[M][0].get_color() in color_to_pixel:
                 # calculate the d_mole of this solvent
                 d_volume = (color_to_pixel[self._material_dict[M][0].get_color()] / self.n_pixels) * self.v_max
@@ -276,6 +280,7 @@ class Vessel:
                                                      molar_mass=molar_mass)
                 if self._material_dict[M][1] - d_mole > 1e-6:  # if there are some of this solvent left
                     d_percentage = d_mole / self._material_dict[M][1]  # calculate the drained ratio
+                    print('percentage: {}'.format(d_percentage))
                     # update material dict for both vessels
                     self._material_dict[M][1] -= d_mole
                     if M in target_material_dict:
@@ -286,6 +291,8 @@ class Vessel:
                     for Solute in self._solute_dict:
                         if M in self._solute_dict[Solute]:
                             d_mole = self._solute_dict[Solute][M] * d_percentage
+                            print('original: {}, {}: {}'.format(Solute, M,  self._solute_dict[Solute][M]))
+                            print('delta: {}, {}: {}'.format(Solute, M, d_mole))
                             self._solute_dict[Solute][M] -= d_mole
                             d_solute[Solute] += d_mole
                             if Solute not in target_solute_dict:
@@ -305,7 +312,7 @@ class Vessel:
                     self._material_dict.pop(M)
                     self._layers_position_dict.pop(M)  # M must form layers, since it's in color_to_pixel
                     # # update solute_dict for both vessels
-                    for Solute in self._solute_dict:
+                    for Solute in copy.deepcopy(self._solute_dict):
                         if M in self._solute_dict[Solute]:
                             d_mole = self._solute_dict[Solute][M]
                             self._solute_dict[Solute][M] = 0
@@ -318,6 +325,13 @@ class Vessel:
                                 target_solute_dict[Solute][M] = d_mole
                             self._solute_dict[Solute].pop(M)
 
+        # print(color_to_pixel)
+        # print(self._material_dict)
+        # print(target_material_dict)
+        # print(self._solute_dict)
+        # print(target_solute_dict)
+
+
         # pop solute from solute_dict if solute_dict[solute] is empty or all the solvent in solute_dict[solute] is 0
         for Solute in self._solute_dict:
             empty_flag = True
@@ -325,14 +339,18 @@ class Vessel:
                 self._solute_dict.pop(Solute)
             else:
                 for Solvent in self._solute_dict[Solute]:
-                    if self._solute_dict[Solute] - 0.0 > 1e-6:
+                    if self._solute_dict[Solute][Solvent] - 0.0 > 1e-6:
                         empty_flag = False
             if empty_flag:
                 self._solute_dict.pop(Solute)
 
+        # print(self._solute_dict)
+        # print(target_solute_dict)
+
         # use d_solute to update material dict for solute
         for M in d_solute:
             if M in self._solute_dict:
+                print('{}: {}'.format(M, d_solute[M]))
                 d_mole = d_solute[M]
                 self._material_dict[M][1] -= d_mole
                 if M in target_material_dict:
@@ -347,6 +365,8 @@ class Vessel:
                 else:
                     target_material_dict[M] = [copy.deepcopy(self._material_dict[M][0]), d_mole]
                 self._material_dict.pop(M)
+        # print(self._material_dict)
+        # print(target_material_dict)
 
         # deal with overflow
         v_max = target_vessel.get_max_volume()
@@ -373,15 +393,11 @@ class Vessel:
         # update target vessel's solute dict
         event_2 = ['update solute dict', target_solute_dict]
 
-        # reset this vessel's position and variance (fully mix)
-        self._fully_mix(parameter=[], dt=dt)
-
         # create a event to reset material's position and variance in target vessel
         event_3 = ['fully mix']
 
         # push event to target vessel
-        target_vessel.push_event_to_queue(event=None, feedbacks=[event_1, event_2, event_3], dt=dt)
-
+        target_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=dt)
         return reward
 
     def _fully_mix(self,
@@ -425,7 +441,7 @@ class Vessel:
 
         # collect data:
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
-        print(self._material_dict)
+        # print(self._material_dict)
         solvent_volume = []
         layers_position = []
         layers_variance = self._layers_variance
@@ -470,7 +486,7 @@ class Vessel:
         # print(solute_polarity)
         # print(solvent_polarity)
         # print('\n')
-
+        print('solute amount: {}'.format(solute_amount))
         new_layers_position, self._layers_variance, new_solute_amount, _ = separate.mix(A=np.array(solvent_volume),
                                                                                         B=np.array(layers_position),
                                                                                         C=layers_variance,
@@ -480,6 +496,7 @@ class Vessel:
                                                                                         S=np.array(solute_amount),
                                                                                         mixing=mixing_parameter)
 
+        print('solute amount: {}'.format(new_solute_amount))
         # print(new_layers_position)
         # print(new_solute_amount)
 
@@ -500,7 +517,7 @@ class Vessel:
                     solvent_counter += 1
         # deal with Air
         self._layers_position_dict['Air'] = new_layers_position[layers_counter]
-        print(self._layers_position_dict)
+        # print(self._layers_position_dict)
 
     def _update_layers(self,
                        parameter,
@@ -512,7 +529,7 @@ class Vessel:
         layers_color = []
         layers_variance = self._layers_variance
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
-
+        print(self_total_volume)
         for M in self._layers_position_dict:
             if M == 'Air':
                 continue
@@ -522,10 +539,11 @@ class Vessel:
 
         # calculate air
         air_volume = self.v_max - self_total_volume
-        if air_volume > 1e-6:
-            layers_amount.append(air_volume)
-            layers_position.append(self._layers_position_dict['Air'])
-            layers_color.append(self.Air.get_color())
+        if air_volume < 1e-6:
+            air_volume = 0
+        layers_amount.append(air_volume)
+        layers_position.append(self._layers_position_dict['Air'])
+        layers_color.append(self.Air.get_color())
 
         self._layers = separate.map_to_state(A=np.array(layers_amount),
                                              B=np.array(layers_position),
