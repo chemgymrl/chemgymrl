@@ -149,7 +149,7 @@ class Vessel:
 
         # if this vessel is empty
         if abs(self_total_volume - 0.0) < 1e-6:
-            target_vessel.push_event_to_queue(event=None, feedback=None, dt=dt)
+            target_vessel.push_event_to_queue(events=None, feedback=None, dt=dt)
             return reward
 
         # if this vessel has enough volume of material to pour
@@ -204,19 +204,6 @@ class Vessel:
                                                                        solute_dict=target_solute_dict,
                                                                        v_max=v_max,
                                                                        )
-        # target_volume_dict, target_total_volume = util.convert_material_dict_to_volume(target_material_dict)
-        # target_v_max = target_vessel.get_max_volume()
-        # overflow = target_total_volume - target_v_max
-        # if overflow > 1e-6:
-        #     reward = -10  # punishment
-        #     d_percentage = target_v_max / target_total_volume
-        #     for M in target_material_dict:
-        #         target_material_dict[M][1] *= d_percentage
-        #     # solute dict
-        #     for Solute in target_solute_dict:
-        #         for Solvent in target_solute_dict[Solute]:
-        #             target_solute_dict[Solute][Solvent] *= d_percentage
-
         # update target vessel's material amount
         event_1 = ['update material dict', target_material_dict]
 
@@ -246,7 +233,7 @@ class Vessel:
         reward = -1
 
         if abs(self_total_volume - 0.0) < 1e-6:
-            target_vessel.push_event_to_queue(event=None, feedback=None, dt=dt)
+            target_vessel.push_event_to_queue(events=None, feedback=None, dt=dt)
             return reward
 
         # calculate pixels
@@ -325,13 +312,6 @@ class Vessel:
                                 target_solute_dict[Solute][M] = d_mole
                             self._solute_dict[Solute].pop(M)
 
-        # print(color_to_pixel)
-        # print(self._material_dict)
-        # print(target_material_dict)
-        # print(self._solute_dict)
-        # print(target_solute_dict)
-
-
         # pop solute from solute_dict if solute_dict[solute] is empty or all the solvent in solute_dict[solute] is 0
         for Solute in self._solute_dict:
             empty_flag = True
@@ -343,9 +323,6 @@ class Vessel:
                         empty_flag = False
             if empty_flag:
                 self._solute_dict.pop(Solute)
-
-        # print(self._solute_dict)
-        # print(target_solute_dict)
 
         # use d_solute to update material dict for solute
         for M in d_solute:
@@ -365,8 +342,6 @@ class Vessel:
                 else:
                     target_material_dict[M] = [copy.deepcopy(self._material_dict[M][0]), d_mole]
                 self._material_dict.pop(M)
-        # print(self._material_dict)
-        # print(target_material_dict)
 
         # deal with overflow
         v_max = target_vessel.get_max_volume()
@@ -374,18 +349,6 @@ class Vessel:
                                                                        solute_dict=target_solute_dict,
                                                                        v_max=v_max,
                                                                        )
-        # target_volume_dict, target_total_volume = util.convert_material_dict_to_volume(target_material_dict)
-        # target_v_max = target_vessel.get_max_volume()
-        # overflow = target_total_volume - target_v_max
-        # if overflow > 1e-6:
-        #     reward = -10  # punishment
-        #     d_percentage = target_v_max / target_total_volume
-        #     for M in target_material_dict:
-        #         target_material_dict[M][1] *= d_percentage
-        #     # solute dict
-        #     for Solute in target_solute_dict:
-        #         for Solvent in target_solute_dict[Solute]:
-        #             target_solute_dict[Solute][Solvent] *= d_percentage
 
         # update target vessel's material amount
         event_1 = ['update material dict', target_material_dict]
@@ -477,16 +440,14 @@ class Vessel:
         # Add Air
         layers_position.append(self._layers_position_dict['Air'])
         layers_density.append(self.Air.get_density())
-        #
-        # print(solvent_volume)
-        # print(layers_position)
-        # print(solute_amount)
-        # print(layers_variance)
-        # print(layers_density)
-        # print(solute_polarity)
-        # print(solvent_polarity)
-        # print('\n')
-        print('solute amount: {}'.format(solute_amount))
+
+        print(solvent_volume)
+        print(layers_position)
+        print(layers_density)
+        print(solute_polarity)
+        print(solvent_polarity)
+        print(solute_amount)
+
         new_layers_position, self._layers_variance, new_solute_amount, _ = separate.mix(A=np.array(solvent_volume),
                                                                                         B=np.array(layers_position),
                                                                                         C=layers_variance,
@@ -495,10 +456,6 @@ class Vessel:
                                                                                         Lpol=np.array(solvent_polarity),
                                                                                         S=np.array(solute_amount),
                                                                                         mixing=mixing_parameter)
-
-        print('solute amount: {}'.format(new_solute_amount))
-        # print(new_layers_position)
-        # print(new_solute_amount)
 
         # use results returned from 'mix' to update self._layers_position_dict and self._solute_dict
         layers_counter = 0  # count position for layers in new_layers_position
@@ -517,7 +474,6 @@ class Vessel:
                     solvent_counter += 1
         # deal with Air
         self._layers_position_dict['Air'] = new_layers_position[layers_counter]
-        # print(self._layers_position_dict)
 
     def _update_layers(self,
                        parameter,
@@ -644,6 +600,7 @@ class Vessel:
             position_list = []
             for L in self._layers_position_dict:
                 position_list.append(self._layers_position_dict[L])
+            return position_list, self._layers_variance
 
     def get_max_volume(self):
         return self.v_max

@@ -112,6 +112,9 @@ class Material:
                    charge):
         self._charge = charge
 
+    def set_polarity(self,
+                     polarity):
+        self._polarity = polarity
 
 class Air(Material):
     def __init__(self):

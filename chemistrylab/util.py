@@ -43,7 +43,7 @@ def check_overflow(material_dict,
         for M in material_dict:
             material_dict[M][1] *= d_percentage
         # solute dict
-        if solute_dict is not None:
+        if solute_dict:
             for Solute in solute_dict:
                 for Solvent in solute_dict[Solute]:
                     solute_dict[Solute][Solvent] *= d_percentage
