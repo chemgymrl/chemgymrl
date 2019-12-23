@@ -143,7 +143,7 @@ class Tests:  # H2O, C6H14, Na+, Cl-
             for Solvent in new_vessel_b_solute_dict[Solute]:
                 assert new_vessel_b_solute_dict[Solute][Solvent] == vessel_b_solute_dict[Solute][Solvent]  # key, value
         # A's layers_position_dict
-        vessel_a_position_dict, _ = vessel_a.get_position_and_variance()
+        vessel_a_position_dict, vessel_a_variance = vessel_a.get_position_and_variance()
         for M in new_vessel_a_material_dict:
             if new_vessel_a_material_dict[M][0].is_solute():
                 assert M not in vessel_a_position_dict
@@ -151,12 +151,14 @@ class Tests:  # H2O, C6H14, Na+, Cl-
                 assert M in vessel_a_position_dict
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
-        vessel_b_position_dict, _ = vessel_b.get_position_and_variance()
+        vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
+        assert vessel_b_variance != 2.0  # variance should not be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
+                assert vessel_b_position_dict[M] != 0.0  # position should not be reset
         assert 'Air' in vessel_b_position_dict
 
     def test_pouring_without_overflow_2(self,
@@ -211,12 +213,14 @@ class Tests:  # H2O, C6H14, Na+, Cl-
                 assert M in vessel_a_position_dict
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
-        vessel_b_position_dict, _ = vessel_b.get_position_and_variance()
+        vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
+        assert vessel_b_variance != 2.0  # variance should not be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
+                assert vessel_b_position_dict[M] != 0.0  # position should not be reset
         assert 'Air' in vessel_b_position_dict
 
     def test_pouring_without_overflow_3(self,
@@ -272,13 +276,15 @@ class Tests:  # H2O, C6H14, Na+, Cl-
                 assert M in vessel_a_position_dict
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
-        vessel_b_position_dict, _ = vessel_b.get_position_and_variance()
+        vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
+        assert vessel_b_variance != 2.0  # variance should not be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
-        assert 'Air' in vessel_b_position_dict
+                assert vessel_b_position_dict[M] != 0.0  # position should not be reset
+            assert 'Air' in vessel_b_position_dict
 
     def test_pouring_without_overflow_4(self,
                                         volume=1000.0):
@@ -334,12 +340,14 @@ class Tests:  # H2O, C6H14, Na+, Cl-
                 assert M in vessel_a_position_dict
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
-        vessel_b_position_dict, _ = vessel_b.get_position_and_variance()
+        vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
+        assert vessel_b_variance == 2.0  # variance should be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
+                assert vessel_b_position_dict[M] == 0.0  # position should be reset
         assert 'Air' in vessel_b_position_dict
 
 
