@@ -1,2 +1,5 @@
-.idea/
 *.pyc
+*.iml
+.pytest_cache/
+.idea/
+

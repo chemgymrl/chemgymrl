@@ -139,6 +139,7 @@ class Vessel:
                         ):
         target_vessel = parameter[0]
         d_volume = parameter[1]  # must be greater than zero
+        pour_nothing = False  # a flag to check is poured nothing
 
         # collect data
         target_material_dict = target_vessel.get_material_dict()
@@ -148,7 +149,8 @@ class Vessel:
         reward = -1
 
         # if this vessel is empty
-        if abs(self_total_volume - 0.0) < 1e-6:
+        if math.isclose(self_total_volume, 0.0, rel_tol=1e-5) or math.isclose(d_volume, 0.0, rel_tol=1e-5):
+            print('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
             target_vessel.push_event_to_queue(events=None, feedback=None, dt=dt)
             return reward
 
@@ -224,6 +226,7 @@ class Vessel:
                         ):
         target_vessel = parameter[0]
         n_pixel = parameter[1]
+        drain_nothing = False  # a flag to check if drained nothing
 
         # collect data
         target_material_dict = target_vessel.get_material_dict()
@@ -232,7 +235,7 @@ class Vessel:
 
         reward = -1
 
-        if abs(self_total_volume - 0.0) < 1e-6:
+        if math.isclose(self_total_volume, 0.0, rel_tol=1e-5) or math.isclose(n_pixel, 0.0, rel_tol=1e-5):
             target_vessel.push_event_to_queue(events=None, feedback=None, dt=dt)
             return reward
 
@@ -379,7 +382,7 @@ class Vessel:
                               parameter,  # [new_material_dict]
                               dt,
                               ):
-        self._material_dict = parameter[0]
+        self._material_dict = util.organize_material_dict(parameter[0])
 
     def _update_solute_dict(self,
                             parameter,  # [new_solute_dict]

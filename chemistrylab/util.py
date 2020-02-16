@@ -1,3 +1,6 @@
+import math
+import copy
+
 def convert_material_dict_to_volume(material_dict,
                                     # the density of solution does not affect the original volume of solvent
                                     ):
@@ -21,6 +24,14 @@ def convert_volume_to_mole(volume,
     return mole
 
 
+def organize_material_dict(material_dict):
+    new_material_dict = copy.deepcopy(material_dict)
+    for M in material_dict:
+        if math.isclose(material_dict[M][1], 0.0, rel_tol=1e-5):
+            new_material_dict.pop(M)
+    return new_material_dict
+
+
 def organize_solute_dict(material_dict,
                          solute_dict):
     for M in material_dict:
@@ -28,7 +39,11 @@ def organize_solute_dict(material_dict,
             for Solute in solute_dict:
                 if M not in solute_dict[Solute]:
                     solute_dict[Solute][M] = 0.0
-    return solute_dict
+    new_solute_didct = copy.deepcopy(solute_dict)
+    for Solute in solute_dict:
+        if Solute not in material_dict:
+            new_solute_didct.pop(Solute)
+    return new_solute_didct
 
 
 def check_overflow(material_dict,

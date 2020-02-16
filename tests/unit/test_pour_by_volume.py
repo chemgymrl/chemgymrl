@@ -1,5 +1,6 @@
 from chemistrylab import *
 from numpy.testing import assert_almost_equal
+import numpy as np
 
 '''
 tests list:
@@ -98,6 +99,16 @@ test_pouring_with_overflow(): Pour from A to B, with overflow
 '''
 
 
+def variance_after_fully_mix(dt=0.05, C=2.0):
+    t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
+    t += dt
+    variance_after_dt = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
+    return variance_after_dt
+
+
+v_a_d = variance_after_fully_mix()  # variance_after_dt
+
+
 class Tests:  # H2O, C6H14, Na+, Cl-
     def test_pouring_without_overflow_1(self,
                                         volume=0.0):
@@ -140,8 +151,13 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         # B's solute_dict
         assert len(new_vessel_b_solute_dict) == len(vessel_b_solute_dict)  # length
         for Solute in new_vessel_b_solute_dict:
+            new_amount = 0.0
+            amount = 0.0
             for Solvent in new_vessel_b_solute_dict[Solute]:
-                assert new_vessel_b_solute_dict[Solute][Solvent] == vessel_b_solute_dict[Solute][Solvent]  # key, value
+                new_amount += new_vessel_b_solute_dict[Solute][Solvent]
+            for Solvent in vessel_b_solute_dict[Solute]:
+                amount += vessel_b_solute_dict[Solute][Solvent]
+            assert new_amount == amount  # total amount of solute does not change
         # A's layers_position_dict
         vessel_a_position_dict, vessel_a_variance = vessel_a.get_position_and_variance()
         for M in new_vessel_a_material_dict:
@@ -152,13 +168,12 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
         vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
-        assert vessel_b_variance != 2.0  # variance should not be reset
+        assert vessel_b_variance != v_a_d  # variance should not be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
-                assert vessel_b_position_dict[M] != 0.0  # position should not be reset
         assert 'Air' in vessel_b_position_dict
 
     def test_pouring_without_overflow_2(self,
@@ -202,8 +217,13 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         # B's solute_dict
         assert len(new_vessel_b_solute_dict) == len(vessel_b_solute_dict)  # length
         for Solute in new_vessel_b_solute_dict:
+            new_amount = 0.0
+            amount = 0.0
             for Solvent in new_vessel_b_solute_dict[Solute]:
-                assert new_vessel_b_solute_dict[Solute][Solvent] == vessel_b_solute_dict[Solute][Solvent]  # key, value
+                new_amount += new_vessel_b_solute_dict[Solute][Solvent]
+            for Solvent in vessel_b_solute_dict[Solute]:
+                amount += vessel_b_solute_dict[Solute][Solvent]
+            assert new_amount == amount  # total amount of solute does not change
         # A's layers_position_dict
         vessel_a_position_dict, _ = vessel_a.get_position_and_variance()
         for M in new_vessel_a_material_dict:
@@ -214,13 +234,12 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
         vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
-        assert vessel_b_variance != 2.0  # variance should not be reset
+        assert vessel_b_variance != v_a_d  # variance should not be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
-                assert vessel_b_position_dict[M] != 0.0  # position should not be reset
         assert 'Air' in vessel_b_position_dict
 
     def test_pouring_without_overflow_3(self,
@@ -259,8 +278,13 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         # A's solute_dict
         assert len(new_vessel_a_solute_dict) == len(vessel_a_solute_dict)  # length
         for Solute in new_vessel_a_solute_dict:
+            new_amount = 0.0
+            amount = 0.0
             for Solvent in new_vessel_a_solute_dict[Solute]:
-                assert new_vessel_a_solute_dict[Solute][Solvent] == vessel_a_solute_dict[Solute][Solvent]  # key, value
+                new_amount += new_vessel_a_solute_dict[Solute][Solvent]
+            for Solvent in vessel_a_solute_dict[Solute]:
+                amount += vessel_a_solute_dict[Solute][Solvent]
+            assert new_amount == amount  # total amount of solute does not change
         # B's material_dict
         assert (not vessel_b_material_dict)
         assert (not new_vessel_b_material_dict)
@@ -277,13 +301,12 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
         vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
-        assert vessel_b_variance != 2.0  # variance should not be reset
+        assert vessel_b_variance != v_a_d  # variance should not be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
-                assert vessel_b_position_dict[M] != 0.0  # position should not be reset
             assert 'Air' in vessel_b_position_dict
 
     def test_pouring_without_overflow_4(self,
@@ -328,9 +351,14 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         assert (not vessel_b_solute_dict)
         assert len(new_vessel_b_solute_dict) == len(vessel_a_solute_dict)  # length
         for Solute in new_vessel_b_solute_dict:
+            new_amount = 0.0
+            amount = 0.0
             for Solvent in new_vessel_b_solute_dict[Solute]:
-                assert new_vessel_b_solute_dict[Solute][Solvent] == vessel_a_solute_dict[Solute][
-                    Solvent]  # key, value
+                new_amount += new_vessel_b_solute_dict[Solute][Solvent]
+            for Solvent in vessel_a_solute_dict[Solute]:
+                amount += vessel_a_solute_dict[Solute][Solvent]
+            assert new_amount == amount  # total amount of solute does not change
+
         # A's layers_position_dict
         vessel_a_position_dict, _ = vessel_a.get_position_and_variance()
         for M in new_vessel_a_material_dict:
@@ -341,13 +369,12 @@ class Tests:  # H2O, C6H14, Na+, Cl-
         assert 'Air' in vessel_a_position_dict
         # B's layers_position_dict
         vessel_b_position_dict, vessel_b_variance = vessel_b.get_position_and_variance()
-        assert vessel_b_variance == 2.0  # variance should be reset
+        assert vessel_b_variance == v_a_d  # variance should be reset
         for M in new_vessel_b_material_dict:
             if new_vessel_b_material_dict[M][0].is_solute():
                 assert M not in vessel_b_position_dict
             else:
                 assert M in vessel_b_position_dict
-                assert vessel_b_position_dict[M] == 0.0  # position should be reset
         assert 'Air' in vessel_b_position_dict
 
 
@@ -403,7 +430,7 @@ def initialize_vessel_h2o_c6h14_na_cl(label=None,
     event_2 = ['update solute dict', solute_dict]
     event_3 = ['fully mix']
 
-    new_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=0)
+    new_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=0.05)
     return new_vessel
 
 
@@ -450,7 +477,7 @@ def initialize_vessel_h2o_na_cl(label=None,
     event_2 = ['update solute dict', solute_dict]
     event_3 = ['fully mix']
 
-    new_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=0)
+    new_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=0.05)
     return new_vessel
 
 
@@ -493,4 +520,11 @@ def initialize_vessel_empty(label=None,
     new_vessel = vessel.Vessel(label=label,
                                v_max=v_max,
                                )
+    material_dict = {}
+    solute_dict = {}
+    event_1 = ['update material dict', material_dict]
+    event_2 = ['update solute dict', solute_dict]
+    event_3 = ['fully mix']
+
+    new_vessel.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=0.05)
     return new_vessel
