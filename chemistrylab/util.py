@@ -1,5 +1,7 @@
 import math
 import copy
+import numpy as np
+
 
 def convert_material_dict_to_volume(material_dict,
                                     # the density of solution does not affect the original volume of solvent
@@ -64,3 +66,77 @@ def check_overflow(material_dict,
                     solute_dict[Solute][Solvent] *= d_percentage
 
     return material_dict, solute_dict
+
+
+def generate_sate(vessel_list=None,
+                  max_n_vessel=5,
+                  max_n_material=10,
+                  n_layer_bits=100,
+                  ):
+    # check error
+    if len(vessel_list) > max_n_vessel:
+        raise ValueError('number of vessels exceeds the max')
+
+    # calculate bits
+    n_material_bits = 11  # number of bits for each material in material_dict
+    n_solute_bits = 3  # number of bits for each solute-solvent pair in solute dict
+    n_total_material_dict_bits = n_material_bits * max_n_material  # total number of bits for material_dict for each vessel
+    n_total_solute_dict_bits = (max_n_material - 1) * n_solute_bits * (max_n_material - 1)  # total number of bits for solute_dict for each vessel
+    n_vessel_bits = n_total_material_dict_bits + n_total_solute_dict_bits + n_layer_bits  # total number of bits in a vessel
+
+    # create state vector with zeros
+    state_vector = np.zeros(shape=(n_vessel_bits * max_n_vessel, 1))
+
+    # fill vector
+    vessel_counter = 0
+    for vessel in vessel_list:
+        # gather data:
+        material_dict = vessel.get_material_dict()
+        solute_dict = vessel.get_solute_dict()
+
+        # check error
+        if len(material_dict) > max_n_material:
+            raise ValueError('number of material exceeds the max')
+
+        # material_dict:
+        material_counter = 0
+        for material in material_dict:
+            starting_bit = vessel_counter * n_vessel_bits + material_counter * n_material_bits
+            state_vector[(starting_bit + 0), 0] = material_dict[material][0].get_index()  # indexed material name
+            state_vector[(starting_bit + 1), 0] = material_dict[material][0].get_density()
+            state_vector[(starting_bit + 2), 0] = material_dict[material][0].get_polarity()
+            state_vector[(starting_bit + 3), 0] = material_dict[material][0].get_temperature()
+            state_vector[(starting_bit + 4), 0] = material_dict[material][0].get_pressure()
+            # one hot encoding phase
+            if material_dict[material][0].get_phase() == 's':
+                state_vector[(starting_bit + 5), 0] = 1.0
+            else:
+                state_vector[(starting_bit + 5), 0] = 0.0
+            if material_dict[material][0].get_phase() == 'l':
+                state_vector[(starting_bit + 6), 0] = 1.0
+            else:
+                state_vector[(starting_bit + 6), 0] = 0.0
+            if material_dict[material][0].get_phase() == 'g':
+                state_vector[(starting_bit + 7), 0] = 1.0
+            else:
+                state_vector[(starting_bit + 7), 0] = 0.0
+            state_vector[(starting_bit + 8), 0] = material_dict[material][0].get_charge()
+            state_vector[(starting_bit + 9), 0] = material_dict[material][0].get_molar_mass()
+            state_vector[(starting_bit + 10), 0] = material_dict[material][1]  # amount of material
+            material_counter += 1
+
+        # solute_dict:
+        solute_solvent_pair_counter = 0
+        for solute in solute_dict:
+            for solvent in solute_dict[solute]:
+                starting_bit = vessel_counter * n_vessel_bits + n_total_material_dict_bits + solute_solvent_pair_counter * n_solute_bits
+                state_vector[(starting_bit + 0), 0] = material_dict[solute][0].get_index()
+                state_vector[(starting_bit + 1), 0] = material_dict[solvent][0].get_index()
+                state_vector[(starting_bit + 2), 0] = solute_dict[solute][solvent]
+                solute_solvent_pair_counter += 1
+
+        # layer:
+        starting_bit = (vessel_counter + 1) * n_vessel_bits
+        state_vector[(starting_bit - n_layer_bits):starting_bit, 0] = vessel.get_layers()
+        vessel_counter += 1
+    return state_vector

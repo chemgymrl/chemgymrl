@@ -15,6 +15,7 @@ class Material:
                  color=None,
                  solute=False,
                  solvent=False,
+                 index=None,
                  ):
         self._name = name
         self.w2d = None
@@ -26,8 +27,9 @@ class Material:
         self._charge = charge
         self._molar_mass = molar_mass  # g/mol
         self._color = color
-        self.solute = solute
-        self.solvent = solvent
+        self._solute = solute
+        self._solvent = solvent
+        self._index = index
 
     def _update_properties(self,
                            # temperature,
@@ -68,45 +70,51 @@ class Material:
     def get_density(self):
         return self._density
 
+    def get_polarity(self):
+        return self._polarity
+
+    def get_temperature(self):
+        return self._temperature
+
+    def get_pressure(self):
+        return self._pressure
+
+    def get_phase(self):
+        return self._phase
+
+    def get_charge(self):
+        return self._charge
+
     def get_molar_mass(self):
         return self._molar_mass
 
     def get_color(self):
         return self._color
 
-    def get_charge(self):
-        return self._charge
-
-    def get_phase(self):
-        return self._phase
-
-    def get_polarity(self):
-        return self._polarity
-
     def is_solute(self):
-        return self.solute
+        return self._solute
 
     def is_solvent(self):
-        return self.solvent
+        return self._solvent
 
     # functions to change material's properties
     def set_solute_flag(self,
                         flag,
                         ):
         if flag:
-            self.solute = True
-            self.solvent = False
+            self._solute = True
+            self._solvent = False
         elif not flag:
-            self.solute = False
+            self._solute = False
 
     def set_solvent_flag(self,
                          flag,
                          ):
         if flag:
-            self.solvent = True
-            self.solute = False
+            self._solvent = True
+            self._solute = False
         elif not flag:
-            self.solvent = False
+            self._solvent = False
 
     def set_charge(self,
                    charge):
@@ -116,6 +124,9 @@ class Material:
                      polarity):
         self._polarity = polarity
 
+    def get_index(self):
+        return self._index
+
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
@@ -124,7 +135,8 @@ class Air(Material):
                          pressure=1,
                          phase='g',
                          molar_mass=28.963,
-                         color=0.45
+                         color=0.45,
+                         index=0,
                          )
 
 
@@ -140,7 +152,7 @@ class H2O(Material):
                          color=0.2,
                          charge=0.0,
                          solvent=True,
-
+                         index=1,
                          )
 
 
@@ -154,7 +166,8 @@ class H(Material):
                          phase='g',
                          molar_mass=1.008,
                          color=0.1,
-                         charge=0.0
+                         charge=0.0,
+                         index=2,
                          )
 
 
@@ -168,7 +181,8 @@ class H2(Material):
                          phase='g',
                          molar_mass=2.016,
                          color=0.1,
-                         charge=0.0
+                         charge=0.0,
+                         index=3,
                          )
 
 
@@ -182,7 +196,8 @@ class O(Material):
                          phase='g',
                          molar_mass=15.999,
                          color=0.15,
-                         charge=0.0
+                         charge=0.0,
+                         index=4,
                          )
 
 
@@ -196,7 +211,8 @@ class O2(Material):
                          phase='g',
                          molar_mass=31.999,
                          color=0.1,
-                         charge=0.0
+                         charge=0.0,
+                         index=5,
                          )
 
 
@@ -210,7 +226,8 @@ class O3(Material):
                          phase='g',
                          molar_mass=47.998,
                          color=0.1,
-                         charge=-1.0
+                         charge=-1.0,
+                         index=6,
                          )
 
 
@@ -226,6 +243,7 @@ class C6H14(Material):
                          color=0.65,
                          charge=0.0,
                          solvent=True,
+                         index=7,
                          )
 
 
@@ -239,7 +257,8 @@ class NaCl(Material):
                          phase='s',
                          molar_mass=58.443,
                          color=0.9,
-                         charge=0.0
+                         charge=0.0,
+                         index=8,
                          )
 
 
@@ -254,7 +273,8 @@ class Na(Material):
                          phase='s',
                          molar_mass=22.990,
                          color=0.85,
-                         charge=0.0
+                         charge=0.0,
+                         index=9,
                          )
 
 
@@ -269,7 +289,8 @@ class Cl(Material):
                          phase='g',
                          molar_mass=35.453,
                          color=0.8,
-                         charge=0.0
+                         charge=0.0,
+                         index=10,
                          )
 
 
@@ -283,7 +304,8 @@ class Cl2(Material):
                          phase='g',
                          molar_mass=70.906,
                          color=0.8,
-                         charge=0.0
+                         charge=0.0,
+                         index=11,
                          )
 
 
@@ -297,7 +319,8 @@ class LiF(Material):
                          phase='s',
                          molar_mass=25.939,
                          color=0.9,
-                         charge=0.0
+                         charge=0.0,
+                         index=12,
                          )
 
 
@@ -311,7 +334,8 @@ class Li(Material):
                          phase='s',
                          molar_mass=6.941,
                          color=0.95,
-                         charge=0.0
+                         charge=0.0,
+                         index=13,
                          )
 
 
@@ -326,7 +350,8 @@ class F(Material):
                          phase='g',
                          molar_mass=18.998,
                          color=0.8,
-                         charge=0.0
+                         charge=0.0,
+                         index=14,
                          )
 
 
@@ -340,7 +365,8 @@ class F2(Material):
                          phase='g',
                          molar_mass=37.997,
                          color=0.8,
-                         charge=0.0
+                         charge=0.0,
+                         index=15,
                          )
 
 
