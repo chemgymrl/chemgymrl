@@ -127,6 +127,7 @@ class Material:
     def get_index(self):
         return self._index
 
+
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
@@ -370,19 +371,22 @@ class F2(Material):
                          )
 
 
-class T1(Material):
-    def __init__(self):
-        super().__init__(name='temp1',
-                         density=0.655,
-                         polarity=0.9,
-                         temperature=298,
-                         )
-
-
-class T2(Material):
-    def __init__(self):
-        super().__init__(name='temp2',
-                         density=0.655,
-                         polarity=0.1,
-                         temperature=298,
-                         )
+total_num_material = 16
+#
+#
+# class T1(Material):
+#     def __init__(self):
+#         super().__init__(name='temp1',
+#                          density=0.655,
+#                          polarity=0.9,
+#                          temperature=298,
+#                          )
+#
+#
+# class T2(Material):
+#     def __init__(self):
+#         super().__init__(name='temp2',
+#                          density=0.655,
+#                          polarity=0.1,
+#                          temperature=298,
+#                          )

@@ -1,6 +1,7 @@
 import math
 import copy
 import numpy as np
+import chemistrylab
 
 
 def convert_material_dict_to_volume(material_dict,
@@ -68,11 +69,11 @@ def check_overflow(material_dict,
     return material_dict, solute_dict
 
 
-def generate_sate(vessel_list=None,
-                  max_n_vessel=5,
-                  max_n_material=10,
-                  n_layer_bits=100,
-                  ):
+def generate_sate_old(vessel_list=None,
+                      max_n_vessel=5,
+                      max_n_material=10,
+                      n_layer_bits=100,
+                      ):
     # check error
     if len(vessel_list) > max_n_vessel:
         raise ValueError('number of vessels exceeds the max')
@@ -81,7 +82,8 @@ def generate_sate(vessel_list=None,
     n_material_bits = 11  # number of bits for each material in material_dict
     n_solute_bits = 3  # number of bits for each solute-solvent pair in solute dict
     n_total_material_dict_bits = n_material_bits * max_n_material  # total number of bits for material_dict for each vessel
-    n_total_solute_dict_bits = (max_n_material - 1) * n_solute_bits * (max_n_material - 1)  # total number of bits for solute_dict for each vessel
+    n_total_solute_dict_bits = (max_n_material - 1) * n_solute_bits * (
+            max_n_material - 1)  # total number of bits for solute_dict for each vessel
     n_vessel_bits = n_total_material_dict_bits + n_total_solute_dict_bits + n_layer_bits  # total number of bits in a vessel
 
     # create state vector with zeros
@@ -140,3 +142,65 @@ def generate_sate(vessel_list=None,
         state_vector[(starting_bit - n_layer_bits):starting_bit, 0] = vessel.get_layers()
         vessel_counter += 1
     return state_vector
+
+
+def generate_state(vessel_list,
+                   max_n_vessel=5):
+    # check error
+    if len(vessel_list) > max_n_vessel:
+        raise ValueError('number of vessels exceeds the max')
+
+    # create a list of the instances of all the subclasses of Material class
+    total_num_material = chemistrylab.material.total_num_material
+    state = []
+    for vessel in vessel_list:
+        # initialize three matrix
+        material_dict_matrix = np.zeros(shape=(total_num_material, 10), dtype=np.float32)
+        solute_dict_matrix = np.zeros(shape=(total_num_material, total_num_material), dtype=np.float32)
+        layer_vector = vessel.get_layers()
+
+        # gather data:
+        material_dict = vessel.get_material_dict()
+        solute_dict = vessel.get_solute_dict()
+
+        # fill material_dict_matrix and solute_dict_matrix
+        # material_dict:
+        for material in material_dict:
+            index = material_dict[material][0].get_index()
+            material_dict_matrix[index, 0] = material_dict[material][0].get_density()
+            material_dict_matrix[index, 1] = material_dict[material][0].get_polarity()
+            material_dict_matrix[index, 2] = material_dict[material][0].get_temperature()
+            material_dict_matrix[index, 3] = material_dict[material][0].get_pressure()
+            # one hot encoding phase
+            if material_dict[material][0].get_phase() == 's':
+                material_dict_matrix[index, 4] = 1.0
+            else:
+                material_dict_matrix[index, 4] = 0.0
+            if material_dict[material][0].get_phase() == 'l':
+                material_dict_matrix[index, 5] = 1.0
+            else:
+                material_dict_matrix[index, 5] = 0.0
+            if material_dict[material][0].get_phase() == 'g':
+                material_dict_matrix[index, 6] = 1.0
+            else:
+                material_dict_matrix[index, 6] = 0.0
+            material_dict_matrix[index, 7] = material_dict[material][0].get_charge()
+            material_dict_matrix[index, 8] = material_dict[material][0].get_molar_mass()
+            material_dict_matrix[index, 9] = material_dict[material][1]
+        # solute_dict:
+        for solute in solute_dict:
+            solute_index = material_dict[solute][0].get_index()
+            for solvent in solute_dict[solute]:
+                solvent_index = material_dict[solvent][0].get_index()
+                solute_dict_matrix[solute_index, solvent_index] = solute_dict[solute][solvent]
+        current_vessel_state = [material_dict_matrix, solute_dict_matrix, layer_vector]
+        state.append(current_vessel_state)
+
+    # fill the rest vessel state with zeros
+    for i in range(max_n_vessel - len(vessel_list)):
+        material_dict_matrix = np.zeros(shape=(total_num_material, 10), dtype=np.float32)
+        solute_dict_matrix = np.zeros(shape=(total_num_material, total_num_material), dtype=np.float32)
+        air = chemistrylab.material.Air()
+        layer_vector = np.zeros(np.shape(state[-1][-1])) + air.get_color()
+        state.append([material_dict_matrix, solute_dict_matrix, layer_vector])
+    return state
