@@ -437,7 +437,7 @@ class Vessel:
                         solute_amount[solute_counter].append(self._solute_dict[Solute][M])
                         solute_counter += 1
                 else:
-                    solute_amount.append(0.0)
+                    solute_amount[0].append(0.0)
 
             layers_position.append(self._layers_position_dict[M])  # layers position
             layers_density.append(self._material_dict[M][0].get_density())  # layers density
@@ -445,7 +445,7 @@ class Vessel:
         layers_position.append(self._layers_position_dict['Air'])
         layers_density.append(self.Air.get_density())
 
-        '''        
+        '''
         print('solvent_volume (A): {}'.format(solvent_volume))
         print('layers_position (B): {}'.format(layers_position))
         print('variance: {}'.format(self._layers_variance))
@@ -455,7 +455,6 @@ class Vessel:
         print('solute_amount (S): {}'.format(solute_amount))
         print('mixing: {}'.format(mixing_parameter))
         '''
-
         new_layers_position, self._layers_variance, new_solute_amount, _ = separate.mix(A=np.array(solvent_volume),
                                                                                         B=np.array(layers_position),
                                                                                         C=layers_variance,
