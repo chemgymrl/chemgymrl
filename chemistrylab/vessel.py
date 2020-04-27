@@ -15,9 +15,11 @@ class Vessel:
                  default_dt=0.05,
                  n_pixels=100,
                  open_vessel=True,  # True means no lid
-                 settling_switch=True,  # switches
+                 # switches
+                 settling_switch=True,
                  layer_switch=True,
                  ):
+        # initialize parameters
         self.label = label
         self.w2v = None
         self.temperature = temperature
@@ -32,8 +34,10 @@ class Vessel:
         self.settling_switch = settling_switch
         self.layer_switch = layer_switch
 
+        # create Air
         self.Air = material.Air()
 
+        # Material Dict and Solute Dict
         self._material_dict = {}  # material.name: [material(), amount]
         self._solute_dict = {}  # solute.name: {solvent.name: amount}
 
@@ -42,7 +46,7 @@ class Vessel:
         self._layers_position_dict = {self.Air.get_name(): 0.0}  # material.name: position
         self._layers_variance = 2.0
 
-        # event queues
+        # event dict holding all the event functions
         self._event_dict = {'temperature change': self._update_temperature,
                             'pour by volume': self._pour_by_volume,
                             'drain by pixel': self._drain_by_pixel,
@@ -52,6 +56,8 @@ class Vessel:
                             'mix': self._mix,
                             'update_layer': self._update_layers,
                             }
+
+        # event queues
         self._event_queue = []  # [['event', parameters], ['event', parameters] ... ]
         self._feedback_queue = []  # [same structure as event queue]
 
@@ -62,11 +68,11 @@ class Vessel:
                             check_flags=True,
                             ):
         reward = 0
-        if events is not None:
+        if events is not None:  # if input event list is not None
             self._event_queue.extend(events)
-        if feedback is not None:
+        if feedback is not None:  # if input feedback list is not None
             self._feedback_queue.extend(feedback)
-        reward = self._update_materials(dt, check_flags)
+        reward = self._update_materials(dt, check_flags)  # call self._update_materials() to execute events / feedback
         return reward
 
     def _update_materials(self,
@@ -74,36 +80,44 @@ class Vessel:
                           check_flags,
                           ):
         reward = 0
-        while self._event_queue:
-            event = self._event_queue.pop(0)
+        # loop over event queue
+        while self._event_queue:  # while it's not empty
+            event = self._event_queue.pop(0)  # get the next event in event_queue
             print('-------{}: {} (event)-------'.format(self.label, event[0]))
-            action = self._event_dict[event[0]]
+            action = self._event_dict[event[0]]  # use the name of the event to call the function form event_dict
             reward += action(parameter=event[1:], dt=dt)
+
+        # generate the merged queue from feedback queue and empty the feedback queue
         merged = self._merge_event_queue(self._feedback_queue, dt, check_flags)
         self._feedback_queue = []
-        while merged:
+
+        # loop over merged queue
+        while merged:  # while it's not empty
             feedback_event = merged.pop(0)
             print('-------{}: {} (feedback_event)-------'.format(self.label, feedback_event[0]))
             action = self._event_dict[feedback_event[0]]
             action(parameter=feedback_event[1:], dt=dt)
         return reward
 
-    def _merge_event_queue(self,  # need to be added
+    def _merge_event_queue(self,
                            event_queue,
                            dt,
                            check_flags,
                            ):
-        # TBD: settle, state
+        '''
+        A function to merge events and add default events
+        The merge need to be added
+        '''
 
+        # add default events at the end of merged queue
         merged = copy.deepcopy(event_queue)
         if check_flags:
             if self.settling_switch:
                 merged.append(['mix', None])
             if self.layer_switch:
                 merged.append(['update_layer'])
-        # if any action that needs to be performed or checked each step, it can be added here
+            # if any action that needs to be performed or checked each step, it can be added here
 
-        # merge events in the list, append merged and pop the input event_queue
         return merged
 
     # event functions
@@ -318,6 +332,7 @@ class Vessel:
             empty_flag = True
             if not self._solute_dict[Solute]:  # pop solute from solute dict if it's empty
                 self._solute_dict.pop(Solute)
+                empty_flag = False
             else:
                 for Solvent in self._solute_dict[Solute]:
                     if self._solute_dict[Solute][Solvent] - 0.0 > 1e-6:
