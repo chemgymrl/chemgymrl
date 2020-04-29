@@ -518,10 +518,10 @@ def initialize_vessel_h2o_c6h14_na_cl(label=None,
                                    },
                    }
 
-    material_dict, solute_dict = util.check_overflow(material_dict=material_dict,
-                                                     solute_dict=solute_dict,
-                                                     v_max=new_vessel.get_max_volume(),
-                                                     )
+    material_dict, solute_dict, a = util.check_overflow(material_dict=material_dict,
+                                                        solute_dict=solute_dict,
+                                                        v_max=new_vessel.get_max_volume(),
+                                                        )
 
     event_1 = ['update material dict', material_dict]
     event_2 = ['update solute dict', solute_dict]
@@ -565,10 +565,10 @@ def initialize_vessel_h2o_na_cl(label=None,
                                    },
                    }
 
-    material_dict, solute_dict = util.check_overflow(material_dict=material_dict,
-                                                     solute_dict=solute_dict,
-                                                     v_max=new_vessel.get_max_volume(),
-                                                     )
+    material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
+                                                        solute_dict=solute_dict,
+                                                        v_max=new_vessel.get_max_volume(),
+                                                        )
 
     event_1 = ['update material dict', material_dict]
     event_2 = ['update solute dict', solute_dict]
@@ -599,10 +599,10 @@ def initialize_vessel_c6h14(label=None,
     material_dict = {C6H14.get_name(): [C6H14, c6h14_amount],
                      }
 
-    material_dict, solute_dict = util.check_overflow(material_dict=material_dict,
-                                                     solute_dict={},
-                                                     v_max=new_vessel.get_max_volume(),
-                                                     )
+    material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
+                                                        solute_dict={},
+                                                        v_max=new_vessel.get_max_volume(),
+                                                        )
 
     event_1 = ['update material dict', material_dict]
     event_2 = ['fully mix']

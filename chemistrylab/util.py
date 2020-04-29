@@ -30,7 +30,7 @@ def convert_volume_to_mole(volume,
 def organize_material_dict(material_dict):
     new_material_dict = copy.deepcopy(material_dict)
     for M in material_dict:
-        if math.isclose(material_dict[M][1], 0.0, rel_tol=1e-5):
+        if math.isclose(material_dict[M][1], 0.0, rel_tol=1e-6):  # remove material with 0.0 amount
             new_material_dict.pop(M)
     return new_material_dict
 
@@ -38,110 +38,36 @@ def organize_material_dict(material_dict):
 def organize_solute_dict(material_dict,
                          solute_dict):
     for M in material_dict:
-        if material_dict[M][0].is_solvent():
+        if material_dict[M][0].is_solvent():  # if the material is solvent add to each solute with 0.0 amount
             for Solute in solute_dict:
                 if M not in solute_dict[Solute]:
                     solute_dict[Solute][M] = 0.0
-    new_solute_didct = copy.deepcopy(solute_dict)
-    for Solute in solute_dict:
+    new_solute_dict = copy.deepcopy(solute_dict)
+    for Solute in solute_dict:  # remove solute if it's not in material dict (avoid Solute: [Solvent, 0.0] )
         if Solute not in material_dict:
-            new_solute_didct.pop(Solute)
-    return new_solute_didct
+            new_solute_dict.pop(Solute)
+    return new_solute_dict
 
 
 def check_overflow(material_dict,
                    solute_dict,
                    v_max,
                    ):
-    volume_dict, total_volume = convert_material_dict_to_volume(material_dict)
-    overflow = total_volume - v_max
-    if overflow > 1e-6:
+    volume_dict, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
+    overflow = total_volume - v_max  # calculate overflow
+    reward = 0  # default 0 if no overflow
+    if overflow > 1e-6:  # if overflow
         reward = -10  # punishment
-        d_percentage = v_max / total_volume
+        d_percentage = v_max / total_volume  # calculate the percentage of material left
         for M in material_dict:
             material_dict[M][1] *= d_percentage
         # solute dict
-        if solute_dict:
+        if solute_dict:  # if not empty
             for Solute in solute_dict:
                 for Solvent in solute_dict[Solute]:
-                    solute_dict[Solute][Solvent] *= d_percentage
+                    solute_dict[Solute][Solvent] *= d_percentage  # update the solute_dict based on percentage
 
-    return material_dict, solute_dict
-
-
-def generate_sate_old(vessel_list=None,
-                      max_n_vessel=5,
-                      max_n_material=10,
-                      n_layer_bits=100,
-                      ):
-    # check error
-    if len(vessel_list) > max_n_vessel:
-        raise ValueError('number of vessels exceeds the max')
-
-    # calculate bits
-    n_material_bits = 11  # number of bits for each material in material_dict
-    n_solute_bits = 3  # number of bits for each solute-solvent pair in solute dict
-    n_total_material_dict_bits = n_material_bits * max_n_material  # total number of bits for material_dict for each vessel
-    n_total_solute_dict_bits = (max_n_material - 1) * n_solute_bits * (
-            max_n_material - 1)  # total number of bits for solute_dict for each vessel
-    n_vessel_bits = n_total_material_dict_bits + n_total_solute_dict_bits + n_layer_bits  # total number of bits in a vessel
-
-    # create state vector with zeros
-    state_vector = np.zeros(shape=(n_vessel_bits * max_n_vessel, 1))
-
-    # fill vector
-    vessel_counter = 0
-    for vessel in vessel_list:
-        # gather data:
-        material_dict = vessel.get_material_dict()
-        solute_dict = vessel.get_solute_dict()
-
-        # check error
-        if len(material_dict) > max_n_material:
-            raise ValueError('number of material exceeds the max')
-
-        # material_dict:
-        material_counter = 0
-        for material in material_dict:
-            starting_bit = vessel_counter * n_vessel_bits + material_counter * n_material_bits
-            state_vector[(starting_bit + 0), 0] = material_dict[material][0].get_index()  # indexed material name
-            state_vector[(starting_bit + 1), 0] = material_dict[material][0].get_density()
-            state_vector[(starting_bit + 2), 0] = material_dict[material][0].get_polarity()
-            state_vector[(starting_bit + 3), 0] = material_dict[material][0].get_temperature()
-            state_vector[(starting_bit + 4), 0] = material_dict[material][0].get_pressure()
-            # one hot encoding phase
-            if material_dict[material][0].get_phase() == 's':
-                state_vector[(starting_bit + 5), 0] = 1.0
-            else:
-                state_vector[(starting_bit + 5), 0] = 0.0
-            if material_dict[material][0].get_phase() == 'l':
-                state_vector[(starting_bit + 6), 0] = 1.0
-            else:
-                state_vector[(starting_bit + 6), 0] = 0.0
-            if material_dict[material][0].get_phase() == 'g':
-                state_vector[(starting_bit + 7), 0] = 1.0
-            else:
-                state_vector[(starting_bit + 7), 0] = 0.0
-            state_vector[(starting_bit + 8), 0] = material_dict[material][0].get_charge()
-            state_vector[(starting_bit + 9), 0] = material_dict[material][0].get_molar_mass()
-            state_vector[(starting_bit + 10), 0] = material_dict[material][1]  # amount of material
-            material_counter += 1
-
-        # solute_dict:
-        solute_solvent_pair_counter = 0
-        for solute in solute_dict:
-            for solvent in solute_dict[solute]:
-                starting_bit = vessel_counter * n_vessel_bits + n_total_material_dict_bits + solute_solvent_pair_counter * n_solute_bits
-                state_vector[(starting_bit + 0), 0] = material_dict[solute][0].get_index()
-                state_vector[(starting_bit + 1), 0] = material_dict[solvent][0].get_index()
-                state_vector[(starting_bit + 2), 0] = solute_dict[solute][solvent]
-                solute_solvent_pair_counter += 1
-
-        # layer:
-        starting_bit = (vessel_counter + 1) * n_vessel_bits
-        state_vector[(starting_bit - n_layer_bits):starting_bit, 0] = vessel.get_layers()
-        vessel_counter += 1
-    return state_vector
+    return material_dict, solute_dict, reward
 
 
 def generate_state(vessel_list,
