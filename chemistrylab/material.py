@@ -371,7 +371,7 @@ class F2(Material):
                          )
 
 
-total_num_material = 16
+total_num_material = len(Material.__subclasses__())
 #
 #
 # class T1(Material):
