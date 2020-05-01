@@ -18,7 +18,7 @@ class Material:
                  index=None,
                  ):
         self._name = name
-        self.w2d = None
+        self.w2v = None  # not used
         self._density = density  # g/mL
         self._polarity = polarity
         self._temperature = temperature  # K
