@@ -1,0 +1,6 @@
+*.pyc
+*.iml
+.pytest_cache/
+.idea/
+*.png
+
