@@ -9,7 +9,7 @@ class Vessel:
     def __init__(self,
                  label,  # Name of the vessel
                  temperature=297,  # C
-                 pressure=1.0,  # atm
+                 pressure=1.0,  # Kpa
                  v_max=1000.0,  # ml
                  p_max=1.5,  # atm
                  default_dt=0.05,  # Default time for each step
@@ -38,8 +38,8 @@ class Vessel:
         self.Air = material.Air()
 
         # Material Dict and Solute Dict
-        self._material_dict = {}  # material.name: [material(), amount]
-        self._solute_dict = {}  # solute.name: {solvent.name: amount}
+        self._material_dict = {}  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = {}  # solute.name: {solvent.name: amount}; amount is in mole
 
         # for vessel's pixel representation
         # layer's pixel representation, initially filled with Air's color
@@ -66,8 +66,8 @@ class Vessel:
     def push_event_to_queue(self,
                             events=None,  # a list of event tuples(['event', parameters])
                             feedback=None,  # a list of event tuples(['event', parameters])
-                            dt=None,
-                            check_flags=True,
+                            dt=None,  # time for each step
+                            check_switches_flag=True,  # whether check switches or not
                             ):
         reward = 0
         if dt is None:
@@ -76,12 +76,12 @@ class Vessel:
             self._event_queue.extend(events)
         if feedback is not None:  # if input feedback list is not None
             self._feedback_queue.extend(feedback)
-        reward = self._update_materials(dt, check_flags)  # call self._update_materials() to execute events / feedback
+        reward = self._update_materials(dt, check_switches_flag)  # call self._update_materials() to execute events / feedback
         return reward
 
     def _update_materials(self,
                           dt,
-                          check_flags,
+                          check_switches_flag,
                           ):
         reward = 0
         # loop over event queue
@@ -92,7 +92,7 @@ class Vessel:
             reward += action(parameter=event[1:], dt=dt)  # call the event function
 
         # generate the merged queue from feedback queue and empty the feedback queue
-        merged = self._merge_event_queue(self._feedback_queue, dt, check_flags)
+        merged = self._merge_event_queue(self._feedback_queue, dt, check_switches_flag)
         self._feedback_queue = []
 
         # loop over merged queue
@@ -107,7 +107,7 @@ class Vessel:
     def _merge_event_queue(self,
                            event_queue,
                            dt,
-                           check_flags,
+                           check_switches_flag,
                            ):
         '''
         A function to merge events and add default events
@@ -116,7 +116,7 @@ class Vessel:
 
         # add default events at the end of merged queue
         merged = copy.deepcopy(event_queue)
-        if check_flags:
+        if check_switches_flag:
             if self.settling_switch:
                 merged.append(['mix', None])
             if self.layer_switch:
@@ -284,8 +284,7 @@ class Vessel:
         for Solute in self._solute_dict:
             d_solute[Solute] = 0.0
         for M in copy.deepcopy(self._material_dict):  # M is the solvent that's drained out
-            if self._material_dict[M][
-                0].get_color() in color_to_pixel:  # if it's in color_to_pixel (means it get drained)
+            if self._material_dict[M][0].get_color() in color_to_pixel:  # if it's in color_to_pixel (means it get drained)
                 # calculate the d_mole of this solvent
                 d_volume = (color_to_pixel[self._material_dict[M][0].get_color()] / self.n_pixels) * self.v_max
 
