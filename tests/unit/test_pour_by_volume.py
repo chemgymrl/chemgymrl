@@ -518,7 +518,7 @@ def initialize_vessel_h2o_c6h14_na_cl(label=None,
                                    },
                    }
 
-    material_dict, solute_dict, a = util.check_overflow(material_dict=material_dict,
+    material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
                                                         solute_dict=solute_dict,
                                                         v_max=new_vessel.get_max_volume(),
                                                         )
