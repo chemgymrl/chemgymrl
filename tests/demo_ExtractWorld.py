@@ -9,6 +9,7 @@ s = env.reset()
 env.render()
 s, r, d, _ = env.step(np.array([3,2]))
 env.render()
+_ = input('Press ENTER to continue')
 
 d = False
 i = 0

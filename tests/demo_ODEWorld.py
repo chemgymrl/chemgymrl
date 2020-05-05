@@ -17,7 +17,7 @@ render_mode = 'human'
 # State [2] is the remaining amount of A
 # State [3] is the remaining amount of B
 s = env.reset()
-#env.render(mode = render_mode)
+env.render(mode = render_mode)
 wait = input('PRESS ENTER TO CONTINUE.')
 
 d = False
@@ -42,7 +42,7 @@ while not d:
         a = env.action_space.sample()
     s, r, d, _ = env.step(a)
     reward += r
-    #env.render(mode = render_mode)
+    env.render(mode = render_mode)
     sleep(1) # Wait 1 seconds before continuing
     i += 1
     print(i, r, d)
