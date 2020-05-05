@@ -2,10 +2,12 @@ from setuptools import setup, find_packages
 import sys
 
 setup(name='chemistrygym',
-      packages=['chemistrylab'],
+      packages=find_packages(),
       install_requires=[
           'gym',
           'numpy',
+          'matplotlib',
+          'cmocean'
       ],
       description='Implementation of extraction simulations in the OpenAI Gym environment framework.',
       author='CLEAN and UW ECE ML',

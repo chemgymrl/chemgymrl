@@ -1,4 +1,4 @@
-from chemistrylab import *
+import chemistrylab.chem_algorithms as chem_algorithms
 from numpy.testing import assert_almost_equal
 import numpy as np
 
@@ -480,26 +480,26 @@ def initialize_vessel_h2o_c6h14_na_cl(label=None,
                                       h2o_volume=v_max / 2,
                                       c6h14_volume=v_max / 2,
                                       ):
-    new_vessel = vessel.Vessel(label=label,
-                               v_max=v_max,
-                               )
+    new_vessel = chem_algorithms.vessel.Vessel(label=label,
+                                               v_max=v_max,
+                                               )
 
     # initialize materials
-    H2O = material.H2O()
-    C6H14 = material.C6H14()
-    Na = material.Na()
-    Cl = material.Cl()
+    H2O = chem_algorithms.material.H2O()
+    C6H14 = chem_algorithms.material.C6H14()
+    Na = chem_algorithms.material.Na()
+    Cl = chem_algorithms.material.Cl()
     Na.set_charge(1.0)
     Na.set_solute_flag(True)
     Cl.set_charge(-1.0)
     Cl.set_solute_flag(True)
 
     # convert volume to mole
-    h2o_amount = util.convert_volume_to_mole(volume=h2o_volume,
+    h2o_amount = chem_algorithms.util.convert_volume_to_mole(volume=h2o_volume,
                                              density=H2O.get_density(),
                                              molar_mass=H2O.get_molar_mass(),
                                              )
-    c6h14_amount = util.convert_volume_to_mole(volume=c6h14_volume,
+    c6h14_amount = chem_algorithms.util.convert_volume_to_mole(volume=c6h14_volume,
                                                density=C6H14.get_density(),
                                                molar_mass=C6H14.get_molar_mass(),
                                                )
@@ -518,7 +518,7 @@ def initialize_vessel_h2o_c6h14_na_cl(label=None,
                                    },
                    }
 
-    material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
+    material_dict, solute_dict, _ = chem_algorithms.util.check_overflow(material_dict=material_dict,
                                                         solute_dict=solute_dict,
                                                         v_max=new_vessel.get_max_volume(),
                                                         )
@@ -535,21 +535,21 @@ def initialize_vessel_h2o_na_cl(label=None,
                                 v_max=v_max,
                                 h2o_volume=v_max / 2,
                                 ):
-    new_vessel = vessel.Vessel(label=label,
+    new_vessel = chem_algorithms.vessel.Vessel(label=label,
                                v_max=v_max,
                                )
 
     # initialize materials
-    H2O = material.H2O()
-    Na = material.Na()
-    Cl = material.Cl()
+    H2O = chem_algorithms.material.H2O()
+    Na = chem_algorithms.material.Na()
+    Cl = chem_algorithms.material.Cl()
     Na.set_charge(1.0)
     Na.set_solute_flag(True)
     Cl.set_charge(-1.0)
     Cl.set_solute_flag(True)
 
     # convert volume to mole
-    h2o_amount = util.convert_volume_to_mole(volume=h2o_volume,
+    h2o_amount = chem_algorithms.util.convert_volume_to_mole(volume=h2o_volume,
                                              density=H2O.get_density(),
                                              molar_mass=H2O.get_molar_mass(),
                                              )
@@ -565,7 +565,7 @@ def initialize_vessel_h2o_na_cl(label=None,
                                    },
                    }
 
-    material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
+    material_dict, solute_dict, _ = chem_algorithms.util.check_overflow(material_dict=material_dict,
                                                         solute_dict=solute_dict,
                                                         v_max=new_vessel.get_max_volume(),
                                                         )
@@ -582,15 +582,15 @@ def initialize_vessel_c6h14(label=None,
                             v_max=v_max,
                             c6h14_volume=v_max / 2,
                             ):
-    new_vessel = vessel.Vessel(label=label,
-                               v_max=v_max,
-                               )
+    new_vessel = chem_algorithms.vessel.Vessel(label=label,
+                                               v_max=v_max,
+                                               )
 
     # initialize materials
-    C6H14 = material.C6H14()
+    C6H14 = chem_algorithms.material.C6H14()
 
     # convert volume to mole
-    c6h14_amount = util.convert_volume_to_mole(volume=c6h14_volume,
+    c6h14_amount = chem_algorithms.util.convert_volume_to_mole(volume=c6h14_volume,
                                                density=C6H14.get_density(),
                                                molar_mass=C6H14.get_molar_mass(),
                                                )
@@ -599,7 +599,7 @@ def initialize_vessel_c6h14(label=None,
     material_dict = {C6H14.get_name(): [C6H14, c6h14_amount],
                      }
 
-    material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
+    material_dict, solute_dict, _ = chem_algorithms.util.check_overflow(material_dict=material_dict,
                                                         solute_dict={},
                                                         v_max=new_vessel.get_max_volume(),
                                                         )
@@ -614,9 +614,9 @@ def initialize_vessel_c6h14(label=None,
 def initialize_vessel_empty(label=None,
                             v_max=v_max,
                             ):
-    new_vessel = vessel.Vessel(label=label,
-                               v_max=v_max,
-                               )
+    new_vessel = chem_algorithms.vessel.Vessel(label=label,
+                                               v_max=v_max,
+                                               )
     material_dict = {}
     solute_dict = {}
     event_1 = ['update material dict', material_dict]
