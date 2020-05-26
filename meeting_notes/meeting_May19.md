@@ -17,7 +17,7 @@
 * Updates about Subworld:
 
 The agent isn't able to learn on the environment but there is no issue with the environment itself
-Chris applied Ppo, A2C and QDN
+Chris applied Ppo, A2C and DQN
 
 Using the ppo alogirithm the agent was able to reach the goal but the policy isn't learning to achieve a higher reward.
 
@@ -39,7 +39,7 @@ Sriram suggested implementing rule based experts with simple if-then rules that 
 Playing the games with the keyboard for people to use it and
 adding animations and sounds.
 
-For subworld using the arrow keys, left and right would change the angles up/down would increase/descrease the throst, another key to dive and surface and enter would execute the action
+For subworld using the arrow keys, left and right would change the angles up/down would increase/decrease the throttle, another key to dive and surface and enter would execute the action
 
 
 Subworld is set up to look at the current frame, the previous position and its dead reckoning.
