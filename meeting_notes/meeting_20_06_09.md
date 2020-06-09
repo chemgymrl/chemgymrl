@@ -38,7 +38,6 @@
 - Nouha:
   - Has been researching Proximal Policy Optimization (PPO).
   - Is working with Google Research's Football RL environment. The code runs, but the rewards are not sufficiently large, which is being resolved.
-  - Mark suggested further research and literary review into PPO and other RL algorithms is most beneficial at this time. Also suggested helping in developing upcoming algorithms.
 
 - Sriram:
   - Has been finishing up the deadline last Friday.
