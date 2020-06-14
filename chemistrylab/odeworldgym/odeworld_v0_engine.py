@@ -27,16 +27,9 @@ class ODEWorldEnv(gym.Env):
         overlap = False,
         ):
         self.n_steps = n_steps # Time steps per action
-        self.dt = dt # Time step of reaction (s)
         self.tmax = 10.0 # Maximum time (s) (n_steps * dt * max_episode steps)
-        self.Ti = Ti # Initial temperature (K)
-        self.Tmin = Tmin # Minimum temperature of the system (K)
-        self.Tmax = Tmax # Maximum temperature of the system (K)
         self.dT = dT # Maximum change in temperature per action (K)
 
-        self.Vi = Vi # Initial Volume (m**3)
-        self.Vmin = Vmin # Minimum Volume of the system (m**3)
-        self.Vmax = Vmax # Maximum Volume of the system (m**3)
         self.dV = dV # Maximum change in Volume per action (m**3)
         self.reaction = reaction(overlap = overlap)
         Pmax = self.reaction.max_mol * R * Tmax / Vmin
@@ -65,8 +58,8 @@ class ODEWorldEnv(gym.Env):
                             dtype=np.float32,
                             )
         self.state[0] = self.t / self.tmax # time
-        self.state[1] = (self.T - self.Tmin) / (self.Tmax - self.Tmin) # T
-        self.state[2] = (self.V - self.Vmin) / (self.Vmax - self.Vmin) # V
+        self.state[1] = (self.T - self.vessels.get_Tmin()) / (self.vessels.get_Tmax() - self.vessels.get_Tmin() ) # T
+        self.state[2] = (self.V - self.vessels.get_min_volume()) / (self.vessels.get_max_volume() - self.vessels.get_min_volume() ) # V
         self.state[3] = self.reaction.get_total_pressure(self.V, self.T) / self.vessels.get_pmax() # total pressure
         for i in range(self.reaction.initial_in_hand.shape[0]):
             self.state[i+4] = self.reaction.n[i] / self.reaction.nmax[i]
@@ -78,13 +71,15 @@ class ODEWorldEnv(gym.Env):
         self._first_render = True
         self.done = False
         self.t = 0.0
-        self.T = 1.0 * self.Ti
-        self.V = 1.0 * self.Vi
+        self.T = 1.0 * self.vessels.get_temperature()
+        self.V = 1.0 * (self.vessels.get_material_volume() + 1)
         self.reaction.reset() # reinitialize the reaction class
         self.plot_data_state = [
                                     [0.0],
-                                    [(self.Ti - self.Tmin) / (self.Tmax - self.Tmin)],
-                                    [(self.Vi - self.Vmin) / (self.Vmax - self.Vmin)],
+                                    [( self.vessels.get_temperature()
+- self.vessels.get_Tmin() ) / ( self.vessels.get_Tmax()- self.vessels.get_Tmin() )],
+                                    [( (self.vessels.get_material_volume() + 1)
+-  self.vessels.get_min_volume()) / ( self.vessels.get_max_volume() -  self.vessels.get_min_volume())],
                                     [self.reaction.get_total_pressure(self.V, self.T)]
                                 ]
         self.plot_data_mol = []
@@ -114,16 +109,16 @@ class ODEWorldEnv(gym.Env):
             # Action [0] changes temperature by, 0.0 = -dT K, 0.5 = 0 K, 1.0 = +dT K
             # Temperature change is linear between frames
             self.T += 2.0 * self.dT * (action[0] - 0.5) / self.n_steps
-            self.T = np.min([np.max([self.T, self.Tmin]), self.Tmax])
+            self.T = np.min([np.max([self.T, self.vessels.get_Tmin()]), self.vessels.get_Tmax() ])
             self.V += 2.0 * self.dV * (action[1] - 0.5) / self.n_steps
-            self.V = np.min([np.max([self.V, self.Vmin]), self.Vmax])
-            d_reward = self.reaction.update(self.T, self.V, self.dt)
-            self.t += self.dt # Increase time by time step
+            self.V = np.min([np.max([self.V,  self.vessels.get_min_volume()]), self.vessels.get_max_volume() ])
+            d_reward = self.reaction.update(self.T, self.V, self.vessels.get_defaultdt() )
+            self.t += self.vessels.get_defaultdt()   # Increase time by time step
             reward += d_reward # Reward is change in concentration of C
             # Record data for render mode
             self.plot_data_state[0].append(self.t)
-            self.plot_data_state[1].append( (self.T - self.Tmin) / (self.Tmax - self.Tmin) )
-            self.plot_data_state[2].append( (self.V - self.Vmin) / (self.Vmax - self.Vmin) )
+            self.plot_data_state[1].append( (self.T - self.vessels.get_Tmin()) / ( self.vessels.get_Tmax() - self.vessels.get_Tmin() ) )
+            self.plot_data_state[2].append( (self.V -  self.vessels.get_min_volume()) / ( self.vessels.get_max_volume() -  self.vessels.get_min_volume()) )
             self.plot_data_state[3].append(self.reaction.get_total_pressure(self.V, self.T))
             C = self.reaction.get_concentration(self.V)
             for i in range(self.reaction.n.shape[0]):
@@ -210,7 +205,7 @@ class ODEWorldEnv(gym.Env):
                                         label = self.reaction.labels[i], # name of species C[i]
                                         )[0],
                                     )
-            self._plot_axs[0, 0].set_xlim([0.0, self.dt*self.n_steps])
+            self._plot_axs[0, 0].set_xlim([0.0,  self.vessels.get_defaultdt() *self.n_steps])
             self._plot_axs[0, 0].set_ylim([0.0, np.max(self.reaction.nmax)])
             self._plot_axs[0, 0].set_xlabel('Time (s)')
             self._plot_axs[0, 0].set_ylabel('amount (mol)')
@@ -225,8 +220,8 @@ class ODEWorldEnv(gym.Env):
                                         label = self.reaction.labels[i], # name of species C[i]
                                         )[0],
                                     )
-            self._plot_axs[0, 1].set_xlim([0.0, self.dt*self.n_steps])
-            self._plot_axs[0, 1].set_ylim([0.0, np.max(self.reaction.nmax)/ (self.Vmin * 1000)])
+            self._plot_axs[0, 1].set_xlim([0.0, self.vessels.get_defaultdt()*self.n_steps])
+            self._plot_axs[0, 1].set_ylim([0.0, np.max(self.reaction.nmax)/ ( self.vessels.get_min_volume() * 1000)])
             self._plot_axs[0, 1].set_xlabel('Time (s)')
             self._plot_axs[0, 1].set_ylabel('Concentration (mol/L)')
             self._plot_axs[0, 1].legend()
@@ -241,7 +236,7 @@ class ODEWorldEnv(gym.Env):
                                                     self.plot_data_state[2], # V
                                                     label = 'V',
                                                     )[0]                                       
-            self._plot_axs[0, 2].set_xlim([0.0, self.dt*self.n_steps])
+            self._plot_axs[0, 2].set_xlim([0.0,  self.vessels.get_defaultdt() *self.n_steps])
             self._plot_axs[0, 2].set_ylim([0, 1])
             self._plot_axs[0, 2].set_xlabel('Time (s)')
             self._plot_axs[0, 2].set_ylabel('T and V (map to range [0, 1])')
@@ -251,7 +246,7 @@ class ODEWorldEnv(gym.Env):
                                                     self.plot_data_state[0], # t
                                                     self.plot_data_state[3], # P
                                                     )[0]
-            self._plot_axs[1, 0].set_xlim([0.0, self.dt*self.n_steps])
+            self._plot_axs[1, 0].set_xlim([0.0,  self.vessels.get_defaultdt()*self.n_steps])
             self._plot_axs[1, 0].set_ylim([0,  self.vessels.get_pmax()  ])
             self._plot_axs[1, 0].set_xlabel('Time (s)')
             self._plot_axs[1, 0].set_ylabel('Pressure (kPa)')
