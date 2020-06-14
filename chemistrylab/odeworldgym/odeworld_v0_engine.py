@@ -3,6 +3,8 @@ import gym
 import gym.spaces
 import matplotlib.pyplot as plt
 from chemistrylab.reactions.reaction_0 import Reaction
+from chemistrylab.chem_algorithms import vessel
+
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
@@ -37,7 +39,7 @@ class ODEWorldEnv(gym.Env):
         self.Vmax = Vmax # Maximum Volume of the system (m**3)
         self.dV = dV # Maximum change in Volume per action (m**3)
         self.reaction = reaction(overlap = overlap)
-        self.Pmax = self.reaction.max_mol * R * Tmax / Vmin
+        Pmax = self.reaction.max_mol * R * Tmax / Vmin
         # Defining action and observation space for OpenAI Gym framework
         act_low = np.zeros(self.reaction.initial_in_hand.shape[0]+2, dtype=np.float32) # 2 means change of T and V
         act_high = np.ones(self.reaction.initial_in_hand.shape[0]+2, dtype=np.float32) # shape[0] means change reactant
@@ -49,7 +51,7 @@ class ODEWorldEnv(gym.Env):
         obs_low = np.zeros(self.reaction.initial_in_hand.shape[0]+4+absorb.shape[0], dtype=np.float32)
         obs_high = np.ones(self.reaction.initial_in_hand.shape[0]+4+absorb.shape[0], dtype=np.float32)
         self.observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
-
+        self.vessels = vessel.Vessel('default', temperature = Ti, p_max = Pmax, Tmax = Tmax, Tmin = Tmin,  v_max = Vmax *1000, v_min = Vmin * 1000, default_dt = dt)
         # Reset the environment to start
         self.reset()
 
@@ -65,7 +67,7 @@ class ODEWorldEnv(gym.Env):
         self.state[0] = self.t / self.tmax # time
         self.state[1] = (self.T - self.Tmin) / (self.Tmax - self.Tmin) # T
         self.state[2] = (self.V - self.Vmin) / (self.Vmax - self.Vmin) # V
-        self.state[3] = self.reaction.get_total_pressure(self.V, self.T) / self.Pmax # total pressure
+        self.state[3] = self.reaction.get_total_pressure(self.V, self.T) / self.vessels.get_pmax() # total pressure
         for i in range(self.reaction.initial_in_hand.shape[0]):
             self.state[i+4] = self.reaction.n[i] / self.reaction.nmax[i]
         for i in range(absorb.shape[0]):
@@ -250,7 +252,7 @@ class ODEWorldEnv(gym.Env):
                                                     self.plot_data_state[3], # P
                                                     )[0]
             self._plot_axs[1, 0].set_xlim([0.0, self.dt*self.n_steps])
-            self._plot_axs[1, 0].set_ylim([0, self.Pmax])
+            self._plot_axs[1, 0].set_ylim([0,  self.vessels.get_pmax()  ])
             self._plot_axs[1, 0].set_xlabel('Time (s)')
             self._plot_axs[1, 0].set_ylabel('Pressure (kPa)')
             # solid spectra (1, 1)

@@ -11,6 +11,9 @@ class Vessel:
                  temperature=297,  # C
                  pressure=1.0,  # Kpa
                  v_max=1000.0,  # ml
+                 v_min = 1000.0,
+                 Tmax = 500,
+                 Tmin = 250,
                  p_max=1.5,  # atm
                  default_dt=0.05,  # Default time for each step
                  n_pixels=100,  # Number of pixel to represent layers
@@ -25,6 +28,9 @@ class Vessel:
         self.temperature = temperature
         self.pressure = pressure
         self.v_max = v_max
+        self.v_min = v_min
+        self.Tmax = Tmax
+        self.Tmin = Tmin
         self.p_max = p_max
         self.open_vessel = open_vessel
         self.default_dt = default_dt
@@ -642,3 +648,13 @@ class Vessel:
 
     def get_max_volume(self):
         return self.v_max
+    def get_min_volume(self):
+        return self.v_min
+    def get_Tmin(self):
+        return self.Tmin
+    def get_Tmax(self):
+        return self.Tmax
+    def get_pmax(self):
+        return self.p_max
+
+
