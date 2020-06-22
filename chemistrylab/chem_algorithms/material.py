@@ -1,5 +1,7 @@
+import inspect
 import numpy as np
 import math
+import sys
 
 
 class Material:
@@ -15,6 +17,8 @@ class Material:
                  color=None,
                  solute=False,
                  solvent=False,
+                 boiling_point=None,
+                 melting_point=None,
                  index=None,
                  ):
         self._name = name
@@ -29,6 +33,8 @@ class Material:
         self._color = color
         self._solute = solute
         self._solvent = solvent
+        self._boiling_point = boiling_point
+        self._melting_point = melting_point
         self._index = index
 
     def _update_properties(self,
@@ -96,6 +102,22 @@ class Material:
 
     def is_solvent(self):
         return self._solvent
+
+    def get_boiling_point(self, in_kelvin=False):
+        temp = self._boiling_point
+
+        if in_kelvin:
+            temp = temp + 273.15
+
+        return temp
+
+    def get_melting_point(self, in_kelvin=False):
+        temp = self._melting_point
+
+        if in_kelvin:
+            temp = temp + 273.15
+
+        return temp
 
     # functions to change material's properties
     def set_solute_flag(self,
@@ -370,8 +392,196 @@ class F2(Material):
                          index=15,
                          )
 
+## ---------- ## HYDROCARBONS ## ---------- ##
+
+class Dodecane(Material):
+    def __init__(self):
+        super().__init__(
+            name='dodecane',
+            density=0.75,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0,
+            charge=0.0,
+            boiling_point=489.5,
+            melting_point=263.6,
+            index=16
+        )
+
+class OneChlorohexane(Material):
+    def __init__(self):
+        super().__init__(
+            name='1-chlorohexane',
+            density=0.879,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=120.62,
+            color=0,
+            charge=0.0,
+            boiling_point=408.2,
+            melting_point=179.2,
+            index=17
+        )
+
+class TwoChlorohexane(Material):
+    def __init__(self):
+        super().__init__(
+            name='2-chlorohexane',
+            density=0.87,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=120.62,
+            color=0,
+            charge=0.0,
+            boiling_point=395.2,
+            melting_point=308.3,
+            index=18
+        )
+
+class ThreeChlorohexane(Material):
+    def __init__(self):
+        super().__init__(
+            name='3-chlorohexane',
+            density=0.9,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=120.62,
+            color=0,
+            charge=0.0,
+            boiling_point=396.2,
+            melting_point=308.3,
+            index=19
+        )
+
+class FiveMethylundecane(Material):
+    def __init__(self):
+        super().__init__(
+            name='5-methylundecane',
+            density=0.75,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0,
+            charge=0.0,
+            boiling_point=481.1,
+            melting_point=255.2,
+            index=20
+        )
+
+class FourEthyldecane(Material):
+    def __init__(self):
+        super().__init__(
+            name='4-ethyldecane',
+            density=0.75,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0,
+            charge=0.0,
+            boiling_point=480.1,
+            melting_point=254.2,
+            index=21
+        )
+
+class FiveSixDimethyldecane(Material):
+    def __init__(self):
+        super().__init__(
+            name='5,6-dimethyldecane',
+            density=0.757,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0,
+            charge=0.0,
+            boiling_point=474.2,
+            melting_point=222.4,
+            index=22
+        )
+
+class FourEthylFiveMethylnonane(Material):
+    def __init__(self):
+        super().__init__(
+            name='4-ethyl-5-methylnonane',
+            density=0.75,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0,
+            charge=0.0,
+            boiling_point=476.3,
+            melting_point=224.5,
+            index=23
+        )
+
+class FourFiveDiethyloctane(Material):
+    def __init__(self):
+        super().__init__(
+            name='4,5-diethyloctane',
+            density=0.768,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0,
+            charge=0.0,
+            boiling_point=470.2,
+            melting_point=222.4,
+            index=24
+        )
+
+class Ethoxyethane(Material):
+    def __init__(self):
+        super().__init__(
+            name='ethoxyethane',
+            density=0.713,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=74.123,
+            color=0,
+            charge=0.0,
+            boiling_point=34.6,
+            melting_point=-116.3,
+            index=25
+        )
+
+def get_materials():
+    '''
+    '''
+
+    names_list = []
+    objects_list = []
+    for name, obj in inspect.getmembers(sys.modules[__name__]):
+        if all([
+            inspect.isclass(obj),
+            name != "Material"
+        ]):
+            names_list.append(name)
+            objects_list.append(obj)
+    
+    return (names_list, objects_list)
 
 total_num_material = len(Material.__subclasses__())
+
 #
 #
 # class T1(Material):
