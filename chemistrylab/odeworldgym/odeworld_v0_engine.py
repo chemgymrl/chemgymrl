@@ -33,336 +33,13 @@ from chemistrylab.chem_algorithms import vessel
 from chemistrylab.chem_algorithms.material import get_materials
 from chemistrylab.chem_algorithms.logger import Logger
 from chemistrylab.reactions.get_reactions import get_reactions
-from chemistrylab.reactions.reaction_0 import Reaction
+from chemistrylab.reactions.wurtz_reaction import Reaction
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
 wave_min = 200
 
 class ODEWorldEnv(gym.Env):
-    '''
-    Class to perform multiple experiments using various materials.
-    '''
-
-    def __init__(self, materials=None, solutes=None, desired="", overlap=False):
-        '''
-        Constructor class to validate parameters and initialize reaction-specific experiments.
-        '''
-
-        self.name = "experiment_0"
-        self.step_num = 1
-
-        # validate the provided list of materials
-        materials = self._validate_materials(materials=materials)
-
-        # access all the available reactions
-        all_reactions = get_reactions()
-
-        # filter all the available reactions to just reactions using or creating provided materials
-        filtered_reactions = self._filter_reactions(
-            all_reactions=all_reactions,
-            materials=materials
-        )
-
-        # initialize an experiment class for each class
-        all_experiments = []
-        all_action_spaces = []
-        all_observation_spaces = []
-        for reaction in filtered_reactions:
-            experiment = Experiment(
-                reaction=reaction,
-                materials=materials,
-                solutes=solutes,
-                desired=desired,
-                overlap=overlap
-            )
-            all_experiments.append(experiment)
-
-            # Defining action and observation space for OpenAI Gym framework
-            # shape[0] is the change in amount of each reactant
-            # + 2 is for the change in T and V
-            # all actions range between 0 () and 1 ()
-            # 0 = no reactant added and T, V are decreased by the maximum amount (-dT and -dV)
-            # 1 = all reactant added and T, V are increased by the maximum amount (dT and dV)
-            act_low = np.zeros(
-                experiment.reaction.initial_in_hand.shape[0] + 2,
-                dtype=np.float32
-            )
-            act_high = np.ones(
-                experiment.reaction.initial_in_hand.shape[0] + 2,
-                dtype=np.float32
-            )
-            action_space = gym.spaces.Box(low=act_low, high=act_high)
-            all_action_spaces.append(action_space)
-
-            # this an array denoting spectral signatures (varying
-            # between 0.0 and 1.0) for a wide range of wavelengths
-            absorb = experiment.reaction.get_spectra(experiment.Vi)
-
-            # Observations have several attributes
-            # + 4 indicates state variables time, temperature, volume, and pressure
-            # initial_in_hand.shape[0] indicates the amount of each reactant
-            # absorb.shape[0] indicates the numerous spectral signatures from get_spectra
-            obs_low = np.zeros(
-                experiment.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0],
-                dtype=np.float32
-            )
-            obs_high = np.ones(
-                experiment.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0],
-                dtype=np.float32
-            )
-            observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
-            all_observation_spaces.append(observation_space)
-
-        # each reaction has a different action and observation space
-        self.action_spaces = all_action_spaces
-        self.observation_spaces = all_observation_spaces
-
-        self.all_experiments = all_experiments
-        self.remaining_experiments = all_experiments
-
-        self.total_vessel = vessel.Vessel(label="total")
-
-        self.reset()
-
-    @staticmethod
-    def _validate_materials(materials=None):
-        '''
-        Method to validate a dictionary of materials.
-        '''
-
-        (material_names, material_classes) = get_materials()
-        class_names = [material().get_name() for material in material_classes]
-
-        validated_materials = []
-
-        for material in materials:
-            name = material["Material"]
-            if all([
-                name not in material_names,
-                name not in class_names
-            ]):
-                print("Material, '{}', was not found as a supported material.".format(name))
-            else:
-                validated_materials.append(material)
-
-        return validated_materials
-
-    @staticmethod
-    def _filter_reactions(all_reactions=None, materials=None):
-        '''
-        Method to eliminate reactions that do not use or create the inputted materials.
-        '''
-
-        return all_reactions
-
-    def _update_state(self):
-        '''
-        Method to update the state variables in each reaction.
-        '''
-
-        for experiment in self.all_experiments:
-            experiment._update_state()
-
-    def _merge_vessels(self, vessels=None):
-        '''
-        '''
-
-        # only one temperature, volume, and pressure can be included in the output vessel
-        temperature = vessels[0].get_temperature()
-        volume = vessels[0].volume
-        pressure = vessels[0].pressure
-
-        # create lists to house the name, classes, and amounts of each material from each vessel
-        material_names = []
-        material_classes = []
-        material_amounts = []
-
-        # create lists to house the name, classes, and amounts of each solute from each vessel
-        solute_names = []
-        solute_classes = []
-        solute_amounts = []
-
-        # iterate through each vessel, recording and storing the necessary materials
-        for reaction_vessel in vessels:
-            # acquire and store materials
-            materials = reaction_vessel._material_dict
-            for item, value in materials.items():
-                material_names.append(item)
-                material_classes.append(value[0])
-                material_amounts.append(value[1])
-            # acquire and store solutes
-            solutes = reaction_vessel._solute_dict
-            for item, value in solutes.items():
-                solute_names.append(item)
-                solute_classes.append(value[0])
-                solute_amounts.append(value[1])
-
-        # create lists to contain only unique records of materials
-        unique_mat_names = []
-        unique_mat_classes = []
-        unique_mat_amounts = []
-
-        for i, name in enumerate(material_names):
-            # if a duplicate record is found, sum the amounts
-            if name in unique_mat_names:
-                index = unique_mat_names.index(name)
-                unique_mat_amounts[index] += material_amounts[i]
-            # if a unique record is found, do not alter it
-            else:
-                unique_mat_names.append(name)
-                unique_mat_classes.append(material_classes[i])
-                unique_mat_amounts.append(material_amounts[i])
-
-        # create a new material dictionary containing no duplicate records
-        new_material_dict = {}
-        for i, name in enumerate(unique_mat_names):
-            new_material_dict[name] = [unique_mat_classes[i], unique_mat_amounts[i]]
-
-        # create lists to contain only unique records of solutes
-        unique_sol_names = []
-        unique_sol_classes = []
-        unique_sol_amounts = []
-
-        for i, name in enumerate(solute_names):
-            # if a duplicate record is found, sum the amounts
-            if name in unique_sol_names:
-                index = unique_sol_names.index(name)
-                unique_sol_amounts[index] += solute_amounts[i]
-            # if a unique record is found, do not alter it
-            else:
-                unique_sol_names.append(name)
-                unique_sol_classes.append(solute_classes[i])
-                unique_sol_amounts.append(solute_amounts[i])
-
-        # create a new material dictionary containing no duplicate records
-        new_solute_dict = {}
-        for i, name in enumerate(unique_sol_names):
-            new_solute_dict[name] = [unique_sol_classes[i], unique_sol_amounts[i]]
-
-        # create the new merged vessel
-        new_vessel = vessel.Vessel(
-            'new',
-            temperature=self.all_experiments[0].Ti,
-            p_max=self.all_experiments[0].Pmax,
-            v_max=self.all_experiments[0].Vmax * 1000,
-            v_min=self.all_experiments[0].Vmin * 1000,
-            Tmax=self.all_experiments[0].Tmax,
-            Tmin=self.all_experiments[0].Tmin,
-            default_dt=self.all_experiments[0].dt
-        )
-        new_vessel.temperature = temperature
-        new_vessel.volume = volume
-        new_vessel.pressure = pressure
-        new_vessel._material_dict = new_material_dict
-        new_vessel._solute_dict = new_solute_dict
-
-        return new_vessel
-
-    def _save_vessel(self):
-        '''
-        Method to save a vessel as a pickle file
-        '''
-
-        file_directory = os.getcwd()
-        filename = "vessel_{}.pickle".format(self.name)
-        open_file = os.path.join(file_directory, filename)
-
-        if os.path.exists(open_file):
-            os.remove(open_file)
-
-        with open(open_file, 'wb') as vessel_file:
-            pickle.dump(self.total_vessel, vessel_file)
-
-    def reset(self):
-        '''
-        Method to reset all variables in each reaction.
-        '''
-
-        all_states = []
-
-        for experiment in self.all_experiments:
-            state = experiment.reset()
-            all_states.append(state)
-
-        return all_states
-
-    def step(self, actions):
-        '''
-        Method to perform a step in each validated reaction using a single action.
-        '''
-
-        # create lists to contain parameters from each reaction
-        all_vessels = []
-        all_states = []
-        all_reward = []
-        all_done = []
-        all_params = []
-
-        # iterate through each reaction and store the outputs of the step
-        for num, experiment in enumerate(self.remaining_experiments):
-            vessels, state, reward, done, params = experiment.step(actions[num])
-            all_vessels.append(vessels)
-            all_states.append(state)
-            all_reward.append(reward)
-            all_done.append(done)
-            all_params.append(params)
-
-            # if one reaction is complete, remove it from the list of reactions;
-            # this way no completed reactions are performed
-            if done:
-                self.remaining_experiments.pop(num)
-
-        # merge the vessels from all reactions and redefine the total vessel
-        merged_vessel = self._merge_vessels(vessels=all_vessels)
-        self.total_vessel = merged_vessel
-
-        # ---------- ADD ---------- #
-        # option to save intermediary vessel here
-
-        # modify or state all the intended outputs
-        out_state = all_states
-        out_reward = sum(all_reward)
-        out_done = all(all_done)
-        out_params = all_params[0]
-        for param in all_params[1:]:
-            out_params.update(param)
-
-        # if all reactions are complete, save the vessel
-        if any([out_done, self.step_num == 20]):
-            self._save_vessel()
-
-        # update the step number
-        print("Completed Step {}".format(self.step_num))
-        self.step_num += 1
-
-        return out_state, out_reward, out_done, out_params
-
-    def render(self, model="human"):
-        '''
-        Method to select which array of subplots to render for each reaction.
-        '''
-
-        for experiment in self.all_experiments:
-            experiment.render()
-
-    def human_render(self, model="plot"):
-        '''
-        Method to render an array of minimal subplots for each reaction.
-        '''
-
-        for experiment in self.all_experiments:
-            experiment.human_render()
-
-    def full_render(self, model="plot"):
-        '''
-        Method to render an array of comprehensive subplots for each reaction.
-        '''
-
-        for experiment in self.all_experiments:
-            experiment.full_render()
-
-class Experiment():
     '''
     Class to define elements of an engine to represent a reaction.
     '''
@@ -424,6 +101,9 @@ class Experiment():
         ---------------
         None
         '''
+
+        self.name = "experiment_0"
+        self.step_num = 1
 
         self.n_steps = n_steps # Time steps per action
         self.dt = dt # Time step of reaction (s)
@@ -604,6 +284,21 @@ class Experiment():
 
         self.vessels = new_vessel
 
+    def _save_vessel(self):
+        '''
+        Method to save a vessel as a pickle file
+        '''
+
+        file_directory = os.getcwd()
+        filename = "vessel_{}.pickle".format(self.name)
+        open_file = os.path.join(file_directory, filename)
+
+        if os.path.exists(open_file):
+            os.remove(open_file)
+
+        with open(open_file, 'wb') as vessel_file:
+            pickle.dump(self.vessels, vessel_file)
+
     def reset(self):
         '''
         Class method to reinitialize the environment by setting
@@ -713,14 +408,16 @@ class Experiment():
             self.reaction.n[i] += dn
             self.reaction.cur_in_hand[i] -= dn
 
-        for __ in range(self.n_steps):
-            # Action [0] changes temperature by, 0.0 = -dT K, 0.5 = 0 K, 1.0 = +dT K
+        for i in range(self.n_steps):
+            # Action [0] changes temperature by, 0.0 = -dT, 0.5 = 0, 1.0 = +dT (all in Kelvin)
             # Temperature change is linear between frames
             self.T += 2.0 * self.dT * (action[0] - 0.5) / self.n_steps
             self.T = np.min([
                 np.max([self.T, self.vessels.get_Tmin()]),
                 self.vessels.get_Tmax()
             ])
+
+            # action[1] changes volume by: 0.0 = -dV, 0.5 = 0, 1.0 = dV (all in Litres)
             self.V += 2.0 * self.dV * (action[1] - 0.5) / self.n_steps
             self.V = np.min([
                 np.max([self.V, self.vessels.get_min_volume()]),
@@ -763,7 +460,16 @@ class Experiment():
         # update the vessels variable
         self._update_vessel()
 
-        return self.vessels, self.state, reward, self.done, {}
+        # ---------- ADD ---------- #
+        # add option to save or print intermediary vessel
+
+        # save the vessel when the final step is complete
+        if any([self.done, self.step_num == 20]):
+            self._save_vessel()
+
+        self.step_num += 1
+
+        return self.state, reward, self.done, {}
 
     def render(self, model='human'):
         '''

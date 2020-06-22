@@ -12,6 +12,7 @@ class ODEWorldEnv_0(ODEWorldEnv):
             materials=[
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "2-chlorohexane", "Initial": 1},
+                {"Material": "3-chlorohexane", "Initial": 1},
                 {"Material": "Na", "Initial": 1}
             ],
             solutes=[
