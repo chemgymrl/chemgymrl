@@ -1,7 +1,7 @@
 '''
 Module to model all six Wurtz chlorine hydrocarbon reactions.
 
-:title: reaction_7.py
+:title: wurtz_reaction.py
 
 :author: Mitchell Shahen
 
@@ -16,35 +16,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append("../../")
+sys.path.append("../../") # allows module to access chemistrylab
 from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 from chemistrylab.reactions.get_reactions import convert_to_class
 
 # Reactions
-# 1) 2 C6H13Cl + 2 Na --> C12H26 + 2 NaCl
-# 2) 2 C6H13Cl + 2 Na --> C12H26 + 2 NaCl
-# 3) 2 C6H13Cl + 2 Na --> C12H26 + 2 NaCl
-# 4) 2 C6H13Cl + 2 Na --> C12H26 + 2 NaCl
-# 5) 2 C6H13Cl + 2 Na --> C12H26 + 2 NaCl
-# 6) 2 C6H13Cl + 2 Na --> C12H26 + 2 NaCl
+# 1) 2 1-chlorohexane + 2 Na --> dodecane + 2 NaCl
+# 2) 1-chlorohexane + 2-chlorohexane + 2 Na --> 5-methylundecane + 2 NaCl
+# 3) 1-chlorohexane + 3-chlorohexane + 2 Na --> 4-ethyldecane + 2 NaCl
+# 4) 2 2-chlorohexane + 2 Na --> 5,6-dimethyldecane + 2 NaCl
+# 5) 2-chlorohexane + 3-chlorohexane + 2 Na --> 4-ethyl-5-methylnonane + 2 NaCl
+# 6) 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
 
 # reaction rate for each reaction
 # used in the exponential formula k = e^(-E/RT)
+# Reaction 1)
 A1 = 1.0
 E1 = 1.0
 
+# Reaction 2)
 A2 = 1.0
 E2 = 1.0
 
+# Reaction 3)
 A3 = 1.0
 E3 = 1.0
 
+# Reaction 4)
 A4 = 1.0
 E4 = 1.0
 
+# Reaction 5)
 A5 = 1.0
 E5 = 1.0
 
+# Reaction 6)
 A6 = 1.0
 E6 = 1.0
 
@@ -59,17 +65,23 @@ SOLUTES = ["ethoxyethane"]
 
 class Reaction():
     '''
-    Class describing a chemical reaction.
+    Class describing the 6 Wurtz reactions.
     '''
 
-    def __init__(self, overlap=False, materials=None, solutes=None, desired=""):
+    def __init__(self, materials=None, solutes=None, desired="", overlap=False):
         '''
         Constructor class module for the Reaction class.
 
         Parameters
         ---------------
-        overlap : boolean (default=False)
-            Indicate if the spectral plot includes overlapping plots
+        `materials` : `list` (default=`None`)
+            A list of dictionaries containing initial material names, classes, and amounts.
+        `solutes` : `list` (default=`None`)
+            A list of dictionaries containing initial solute names, classes, and amounts.
+        `desired` : `str` (default="")
+            A string indicating the name of the desired material.
+        `overlap` : `bool` (default=`False`)
+            Indicate if the spectral plot includes overlapping plots.
 
         Returns
         ---------------
@@ -122,7 +134,7 @@ class Reaction():
         # define the maximal number of moles available for any chemical
         self.max_mol = 2.0
 
-        # define parameters for generating guassian spectra
+        # define parameters for generating spectra
         self.params = []
         if overlap:
             self.params.append(spec.S_1) # spectra for the 1-chlorohexane
@@ -229,9 +241,9 @@ class Reaction():
         Parameters
         ---------------
         T : np.float32
-            The temperature of the system
+            The temperature of the system in Kelvin
         V : np.float32
-            The volume of the system
+            The volume of the system in Litres
         dt : np.float32
             The time-step demarcating steps
 
@@ -303,9 +315,9 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system
+            The volume of the system in Litres
         T : np.float32 (default=300)
-            The temperature of the system
+            The temperature of the system in Kelvin
 
         Returns
         ---------------
@@ -331,9 +343,9 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system
+            The volume of the system in Litres
         T : np.float32 (default=300)
-            The temperature of the system
+            The temperature of the system in Kelvin
 
         Returns
         ---------------
@@ -359,12 +371,12 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32 (default=0.1)
-            The volume of the system
+            The volume of the system in Litres
 
         Returns
         ---------------
         C : np.array
-            An array of the concentrations of each chemical in the experiment.
+            An array of the concentrations (in mol/m**3) of each chemical in the experiment.
 
         Raises
         ---------------
@@ -385,7 +397,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system
+            The volume of the system in Litres
 
         Returns
         ---------------
@@ -486,7 +498,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system
+            The volume of the system in Litres
 
         Returns
         ---------------
