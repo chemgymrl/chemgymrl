@@ -10,7 +10,13 @@ class Vessel:
                  label,  # Name of the vessel
                  temperature=297,  # C
                  pressure=1.0,  # Kpa
+                 volume=1000.0, # mL
+                 materials={}, # moles of materials
+                 solutes={}, # moles of solutes
                  v_max=1000.0,  # ml
+                 v_min = 1000.0,
+                 Tmax = 500,
+                 Tmin = 250,
                  p_max=1.5,  # atm
                  default_dt=0.05,  # Default time for each step
                  n_pixels=100,  # Number of pixel to represent layers
@@ -24,7 +30,11 @@ class Vessel:
         self.w2v = None
         self.temperature = temperature
         self.pressure = pressure
+        self.volume = volume
         self.v_max = v_max
+        self.v_min = v_min
+        self.Tmax = Tmax
+        self.Tmin = Tmin
         self.p_max = p_max
         self.open_vessel = open_vessel
         self.default_dt = default_dt
@@ -34,12 +44,12 @@ class Vessel:
         self.settling_switch = settling_switch
         self.layer_switch = layer_switch
 
-        # create Air （not in material dict）
+        # create Air （not in material dict)
         self.Air = material.Air()
 
         # Material Dict and Solute Dict
-        self._material_dict = {}  # material.name: [material(), amount]; amount is in mole
-        self._solute_dict = {}  # solute.name: {solvent.name: amount}; amount is in mole
+        self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = solutes  # solute.name: {solvent.name: amount}; amount is in mole
 
         # for vessel's pixel representation
         # layer's pixel representation, initially filled with Air's color
@@ -161,7 +171,7 @@ class Vessel:
         # collect data
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
+        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
 
         reward = -1
 
@@ -251,7 +261,7 @@ class Vessel:
         # collect data
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
+        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
         print('-------{}: {} (old_material_dict)-------'.format(self.label, self._material_dict))
         print('-------{}: {} (old_solute_dict)-------'.format(self.label, self._solute_dict))
         print('-------{}: {} (old_material_dict)-------'.format(target_vessel.label, target_material_dict))
@@ -431,7 +441,7 @@ class Vessel:
             mixing_parameter = parameter[0]
 
         # collect data (according to separate.mix()):
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)  # convert to ml
+        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict)  # convert to ml
         solvent_volume = []
         layers_position = []
         layers_variance = self._layers_variance
@@ -550,7 +560,6 @@ class Vessel:
     def get_material_amount(self,
                             material_name=None):
         """
-
         :param material_name: a string or a list of strings
         :return:
         """
@@ -570,6 +579,8 @@ class Vessel:
 
     def get_material_volume(self,
                             material_name=None):
+        print("Now")
+        print(self._material_dict)
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
         if type(material_name) is list:
             amount = []
@@ -592,7 +603,6 @@ class Vessel:
     def get_material_position(self,
                               material_name=None):
         """
-
         :param material_name: a string or a list of strings
         :return:
         """
@@ -641,4 +651,22 @@ class Vessel:
             return position_list, self._layers_variance
 
     def get_max_volume(self):
-        return self.v_max
+        return self.v_max * 1000
+
+    def get_min_volume(self):
+        return self.v_min * 1000 
+
+    def get_Tmin(self):
+        return self.Tmin
+
+    def get_Tmax(self):
+        return self.Tmax
+
+    def get_pmax(self):
+        return self.p_max
+
+    def get_defaultdt(self):
+        return self.default_dt
+
+    def get_temperature(self):
+        return self.temperature
