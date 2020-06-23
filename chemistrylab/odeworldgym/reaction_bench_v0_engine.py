@@ -1,7 +1,7 @@
 '''
-ODEworld Engine Class
+Reaction Bench Engine Class
 
-:title: odeworld_v0_engine
+:title: reaction_bench_v0_engine
 
 :author: Chris Beeler and Mitchell Shahen
 
@@ -69,6 +69,12 @@ class ODEWorldEnv(gym.Env):
         `reaction` : `class`
             A reaction class containing various methods that
             properly define a reaction to be carried out.
+        `materials` : `list` (default=`None`)
+            A list of dictionaries including initial material names, classes, and amounts.
+        `solutes` : `list` (default=`None`)
+            A list of dictionaries including initial solute names, classes, and amounts.
+        `desired` : `str` (default="")
+            A string indicating the desired output material.
         `n_steps` : `int` (default=`50`)
             The number of time steps to be taken during each action.
         `dt` : `float` (default=`0.01`)
@@ -90,7 +96,9 @@ class ODEWorldEnv(gym.Env):
         `dV` : `float` (default=`0.0005`)
             The maximal allowed volume change, in litres, for a single action.
         `overlap` : `boolean` (default=`False`)
-            Indicates if the spectral plots show overlapping signatures,
+            Indicates if the spectral plots show overlapping signatures.
+        `vessel_path` : `str` (default=`None`)
+            A string indicating the path to a vessel intended to be loaded into this module.
 
         Returns
         ---------------
@@ -125,8 +133,9 @@ class ODEWorldEnv(gym.Env):
             desired=desired
         )
 
-        # initialize vessels
+        # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+        self.vessel_path = vessel_path
         if vessel_path == None:
             self.vessels = vessel.Vessel(
                 'default',
@@ -148,6 +157,7 @@ class ODEWorldEnv(gym.Env):
                 material_class = self.reaction.material_classes[i]
                 self.n_init[i] = self.vessels._material_dict[material_name][1]
 
+        # reset the inputted reaction before performing any steps
         self.reaction.reset(n_init=self.n_init)
 
         # set the maximum pressure
@@ -188,7 +198,7 @@ class ODEWorldEnv(gym.Env):
         )
         self.observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
 
-        # Reset the environment immediately upon calling the class
+        # Reset the environment upon calling the class
         self.reset()
 
         # initialize the logger
@@ -200,7 +210,7 @@ class ODEWorldEnv(gym.Env):
     def _update_state(self):
         '''
         Method to update the state vector with the current time, temperature, volume,
-        pressure, and the amounts of each reagent that has been added.
+        pressure, the amounts of each reactant, and spectral parameters.
 
         Parameters
         ---------------
@@ -244,8 +254,7 @@ class ODEWorldEnv(gym.Env):
         Pmax = self.vessels.get_pmax()
         self.state[3] = total_pressure / Pmax
 
-        # remaining state variables pertain to reactant
-        # concentrations and absorption spectra
+        # remaining state variables pertain to reactant amounts and spectra
         for i in range(self.reaction.initial_in_hand.shape[0]):
             self.state[i+4] = self.reaction.n[i] / self.reaction.nmax[i]
         for i in range(absorb.shape[0]):
@@ -253,7 +262,19 @@ class ODEWorldEnv(gym.Env):
 
     def _update_vessel(self):
         '''
-        Method to update the information stored in the vessel upon completing a step
+        Method to update the information stored in the vessel upon completing a step.
+        
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
         '''
 
         # get the temperature and pressure from the state variables
@@ -277,7 +298,7 @@ class ODEWorldEnv(gym.Env):
             amount = self.reaction.initial_solutes[i]
             new_solute_dict[solute_name] = [solute_class, amount]
 
-        # update the existing vessel with new data
+        # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
             'new',
             temperature=self.Ti,
@@ -294,20 +315,40 @@ class ODEWorldEnv(gym.Env):
         new_vessel.volume = volume
         new_vessel.pressure = pressure
 
+        # replace the old vessel with the updated version
         self.vessels = new_vessel
 
     def _save_vessel(self):
         '''
-        Method to save a vessel as a pickle file
+        Method to save a vessel as a pickle file.
+        
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
         '''
 
-        file_directory = os.getcwd()
-        filename = "vessel_{}.pickle".format(self.name)
-        open_file = os.path.join(file_directory, filename)
+        # if a vessel path was provided when the environment was initialized, use it for saving vessels
+        if isinstance(self.vessel_path, str):
+            open_file = self.vessel_path
+        # otherwise, save the vessels in the current working directory
+        else:
+            file_directory = os.getcwd()
+            filename = "vessel_{}.pickle".format(self.name)
+            open_file = os.path.join(file_directory, filename)
 
+        # delete any existing vessel files to ensure the vessel is saved as intended
         if os.path.exists(open_file):
             os.remove(open_file)
 
+        # open the intended vessel file and save the vessel as a pickle file
         with open(open_file, 'wb') as vessel_file:
             pickle.dump(self.vessels, vessel_file)
 
@@ -387,12 +428,12 @@ class ODEWorldEnv(gym.Env):
         Returns
         ---------------
         `state` : `np.array`
-            An array containing updated values of all the thermodynamic variables and
-            reactants used in the most recent step.
+            An array containing updated values of all the thermodynamic variables,
+            reactants, and spectra generated by the most recent step.
         `reward` : `float`
             The amount of the desired product that has been created in the most recent step.
         `done` : `boolean`
-            Indicates if, upon completing the most recent step, all the requested steps
+            Indicates if, upon completing the most recent step, all the required steps
             have been completed.
         `parameters` : `dict`
             Any additional parameters used/generated in the most recent step that need
@@ -479,6 +520,7 @@ class ODEWorldEnv(gym.Env):
         if any([self.done, self.step_num == 20]):
             self._save_vessel()
 
+        # update the step counter
         self.step_num += 1
 
         return self.state, reward, self.done, {}
@@ -498,8 +540,7 @@ class ODEWorldEnv(gym.Env):
 
         Raises
         ---------------
-        `IOError`
-            Raised when the requested render model is neither `human` nor `full`.
+        None
         '''
 
         if model == 'human':
@@ -602,7 +643,6 @@ class ODEWorldEnv(gym.Env):
             self._plot_fig.canvas.draw()
             plt.pause(0.000001)
 
-    # Rendering the environment for a human to visualize the state
     def full_render(self, model='plot'):
         '''
         Method to plot thermodynamic variables and spectral data.
