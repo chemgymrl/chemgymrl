@@ -24,7 +24,7 @@ import chemistrylab
 perfect = False # Use a perfect policy
 
 # Initialize the environment
-env = gym.make('ODEWorld_0-v0')
+env = gym.make('ReactionBench_0-v0')
 render_mode = "human"
 
 # Reset the environment to get initial state
