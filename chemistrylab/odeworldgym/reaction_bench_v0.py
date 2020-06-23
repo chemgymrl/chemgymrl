@@ -1,14 +1,24 @@
+'''
+Module to call the Reaction Bench class and pass parameters to it's engine.
+
+:title: reaction_bench_v0.py
+
+:author: Chris Beeler and Mitchell Shahen
+
+:history: 2020-06-23
+'''
+
 import numpy as np
 import gym
 import gym.spaces
 import sys
 
 sys.path.append("../../")
-from chemistrylab.odeworldgym.odeworld_v0_engine import ODEWorldEnv
+from chemistrylab.odeworldgym.reaction_bench_v0_engine import ReactionBenchEnv
 
-class ODEWorldEnv_0(ODEWorldEnv):
+class ReactionBenchEnv_0(ReactionBenchEnv):
     def __init__(self):
-        super(ODEWorldEnv_0, self).__init__(
+        super(ReactionBenchEnv_0, self).__init__(
             materials=[
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "2-chlorohexane", "Initial": 1},
@@ -22,9 +32,9 @@ class ODEWorldEnv_0(ODEWorldEnv):
             overlap=False
         )
 
-class ODEWorldEnv_0_Overlap(ODEWorldEnv):
+class ReactionBenchEnv_0_Overlap(ReactionBenchEnv):
     def __init__(self):
-        super(ODEWorldEnv_0_Overlap, self).__init__(
+        super(ReactionBenchEnv_0_Overlap, self).__init__(
             materials=[
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "Na", "Initial": 1}
