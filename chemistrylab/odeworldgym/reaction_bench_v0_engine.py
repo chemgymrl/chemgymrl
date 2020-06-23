@@ -37,7 +37,7 @@ R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
 wave_min = 200
 
-class ODEWorldEnv(gym.Env):
+class ReactionBenchEnv(gym.Env):
     '''
     Class to define elements of an engine to represent a reaction.
     '''
