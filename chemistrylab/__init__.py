@@ -11,13 +11,13 @@ register(
 ############################ ODEWorld ####################################
 
 register(
-    id='ODEWorld_0-v0',
-    entry_point='chemistrylab.odeworldgym.odeworld_v0:ODEWorldEnv_0',
+    id='ReactionBench_0-v0',
+    entry_point='chemistrylab.odeworldgym.reaction_bench_v0:ReactionBenchEnv_0',
     max_episode_steps=20,
 )
 
 register(
-    id='ODEWorld_0_overlap-v0',
-    entry_point='chemistrylab.odeworldgym.odeworld_v0:ODEWorldEnv_0_Overlap',
+    id='ReactionBench_0_overlap-v0',
+    entry_point='chemistrylab.odeworldgym.reaction_bench_v0:ReactionBenchEnv_0_Overlap',
     max_episode_steps=20,
 )
