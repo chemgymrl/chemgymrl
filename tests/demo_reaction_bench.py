@@ -1,3 +1,13 @@
+'''
+Reaction Bench Demo
+
+:title: demo_reaction_bench.py
+
+:author: Chris Beeler and Mitchell Shahen
+
+:history: 2020-06-22
+'''
+
 import gym
 import numpy as np
 import pickle
@@ -6,7 +16,7 @@ from time import sleep
 # ensure all necessary modules can be found
 import sys
 sys.path.append("../") # to access chemistrylab
-sys.path.append("../chemistrylab/reactions")
+sys.path.append("../chemistrylab/reactions") # to access all reactions
 import chemistrylab
 
 # Demo for using ODEWorld-v0, Custom Reaction
@@ -35,8 +45,7 @@ while not done:
     # Select random actions
     # Action [0] changes the temperature between -dT (a[0]=0.0) and +dT (a[1]=1.0)
     # Action [1] changes the Volume between -dV and +dV
-    # Action [2] adds reactant A to the system between 0 mol (a[1]=0.0) and 1 mol (a[1]=1.0)
-    # Action [3] adds reactant B to the system between 0 mol (a[2]=0.0) and 1 mol (a[2]=1.0)
+    # Actions [2:] adds all reactants to the system between 0 mol (a[1]=0.0) and 1 mol (a[1]=1.0)
     if perfect:
         if i == 0:
             action = np.ones(env.action_space.shape)
@@ -48,22 +57,17 @@ while not done:
         action = env.action_space.sample()
 
     state, reward, done, __ = env.step(action)
-    print(env.vessels._material_dict)
+    # print(env.vessels._material_dict)
     total_reward += reward
 
     env.render(mode=render_mode)
     sleep(1) # Wait before continuing
 
     i += 1
-#    print("\nCompleted Step {}".format(i))
-#    print("Generated {} Reward".format(reward))
-#    print("Completed All Steps? {}".format(done))
 
-#print("\nExecuted {} Actions.".format(i))
-#print("Generated {} Mol of Reward".format(round(total_reward, 3)))
+wait = input('PRESS ENTER TO EXIT.')
 
-#wait = input('PRESS ENTER TO EXIT.')
-
+# locate and open the saved vessel file
 with open('vessel_experiment_0.pickle', 'rb') as handle:
     b = pickle.load(handle)
     print(b._material_dict)
