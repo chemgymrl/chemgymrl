@@ -14,7 +14,7 @@ import gym.spaces
 import sys
 
 sys.path.append("../../")
-from chemistrylab.odeworldgym.reaction_bench_v0_engine import ReactionBenchEnv
+from chemistrylab.reaction_bench.reaction_bench_v0_engine import ReactionBenchEnv
 
 class ReactionBenchEnv_0(ReactionBenchEnv):
     def __init__(self):
