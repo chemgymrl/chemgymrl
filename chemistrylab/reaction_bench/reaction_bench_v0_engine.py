@@ -133,6 +133,10 @@ class ReactionBenchEnv(gym.Env):
             desired=desired
         )
 
+        # set the maximum pressure
+        Pmax = self.reaction.max_mol * R * Tmax / Vmin
+        self.Pmax = Pmax
+
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
         self.vessel_path = vessel_path
@@ -159,10 +163,6 @@ class ReactionBenchEnv(gym.Env):
 
         # reset the inputted reaction before performing any steps
         self.reaction.reset(n_init=self.n_init)
-
-        # set the maximum pressure
-        Pmax = self.reaction.max_mol * R * Tmax / Vmin
-        self.Pmax = Pmax
 
         # Defining action and observation space for OpenAI Gym framework
         # shape[0] is the change in amount of each reactant
