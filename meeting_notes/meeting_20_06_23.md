@@ -1,6 +1,6 @@
 # Meeting Notes
 
-## Date: June 9, 2020
+## Date: June 23, 2020
 
 ### Attendees
 
@@ -29,7 +29,7 @@
 
 ### Future Work
 
-- Combustion bench should wait until Reaction and Extract benches are working completely. An introductory Combustion bench might be mixing salt and water then heating off the water.
+- Distillation bench should wait until Reaction and Extract benches are working completely. An introductory Distillation bench might be mixing salt and water then heating off the water.
 - Sriram should work on outlining a paper for this project. This will help us frame the project moving forward. Aims to educate the user-base about what is and is not possible in our domain. Plots from Reaction bench are also useful to this paper.
 - Implementing RL and how this is done is to be solidified.
   - Which algorithms will work best in our domain?
