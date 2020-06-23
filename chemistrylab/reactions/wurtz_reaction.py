@@ -149,9 +149,6 @@ class Reaction():
             self.params.append(spec.S_8) # spectra for 4,5-diethyloctane
             self.params.append(spec.S_8) # spectra for NaCl
 
-        # perform the mandatory reset of the environment prior to any action
-        self.reset()
-
     @staticmethod
     def get_ni_label():
         '''
@@ -200,7 +197,7 @@ class Reaction():
 
         return num_list
 
-    def reset(self):
+    def reset(self, n_init):
         '''
         Method to reset the environment back to its initial state.
         Populates two class instance attributes with initial data.
@@ -222,7 +219,7 @@ class Reaction():
         self.cur_in_hand = 1.0 * self.initial_in_hand
 
         # define a class instance attribute for the amount of each chemical
-        self.n = np.zeros(self.nmax.shape[0], dtype=np.float32)
+        self.n = n_init
 
     def update(self, T, V, dt):
         '''

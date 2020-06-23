@@ -58,7 +58,8 @@ class ODEWorldEnv(gym.Env):
             Vmin=0.001,
             Vmax=0.005,
             dV=0.0005,
-            overlap=False
+            overlap=False,
+            vessel_path=None
     ):
         '''
         Constructor class method to pass thermodynamic variables to class methods.
@@ -124,6 +125,31 @@ class ODEWorldEnv(gym.Env):
             desired=desired
         )
 
+        # initialize vessels
+        self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+        if vessel_path == None:
+            self.vessels = vessel.Vessel(
+                'default',
+                temperature=Ti,
+                p_max=Pmax,
+                v_max=Vmax * 1000,
+                v_min=Vmin * 1000,
+                Tmax=Tmax,
+                Tmin=Tmin,
+                default_dt=dt
+            )
+        else:
+            with open(vessel_path, 'rb') as handle:
+                b = pickle.load(handle)
+                self.vessels = b
+
+            for i in range(self.n_init.shape[0]):
+                material_name = self.reaction.labels[i]
+                material_class = self.reaction.material_classes[i]
+                self.n_init[i] = self.vessels._material_dict[material_name][1]
+
+        self.reaction.reset(n_init=self.n_init)
+
         # set the maximum pressure
         Pmax = self.reaction.max_mol * R * Tmax / Vmin
         self.Pmax = Pmax
@@ -161,18 +187,6 @@ class ODEWorldEnv(gym.Env):
             dtype=np.float32
         )
         self.observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
-
-        # initialize vessels
-        self.vessels = vessel.Vessel(
-            'default',
-            temperature=Ti,
-            p_max=Pmax,
-            v_max=Vmax * 1000,
-            v_min=Vmin * 1000,
-            Tmax=Tmax,
-            Tmin=Tmin,
-            default_dt=dt
-        )
 
         # Reset the environment immediately upon calling the class
         self.reset()
@@ -325,7 +339,7 @@ class ODEWorldEnv(gym.Env):
         self.V = 1.0 * self.Vi
 
         # reinitialize the reaction class
-        self.reaction.reset()
+        self.reaction.reset(n_init=self.n_init)
 
         # save the necessary temperatures,  volumes, and pressure
         Ti = self.vessels.get_temperature()
