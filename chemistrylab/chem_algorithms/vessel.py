@@ -539,7 +539,7 @@ class Vessel:
                 continue
             layers_amount.append(self_volume_dict[M])
             layers_position.append((self._layers_position_dict[M]))
-            layers_color.append(self._material_dict[M][0].get_color())
+            layers_color.append(self._material_dict[M][0]().get_color())
 
         # calculate air
         air_volume = self.v_max - self_total_volume
@@ -630,7 +630,7 @@ class Vessel:
 
     def get_material_color(self,
                            material):
-        return self._material_dict[material][0].get_color()
+        return self._material_dict[material][0]().get_color()
 
     def get_material_dict(self):
         return copy.deepcopy(self._material_dict)
