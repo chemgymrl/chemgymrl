@@ -10,9 +10,9 @@ def convert_material_dict_to_volume(material_dict,
     volume_dict = {}
     total_volume = 0
     for M in material_dict:
-        if not material_dict[M][0].is_solute():
-            mass = material_dict[M][0].get_molar_mass() * material_dict[M][1]
-            volume = mass / material_dict[M][0].get_density()
+        if not material_dict[M][0]().is_solute():
+            mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
+            volume = mass / material_dict[M][0]().get_density()
             volume_dict[M] = volume
             total_volume += volume
     return volume_dict, total_volume
@@ -38,7 +38,7 @@ def organize_material_dict(material_dict):
 def organize_solute_dict(material_dict,
                          solute_dict):
     for M in material_dict:
-        if material_dict[M][0].is_solvent():  # if the material is solvent add to each solute with 0.0 amount
+        if material_dict[M][0]().is_solvent():  # if the material is solvent add to each solute with 0.0 amount
             for Solute in solute_dict:
                 if M not in solute_dict[Solute]:
                     solute_dict[Solute][M] = 0.0
@@ -53,7 +53,7 @@ def check_overflow(material_dict,
                    solute_dict,
                    v_max,
                    ):
-    volume_dict, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
+    __, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow
@@ -90,40 +90,44 @@ def generate_state(vessel_list,
         solute_dict = vessel.get_solute_dict()
 
         # fill material_dict_matrix and solute_dict_matrix
+
         # material_dict:
         for materials in material_dict:
-            index = material_dict[materials][0].get_index()
-            material_dict_matrix[index, 0] = material_dict[materials][0].get_density()
-            material_dict_matrix[index, 1] = material_dict[materials][0].get_polarity()
-            material_dict_matrix[index, 2] = material_dict[materials][0].get_temperature()
-            material_dict_matrix[index, 3] = material_dict[materials][0].get_pressure()
+            index = material_dict[materials][0]().get_index()
+            material_dict_matrix[index, 0] = material_dict[materials][0]().get_density()
+            material_dict_matrix[index, 1] = material_dict[materials][0]().get_polarity()
+            material_dict_matrix[index, 2] = material_dict[materials][0]().get_temperature()
+            material_dict_matrix[index, 3] = material_dict[materials][0]().get_pressure()
             # one hot encoding phase
-            if material_dict[materials][0].get_phase() == 's':
+            if material_dict[materials][0]().get_phase() == 's':
                 material_dict_matrix[index, 4] = 1.0
             else:
                 material_dict_matrix[index, 4] = 0.0
-            if material_dict[materials][0].get_phase() == 'l':
+            if material_dict[materials][0]().get_phase() == 'l':
                 material_dict_matrix[index, 5] = 1.0
             else:
                 material_dict_matrix[index, 5] = 0.0
-            if material_dict[materials][0].get_phase() == 'g':
+            if material_dict[materials][0]().get_phase() == 'g':
                 material_dict_matrix[index, 6] = 1.0
             else:
                 material_dict_matrix[index, 6] = 0.0
-            material_dict_matrix[index, 7] = material_dict[materials][0].get_charge()
-            material_dict_matrix[index, 8] = material_dict[materials][0].get_molar_mass()
+            material_dict_matrix[index, 7] = material_dict[materials][0]().get_charge()
+            material_dict_matrix[index, 8] = material_dict[materials][0]().get_molar_mass()
             material_dict_matrix[index, 9] = material_dict[materials][1]
+
         # solute_dict:
         for solute in solute_dict:
-            solute_index = material_dict[solute][0].get_index()
+            solute_class = solute_dict[solute][0]()
+            solute_index = solute_class.get_index()
             for solvent in solute_dict[solute]:
-                solvent_index = material_dict[solvent][0].get_index()
+                solvent_index = solute_dict[solvent][0]().get_index()
                 solute_dict_matrix[solute_index, solvent_index] = solute_dict[solute][solvent]
+
         current_vessel_state = [material_dict_matrix, solute_dict_matrix, layer_vector]
         state.append(current_vessel_state)
 
     # fill the rest vessel state with zeros
-    for i in range(max_n_vessel - len(vessel_list)):
+    for __ in range(max_n_vessel - len(vessel_list)):
         material_dict_matrix = np.zeros(shape=(total_num_material, 10), dtype=np.float32)
         solute_dict_matrix = np.zeros(shape=(total_num_material, total_num_material), dtype=np.float32)
         air = material.Air()

@@ -49,7 +49,7 @@ class Vessel:
 
         # Material Dict and Solute Dict
         self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
-        self._solute_dict = solutes  # solute.name: {solvent.name: amount}; amount is in mole
+        self._solute_dict = solutes  # solute.name: [solvent(), amount]; amount is in mole
 
         # for vessel's pixel representation
         # layer's pixel representation, initially filled with Air's color
@@ -294,13 +294,13 @@ class Vessel:
         for Solute in self._solute_dict:
             d_solute[Solute] = 0.0
         for M in copy.deepcopy(self._material_dict):  # M is the solvent that's drained out
-            if self._material_dict[M][0].get_color() in color_to_pixel:  # if it's in color_to_pixel (means it get drained)
+            if self._material_dict[M][0]().get_color() in color_to_pixel:  # if it's in color_to_pixel (means it get drained)
                 # calculate the d_mole of this solvent
-                d_volume = (color_to_pixel[self._material_dict[M][0].get_color()] / self.n_pixels) * self.v_max
+                d_volume = (color_to_pixel[self._material_dict[M][0]().get_color()] / self.n_pixels) * self.v_max
 
                 # convert volume to amount (mole)
-                density = self._material_dict[M][0].get_density()
-                molar_mass = self._material_dict[M][0].get_molar_mass()
+                density = self._material_dict[M][0]().get_density()
+                molar_mass = self._material_dict[M][0]().get_molar_mass()
                 d_mole = util.convert_volume_to_mole(volume=d_volume,
                                                      density=density,
                                                      molar_mass=molar_mass)
@@ -408,7 +408,7 @@ class Vessel:
         # create new layer_position_dict
         new_layers_position_dict = {}
         for M in self._material_dict:
-            if not self._material_dict[M][0].is_solute():  # do not fill in solute (solute does not form layer)
+            if not self._material_dict[M][0]().is_solute():  # do not fill in solute (solute does not form layer)
                 new_layers_position_dict[M] = 0.0
         new_layers_position_dict[self.Air.get_name()] = 0.0  # Add Air
         self._layers_variance = 2.0  # reset variances
@@ -452,7 +452,7 @@ class Vessel:
         if self._solute_dict:
             for Solute in self._solute_dict:
                 solute_amount.append([])  # append empty lists for each solute
-                solute_polarity.append(self._material_dict[Solute][0].get_polarity())  # collect polarity
+                solute_polarity.append(self._material_dict[Solute][0]().get_polarity())  # collect polarity
         else:
             solute_amount.append([])
             solute_polarity.append(0.0)
@@ -460,9 +460,9 @@ class Vessel:
         for M in self._layers_position_dict:  # if M forms a layer
             if M == 'Air':  # skip Air for now
                 continue
-            if self._material_dict[M][0].is_solvent():  # if it's solvent
+            if self._material_dict[M][0]().is_solvent():  # if it's solvent
                 solvent_volume.append(self_volume_dict[M])  # solvent amount
-                solvent_polarity.append(self._material_dict[M][0].get_polarity())  # solvent polairty
+                solvent_polarity.append(self._material_dict[M][0]().get_polarity())  # solvent polairty
                 solute_counter = 0
                 if self._solute_dict:
                     for Solute in self._solute_dict:  # fill in solute_amount
@@ -472,7 +472,7 @@ class Vessel:
                     solute_amount[0].append(0.0)
 
             layers_position.append(self._layers_position_dict[M])  # layers position
-            layers_density.append(self._material_dict[M][0].get_density())  # layers density
+            layers_density.append(self._material_dict[M][0]().get_density())  # layers density
 
         # Add Air
         layers_position.append(self._layers_position_dict['Air'])
@@ -510,7 +510,7 @@ class Vessel:
             self._layers_position_dict[M] = new_layers_position[layers_counter]
             if self._solute_dict:
                 layers_counter += 1
-                if self._material_dict[M][0].is_solvent:
+                if self._material_dict[M][0]().is_solvent:
                     solute_counter = 0  # count position for solute in new_solute_amount
                     for Solute in self._solute_dict:
                         self._solute_dict[Solute][M] = new_solute_amount[solute_counter][solvent_counter]
@@ -579,8 +579,6 @@ class Vessel:
 
     def get_material_volume(self,
                             material_name=None):
-        print("Now")
-        print(self._material_dict)
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
         if type(material_name) is list:
             amount = []

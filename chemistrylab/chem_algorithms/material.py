@@ -408,6 +408,7 @@ class Dodecane(Material):
             charge=0.0,
             boiling_point=489.5,
             melting_point=263.6,
+            solute=False,
             index=16
         )
 
@@ -425,6 +426,7 @@ class OneChlorohexane(Material):
             charge=0.0,
             boiling_point=408.2,
             melting_point=179.2,
+            solute=False,
             index=17
         )
 
@@ -442,6 +444,7 @@ class TwoChlorohexane(Material):
             charge=0.0,
             boiling_point=395.2,
             melting_point=308.3,
+            solute=False,
             index=18
         )
 
@@ -459,6 +462,7 @@ class ThreeChlorohexane(Material):
             charge=0.0,
             boiling_point=396.2,
             melting_point=308.3,
+            solute=False,
             index=19
         )
 
@@ -476,6 +480,7 @@ class FiveMethylundecane(Material):
             charge=0.0,
             boiling_point=481.1,
             melting_point=255.2,
+            solute=False,
             index=20
         )
 
@@ -493,6 +498,7 @@ class FourEthyldecane(Material):
             charge=0.0,
             boiling_point=480.1,
             melting_point=254.2,
+            solute=False,
             index=21
         )
 
@@ -510,6 +516,7 @@ class FiveSixDimethyldecane(Material):
             charge=0.0,
             boiling_point=474.2,
             melting_point=222.4,
+            solute=False,
             index=22
         )
 
@@ -527,6 +534,7 @@ class FourEthylFiveMethylnonane(Material):
             charge=0.0,
             boiling_point=476.3,
             melting_point=224.5,
+            solute=False,
             index=23
         )
 
@@ -544,6 +552,7 @@ class FourFiveDiethyloctane(Material):
             charge=0.0,
             boiling_point=470.2,
             melting_point=222.4,
+            solute=False,
             index=24
         )
 
@@ -561,6 +570,7 @@ class Ethoxyethane(Material):
             charge=0.0,
             boiling_point=34.6,
             melting_point=-116.3,
+            solute=True,
             index=25
         )
 
