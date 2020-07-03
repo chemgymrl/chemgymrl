@@ -1,9 +1,12 @@
 import numpy as np
 import gym
-from chemistrylab.extract_algorithms import separate
 import math
 import copy
+import sys
+
+sys.path.append("../../../")
 from chemistrylab.chem_algorithms import material, util, vessel
+from chemistrylab.extract_algorithms import separate
 
 
 class Extraction:
@@ -40,8 +43,8 @@ class Extraction:
         """
         0: Valve (Speed multiplier, relative to max_valve_speed)
         1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
-        2: Mix B1 (mixing coefficient, *-1 when passed into mix function)
-        3: Mix B2 (mixing coefficient, *-1 when passed into mix function)
+        2: Mix B1 (mixing coefficient, *-1 when passed into mix function) # maybe never done
+        3: Mix B2 (mixing coefficient, *-1 when passed into mix function) # maybe never done
         4: Add B1 to ExV (Volume multiplier, relative to max_vessel_volume)
         5: Add B1 to B2 (Volume multiplier, relative to max_vessel_volume)
         6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
@@ -205,4 +208,3 @@ class Extraction:
                 reward = 0
                 print("Oops! Division by zero. There's no target material in ExV(Extraction Vessel)")
         return reward
-
