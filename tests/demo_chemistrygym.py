@@ -8,15 +8,18 @@ Reaction Bench Demo
 :history: 2020-07-03
 '''
 
+# import all the required external modules
 import gym
 import numpy as np
 import pickle
+import sys
 from time import sleep
 
 # ensure all necessary modules can be found
-import sys
 sys.path.append("../") # to access chemistrylab
 sys.path.append("../chemistrylab/reactions") # to access all reactions
+
+# import all local modules
 import chemistrylab
 
 # ---------- # REACTION BENCH DEMO # ---------- #
