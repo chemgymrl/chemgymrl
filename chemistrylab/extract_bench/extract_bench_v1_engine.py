@@ -31,6 +31,33 @@ extraction_dict = {
 class ExtractBenchEnv(gym.Env):
     '''
     Class object defining the ExtractWorld Engine
+
+    Parameters
+    ---------------
+    `n_steps` : `int` (default=`100`)
+        The number of steps in an episode.
+    `dt` : `float` (default=`0.01`)
+        The default time-step.
+    `extraction` : `str` (default="")
+        The name/title of the extraction.
+    `n_vessel_pixels` : `int` (default=`100`)
+        The number of pixels in a vessel.
+    `max_valve_speed` : `int` (default=`100`)
+        The maximal amount of material flowing through the valve in a given time-step.
+    `extraction_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `solute` : `str` (default=`None`)
+        The name of the added solute.
+    `target_material` : `str` (default=`None`)
+        The name of the required output material designated as reward.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
     def __init__(
@@ -82,6 +109,19 @@ class ExtractBenchEnv(gym.Env):
     def reset(self):
         '''
         Initialize the environment
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `state` : `np.array`
+            A numpy array containing state variables, material concentrations, and spectral data.
+
+        Raises
+        ---------------
+        None
         '''
 
         self.done = False
@@ -89,12 +129,33 @@ class ExtractBenchEnv(gym.Env):
         self.vessels, self.external_vessels, self.state = self.extraction.reset(
             extraction_vessel=self.extraction_vessel
         )
+
         return self.state
 
-    # Updating the environment with the agents action
     def step(self, action):
         '''
-        Update the environment by performing an action
+        Update the environment by performing an action.
+
+        Parameters
+        ---------------
+        `action` : `list`
+            A list of two numbers indicating the index of the action to
+            perform and a multiplier to use in completing the action.
+
+        Returns
+        ---------------
+        `state` : `np.array`
+            A numpy array containing state variables, material concentrations, and spectral data.
+        `reward` : `float`
+            The amount of reward generated in perfoming the action.
+        `done` : `bool`
+            A boolean indicting if all the steps in an episode have been completed.
+        `params` : `dict`
+            A dictionary containing additional parameters or information that may be useful.
+
+        Raises
+        ---------------
+        None
         '''
 
         vessels = self.vessels
@@ -125,6 +186,20 @@ class ExtractBenchEnv(gym.Env):
 
     def render(self, model='human'):
         '''
+        Select a render mode to display pertinent information.
+
+        Parameters
+        ---------------
+        `model` : `str` (default=`human`)
+            The name of the render mode to use.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
         '''
 
         if model == 'human':
@@ -132,6 +207,20 @@ class ExtractBenchEnv(gym.Env):
 
     def human_render(self, mode='plot'):
         '''
+        Render the pertinent information in a minimal style for the user to visualize and process.
+
+        Parameters
+        ---------------
+        `mode` : `str` (default=`plot`)
+            The type of rendering to use.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
         '''
 
         position_separate = []

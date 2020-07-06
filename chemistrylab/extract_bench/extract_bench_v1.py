@@ -8,6 +8,7 @@ Module to access and execute the ExtractWorld Engine
 :history: 2020-06-24
 '''
 
+# import extrernal modules
 import numpy as np
 import gym
 import gym.spaces
@@ -15,13 +16,30 @@ import os
 import pickle
 import sys
 
-sys.path.append("../../")
+sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms import material, util, vessel
 from chemistrylab.extract_bench.extract_bench_v1_engine import ExtractBenchEnv
 
 def get_extract_vessel(vessel_path=None, extract_vessel=None):
     '''
     Function to obtain an extraction vessel containing materials.
+
+    Parameters
+    ---------------
+    `vessel_path` : `str` (default=`None`)
+        A string indicating the local of a pickle file containing the required vessel object.
+    `extract_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+
+    Returns
+    ---------------
+    `extract_vessel` : `vessel`
+        A vessel object containing state variables, materials, solutes, and spectral data.
+
+    Raises
+    ---------------
+    `IOError`:
+        Raised if neither a path to a pickle file nor a vessel object is provided.
     '''
 
     # ensure that at least one of the methods to obtain a vessel is provided
@@ -38,7 +56,20 @@ def get_extract_vessel(vessel_path=None, extract_vessel=None):
 
 def oil_vessel():
     '''
-    Function to generate an input vessel for the oil and water extraction experiment
+    Function to generate an input vessel for the oil and water extraction experiment.
+
+    Parameters
+    ---------------
+    None
+
+    Returns
+    ---------------
+    `extract_vessel` : `vessel`
+        A vessel object containing state variables, materials, solutes, and spectral data.
+
+    Raises
+    ---------------
+    None
     '''
 
     # initialize extraction vessel
@@ -85,6 +116,10 @@ def oil_vessel():
     return extraction_vessel
 
 class ExtractWorld_v1(ExtractBenchEnv):
+    '''
+    Class to define an environment which performs an extraction on materials in a vessel.
+    '''
+
     def __init__(self):
         super(ExtractWorld_v1, self).__init__(
             extraction='wurtz',
@@ -97,6 +132,10 @@ class ExtractWorld_v1(ExtractBenchEnv):
         )
 
 class ExtractWorld_v2(ExtractBenchEnv):
+    '''
+    Class to define an environment which performs an extraction on materials in a vessel.
+    '''
+
     def __init__(self):
         super(ExtractWorld_v2, self).__init__(
             extraction='water_oil_2',
