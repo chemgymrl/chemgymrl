@@ -6,6 +6,17 @@ Module to describe the extraction of a desired material generated in a Wurtz rea
 :author: Mitchell Shahen
 
 :history: 2020-06-27
+
+Available Actions for this Extraction Experiment are included below.
+
+0: Valve (Speed multiplier, relative to max_valve_speed)
+1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
+2: Pour B1 into ExV (Volume multiplier, relative to max_vessel_volume)
+3: Pour B2 into ExV (Volume multiplier, relative to max_vessel_volume)
+4: Pour ExV into B2 (Volume multiplier, relative to max_vessel_volume)
+5: Pour S1 into ExV (Volume multiplier, relative to max_vessel_volume)
+6: Pour S2 into ExV (Volume multiplier, relative to max_vessel_volume)
+7: Done (Value doesn't matter)
 '''
 
 import numpy as np
@@ -21,7 +32,38 @@ from chemistrylab.reactions.get_reactions import convert_to_class
 
 class Extraction:
     '''
-    Class object for a Wurtz extraction experiment
+    Class object for a Wurtz extraction experiment.
+
+    Parameters
+    ---------------
+    `extraction_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `solute` : `str` (default=`None`)
+        The name of the added solute.
+    `target_material` : `str` (default=`None`)
+        The name of the required output material designated as reward.
+    `nempty_vessels` : `int` (default=`2`)
+        The number of empty vessels to add.
+    `solute_volume` : `int` (default=`1000000000`)
+        The amount of `solute` available to add during the extraction.
+    `dt` : `float` (default=`0.01`)
+        The default time-step.
+    `max_vessel_volume` : `float` (default=`1000.0`)
+        The maximal volume of an added vessel.
+    `n_vessel_pixels` : `int` (default=`100`)
+        The number of pixels in a vessel.
+    `max_valve_speed` : `int` (default=`10`)
+        The maximal amount of material flowing through the valve in a given time-step.
+    `n_actions` : `int` (default=`8`)
+        The number of actions included in this extraction experiment.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
     def __init__(
@@ -62,18 +104,22 @@ class Extraction:
     #     return observation_space
 
     def get_action_space(self):
-        """
-        0: Valve (Speed multiplier, relative to max_valve_speed)
-        1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
-        2: Pour B1 into ExV (Volume multiplier, relative to max_vessel_volume)
-        3: Pour B2 into ExV (Volume multiplier, relative to max_vessel_volume)
-        4: Pour ExV into B2 (Volume multiplier, relative to max_vessel_volume)
-        5: Pour S1 into ExV (Volume multiplier, relative to max_vessel_volume)
-        6: Pour S2 into ExV (Volume multiplier, relative to max_vessel_volume)
-        7: Done (Value doesn't matter)
+        '''
+        Method to describe the actions index and multipliers available.
 
-        :return: action_space
-        """
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `action_space` : `MultiDiscrete`
+            A MultiDiscrete object indicating the options for selecting actions and multipliers.
+
+        Raises
+        ---------------
+        None
+        '''
 
         # action_space = gym.spaces.Box(low=np.array([0, 0], dtype=np.float32),
         #                               high=np.array([self.n_actions, 1], dtype=np.float32),
@@ -85,7 +131,25 @@ class Extraction:
 
     def reset(self, extraction_vessel):
         '''
-        Method to reset the environment
+        Method to reset the environment.
+
+        Parameters
+        ---------------
+        `extraction_vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+
+        Returns
+        ---------------
+        `vessels` : `list`
+            A list of all the vessel objects that contain materials and solutes.
+        `external_vessels` : `list`
+            A list of the external vessels, beakers, to be used in the extraction.
+        `state` : `np.array`
+            An array containing state variables, material concentrations, and spectral data.
+
+        Raises
+        ---------------
+        None
         '''
 
         # delete the extraction vessel's solute_dict and copy it into a list of vessels
@@ -170,22 +234,37 @@ class Extraction:
         return vessels, external_vessels, state
 
     def perform_action(self, vessels, external_vessels, action):
-        """
-        0: Valve (Speed multiplier, relative to max_valve_speed)
-        1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
-        2: Pour B1 into ExV (Volume multiplier, relative to max_vessel_volume)
-        3: Pour B2 into ExV (Volume multiplier, relative to max_vessel_volume)
-        4: Pour ExV into B2 (Volume multiplier, relative to max_vessel_volume)
-        5: Pour S1 into ExV (Volume multiplier, relative to max_vessel_volume)
-        6: Pour S2 into ExV (Volume multiplier, relative to max_vessel_volume)
-        7: Done (Value doesn't matter)
+        '''
+        Method to perform the action designated by `action` and update
+        the state, vessels, external vessels, and generate reward.
 
-        :param external_vessels:
-        :param vessels: a list containing several vessels
-        :param action: a tuple of two elements, first one represents action, second one is a multiplier
+        Parameters
+        ---------------
+        `vessels` : `list`
+            A list of all the vessel objects that contain materials and solutes.
+        `external_vessels` : `list`
+            A list of the external vessels, beakers, to be used in the extraction.
+        `state` : `np.array`
+            An array containing state variables, material concentrations, and spectral data.
+        `action` : `list`
+            A list of two numbers indicating the index of an action to
+            perform and a multiplier used when performin the action.
 
-        :return: new vessels, oil vessel, reward, done
-        """
+        Returns
+        ---------------
+        `vessels` : `list`
+            A list of all the vessel objects that contain materials and solutes.
+        `external_vessels` : `list`
+            A list of the external vessels, beakers, to be used in the extraction.
+        `reward` : `float`
+            The amount of the target material that has been generated by the most recent action.
+        `done` : `bool`
+            A boolean indicating if all of the required actions have now been completed.
+
+        Raises
+        ---------------
+        None
+        '''
 
         reward = -1  # default reward for each step
         done = False
@@ -309,6 +388,22 @@ class Extraction:
 
     def done_reward(self, beaker):  # `beaker` is the beaker used to collect extracted material
         '''
+        Method to calculate the full reward once the final action has taken place.
+
+        Parameters
+        ---------------
+        `beaker` : `vessel.Vessel`
+            A vessel objects that contains all of the extracted materials and solutes.
+
+        Returns
+        ---------------
+        `reward` : `float`
+            The amount of the target material that has been generated by the most recent action.
+
+        Raises
+        ---------------
+        `AssertionError`:
+            Raised if no target material is found in the extraction vessel.
         '''
 
         material_amount = beaker.get_material_amount(self.target_material)
