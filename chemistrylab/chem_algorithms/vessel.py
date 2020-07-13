@@ -6,6 +6,9 @@ import copy
 
 
 class Vessel:
+    '''
+    '''
+
     def __init__(self,
                  label,  # Name of the vessel
                  temperature=297,  # C
@@ -533,7 +536,10 @@ class Vessel:
         layers_position = []
         layers_color = []
         layers_variance = self._layers_variance
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
+        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+            self._material_dict
+        )
+
         for M in self._layers_position_dict:
             if M == 'Air':
                 continue
@@ -549,12 +555,13 @@ class Vessel:
         layers_position.append(self._layers_position_dict['Air'])
         layers_color.append(self.Air.get_color())
 
-        self._layers = separate.map_to_state(A=np.array(layers_amount),
-                                             B=np.array(layers_position),
-                                             C=layers_variance,
-                                             colors=layers_color,
-                                             x=separate.x,
-                                             )
+        self._layers = separate.map_to_state(
+            A=np.array(layers_amount),
+            B=np.array(layers_position),
+            C=layers_variance,
+            colors=layers_color,
+            x=separate.x
+        )
 
     # functions to access private properties
     def get_material_amount(self,
@@ -649,10 +656,10 @@ class Vessel:
             return position_list, self._layers_variance
 
     def get_max_volume(self):
-        return self.v_max / 1000
+        return self.v_max
 
     def get_min_volume(self):
-        return self.v_min / 1000
+        return self.v_min
 
     def get_Tmin(self):
         return self.Tmin
