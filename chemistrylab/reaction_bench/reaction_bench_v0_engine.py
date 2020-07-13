@@ -246,8 +246,8 @@ class ReactionBenchEnv(gym.Env):
         self.state[1] = (self.T - Tmin) / (Tmax - Tmin)
 
         # state[2] = volume
-        Vmin = self.vessels.get_min_volume()
-        Vmax = self.vessels.get_max_volume()
+        Vmin = self.vessels.get_min_volume() / 1000
+        Vmax = self.vessels.get_max_volume() / 1000
         self.state[2] = (self.V - Vmin) / (Vmax - Vmin)
 
         # state[3] = pressure
@@ -388,8 +388,8 @@ class ReactionBenchEnv(gym.Env):
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
         Vi = self.Vi
-        Vmin = self.vessels.get_min_volume()
-        Vmax = self.vessels.get_max_volume()
+        Vmin = self.vessels.get_min_volume() / 1000
+        Vmax = self.vessels.get_max_volume() / 1000
         total_pressure = self.reaction.get_total_pressure(self.V, self.T)
 
         # populate the state with the above variables
@@ -474,8 +474,8 @@ class ReactionBenchEnv(gym.Env):
             # action[1] changes volume by: 0.0 = -dV, 0.5 = 0, 1.0 = dV (all in Litres)
             self.V += 2.0 * self.dV * (action[1] - 0.5) / self.n_steps
             self.V = np.min([
-                np.max([self.V, self.vessels.get_min_volume()]),
-                self.vessels.get_max_volume()
+                np.max([self.V, self.vessels.get_min_volume() / 1000]),
+                self.vessels.get_max_volume() / 1000
             ])
             d_reward = self.reaction.update(
                 self.T,
@@ -494,8 +494,8 @@ class ReactionBenchEnv(gym.Env):
             self.plot_data_state[1].append((self.T - Tmin)/(Tmax - Tmin))
 
             # record volume data
-            Vmin = self.vessels.get_min_volume()
-            Vmax = self.vessels.get_max_volume()
+            Vmin = self.vessels.get_min_volume() / 1000
+            Vmax = self.vessels.get_max_volume() / 1000
             self.plot_data_state[2].append((self.V - Vmin)/(Vmax - Vmin))
 
             # record pressure data
@@ -724,7 +724,7 @@ class ReactionBenchEnv(gym.Env):
                 )
             self._plot_axs[0, 1].set_xlim([0.0, self.vessels.get_defaultdt() * self.n_steps])
             self._plot_axs[0, 1].set_ylim([
-                0.0, np.max(self.reaction.nmax)/(self.vessels.get_min_volume() * 1000)
+                0.0, np.max(self.reaction.nmax)/(self.vessels.get_min_volume())
             ])
             self._plot_axs[0, 1].set_xlabel('Time (s)')
             self._plot_axs[0, 1].set_ylabel('Molar Concentration (mol/L)')
