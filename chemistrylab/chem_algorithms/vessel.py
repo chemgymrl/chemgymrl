@@ -649,10 +649,10 @@ class Vessel:
             return position_list, self._layers_variance
 
     def get_max_volume(self):
-        return self.v_max * 1000
+        return self.v_max / 1000
 
     def get_min_volume(self):
-        return self.v_min * 1000 
+        return self.v_min / 1000
 
     def get_Tmin(self):
         return self.Tmin

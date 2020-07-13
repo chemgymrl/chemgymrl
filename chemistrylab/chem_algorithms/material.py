@@ -149,7 +149,6 @@ class Material:
     def get_index(self):
         return self._index
 
-
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
@@ -158,10 +157,9 @@ class Air(Material):
                          pressure=1,
                          phase='g',
                          molar_mass=28.963,
-                         color=0.45,
+                         color=0.65,
                          index=0,
                          )
-
 
 class H2O(Material):
     def __init__(self):
@@ -178,7 +176,6 @@ class H2O(Material):
                          index=1,
                          )
 
-
 class H(Material):
     def __init__(self):
         super().__init__(name='H',
@@ -192,7 +189,6 @@ class H(Material):
                          charge=0.0,
                          index=2,
                          )
-
 
 class H2(Material):
     def __init__(self):
@@ -208,7 +204,6 @@ class H2(Material):
                          index=3,
                          )
 
-
 class O(Material):
     def __init__(self):
         super().__init__(name='O',
@@ -222,7 +217,6 @@ class O(Material):
                          charge=0.0,
                          index=4,
                          )
-
 
 class O2(Material):
     def __init__(self):
@@ -238,7 +232,6 @@ class O2(Material):
                          index=5,
                          )
 
-
 class O3(Material):
     def __init__(self):
         super().__init__(name='O3',
@@ -252,7 +245,6 @@ class O3(Material):
                          charge=-1.0,
                          index=6,
                          )
-
 
 class C6H14(Material):
     def __init__(self):
@@ -269,7 +261,6 @@ class C6H14(Material):
                          index=7,
                          )
 
-
 class NaCl(Material):
     def __init__(self):
         super().__init__(name='NaCl',
@@ -283,7 +274,6 @@ class NaCl(Material):
                          charge=0.0,
                          index=8,
                          )
-
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
@@ -300,7 +290,6 @@ class Na(Material):
                          index=9,
                          )
 
-
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
     def __init__(self):
@@ -316,7 +305,6 @@ class Cl(Material):
                          index=10,
                          )
 
-
 class Cl2(Material):
     def __init__(self):
         super().__init__(name='Cl2',
@@ -330,7 +318,6 @@ class Cl2(Material):
                          charge=0.0,
                          index=11,
                          )
-
 
 class LiF(Material):
     def __init__(self):
@@ -346,7 +333,6 @@ class LiF(Material):
                          index=12,
                          )
 
-
 class Li(Material):
     def __init__(self):
         super().__init__(name='Li',
@@ -360,7 +346,6 @@ class Li(Material):
                          charge=0.0,
                          index=13,
                          )
-
 
 # Note: F is very unstable when not an aqueous ion
 class F(Material):
@@ -376,7 +361,6 @@ class F(Material):
                          charge=0.0,
                          index=14,
                          )
-
 
 class F2(Material):
     def __init__(self):
@@ -404,7 +388,7 @@ class Dodecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.05,
             charge=0.0,
             boiling_point=489.5,
             melting_point=263.6,
@@ -422,7 +406,7 @@ class OneChlorohexane(Material):
             pressure=1,
             phase='l',
             molar_mass=120.62,
-            color=0,
+            color=0.1,
             charge=0.0,
             boiling_point=408.2,
             melting_point=179.2,
@@ -440,7 +424,7 @@ class TwoChlorohexane(Material):
             pressure=1,
             phase='l',
             molar_mass=120.62,
-            color=0,
+            color=0.15,
             charge=0.0,
             boiling_point=395.2,
             melting_point=308.3,
@@ -458,7 +442,7 @@ class ThreeChlorohexane(Material):
             pressure=1,
             phase='l',
             molar_mass=120.62,
-            color=0,
+            color=0.2,
             charge=0.0,
             boiling_point=396.2,
             melting_point=308.3,
@@ -476,7 +460,7 @@ class FiveMethylundecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.25,
             charge=0.0,
             boiling_point=481.1,
             melting_point=255.2,
@@ -494,7 +478,7 @@ class FourEthyldecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.3,
             charge=0.0,
             boiling_point=480.1,
             melting_point=254.2,
@@ -512,7 +496,7 @@ class FiveSixDimethyldecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.35,
             charge=0.0,
             boiling_point=474.2,
             melting_point=222.4,
@@ -530,7 +514,7 @@ class FourEthylFiveMethylnonane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.4,
             charge=0.0,
             boiling_point=476.3,
             melting_point=224.5,
@@ -548,7 +532,7 @@ class FourFiveDiethyloctane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.45,
             charge=0.0,
             boiling_point=470.2,
             melting_point=222.4,
@@ -566,7 +550,7 @@ class Ethoxyethane(Material):
             pressure=1,
             phase='l',
             molar_mass=74.123,
-            color=0,
+            color=0.5,
             charge=0.0,
             boiling_point=34.6,
             melting_point=-116.3,
