@@ -152,7 +152,7 @@ class Material:
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
-                         density=1.225e-3,
+                         density=1.225e-3, # in g/cm^3
                          temperature=297,
                          pressure=1,
                          phase='g',
