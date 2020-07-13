@@ -44,7 +44,7 @@ def get_extract_vessel(vessel_path=None, extract_vessel=None):
 
     # ensure that at least one of the methods to obtain a vessel is provided
     if all([not vessel_path, not vessel]):
-        raise IOError("")
+        raise IOError("No vessel acquisition method specified.")
 
     # if a vessel object is provided, use it;
     # otherwise locate and extract the vessel object as a pickle file
@@ -138,7 +138,7 @@ class ExtractWorld_v2(ExtractBenchEnv):
 
     def __init__(self):
         super(ExtractWorld_v2, self).__init__(
-            extraction='water_oil_2',
+            extraction='water_oil',
             extraction_vessel=oil_vessel(),
             target_material='Na'
         )

@@ -24,7 +24,7 @@ from chemistrylab.extract_algorithms import separate
 
 # A dictionary of available extractions
 extraction_dict = {
-    'water_oil_2': water_oil_v1,
+    'water_oil': water_oil_v1,
     "wurtz": wurtz_v0
 }
 
@@ -158,25 +158,30 @@ class ExtractBenchEnv(gym.Env):
         None
         '''
 
+        # define the necessary parameters
         vessels = self.vessels
         ext_vessels = self.external_vessels
         done = self.done
 
+        # perform the inputted action in the extraction module
         vessels, ext_vessels, reward, done = self.extraction.perform_action(
             vessels=vessels,
             external_vessels=ext_vessels,
             action=action
         )
 
+        # re-define self variables for future use
         self.vessels = vessels
         self.external_vessels = ext_vessels
         self.done = done
 
+        # determine the state after performing the action
         self.state = util.generate_state(
             self.vessels,
             max_n_vessel=self.extraction.n_total_vessels
         )
 
+        # document the most recent step and determine if future steps are necessary
         self.n_steps -= 1
         if self.n_steps == 0:
             self.done = True
@@ -224,15 +229,15 @@ class ExtractBenchEnv(gym.Env):
         '''
 
         position_separate = []
-        for Vessel in self.vessels:
-            position, volume = Vessel.get_position_and_variance()
+        for vessel_obj in self.vessels:
+            position, __ = vessel_obj.get_position_and_variance()
             position_separate.append(
                 np.zeros((len(position), separate.x.shape[0]), dtype=np.float32)
             )
 
         for i, arr in enumerate(position_separate):
-            position, volume = self.vessels[i].get_position_and_variance(dict_or_list='dict')
-            t = -1.0 * np.log(volume * np.sqrt(2.0 * np.pi))
+            position, var = self.vessels[i].get_position_and_variance(dict_or_list='dict')
+            t = -1.0 * np.log(var * np.sqrt(2.0 * np.pi))
             j = 0
             for layer in position:
                 # Loop over each phase
@@ -240,7 +245,7 @@ class ExtractBenchEnv(gym.Env):
                     # Calculate the value of the Gaussian for that phase and x position
                     mat_vol = self.vessels[i].get_material_volume(layer)
                     exponential = np.exp(
-                        -1.0 * (((separate.x[k] - position[layer]) / (2.0 * volume)) ** 2) + t
+                        -1.0 * (((separate.x[k] - position[layer]) / (2.0 * var)) ** 2) + t
                     )
                     arr[j, k] = mat_vol * exponential
                 j += 1
@@ -267,7 +272,7 @@ class ExtractBenchEnv(gym.Env):
             )
 
             for i, arr in enumerate(position_separate):
-                position, volume = self.vessels[i].get_position_and_variance()
+                position, __ = self.vessels[i].get_position_and_variance()
                 j = 0
 
                 for layer in position:
@@ -302,7 +307,7 @@ class ExtractBenchEnv(gym.Env):
         else:
             for i, arr in enumerate(position_separate):
                 self._plot_axs[i, 0].clear()
-                position, volume = self.vessels[i].get_position_and_variance()
+                position, __ = self.vessels[i].get_position_and_variance()
 
                 j = 0
                 for layer in position:
