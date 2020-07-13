@@ -239,14 +239,18 @@ class ExtractBenchEnv(gym.Env):
             position, var = self.vessels[i].get_position_and_variance(dict_or_list='dict')
             t = -1.0 * np.log(var * np.sqrt(2.0 * np.pi))
             j = 0
+
             for layer in position:
                 # Loop over each phase
+                mat_vol = self.vessels[i].get_material_volume(layer)
+
                 for k in range(arr.shape[1]):
                     # Calculate the value of the Gaussian for that phase and x position
-                    mat_vol = self.vessels[i].get_material_volume(layer)
                     exponential = np.exp(
                         -1.0 * (((separate.x[k] - position[layer]) / (2.0 * var)) ** 2) + t
                     )
+
+                    # populate the array
                     arr[j, k] = mat_vol * exponential
                 j += 1
 
@@ -332,5 +336,5 @@ class ExtractBenchEnv(gym.Env):
                 )
                 # self._plot_axs[i, 1].colorbar(mappable)
                 self._plot_fig.canvas.draw()
-                # plt.show()
+                plt.show()
                 self._first_render = False
