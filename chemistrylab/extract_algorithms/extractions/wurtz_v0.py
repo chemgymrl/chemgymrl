@@ -97,12 +97,6 @@ class Extraction:
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
-    # def get_observation_space(self):
-    #     obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
-    #     return observation_space
-
     def get_action_space(self):
         '''
         Method to describe the actions index and multipliers available.
@@ -120,10 +114,6 @@ class Extraction:
         ---------------
         None
         '''
-
-        # action_space = gym.spaces.Box(low=np.array([0, 0], dtype=np.float32),
-        #                               high=np.array([self.n_actions, 1], dtype=np.float32),
-        #                               dtype=np.float32)
 
         action_space = gym.spaces.MultiDiscrete([self.n_actions, 5])
 
@@ -418,7 +408,7 @@ class Extraction:
                 reward = (material_amount / init_target_amount) * 100
 
                 print(
-                    "done_reward: {}, in_beaker_2: {}, initial: {}".format(
+                    "done_reward: {}, in_vessel: {}, initial: {}".format(
                         reward,
                         material_amount,
                         init_target_amount
