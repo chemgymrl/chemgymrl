@@ -12,7 +12,7 @@ def convert_material_dict_to_volume(material_dict,
     for M in material_dict:
         if not material_dict[M][0]().is_solute():
             mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
-            volume = mass / material_dict[M][0]().get_density()
+            volume = mass / material_dict[M][0]().get_density() # in mL
             volume_dict[M] = volume
             total_volume += volume
     return volume_dict, total_volume
