@@ -7,7 +7,8 @@ setup(name='chemistrygym',
           'gym',
           'numpy',
           'matplotlib',
-          'cmocean'
+          'cmocean',
+          'pyyaml'
       ],
       description='Implementation of extraction simulations in the OpenAI Gym environment framework.',
       author='CLEAN and UW ECE ML',
