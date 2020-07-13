@@ -11,6 +11,7 @@ Reaction Bench Demo
 # import all the required external modules
 import gym
 import numpy as np
+import os
 import pickle
 import sys
 from time import sleep
@@ -71,6 +72,13 @@ while not done:
     sleep(1)
 
     i += 1
+
+# open and check the material dict
+vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
+with open(vessel_path, 'rb') as open_file:
+    v = pickle.load(open_file)
+print(v._material_dict)
+__ = input("PRESS ENTER TO CONTINUE")
 
 # ---------- # EXTRACT BENCH DEMO # ---------- #
 __ = input('PRESS ENTER TO START EXTRACT BENCH.')
