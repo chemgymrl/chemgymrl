@@ -295,9 +295,7 @@ class Reaction():
         # update the concentrations of each chemical
         for i in range(self.n.shape[0]):
             # convert back to moles
-            # Note: concentration is in mol/m**3 and V is in L
-            # moles = moles/m**3 * L * 0.001m**3/L
-            dn = dC[i] * V * 0.001
+            dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
 
         # calculate the reward (new molar amount of the desired chemical, if present)
@@ -332,7 +330,13 @@ class Reaction():
         # calculate the total pressure of all chemicals
         P_total = 0
         for i in range(self.n.shape[0]):
-            P_total += self.n[i] * R * T / V
+            P_total += self.n[i] * R * T / (V * 1000)
+            '''
+            print(self.n[i])
+            print(V)
+            print(P_total)
+            print("")
+            '''
 
         return P_total
 
@@ -360,7 +364,7 @@ class Reaction():
         # create an array of all the pressures of each chemical individually
         P = np.zeros(self.n.shape[0], dtype=np.float32)
         for i in range(self.n.shape[0]):
-            P[i] = self.n[i] * R * T / V
+            P[i] = self.n[i] * R * T / (V * 1000)
 
         return P
 
@@ -386,7 +390,7 @@ class Reaction():
         # create an array containing the concentrations of each chemical
         C = np.zeros(self.n.shape[0], dtype=np.float32)
         for i in range(self.n.shape[0]):
-            C[i] = self.n[i] / (V * 0.001)
+            C[i] = self.n[i] / (V * 1000)
 
         return C
 
@@ -429,6 +433,8 @@ class Reaction():
                             (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
                         ) ** 2.0
                     )
+                    if decay_rate < 1e-30:
+                        decay_rate = 0
                     absorb[k] += amount * height * decay_rate
 
         # absorption must be between 0 and 1

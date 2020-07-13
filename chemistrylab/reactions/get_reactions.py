@@ -22,7 +22,7 @@ def convert_to_class(materials=None):
 
     all_material_classes = []
 
-    # iterate through each material in the list of provided material strings
+    # iterate through each material in the list of provided material name strings
     for material in materials:
         # get the index of the current material in the list of names from get_materials;
         # obtain the class representation of the material using the index
