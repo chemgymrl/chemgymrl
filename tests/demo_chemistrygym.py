@@ -68,11 +68,11 @@ while not done:
 
     # render the plot and wait before continuing
     r_env.render(mode=render_mode)
-    sleep(3)
+    sleep(1)
 
     i += 1
 
-# ---------- # Extract BENCH DEMO # ---------- #
+# ---------- # EXTRACT BENCH DEMO # ---------- #
 __ = input('PRESS ENTER TO START EXTRACT BENCH.')
 
 # create a registered environment
