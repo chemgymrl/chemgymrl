@@ -27,7 +27,6 @@ import sys
 
 sys.path.append("../../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import material, util, vessel
-from chemistrylab.extract_algorithms import separate
 from chemistrylab.reactions.get_reactions import convert_to_class
 
 class Extraction:
@@ -326,7 +325,7 @@ class Extraction:
             # Pour the Extraction Vessel into Beaker 2
             if do_action == 4:
                 # determine the volume to pour from the extraction vessel into the second beaker
-                d_volume = extract_vessel.get_max_volume() * multiplier
+                d_volume = 1000.0 * multiplier # use the default volume for the extraction vessel
 
                 # push the event to the extraction vessel
                 event = ['pour by volume', beaker_2, d_volume]
