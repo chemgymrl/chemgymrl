@@ -121,9 +121,9 @@ class ReactionBenchEnv(gym.Env):
         self.dT = dT # Maximum change in temperature per action (K)
 
         self.Vi = Vi # Initial Volume (m**3)
-        self.Vmin = Vmin # Minimum Volume of the system (m**3)
-        self.Vmax = Vmax # Maximum Volume of the system (m**3)
-        self.dV = dV # Maximum change in Volume per action (m**3)
+        self.Vmin = Vmin # Minimum Volume of the system (L)
+        self.Vmax = Vmax # Maximum Volume of the system (L)
+        self.dV = dV # Maximum change in Volume per action (L)
 
         # initialize the reaction
         self.reaction = reaction(
@@ -151,6 +151,8 @@ class ReactionBenchEnv(gym.Env):
                 Tmin=Tmin,
                 default_dt=dt
             )
+            for i in range(self.reaction.initial_in_hand.shape[0]):
+                self.n_init[i] = self.reaction.initial_in_hand[i]
         else:
             with open(vessel_path, 'rb') as handle:
                 b = pickle.load(handle)
@@ -158,7 +160,6 @@ class ReactionBenchEnv(gym.Env):
 
             for i in range(self.n_init.shape[0]):
                 material_name = self.reaction.labels[i]
-                material_class = self.reaction.material_classes[i]
                 self.n_init[i] = self.vessels._material_dict[material_name][1]
 
         # reset the inputted reaction before performing any steps
