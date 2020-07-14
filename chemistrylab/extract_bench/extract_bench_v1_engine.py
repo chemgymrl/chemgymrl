@@ -336,5 +336,5 @@ class ExtractBenchEnv(gym.Env):
                 )
                 # self._plot_axs[i, 1].colorbar(mappable)
                 self._plot_fig.canvas.draw()
-                plt.show()
+                # plt.show() # adding this causes the plot to be unresponsive when updating
                 self._first_render = False
