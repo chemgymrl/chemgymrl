@@ -8,14 +8,15 @@ Module to access and execute the ExtractWorld Engine
 :history: 2020-06-24
 '''
 
-# import extrernal modules
-import numpy as np
+# import external modules
 import gym
 import gym.spaces
+import numpy as np
 import os
 import pickle
 import sys
 
+# import local modules
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms import material, util, vessel
 from chemistrylab.extract_bench.extract_bench_v1_engine import ExtractBenchEnv
@@ -75,13 +76,17 @@ def oil_vessel():
     # initialize extraction vessel
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
-    # initialize materials
+    # initialize H2O
     H2O = material.H2O()
+
+    # initialize Na
     Na = material.Na()
-    Cl = material.Cl()
     Na.set_charge(1.0)
     Na.set_solute_flag(True)
     Na.set_polarity(2.0)
+
+    # initialize Cl
+    Cl = material.Cl()
     Cl.set_charge(-1.0)
     Cl.set_solute_flag(True)
     Cl.set_polarity(2.0)
@@ -92,6 +97,8 @@ def oil_vessel():
         Na.get_name(): [Na, 1.0],
         Cl.get_name(): [Cl, 1.0]
     }
+
+    # solute_dict
     solute_dict = {
         Na.get_name(): [H2O.get_name(), 1.0],
         Cl.get_name(): [H2O.get_name(), 1.0],
@@ -103,13 +110,14 @@ def oil_vessel():
         v_max=extraction_vessel.get_max_volume()
     )
 
-    event_1 = ['update material dict', material_dict]
-    event_2 = ['update solute dict', solute_dict]
-    event_3 = ['fully mix']
-
+    # set events and push them to the queue
     extraction_vessel.push_event_to_queue(
         events=None,
-        feedback=[event_1, event_2, event_3],
+        feedback=[
+            ['update material dict', material_dict],
+            ['update solute dict', solute_dict],
+            ['fully mix']
+        ],
         dt=0
     )
 

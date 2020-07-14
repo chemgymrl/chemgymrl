@@ -301,7 +301,7 @@ class ReactionBenchEnv(gym.Env):
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
-            'new',
+            'react_vessel',
             temperature=self.Ti,
             p_max=self.Pmax,
             v_max=self.Vmax * 1000,

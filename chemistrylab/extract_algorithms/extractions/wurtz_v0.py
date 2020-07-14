@@ -19,12 +19,14 @@ Available Actions for this Extraction Experiment are included below.
 7: Done (Value doesn't matter)
 '''
 
+# import external modules
 import numpy as np
 import gym
 import math
 import copy
 import sys
 
+# import local modules
 sys.path.append("../../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import material, util, vessel
 from chemistrylab.reactions.get_reactions import convert_to_class

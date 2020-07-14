@@ -11,18 +11,20 @@ Module defining the ExtractWorld Engine
 # pylint: disable=no-member
 # pylint: disable=unsubscriptable-object
 
+# import external modules
 import cmocean
 import numpy as np
 import gym
 import matplotlib.pyplot as plt
 import sys
 
+# import local modules
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util
 from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0
 from chemistrylab.extract_algorithms import separate
 
-# A dictionary of available extractions
+# a dictionary of available extractions
 extraction_dict = {
     'water_oil': water_oil_v1,
     "wurtz": wurtz_v0

@@ -1,5 +1,5 @@
 '''
-Reaction Bench Demo
+ChemistryGym Demo
 
 :title: demo_chemistrygym.py
 
@@ -23,7 +23,7 @@ sys.path.append("../chemistrylab/reactions") # to access all reactions
 # import all local modules
 import chemistrylab
 
-# ---------- # REACTION BENCH DEMO # ---------- #
+# -------------------- # REACTION BENCH DEMO # -------------------- #
 __ = input("PRESS ENTER TO START REACTION BENCH.")
 
 # Use a perfect policy
@@ -37,7 +37,7 @@ render_mode = "human"
 # State [0] is seconds since the start of reaction
 # State [1] is the thermostat temperature of the system
 # State [2 and beyond] is the remaining amounts of each reactant
-s = r_env.reset()
+__ = r_env.reset()
 r_env.render(mode=render_mode)
 
 __ = input('PRESS ENTER TO CONTINUE REACTION BENCH.')
@@ -50,9 +50,10 @@ total_reward = 0.0
 
 while not done:
     # Select random actions
-    # Action [0] changes the temperature between -dT (a[0]=0.0) and +dT (a[1]=1.0)
-    # Action [1] changes the Volume between -dV and +dV
-    # Actions [2:] adds all reactants to the system between 0 mol (a[1]=0.0) and 1 mol (a[1]=1.0)
+    # Actions:
+    #   a[0] changes the temperature between -dT (a[0] = 0.0) and +dT (a[0] = 1.0)
+    #   a[1] changes the Volume between -dV (a[1] = 0.0) and +dV (a[1] = 1.0)
+    #   a[2:] adds between none (a[2:] = 0.0) and all (a[2:] = 1.0) of each reactant
     if perfect:
         if i == 0:
             action = np.ones(r_env.action_space.shape)
@@ -69,7 +70,7 @@ while not done:
 
     # render the plot and wait before continuing
     r_env.render(mode=render_mode)
-    sleep(1)
+    sleep(2)
 
     i += 1
 
@@ -80,7 +81,7 @@ with open(vessel_path, 'rb') as open_file:
 print(v._material_dict)
 __ = input("PRESS ENTER TO CONTINUE")
 
-# ---------- # EXTRACT BENCH DEMO # ---------- #
+# -------------------- # EXTRACT BENCH DEMO # -------------------- #
 __ = input('PRESS ENTER TO START EXTRACT BENCH.')
 
 # create a registered environment
@@ -88,11 +89,13 @@ e_env = gym.make('WurtzExtract-v1')
 e_env.reset()
 
 # render the initial state
-e_env.render()
+e_env.render(model=render_mode)
 
-# perform a sample action and render the resulting state
-action = np.array([3, 2])
-state, reward, done, __ = e_env.step(action)
+# queue and perform the Extraction Vessel's pour by volume action with a multiplier of 0.5 (2/4)
+action = np.array([4, 2])
+__, __, __, __ = e_env.step(action)
+
+# render the resulting state
 e_env.render()
 
 __ = input('PRESS ENTER TO CONTINUE EXTRACT BENCH')
@@ -102,21 +105,29 @@ step_num = 0
 total_reward = 0.0
 
 while not done:
-    # on the first step pour the extraction vessel by volume to get all the materials into beakers
-    if step_num == 0:
-        action = np.array([4, 2])
-    # otherwise select a random action
-    else:
-        action_space = e_env.action_space
-        action = action_space.sample()
+    # select and perform a random action
+    # actions consist of arrays of two elements
+    #   action[0] is a number indicating the event to take place
+    #   action[1] is a number representing a multiplier for the event
+    # Actions and multipliers are included below:
+    #   0: Valve (Speed multiplier, relative to max_valve_speed)
+    #   1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
+    #   2: Pour B1 into ExV (Volume multiplier, relative to max_vessel_volume)
+    #   3: Pour B2 into ExV (Volume multiplier, relative to max_vessel_volume)
+    #   4: Pour ExV into B2 (Volume multiplier, relative to default vessel volume)
+    #   5: Pour S1 into ExV (Volume multiplier, relative to max_vessel_volume)
+    #   6: Pour S2 into ExV (Volume multiplier, relative to max_vessel_volume)
+    #   7: Done (Multiplier doesn't matter)
+    action_space = e_env.action_space
+    action = action_space.sample()
 
     # perform the random action and update the reward
     state, reward, done, __ = e_env.step(action)
     total_reward += reward
 
-    # render the plots
+    # render each of the three plots
     e_env.render()
-    sleep(3)
+    sleep(2)
 
     step_num += 1
 

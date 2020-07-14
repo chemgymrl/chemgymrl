@@ -1,6 +1,16 @@
+'''
+ChemistryLab Init Registration File
+
+:title: __init__.py
+
+:author: Chris Beeler and Mitchell Shahen
+
+:history: 2020-07-03
+'''
+
 from gym.envs.registration import register
 
-############################ ExtractWorld ####################################
+############################ ExtractBench ####################################
 
 register(
     id='WurtzExtract-v1',
@@ -14,7 +24,7 @@ register(
     max_episode_steps=100
 )
 
-############################ ODEWorld ####################################
+############################ ReactBench ####################################
 
 register(
     id='WurtzReact-v0',
