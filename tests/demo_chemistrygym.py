@@ -22,7 +22,7 @@ sys.path.append("../chemistrylab/reactions") # to access all reactions
 
 # import all local modules
 import chemistrylab
-'''
+
 # ---------- # REACTION BENCH DEMO # ---------- #
 __ = input("PRESS ENTER TO START REACTION BENCH.")
 
@@ -79,7 +79,7 @@ with open(vessel_path, 'rb') as open_file:
     v = pickle.load(open_file)
 print(v._material_dict)
 __ = input("PRESS ENTER TO CONTINUE")
-'''
+
 # ---------- # EXTRACT BENCH DEMO # ---------- #
 __ = input('PRESS ENTER TO START EXTRACT BENCH.')
 
