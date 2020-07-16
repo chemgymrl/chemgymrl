@@ -22,7 +22,7 @@ sys.path.append("../chemistrylab/reactions") # to access all reactions
 
 # import all local modules
 import chemistrylab
-
+'''
 # -------------------- # REACTION BENCH DEMO # -------------------- #
 __ = input("PRESS ENTER TO START REACTION BENCH.")
 
@@ -73,12 +73,32 @@ while not done:
     sleep(2)
 
     i += 1
-
+'''
 # open and check the material dict
 vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
 with open(vessel_path, 'rb') as open_file:
     v = pickle.load(open_file)
-print(v._material_dict)
+
+print("")
+print("---------- VESSEL ----------")
+print("Label: {}".format(v.label))
+
+print("")
+print("---------- THERMODYNAMIC VARIABLES ----------")
+print("Temperature (in K): {}".format(v.temperature))
+print("Volume (in L): {}".format(v.volume))
+print("Pressure (in kPa): {}".format(v.pressure))
+
+print("")
+print("---------- MATERIAL_DICT ----------")
+for material, value_list in v._material_dict.items():
+    print("{} : {}".format(material, value_list))
+
+print("")
+print("---------- SOLUTE_DICT ----------")
+for solute, value_list in v._solute_dict.items():
+    print("{} : {}".format(solute, value_list))
+
 __ = input("PRESS ENTER TO CONTINUE")
 
 # -------------------- # EXTRACT BENCH DEMO # -------------------- #
@@ -89,7 +109,7 @@ e_env = gym.make('WurtzExtract-v1')
 e_env.reset()
 
 # render the initial state
-e_env.render(model=render_mode)
+e_env.render()
 
 # queue and perform the Extraction Vessel's pour by volume action with a multiplier of 0.5 (2/4)
 action = np.array([4, 2])
