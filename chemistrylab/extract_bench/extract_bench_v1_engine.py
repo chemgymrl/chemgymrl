@@ -108,6 +108,24 @@ class ExtractBenchEnv(gym.Env):
         # Reset the environment to start
         # self.reset()
 
+    def _calc_reward(self):
+        '''
+        '''
+
+        total_reward = 0
+
+        for vessel_obj in self.vessels:
+            mat_dict = vessel_obj._material_dict
+            materials = [item for item in mat_dict]
+
+            if self.target_material in materials:
+                total_reward += self.extraction.done_reward(beaker=vessel_obj)
+
+        if total_reward == 0:
+            print("Error: No target material found in any vessel!")
+
+        return total_reward
+
     def reset(self):
         '''
         Initialize the environment
@@ -187,7 +205,11 @@ class ExtractBenchEnv(gym.Env):
         self.n_steps -= 1
         if self.n_steps == 0:
             self.done = True
-            reward = self.extraction.done_reward(self.vessels[2])
+
+            # after the last iteration, calculate the amount of target material in each vessel
+            reward = self._calc_reward()
+
+            # reward = self.extraction.done_reward(self.vessels[2])
 
         return self.state, reward, self.done, {}
 
@@ -230,20 +252,24 @@ class ExtractBenchEnv(gym.Env):
         None
         '''
 
+        # create a list containing an array for each vessel in `self.vessels`
         position_separate = []
         for vessel_obj in self.vessels:
             position, __ = vessel_obj.get_position_and_variance()
+
+            # append an array of shape: (# of layers in vessel, # of points in the spectral plot)
             position_separate.append(
                 np.zeros((len(position), separate.x.shape[0]), dtype=np.float32)
             )
 
+        # iterate through each array and populate them with gaussian data for each material layer
         for i, arr in enumerate(position_separate):
             position, var = self.vessels[i].get_position_and_variance(dict_or_list='dict')
             t = -1.0 * np.log(var * np.sqrt(2.0 * np.pi))
             j = 0
 
             for layer in position:
-                # Loop over each phase
+                # Loop over each layer
                 mat_vol = self.vessels[i].get_material_volume(layer)
 
                 for k in range(arr.shape[1]):
@@ -267,9 +293,13 @@ class ExtractBenchEnv(gym.Env):
             )
         )
 
+        # set parameters and plotting for the first rendering
         if self._first_render:
+            # close all existing plots and enable interactive mode
             plt.close('all')
             plt.ion()
+
+            # define a set of three subplots
             self._plot_fig, self._plot_axs = plt.subplots(
                 self.extraction.n_total_vessels,
                 2,
@@ -277,25 +307,30 @@ class ExtractBenchEnv(gym.Env):
                 gridspec_kw={'width_ratios': [3, 1]}
             )
 
+            # extract each array of plotting data, determine the plot colour, and add the plot
             for i, arr in enumerate(position_separate):
                 position, __ = self.vessels[i].get_position_and_variance()
                 j = 0
 
+                # determine the color of the plot
                 for layer in position:
                     if layer == 'Air':
                         color = self.vessels[i].Air.get_color()
                     else:
                         color = self.vessels[i].get_material_color(layer)
-
                     color = cmocean.cm.delta(color)
+
+                    # add each layer to the subplot as different plot objects
                     self._plot_axs[i, 0].plot(separate.x, arr[j], label=layer, c=color)
                     j += 1
 
+                # set plotting parameters for the current subplot
                 self._plot_axs[i, 0].set_xlim([separate.x[0], separate.x[-1]])
                 self._plot_axs[i, 0].set_ylim([0, self.vessels[i].v_max])
                 self._plot_axs[i, 0].set_xlabel('Separation')
                 self._plot_axs[i, 0].legend()
 
+                # define the mixing visualization graphic rendered beside the current subplot
                 __ = self._plot_axs[i, 1].pcolormesh(
                     Ls[i],
                     vmin=0,
@@ -303,40 +338,57 @@ class ExtractBenchEnv(gym.Env):
                     cmap=cmocean.cm.delta
                 )
 
+                # set plotting parameters for the mixing graphic
                 self._plot_axs[i, 1].set_xticks([])
                 self._plot_axs[i, 1].set_ylabel('Height')
                 # self._plot_axs[i, 1].colorbar(mappable)
+
+                # draw the canvas and render the subplot
                 self._plot_fig.canvas.draw()
                 plt.show()
 
                 self._first_render = False
+
+        # if the plot has already been rendered, update the plot
         else:
+            # iterate through each array
             for i, arr in enumerate(position_separate):
+                # clear the plot of all data and determine the data's intended position on the plot
                 self._plot_axs[i, 0].clear()
                 position, __ = self.vessels[i].get_position_and_variance()
 
                 j = 0
+
+                # determine the colour of each layer
                 for layer in position:
                     if layer == 'Air':
                         color = self.vessels[i].Air.get_color()
                     else:
                         color = self.vessels[i].get_material_color(layer)
-
                     color = cmocean.cm.delta(color)
+
+                    # add each layer to the current subplot
                     self._plot_axs[i, 0].plot(separate.x, arr[j], label=layer, c=color)
                     j += 1
 
+                # set plotting parameters for the current subplot
                 self._plot_axs[i, 0].set_xlim([separate.x[0], separate.x[-1]])
                 self._plot_axs[i, 0].set_ylim([0, self.vessels[i].v_max])
                 self._plot_axs[i, 0].set_xlabel('Separation')
                 self._plot_axs[i, 0].legend()
+
+                # define the layer mixture graphic beside the current subplot
                 __ = self._plot_axs[i, 1].pcolormesh(
                     Ls[i],
                     vmin=0,
                     vmax=1,
                     cmap=cmocean.cm.delta
                 )
+
                 # self._plot_axs[i, 1].colorbar(mappable)
+
+                # draw the subplot on the existing canvas
                 self._plot_fig.canvas.draw()
                 # plt.show() # adding this causes the plot to be unresponsive when updating
+
                 self._first_render = False
