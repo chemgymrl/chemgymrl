@@ -4,8 +4,8 @@
 
 ### Attendees
 
-- Chris Beeler
-- Nouha Chatti (Secretary)
+- Chris Beeler (Secretary)
+- Nouha Chatti
 - Mark Crowley
 - Mitchell Shahen 
 - Isaac Tamblyn 
