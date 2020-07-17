@@ -8,10 +8,10 @@ Module to access and execute the ExtractWorld Engine
 :history: 2020-06-24
 '''
 
+# pylint: disable=invalid-name
+# pylint: disable=wrong-import-position
+
 # import external modules
-import gym
-import gym.spaces
-import numpy as np
 import os
 import pickle
 import sys

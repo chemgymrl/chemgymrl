@@ -8,6 +8,12 @@ ChemistryGym Demo
 :history: 2020-07-03
 '''
 
+# pylint: disable=invalid-name
+# pylint: disable=protected-access
+# pylint: disable=unused-import
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
+
 # import all the required external modules
 import gym
 import numpy as np
@@ -22,7 +28,7 @@ sys.path.append("../chemistrylab/reactions") # to access all reactions
 
 # import all local modules
 import chemistrylab
-'''
+
 # -------------------- # REACTION BENCH DEMO # -------------------- #
 __ = input("PRESS ENTER TO START REACTION BENCH.")
 
@@ -73,7 +79,7 @@ while not done:
     sleep(2)
 
     i += 1
-'''
+
 # open and check the material dict
 vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
 with open(vessel_path, 'rb') as open_file:

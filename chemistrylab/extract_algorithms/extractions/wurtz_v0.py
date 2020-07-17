@@ -19,16 +19,25 @@ Available Actions for this Extraction Experiment are included below.
 7: Done (Value doesn't matter)
 '''
 
+# pylint: disable=invalid-name
+# pylint: disable=protected-access
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=wrong-import-position
+
 # import external modules
-import numpy as np
-import gym
-import math
 import copy
 import sys
 
+# import OpenAI Gym
+import gym
+
 # import local modules
 sys.path.append("../../../") # to access chemistrylab
-from chemistrylab.chem_algorithms import material, util, vessel
+from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.reactions.get_reactions import convert_to_class
 
 class Extraction:
@@ -68,17 +77,17 @@ class Extraction:
     '''
 
     def __init__(
-        self,
-        extraction_vessel,
-        solute,
-        target_material,
-        n_empty_vessels=2,  # number of empty vessels
-        solute_volume=1000000000,  # the amount of solute available (unlimited)
-        dt=0.05,  # time for each step (time for separation)
-        max_vessel_volume=1000.0,  # max volume of empty vessels / g
-        n_vessel_pixels=100,  # number of pixels for each vessel
-        max_valve_speed=10,  # maximum draining speed (pixels/step)
-        n_actions=8
+            self,
+            extraction_vessel,
+            solute,
+            target_material,
+            n_empty_vessels=2,  # number of empty vessels
+            solute_volume=1000000000,  # the amount of solute available (unlimited)
+            dt=0.05,  # time for each step (time for separation)
+            max_vessel_volume=1000.0,  # max volume of empty vessels / g
+            n_vessel_pixels=100,  # number of pixels for each vessel
+            max_valve_speed=10,  # maximum draining speed (pixels/step)
+            n_actions=8
     ):
         '''
         Constructor class for the Wurtz Extraction class
@@ -264,8 +273,8 @@ class Extraction:
 
         # if the multiplier is 0, push an empty list of events to the vessel queue
         if all([multiplier == 0, do_action != 7]):
-            for vessel in vessels:
-                __ = vessel.push_event_to_queue(dt=self.dt)
+            for vessel_obj in vessels:
+                __ = vessel_obj.push_event_to_queue(dt=self.dt)
         else:
             # obtain the necessary vessels
             extract_vessel = vessels[0]
@@ -404,7 +413,7 @@ class Extraction:
             reward = -100
         else:
             try:
-                assert (abs(init_target_amount - 0.0) > 1e-6)
+                assert abs(init_target_amount - 0.0) > 1e-6
 
                 reward = (material_amount / init_target_amount) * 100
 

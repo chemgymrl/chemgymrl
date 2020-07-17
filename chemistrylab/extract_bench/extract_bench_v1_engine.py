@@ -8,15 +8,27 @@ Module defining the ExtractWorld Engine
 :history: 2020-06-24
 '''
 
+# pylint: disable=arguments-differ
+# pylint: disable=invalid-name
 # pylint: disable=no-member
+# pylint: disable=protected-access
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
 # pylint: disable=unsubscriptable-object
+# pylint: disable=unused-argument
+# pylint: disable=wrong-import-position
+
+# import internal Python modules
+import sys
 
 # import external modules
 import cmocean
 import numpy as np
 import gym
 import matplotlib.pyplot as plt
-import sys
 
 # import local modules
 sys.path.append("../../") # access chemistrylab
@@ -63,15 +75,15 @@ class ExtractBenchEnv(gym.Env):
     '''
 
     def __init__(
-        self,
-        n_steps=100,
-        dt=0.01,
-        extraction="",
-        n_vessel_pixels=100,
-        max_valve_speed=10,
-        extraction_vessel=None,
-        solute=None,
-        target_material=None
+            self,
+            n_steps=100,
+            dt=0.01,
+            extraction="",
+            n_vessel_pixels=100,
+            max_valve_speed=10,
+            extraction_vessel=None,
+            solute=None,
+            target_material=None
     ):
         '''
         Constructor class method for the Extract Bench Environment
@@ -116,9 +128,8 @@ class ExtractBenchEnv(gym.Env):
 
         for vessel_obj in self.vessels:
             mat_dict = vessel_obj._material_dict
-            materials = [item for item in mat_dict]
 
-            if self.target_material in materials:
+            if self.target_material in mat_dict:
                 total_reward += self.extraction.done_reward(beaker=vessel_obj)
 
         if total_reward == 0:
