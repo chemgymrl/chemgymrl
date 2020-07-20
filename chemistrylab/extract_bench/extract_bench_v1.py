@@ -125,7 +125,7 @@ def oil_vessel():
 
 class ExtractWorld_v1(ExtractBenchEnv):
     '''
-    Class to define an environment which performs an extraction on materials in a vessel.
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     '''
 
     def __init__(self):
@@ -141,7 +141,7 @@ class ExtractWorld_v1(ExtractBenchEnv):
 
 class ExtractWorld_v2(ExtractBenchEnv):
     '''
-    Class to define an environment which performs an extraction on materials in a vessel.
+    Class to define an environment which performs a water-oil extraction on materials in a vessel.
     '''
 
     def __init__(self):

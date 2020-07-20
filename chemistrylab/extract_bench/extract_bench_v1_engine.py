@@ -117,15 +117,14 @@ class ExtractBenchEnv(gym.Env):
         self._plot_fig = None
         self._plot_axs = None
 
-        # Reset the environment to start
-        # self.reset()
-
     def _calc_reward(self):
         '''
+        Method to calculate the generated reward in every vessel in `self.vessels`.
         '''
 
         total_reward = 0
 
+        # search every vessel's material_dict for the target material
         for vessel_obj in self.vessels:
             mat_dict = vessel_obj._material_dict
 

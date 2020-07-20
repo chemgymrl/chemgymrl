@@ -393,7 +393,7 @@ class Extraction:
         Parameters
         ---------------
         `beaker` : `vessel.Vessel`
-            A vessel objects that contains all of the extracted materials and solutes.
+            A vessel object that contains all of the extracted materials and solutes.
 
         Returns
         ---------------
@@ -418,10 +418,11 @@ class Extraction:
                 reward = (material_amount / init_target_amount) * 100
 
                 print(
-                    "done_reward: {}, in_vessel: {}, initial: {}".format(
-                        reward,
-                        material_amount,
-                        init_target_amount
+                    "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
+                        beaker.label,
+                        "{} %".format(round(reward, 2)),
+                        "{:e}".format(material_amount),
+                        "{:e}".format(init_target_amount)
                     )
                 )
 
