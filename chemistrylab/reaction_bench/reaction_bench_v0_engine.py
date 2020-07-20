@@ -591,7 +591,14 @@ class ReactionBenchEnv(gym.Env):
             self.state[2],
             self.state[3]
         ] + self.reaction.get_ni_num()
-        label_list = ['t', 'T', 'V', 'P'] + self.reaction.get_ni_label()
+
+        reactant_labels = []
+        for reactant in self.reaction.get_ni_label():
+            name = reactant.replace("[", "").replace("]", "")
+            short_name = name[0:5]
+            reactant_labels.append(short_name)
+
+        label_list = ['t', 'T', 'V', 'P'] + reactant_labels
 
         # define and render an empty plot if none such yet exists
         if self._first_render:
@@ -684,7 +691,14 @@ class ReactionBenchEnv(gym.Env):
             self.state[2],
             self.state[3]
         ] + self.reaction.get_ni_num()
-        label_list = ['t', 'T', 'V', 'P'] + self.reaction.get_ni_label()
+
+        reactant_labels = []
+        for reactant in self.reaction.get_ni_label():
+            name = reactant.replace("[", "").replace("]", "")
+            short_name = name[0:4]
+            reactant_labels.append(short_name)
+
+        label_list = ['t', 'T', 'V', 'P'] + reactant_labels
 
         # get the spectral data peak and dashed spectral lines
         peak = self.reaction.get_spectra_peak(self.V)
