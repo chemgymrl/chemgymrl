@@ -29,9 +29,9 @@ from chemistrylab.reactions.get_reactions import convert_to_class
 # 6) 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
 
 # reaction rate for each reaction
-# used in the exponential formula k = e^(-E/RT)
+# used in the exponential formula k = A * e^(-E/RT)
 # Reaction 1)
-A1 = 1.0
+A1 = 10.0
 E1 = 1.0
 
 # Reaction 2)
