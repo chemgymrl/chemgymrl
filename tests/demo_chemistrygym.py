@@ -51,7 +51,7 @@ __ = input('PRESS ENTER TO CONTINUE REACTION BENCH.')
 done = False
 i = 0
 
-# Game will play until: 20 steps are reached
+# Game will play until: 20 steps are completed
 total_reward = 0.0
 
 while not done:
@@ -91,9 +91,9 @@ print("Label: {}".format(v.label))
 
 print("")
 print("---------- THERMODYNAMIC VARIABLES ----------")
-print("Temperature (in K): {}".format(v.temperature))
-print("Volume (in L): {}".format(v.volume))
-print("Pressure (in kPa): {}".format(v.pressure))
+print("Temperature (in K): {:e}".format(v.temperature))
+print("Volume (in L): {:e}".format(v.volume))
+print("Pressure (in kPa): {:e}".format(v.pressure))
 
 print("")
 print("---------- MATERIAL_DICT ----------")
@@ -117,7 +117,7 @@ e_env.reset()
 # render the initial state
 e_env.render()
 
-# queue and perform the Extraction Vessel's pour by volume action with a multiplier of 0.5 (2/4)
+# queue and perform the Extraction Vessel's pour by volume action with a multiplier of 0.5
 action = np.array([4, 2])
 __, __, __, __ = e_env.step(action)
 
@@ -146,6 +146,12 @@ while not done:
     #   7: Done (Multiplier doesn't matter)
     action_space = e_env.action_space
     action = action_space.sample()
+
+    # ensure atleast 5 steps are completed before the done exit action
+    if step_num < 5:
+        while action[0] == 7:
+            action_space = e_env.action_space
+            action = action_space.sample()
 
     # perform the random action and update the reward
     state, reward, done, __ = e_env.step(action)
