@@ -244,8 +244,6 @@ class Extraction:
             A list of all the vessel objects that contain materials and solutes.
         `external_vessels` : `list`
             A list of the external vessels, beakers, to be used in the extraction.
-        `state` : `np.array`
-            An array containing state variables, material concentrations, and spectral data.
         `action` : `list`
             A list of two numbers indicating the index of an action to
             perform and a multiplier used when performin the action.
