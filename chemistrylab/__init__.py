@@ -37,3 +37,11 @@ register(
     entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0_Overlap',
     max_episode_steps=20
 )
+
+############################ DistillationBench ####################################
+
+register(
+    id='WurtzDistillation-v0',
+    entry_point='chemistrylab.distillation_bench.distillation_bench_v1:Distillation_v1',
+    max_episode_steps=20
+)
