@@ -1,0 +1,35 @@
+Distillation Bench:
+
+- Needs 3 vessels
+- Boil (input) vessel and 2 beakers
+
+- Actions:
+	- Add/remove heat to boil vessel
+	- Pour boil vessel to beaker 1
+	- Pour beaker 1 into beaker 2
+	- Pour beaker 1 into boil vessel
+	- Pour beaker 2 into boil vessel
+	- Done
+
+- Processes:
+	- Change in temperature by addition/removal of heat by Q = mcT
+	- Boiling of materials
+	- Boiled off materials simply appear in beaker 1 already at room temperature
+
+- Reward:
+	- Want to obtain all target material in a vessel with no other materials
+	- Use purity of materials in vessel (mol of target/mol of all materials in vessel)
+	- Discourage target material in multiple vessels
+
+- How to Boil:
+	1. Heat is added until we reach the boiling point of a material (temp of the vessel rises using weighted c)
+	2. Remaining heat is used to perform the phase transition of the material (no vessel temp change)
+	3. If heat remains after all of boiled material has boiled off, return to step 1
+	4. If no heat remains, but material to be boiled off remains, end the action and maintain vessel temp
+
+- Overview of Changes:
+	- Make new Distillation file
+	- Make new distillation engine
+	- Make new distillation Bench
+	- Add heat change in vessel file
+	- Register the new environment
