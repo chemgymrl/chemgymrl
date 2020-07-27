@@ -11,7 +11,7 @@ class Vessel:
 
     def __init__(self,
                  label,  # Name of the vessel
-                 temperature=297,  # C
+                 temperature=297,  # K
                  pressure=1.0,  # Kpa
                  volume=1000.0, # mL
                  materials={}, # moles of materials
@@ -70,6 +70,7 @@ class Vessel:
                             'update solute dict': self._update_solute_dict,
                             'mix': self._mix,
                             'update_layer': self._update_layers,
+                            'change_heat': self._change_heat
                             }
 
         # event queues
@@ -148,6 +149,116 @@ class Vessel:
         for i in self._material_dict.values():  # loop over all the materials
             feedback = i[0].update_temperature(target_temperature=parameters[0], dt=dt)
             self._feedback_queue.extend(feedback)
+
+    def _change_heat(self, parameter, dt):
+        '''
+        '''
+
+        # extract the inputted parameters
+        heat_change = parameter[0]
+        out_beaker = parameter[1]
+
+        print("Implement Heat Change of {:e} joules".format(heat_change))
+
+        # create a list of increments of heat changes
+        num_increments = 100
+        heat_packets = [heat_change/num_increments for __ in range(num_increments)]
+
+        # get the necessary vessel properties
+        material_names = list(self._material_dict.keys())
+        material_amounts = [amount for __, amount in self._material_dict.values()]
+        material_objs = [material_obj for material_obj, __ in self._material_dict.values()]
+        material_bps = [material_obj()._boiling_point for material_obj in material_objs]
+        material_sp_heats = [material_obj()._specific_heat for material_obj in material_objs]
+
+        # ensure all material boiling points are above the current vessel temperature
+        if min(material_bps) < self.temperature:
+            raise IOError("")
+
+        # determine the material with the smallest boiling point and its value
+        smallest_bp = min(material_bps)
+
+        # modify the vessel temperature until a material's boiling point is reached;
+        # then induce a phase change; once complete, continue adjusting the vessel temperature
+        while self.temperature < smallest_bp:
+            try:
+                # obtain the change in heat
+                dQ = heat_packets.pop(0)
+            except IndexError:
+                break
+
+            # get parameters related to the material with the smallest boiling point
+            smallest_bp_index = material_bps.index(smallest_bp)
+            smallest_bp_material_name = material_names[smallest_bp_index]
+            smallest_bp_material_amount = material_amounts[smallest_bp_index]
+            smallest_bp_material_obj = material_objs[smallest_bp_index]
+            smallest_bp_material_sp_heat = material_sp_heats[smallest_bp_index]
+
+            # if the vessel temperature reaches a boiling point, boil off the material with that BP
+            if all([
+                self.temperature == smallest_bp,
+                smallest_bp_material_amount > 0
+            ]):
+                # calculate the mass boiled off using the next packet of heat energy
+                molar_mass = smallest_bp_material_obj()._molar_mass
+                dM = dQ / (self.temperature * smallest_bp_material_sp_heat * molar_mass)
+
+                # subtract the previous material amount by dM
+                material_amounts[smallest_bp_index] -= dM
+                print("Boiling Off {} mol of {}".format(dM, smallest_bp_material_name))
+
+                # ensure the beaker has an entry for the boiled off material
+                if not smallest_bp_material_name in out_beaker._material_dict.keys():
+                    out_beaker._material_dict[smallest_bp_material_name] = [
+                        smallest_bp_material_obj,
+                        0.0
+                    ]
+
+                # add the boiled off material to the beaker
+                out_beaker._material_dict[smallest_bp_material_name][1] += dM
+
+            # if no material is left to boil off, update the smallest boiling point
+            if all([
+                self.temperature == smallest_bp,
+                smallest_bp_material_amount == 0
+            ]):
+                # delete the boiled off material from all vessel-generated lists
+                __ = material_names.pop(smallest_bp_index)
+                __ = material_amounts.pop(smallest_bp_index)
+                __ = material_objs.pop(smallest_bp_index)
+                __ = material_sp_heats.pop(smallest_bp_index)
+
+                # remove the previously smallest boiling point
+                __ = material_bps.pop(smallest_bp_index)
+
+                # update the smallest boiling point value
+                smallest_bp = min(material_bps)
+
+            # if no boiling point has been reached, modify the temperature of the vessel
+            else:
+                # calculate the total entropy of all the materials
+                total_entropy = 0 # in J/K
+                for i, material_amount in enumerate(material_amounts):
+                    specific_heat = material_sp_heats[i] # in J/g*K
+                    molar_amount = material_amount # in mol
+                    molar_mass = material_objs[i]()._molar_mass # in g/mol
+
+                    # calculate the entropy
+                    total_entropy += specific_heat * molar_amount * molar_mass
+
+                # calculate the change in temperature using dQ / (m * c) = dT
+                dT = dQ / total_entropy
+                self.temperature += dT
+
+        print("Modified Vessel Temperature to {} Kelvin".format(self.temperature))
+
+        # after completing the while loop, update the vessel's material dictionary
+        new_material_dict = {}
+        for i, name in enumerate(material_names):
+            new_material_dict[name] = [material_objs[i], material_amounts[i]]
+        self._material_dict = new_material_dict
+
+        return 0
 
     def open_lid(self):
         if self.open_vessel:
