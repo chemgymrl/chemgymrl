@@ -44,7 +44,7 @@ def get_extract_vessel(vessel_path=None, extract_vessel=None):
     '''
 
     # ensure that at least one of the methods to obtain a vessel is provided
-    if all([not vessel_path, not vessel]):
+    if all([not os.path.exists(vessel_path), not extract_vessel]):
         raise IOError("No vessel acquisition method specified.")
 
     # if a vessel object is provided, use it;

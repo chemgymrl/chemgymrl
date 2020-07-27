@@ -120,6 +120,19 @@ class ExtractBenchEnv(gym.Env):
     def _calc_reward(self):
         '''
         Method to calculate the generated reward in every vessel in `self.vessels`.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `total_reward` : `float`
+            The sum of reward found in each vessel.
+
+        Raises
+        ---------------
+        None
         '''
 
         total_reward = 0
