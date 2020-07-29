@@ -34,8 +34,8 @@ __ = input('PRESS ENTER TO START DISTILLATION BENCH.')
 d_env = gym.make('Distillation-v0')
 d_env.reset()
 
-# queue and perform the Boil Vessel's change heat action by adding the maximal amount of heat
-action = np.array([0, 10])
+# queue and perform the Boil Vessel's change heat action but add no heat
+action = np.array([0, 5])
 __, __, __, __ = d_env.step(action)
 
 __ = input('PRESS ENTER TO CONTINUE DISTILLATION BENCH')

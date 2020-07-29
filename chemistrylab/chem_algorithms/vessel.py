@@ -37,8 +37,8 @@ class Vessel:
             temperature=297, # K
             pressure=1.0, # Kpa
             volume=1000.0, # mL
-            materials=None, # moles of materials
-            solutes=None, # moles of solutes
+            materials={}, # moles of materials
+            solutes={}, # moles of solutes
             v_max=1000.0, # ml
             v_min=1000.0, # mL
             Tmax=500, # Kelvin
