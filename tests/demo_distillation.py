@@ -1,11 +1,11 @@
 '''
-ChemistryGym Demo
+Distillation Demo
 
-:title: demo_chemistrygym.py
+:title: demo_distillation.py
 
-:author: Chris Beeler and Mitchell Shahen
+:author: Mitchell Shahen
 
-:history: 2020-07-03
+:history: 2020-07-23
 '''
 
 # pylint: disable=invalid-name
@@ -17,8 +17,6 @@ ChemistryGym Demo
 # import all the required external modules
 import gym
 import numpy as np
-import os
-import pickle
 import sys
 from time import sleep
 
@@ -32,11 +30,11 @@ import chemistrylab
 # -------------------- # DISTILLATION BENCH DEMO # -------------------- #
 __ = input('PRESS ENTER TO START DISTILLATION BENCH.')
 
-# create a registered environment
+# create the registered distillation environment
 d_env = gym.make('Distillation-v0')
 d_env.reset()
 
-# queue and perform the Extraction Vessel's pour by volume action with a multiplier of 0.5
+# queue and perform the Boil Vessel's change heat action by adding the maximal amount of heat
 action = np.array([0, 10])
 __, __, __, __ = d_env.step(action)
 
@@ -52,14 +50,12 @@ while not done:
     #   action[0] is a number indicating the event to take place
     #   action[1] is a number representing a multiplier for the event
     # Actions and multipliers are included below:
-    #   0: Valve (Speed multiplier, relative to max_valve_speed)
-    #   1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
-    #   2: Pour B1 into ExV (Volume multiplier, relative to max_vessel_volume)
-    #   3: Pour B2 into ExV (Volume multiplier, relative to max_vessel_volume)
-    #   4: Pour ExV into B2 (Volume multiplier, relative to default vessel volume)
-    #   5: Pour S1 into ExV (Volume multiplier, relative to max_vessel_volume)
-    #   6: Pour S2 into ExV (Volume multiplier, relative to max_vessel_volume)
-    #   7: Done (Multiplier doesn't matter)
+    #   0: Add/Remove Heat (Heat value multiplier, relative of maximal heat change)
+    #   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
+    #   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+    #   3: Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)
+    #   4: Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)
+    #   5: Done (Value doesn't matter)
     action_space = d_env.action_space
     action = action_space.sample()
 

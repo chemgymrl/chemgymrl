@@ -1,5 +1,15 @@
 '''
+Distillation Bench Environment
+
+:title: distillation_bench_v1.py
+
+:author: Mitchell Shahen
+
+:history: 2020-07-23
 '''
+
+# pylint: disable=invalid-name
+# pylint: disable=wrong-import-position
 
 # import external modules
 import os

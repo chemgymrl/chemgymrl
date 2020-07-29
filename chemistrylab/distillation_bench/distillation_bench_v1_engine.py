@@ -1,5 +1,18 @@
 '''
+Distillation Demo
+
+:title: distillation_bench_v1_engine.py
+
+:author: Mitchell Shahen
+
+:history: 2020-07-23
 '''
+
+# pylint: disable=arguments-differ
+# pylint: disable=protected-access
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
 
 import gym
 import sys
@@ -10,15 +23,34 @@ from chemistrylab.distillations import distill_v0
 
 class DistillationBenchEnv(gym.Env):
     '''
+    Class object to create a Distillation environment.
+
+    Parameters
+    ---------------
+    `boil_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `target_material` : `str` (default=`None`)
+        The name of the required output material designated as reward.
+    `n_steps` : `int` (default=`100`)
+        The number of steps in an episode.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
     def __init__(
-        self,
-        n_steps=100,
-        boil_vessel=None,
-        target_material=None
+            self,
+            n_steps=100,
+            boil_vessel=None,
+            target_material=None
     ):
         '''
+        Constructor class for the Distillation environment.
         '''
 
         # set necessary variables
@@ -192,4 +224,7 @@ class DistillationBenchEnv(gym.Env):
 
     def human_render(self):
         '''
+        Method to render a series of graphs to illustrate operations on vessels.
         '''
+
+        return self.done

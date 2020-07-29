@@ -17,6 +17,14 @@ Available Actions for this Distillation Experiment are included below.
 5: Done (Value doesn't matter)
 '''
 
+# pylint: disable=invalid-name
+# pylint: disable=protected-access
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
+
 import gym
 import sys
 
@@ -33,7 +41,7 @@ class Distillation:
         A vessel object containing state variables, materials, solutes, and spectral data.
     `target_material` : `str` (default=`None`)
         The name of the required output material designated as reward.
-    `nempty_vessels` : `int` (default=`2`)
+    `n_empty_vessels` : `int` (default=`2`)
         The number of empty vessels to add.
     `dQ` : `float` (default=`1.0`)
         The maximal change in heat energy.
@@ -54,18 +62,21 @@ class Distillation:
     '''
 
     def __init__(
-        self,
-        boil_vessel,
-        target_material,
-        n_empty_vessels=2,
-        dQ=1.0, # maximal change in heat
-        dt=0.05, # default time step
-        max_vessel_volume=1000.0, # maximal volume of empty vessels
-        n_actions=6 # number of available actions
+            self,
+            boil_vessel,
+            target_material,
+            n_empty_vessels=2,
+            dQ=1.0, # maximal change in heat
+            dt=0.05, # default time step
+            max_vessel_volume=1000.0, # maximal volume of empty vessels
+            n_actions=6 # number of available actions
     ):
         '''
         Constructor class for the Distillation class
         '''
+
+        # inputted vessels
+        self.boil_vessel = boil_vessel
 
         # actions
         self.n_actions = n_actions
