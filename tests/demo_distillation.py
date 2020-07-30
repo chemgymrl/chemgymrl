@@ -34,9 +34,15 @@ __ = input('PRESS ENTER TO START DISTILLATION BENCH.')
 d_env = gym.make('Distillation-v0')
 d_env.reset()
 
+# render the initial state
+d_env.render()
+
 # queue and perform the Boil Vessel's change heat action but add no heat
 action = np.array([0, 5])
 __, __, __, __ = d_env.step(action)
+
+# render the results of the manual action
+d_env.render()
 
 __ = input('PRESS ENTER TO CONTINUE DISTILLATION BENCH')
 
@@ -69,7 +75,7 @@ while not done:
     state, reward, done, __ = d_env.step(action)
     total_reward += reward
 
-    # render each of the three plots
+    # render each of the vessel plots
     d_env.render()
     sleep(2)
 

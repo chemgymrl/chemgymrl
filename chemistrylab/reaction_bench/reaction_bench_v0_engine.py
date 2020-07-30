@@ -279,9 +279,9 @@ class ReactionBenchEnv(gym.Env):
         '''
 
         # get the temperature and pressure from the state variables
-        temperature = self.state[1]
-        volume = self.state[2]
-        pressure = self.state[3]
+        temperature = self.T
+        volume = self.V
+        pressure = self.P
 
         # tabulate all the materials used and their new values
         new_material_dict = {}
@@ -379,6 +379,7 @@ class ReactionBenchEnv(gym.Env):
         self.t = 0.0
         self.T = 1.0 * self.vessels.get_temperature()
         self.V = 1.0 * self.Vi
+        self.P = 1.0 * self.vessels.get_pressure()
 
         # reinitialize the reaction class
         self.reaction.reset(n_init=self.n_init)
@@ -499,8 +500,9 @@ class ReactionBenchEnv(gym.Env):
             self.plot_data_state[2].append((self.V - Vmin)/(Vmax - Vmin))
 
             # record pressure data
+            self.P = self.reaction.get_total_pressure(self.V, self.T)
             self.plot_data_state[3].append(
-                self.reaction.get_total_pressure(self.V, self.T)
+                self.P/self.vessels.get_pmax()
             )
 
             C = self.reaction.get_concentration(self.V)

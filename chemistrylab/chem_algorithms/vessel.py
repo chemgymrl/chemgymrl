@@ -1147,3 +1147,10 @@ class Vessel:
         '''
 
         return self.temperature
+
+    def get_pressure(self):
+        '''
+        Method to get the vessel's pressure property
+        '''
+
+        return self.pressure

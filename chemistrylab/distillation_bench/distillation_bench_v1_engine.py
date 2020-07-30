@@ -15,6 +15,8 @@ Distillation Demo
 # pylint: disable=wrong-import-position
 
 import gym
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
 
 sys.path.append("../../")
@@ -227,4 +229,49 @@ class DistillationBenchEnv(gym.Env):
         Method to render a series of graphs to illustrate operations on vessels.
         '''
 
-        return self.done
+        # obtain all vessels
+        vessels = self.vessels
+
+        # separate the beakers from the boil vessel
+        beakers = []
+        for vessel_obj in vessels:
+            if "beaker" in vessel_obj.label:
+                beakers.append(vessel_obj)
+
+        boil_vessel = [vessel_obj for vessel_obj in vessels if vessel_obj not in beakers][0]
+
+        # generate the pyplot figure
+        fig, axs = plt.subplots(
+            2, # number of rows
+            max(len(beakers), 2) # number of columns
+        )
+
+        # create a subplot for the boil vessel at position 0, 0
+        axs[0, 0].bar(
+            [name[0:5] for name in boil_vessel._material_dict.keys()],
+            [value[1] for value in boil_vessel._material_dict.values()]
+        )
+        axs[0, 0].set_title("Boil Vessel")
+        axs[0, 0].set_ylabel('Molar Amount')
+
+        # create a subplot for the boil vessel at position 0, 0
+        axs[0, 1].bar(
+            [vessel_obj.label for vessel_obj in vessels],
+            [vessel_obj.temperature for vessel_obj in vessels]
+        )
+        axs[0, 1].set_title("Vessel Temperatures")
+        axs[0, 1].set_ylabel('Temperature (in K)')
+
+        # create subplots in the second row for each beaker
+        for i, vessel_obj in enumerate(beakers):
+            material_names = [name[0:5] for name in vessel_obj._material_dict.keys()]
+            material_amounts = [value[1] for value in vessel_obj._material_dict.values()]
+
+            # plot the data
+            axs[1, i].bar(material_names, material_amounts)
+
+            # add subplot titles and axes labels
+            axs[1, i].set_title(vessel_obj.label)
+            axs[1, i].set_ylabel('Molar Amount')
+
+        plt.show()
