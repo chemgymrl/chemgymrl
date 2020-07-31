@@ -236,7 +236,7 @@ class Vessel:
 
     def _change_heat(self, parameter, dt):
         '''
-        Method to modify the temperature and contents of a vessel by adding heat.
+        Method to modify the temperature and contents of a vessel by adding or removing heat.
         '''
 
         # extract the inputted parameters
@@ -277,7 +277,6 @@ class Vessel:
             smallest_bp_material_name = material_names[smallest_bp_index]
             smallest_bp_material_amount = material_amounts[smallest_bp_index]
             smallest_bp_material_obj = material_objs[smallest_bp_index]
-            smallest_bp_material_sp_heat = material_sp_heats[smallest_bp_index]
 
             # if the vessel temperature reaches a boiling point, boil off the material with that BP
             if all([
@@ -285,8 +284,8 @@ class Vessel:
                     smallest_bp_material_amount > 0
             ]):
                 # calculate the mass boiled off using the next packet of heat energy
-                molar_mass = smallest_bp_material_obj()._molar_mass
-                dM = dQ / (self.temperature * smallest_bp_material_sp_heat * molar_mass)
+                enthalpy_vapor = smallest_bp_material_obj()._enthalpy_vapor
+                dM = dQ / enthalpy_vapor
 
                 # subtract the previous material amount by dM
                 material_amounts[smallest_bp_index] -= dM

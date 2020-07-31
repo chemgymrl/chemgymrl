@@ -20,6 +20,8 @@ class Material:
                  boiling_point=None,
                  melting_point=None,
                  specific_heat=None,
+                 enthalpy_fusion=None,
+                 enthalpy_vapor=None,
                  index=None
                  ):
         self._name = name
@@ -37,6 +39,8 @@ class Material:
         self._boiling_point = boiling_point
         self._melting_point = melting_point
         self._specific_heat = specific_heat # J/g*K
+        self._enthalpy_fusion = enthalpy_fusion # J/mol
+        self._enthalpy_vapor = enthalpy_vapor # J/mol
         self._index = index
 
     def _update_properties(self,
@@ -150,6 +154,12 @@ class Material:
 
     def set_specific_heat(self, specific_heat):
         self._specific_heat = specific_heat
+
+    def set_enthalpy_fusion(self, enthalpy_fusion):
+        self._enthalpy_fusion = enthalpy_fusion
+
+    def set_enthalpy_vapor(self, enthalpy_vapor):
+        self._enthalpy_vapor = enthalpy_vapor
 
     def get_index(self):
         return self._index
@@ -287,6 +297,8 @@ class NaCl(Material):
                          charge=0.0,
                          boiling_point=1738.0,
                          specific_heat=0.853,
+                         enthalpy_fusion=27950.0,
+                         enthalpy_vapor=229700.0,
                          index=8
                          )
 
@@ -304,6 +316,8 @@ class Na(Material):
                          charge=0.0,
                          boiling_point=1156.0,
                          specific_heat=1.23,
+                         enthalpy_fusion=2600.0,
+                         enthalpy_vapor=97700.0,
                          index=9
                          )
 
@@ -320,6 +334,8 @@ class Cl(Material):
                          color=0.8,
                          charge=0.0,
                          specific_heat=0.48,
+                         enthalpy_fusion=3200.0,
+                         enthalpy_vapor=10200.0,
                          index=10
                          )
 
@@ -416,7 +432,9 @@ class Dodecane(Material):
             boiling_point=489.5,
             melting_point=263.6,
             solute=False,
-            specific_heat=2.21,
+            specific_heat=2.3889, # in J/g*K
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=16
         )
 
@@ -435,7 +453,9 @@ class OneChlorohexane(Material):
             boiling_point=408.2,
             melting_point=179.2,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=1.5408,
+            enthalpy_fusion=15490.0,
+            enthalpy_vapor=42800.0,
             index=17
         )
 
@@ -454,7 +474,9 @@ class TwoChlorohexane(Material):
             boiling_point=395.2,
             melting_point=308.3,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=1.5408,
+            enthalpy_fusion=11970.0,
+            enthalpy_vapor=43820.0,
             index=18
         )
 
@@ -473,7 +495,9 @@ class ThreeChlorohexane(Material):
             boiling_point=396.2,
             melting_point=308.3,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=1.5408,
+            enthalpy_fusion=11970.0,
+            enthalpy_vapor=32950.0,
             index=19
         )
 
@@ -492,7 +516,9 @@ class FiveMethylundecane(Material):
             boiling_point=481.1,
             melting_point=255.2,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=20
         )
 
@@ -511,7 +537,9 @@ class FourEthyldecane(Material):
             boiling_point=480.1,
             melting_point=254.2,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=21
         )
 
@@ -530,7 +558,9 @@ class FiveSixDimethyldecane(Material):
             boiling_point=474.2,
             melting_point=222.4,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=22
         )
 
@@ -549,7 +579,9 @@ class FourEthylFiveMethylnonane(Material):
             boiling_point=476.3,
             melting_point=224.5,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=23
         )
 
@@ -568,7 +600,9 @@ class FourFiveDiethyloctane(Material):
             boiling_point=470.2,
             melting_point=222.4,
             solute=False,
-            specific_heat=1.0,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=24
         )
 
@@ -587,7 +621,9 @@ class Ethoxyethane(Material):
             boiling_point=34.6,
             melting_point=-116.3,
             solute=True,
-            specific_heat=1.0,
+            specific_heat=2.253,
+            enthalpy_fusion=7190.0,
+            enthalpy_vapor=27250.0,
             index=25
         )
 
