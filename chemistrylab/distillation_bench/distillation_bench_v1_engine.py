@@ -17,6 +17,8 @@ Distillation Demo
 import gym
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import pickle
 import sys
 
 sys.path.append("../../")
@@ -49,7 +51,8 @@ class DistillationBenchEnv(gym.Env):
             self,
             n_steps=100,
             boil_vessel=None,
-            target_material=None
+            target_material=None,
+            out_vessel_path=None
     ):
         '''
         Constructor class for the Distillation environment.
@@ -82,6 +85,9 @@ class DistillationBenchEnv(gym.Env):
         self._plot_fig = None
         self._plot_axs = None
 
+        # set up the intended path for the final distillation vessel to be stored
+        self.vessel_path = out_vessel_path
+
     def _calc_reward(self):
         '''
         Method to calculate the generated reward in every vessel in `self.vessels`.
@@ -113,6 +119,50 @@ class DistillationBenchEnv(gym.Env):
             print("Error: No target material found in any vessel!")
 
         return total_reward
+
+    def _save_vessel(self, vessel):
+        '''
+        Method to save a vessel as a pickle file.
+        
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # if a vessel path was provided when the environment was initialized, use it for saving vessels
+        if isinstance(self.vessel_path, str):
+            open_file = self.vessel_path
+        # otherwise, save the vessels in the current working directory
+        else:
+            file_directory = os.getcwd()
+            filename = "vessel_distillation.pickle"
+            open_file = os.path.join(file_directory, filename)
+
+        # delete any existing vessel files to ensure the vessel is saved as intended
+        num = 0
+        while os.path.exists(open_file):
+            # rename the filename by adding a number
+            start_filename = filename.split(".")[0]
+            new_start_filename = "{}_{}".format(start_filename, num)
+            new_filename = "{}.pickle".format(new_start_filename)
+
+            # recreate the open_file variable
+            open_file = os.path.join(file_directory, new_filename)
+
+            # increase the arbitrary marker by 1
+            num += 1
+
+        # open the intended vessel file and save the vessel as a pickle file
+        with open(open_file, 'wb') as vessel_file:
+            pickle.dump(vessel, vessel_file)
 
     def reset(self):
         '''
@@ -200,6 +250,9 @@ class DistillationBenchEnv(gym.Env):
 
             # after the last step, calculate the final reward
             reward = self._calc_reward()
+
+            # option to save any final vessels here
+            # self._save_vessel(vessel=self.vessels[0])
 
         return self.state, reward, self.done, {}
 

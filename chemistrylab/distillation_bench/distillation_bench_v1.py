@@ -66,5 +66,6 @@ class Distillation_v1(DistillationBenchEnv):
                 vessel_path=os.path.join(os.getcwd(), "vessel_experiment_0.pickle"),
                 in_vessel=None
             ),
-            target_material="dodecane"
+            target_material="dodecane",
+            out_vessel_path=None
         )
