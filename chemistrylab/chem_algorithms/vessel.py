@@ -212,6 +212,7 @@ class Vessel:
         return merged
 
     ## ---------- START EVENT FUNCTIONS ---------- ##
+
     def _update_temperature(
             self,
             parameters,  # [target_temperature]
@@ -256,7 +257,10 @@ class Vessel:
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
-                    raise IOError("")
+                    raise IOError(
+                        "An error has caused the temperature of the vessel "
+                        "to exceed the boiling point of at least one material."
+                    )
             except ValueError:
                 raise ValueError("No material remaining in the boil vessel.")
 
@@ -274,8 +278,8 @@ class Vessel:
             # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
             temp_change_needed = smallest_bp - self.temperature
 
-            # calculate the total entropy of all the materials
-            total_entropy = 0 # in J/K
+            # calculate the total entropy of all the materials in J/K
+            total_entropy = 0
             for i, material_amount in enumerate(material_amounts):
                 specific_heat = material_sp_heats[i] # in J/g*K
                 molar_amount = material_amount # in mol
