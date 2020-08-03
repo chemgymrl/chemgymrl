@@ -294,44 +294,6 @@ class DistillationBenchEnv(gym.Env):
         # there is only one boil vessel
         boil_vessel = [vessel_obj for vessel_obj in vessels if vessel_obj not in beakers][0]
 
-        '''
-        # generate the pyplot figure
-        fig, axs = plt.subplots(
-            2, # number of rows
-            max(len(beakers), 2) # number of columns
-        )
-
-        # create a subplot for the boil vessel at position 0, 0
-        axs[0, 0].bar(
-            [name[0:5] for name in boil_vessel._material_dict.keys()],
-            [value[1] for value in boil_vessel._material_dict.values()]
-        )
-        axs[0, 0].set_title("Boil Vessel")
-        axs[0, 0].set_ylabel('Molar Amount')
-
-        # create a subplot for the boil vessel at position 0, 0
-        axs[0, 1].bar(
-            [vessel_obj.label for vessel_obj in vessels],
-            [vessel_obj.temperature for vessel_obj in vessels]
-        )
-        axs[0, 1].set_title("Vessel Temperatures")
-        axs[0, 1].set_ylabel('Temperature (in K)')
-
-        # create subplots in the second row for each beaker
-        for i, vessel_obj in enumerate(beakers):
-            material_names = [name[0:5] for name in vessel_obj._material_dict.keys()]
-            material_amounts = [value[1] for value in vessel_obj._material_dict.values()]
-
-            # plot the data
-            axs[1, i].bar(material_names, material_amounts)
-
-            # add subplot titles and axes labels
-            axs[1, i].set_title(vessel_obj.label)
-            axs[1, i].set_ylabel('Molar Amount')
-
-        plt.draw()
-        '''
-
         if self._first_render:
             plt.close('all')
             plt.ion()
@@ -339,13 +301,15 @@ class DistillationBenchEnv(gym.Env):
             num_columns = max(len(beakers), 2)
             self._plot_fig, self._plot_axs = plt.subplots(
                 2, # number of rows
-                num_columns # number of columns
+                num_columns, # number of columns
+                figsize=(18, 9)
             )
 
             # create a subplot for the boil vessel at position (0, 0)
             self._plot_bar1 = self._plot_axs[0, 0].bar(
                 [name[0:5] for name in boil_vessel._material_dict.keys()],
-                [value[1] for value in boil_vessel._material_dict.values()]
+                [value[1] for value in boil_vessel._material_dict.values()],
+                color='red'
             )
             self._plot_axs[0, 0].set_title("Boil Vessel")
             self._plot_axs[0, 0].set_ylabel("Molar Amount")
@@ -353,7 +317,8 @@ class DistillationBenchEnv(gym.Env):
             # create a subplot for the vessel temperatures at position (0, 1)
             self._plot_bar2 = self._plot_axs[0, 1].bar(
                 [vessel_obj.label for vessel_obj in vessels],
-                [vessel_obj.temperature for vessel_obj in vessels]
+                [vessel_obj.temperature for vessel_obj in vessels],
+                color='orange'
             )
             self._plot_axs[0, 1].set_title("Vessel Temperatures")
             self._plot_axs[0, 1].set_ylabel('Temperature (in K)')
@@ -364,7 +329,7 @@ class DistillationBenchEnv(gym.Env):
                 material_names = [name[0:5] for name in beaker_obj._material_dict.keys()]
                 material_amounts = [value[1] for value in beaker_obj._material_dict.values()]
 
-                beaker_plot = self._plot_axs[1, i].bar(material_names, material_amounts)
+                beaker_plot = self._plot_axs[1, i].bar(material_names, material_amounts, color='blue')
                 self._plot_axs[1, i].set_title(beaker_obj.label)
                 self._plot_axs[1, i].set_ylabel("Molar Amount")
 
@@ -379,29 +344,31 @@ class DistillationBenchEnv(gym.Env):
         # if the plot has already been rendered, simply add the new data to it
         else:
             # reset the boil vessel plot with new vessel data
-            self._plot_bar1.set_xdata(
-                [name[0:5] for name in boil_vessel._material_dict.keys()]
+            __ = self._plot_axs[0, 0].bar(
+                [name[0:5] for name in boil_vessel._material_dict.keys()],
+                [value[1] for value in boil_vessel._material_dict.values()],
+                color='red'
             )
-            self._plot_bar1.set_ydata(
-                [value[1] for value in boil_vessel._material_dict.values()]
-            )
+            self._plot_axs[0, 0].set_title("Boil Vessel")
+            self._plot_axs[0, 0].set_ylabel("Molar Amount")
 
             # reset the vessel temperature plot with new data
-            self._plot_bar2.set_xdata(
-                [vessel_obj.label for vessel_obj in vessels]
+            __ = self._plot_axs[0, 1].bar(
+                [vessel_obj.label for vessel_obj in vessels],
+                [vessel_obj.temperature for vessel_obj in vessels],
+                color='orange'
             )
-            self._plot_bar2.set_ydata(
-                [vessel_obj.temperature for vessel_obj in vessels]
-            )
+            self._plot_axs[0, 1].set_title("Vessel Temperatures")
+            self._plot_axs[0, 1].set_ylabel('Temperature (in K)')
 
             # reset the data in each beaker plot
             for i, beaker_plot in enumerate(self._beaker_plots):
-                beaker_plot.set_xdata(
-                    [name[0:5] for name in beakers[i]._material_dict.keys()]
-                )
-                beaker_plot.set_ydata(
-                    [value[1] for value in beakers[i]._material_dict.values()]
-                )
+                material_names = [name[0:5] for name in beakers[i]._material_dict.keys()]
+                material_amounts = [value[1] for value in beakers[i]._material_dict.values()]
+
+                beaker_plot = self._plot_axs[1, i].bar(material_names, material_amounts, color='blue')
+                self._plot_axs[1, i].set_title(beakers[i].label)
+                self._plot_axs[1, i].set_ylabel("Molar Amount")
 
                 self._beaker_plots[i] = beaker_plot
 
