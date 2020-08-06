@@ -342,7 +342,7 @@ class ReactionBenchEnv(gym.Env):
         # otherwise, save the vessels in the current working directory
         else:
             file_directory = os.getcwd()
-            filename = "vessel_{}.pickle".format(self.name)
+            filename = "react_vessel.pickle"
             open_file = os.path.join(file_directory, filename)
 
         # delete any existing vessel files to ensure the vessel is saved as intended
