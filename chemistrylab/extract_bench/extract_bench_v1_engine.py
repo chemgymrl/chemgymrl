@@ -29,6 +29,8 @@ import cmocean
 import numpy as np
 import gym
 import matplotlib.pyplot as plt
+import os
+import pickle
 
 # import local modules
 sys.path.append("../../") # access chemistrylab
@@ -149,6 +151,36 @@ class ExtractBenchEnv(gym.Env):
 
         return total_reward
 
+    def _save_vessel(self, extract_vessel):
+        '''
+        Method to save a vessel as a pickle file.
+        
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # specify a vessel path for saving the extract vessel
+        file_directory = os.getcwd()
+        filename = "extract_vessel.pickle"
+        open_file = os.path.join(file_directory, filename)
+
+        # delete any existing vessel files to ensure the vessel is saved as intended
+        if os.path.exists(open_file):
+            os.remove(open_file)
+
+        # open the intended vessel file and save the vessel as a pickle file
+        with open(open_file, 'wb') as vessel_file:
+            pickle.dump(extract_vessel, vessel_file)
+
     def reset(self):
         '''
         Initialize the environment
@@ -229,10 +261,13 @@ class ExtractBenchEnv(gym.Env):
         if self.n_steps == 0:
             self.done = True
 
+        # once all the steps have been completed, calculate the final reward and save any vessels
+        if self.done:
             # after the last iteration, calculate the amount of target material in each vessel
             reward = self._calc_reward()
 
-            # reward = self.extraction.done_reward(self.vessels[2])
+            # save the final extraction vessel
+            self._save_vessel(self.vessels[0])
 
         return self.state, reward, self.done, {}
 
