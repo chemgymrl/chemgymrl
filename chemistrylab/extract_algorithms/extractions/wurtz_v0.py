@@ -382,6 +382,10 @@ class Extraction:
                     if self.target_material in names:
                         reward += self.done_reward(in_vessel)
 
+            # redefine the vessels and external_vessels parameters
+            vessels = [extract_vessel, beaker_1, beaker_2]
+            external_vessels = [solute_vessel1, solute_vessel2]
+
         return vessels, external_vessels, reward, done
 
     def done_reward(self, beaker):  # `beaker` is the beaker used to collect extracted material
