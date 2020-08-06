@@ -63,7 +63,7 @@ class Distillation_v1(DistillationBenchEnv):
     def __init__(self):
         super(Distillation_v1, self).__init__(
             boil_vessel=get_vessel(
-                vessel_path=os.path.join(os.getcwd(), "vessel_experiment_0.pickle"),
+                vessel_path=os.path.join(os.getcwd(), "extract_vessel.pickle"),
                 in_vessel=None
             ),
             target_material="dodecane",
