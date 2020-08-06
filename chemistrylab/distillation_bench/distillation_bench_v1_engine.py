@@ -86,7 +86,7 @@ class DistillationBenchEnv(gym.Env):
         self._plot_axs = None
 
         # set up the intended path for the final distillation vessel to be stored
-        self.vessel_path = out_vessel_path
+        self.out_vessel_path = out_vessel_path
 
     def _calc_reward(self):
         '''
@@ -138,8 +138,8 @@ class DistillationBenchEnv(gym.Env):
         '''
 
         # if a vessel path was provided when the environment was initialized, use it for saving vessels
-        if isinstance(self.vessel_path, str):
-            open_file = self.vessel_path
+        if isinstance(self.out_vessel_path, str):
+            open_file = self.out_vessel_path
         # otherwise, save the vessels in the current working directory
         else:
             file_directory = os.getcwd()
