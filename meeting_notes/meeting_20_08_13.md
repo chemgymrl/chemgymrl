@@ -7,7 +7,6 @@
 - Mitchell Shahen (Secretary)
 - Isaac Tamblyn
 - Sriram Ganapathi
-
 - Nouha Chatti
 - Chris Beeler
 - Mark Crowley
