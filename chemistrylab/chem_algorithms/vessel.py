@@ -20,11 +20,14 @@ Module to define the vessel object and it's associated functionality.
 # pylint: disable=unused-argument
 # pylint: disable=wrong-import-order
 
-import numpy as np
+import copy
 import math
+import numpy as np
+import sys
+
+sys.path.append("../../")
 from chemistrylab.chem_algorithms import material, util
 from chemistrylab.extract_algorithms import separate
-import copy
 
 class Vessel:
     '''

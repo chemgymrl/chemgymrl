@@ -1,6 +1,9 @@
 import math
 import copy
 import numpy as np
+import sys
+
+sys.path.append("../../")
 from chemistrylab.chem_algorithms import material
 
 
