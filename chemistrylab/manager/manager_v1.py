@@ -38,10 +38,12 @@ def get_environments():
     None
     '''
 
+    # create all the environments that are to be made available to the lab manager
     r_env = gym.make('WurtzReact-v0')
     e_env = gym.make('WurtzExtract-v1')
     d_env = gym.make('Distillation-v0')
 
+    # return a list of all the available environments
     envs_list = [r_env, e_env, d_env]
 
     return envs_list

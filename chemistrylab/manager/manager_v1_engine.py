@@ -163,6 +163,9 @@ class LabManagerEnv(gym.Env):
         None
         '''
 
+        # obtain the current environment
         env = self.current_env
 
+        # perform the render action of that environment;
+        # note the plots are stored within the environment class
         env.render(model=model)
