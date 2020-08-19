@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module manager_v1</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>manager_v1</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5C16133%5Cdesktop%5Ccoop%5Cdev%5Cchemistrygym%5Cchemistrylab%5Cmanager%5Cmanager_v1.py">c:\users\16133\desktop\coop\dev\chemistrygym\chemistrylab\manager\manager_v1.py</a></font></td></tr></table>
+    <p><tt><a href="#LabManager">LabManager</a>&nbsp;Environment<br>
+&nbsp;<br>
+:title:&nbsp;manager_v1.py<br>
+&nbsp;<br>
+:author:&nbsp;Chris&nbsp;Beeler&nbsp;and&nbsp;Mitchell&nbsp;Shahen<br>
+&nbsp;<br>
+:history:&nbsp;2020-08-07</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="gym.html">gym</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="chemistrylab.manager.manager_v1_engine.html#LabManagerEnv">chemistrylab.manager.manager_v1_engine.LabManagerEnv</a>(<a href="gym.core.html#Env">gym.core.Env</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="manager_v1.html#LabManager">LabManager</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="LabManager">class <strong>LabManager</strong></a>(<a href="chemistrylab.manager.manager_v1_engine.html#LabManagerEnv">chemistrylab.manager.manager_v1_engine.LabManagerEnv</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;object&nbsp;to&nbsp;define&nbsp;the&nbsp;Lab&nbsp;Manager&nbsp;environment&nbsp;and<br>
+the&nbsp;environments&nbsp;made&nbsp;available&nbsp;to&nbsp;the&nbsp;Lab&nbsp;Manager.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="manager_v1.html#LabManager">LabManager</a></dd>
+<dd><a href="chemistrylab.manager.manager_v1_engine.html#LabManagerEnv">chemistrylab.manager.manager_v1_engine.LabManagerEnv</a></dd>
+<dd><a href="gym.core.html#Env">gym.core.Env</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="LabManager-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Constructor&nbsp;class&nbsp;for&nbsp;the&nbsp;Lab&nbsp;Manager&nbsp;engine.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`n_steps`&nbsp;:&nbsp;`int`&nbsp;(default=`100`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;time&nbsp;steps&nbsp;to&nbsp;be&nbsp;taken&nbsp;during&nbsp;each&nbsp;action.<br>
+`environments`&nbsp;:&nbsp;`list`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;environments&nbsp;available&nbsp;to&nbsp;the&nbsp;lab&nbsp;manager.<br>
+`out_vessel_path`&nbsp;:&nbsp;`str`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;string&nbsp;indicating&nbsp;the&nbsp;path&nbsp;to&nbsp;a&nbsp;vessel&nbsp;intended&nbsp;to&nbsp;be&nbsp;loaded&nbsp;into&nbsp;this&nbsp;module.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="chemistrylab.manager.manager_v1_engine.html#LabManagerEnv">chemistrylab.manager.manager_v1_engine.LabManagerEnv</a>:<br>
+<dl><dt><a name="LabManager-render"><strong>render</strong></a>(self, model)</dt><dd><tt>Method&nbsp;to&nbsp;render&nbsp;the&nbsp;results&nbsp;of&nbsp;the&nbsp;action&nbsp;performed&nbsp;on&nbsp;the&nbsp;current&nbsp;environment.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`model`&nbsp;:&nbsp;`str`&nbsp;(default=`human`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;string&nbsp;indicating&nbsp;the&nbsp;type&nbsp;of&nbsp;rendering&nbsp;to&nbsp;use.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<dl><dt><a name="LabManager-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Method&nbsp;to&nbsp;reset&nbsp;each&nbsp;environment&nbsp;made&nbsp;available&nbsp;to&nbsp;the&nbsp;Lab&nbsp;Manager.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<dl><dt><a name="LabManager-set_environment"><strong>set_environment</strong></a>(self, env_index=0)</dt><dd><tt>Method&nbsp;to&nbsp;specify&nbsp;the&nbsp;environment&nbsp;to&nbsp;use.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`env_index`&nbsp;:&nbsp;`int`&nbsp;(default=`0`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;integer&nbsp;indicating&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;intended<br>
+&nbsp;&nbsp;&nbsp;&nbsp;environment&nbsp;in&nbsp;the&nbsp;`environments`&nbsp;variables&nbsp;to&nbsp;use.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<dl><dt><a name="LabManager-step"><strong>step</strong></a>(self, action)</dt><dd><tt>Method&nbsp;to&nbsp;perform&nbsp;the&nbsp;`action`&nbsp;parameter&nbsp;on&nbsp;the&nbsp;current&nbsp;environment.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`action`&nbsp;:&nbsp;`gym.spaces.MultiDiscrete`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;object&nbsp;defining&nbsp;the&nbsp;action&nbsp;to&nbsp;perform&nbsp;on&nbsp;the&nbsp;current&nbsp;environment.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+`state`&nbsp;:&nbsp;`np.array`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;array&nbsp;containing&nbsp;updated&nbsp;values&nbsp;of&nbsp;all&nbsp;the&nbsp;thermodynamic&nbsp;variables,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;reactants,&nbsp;and&nbsp;spectra&nbsp;generated&nbsp;by&nbsp;the&nbsp;most&nbsp;recent&nbsp;step.<br>
+`reward`&nbsp;:&nbsp;`float`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;amount&nbsp;of&nbsp;the&nbsp;desired&nbsp;product&nbsp;that&nbsp;has&nbsp;been&nbsp;created&nbsp;in&nbsp;the&nbsp;most&nbsp;recent&nbsp;step.<br>
+`done`&nbsp;:&nbsp;`boolean`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Indicates&nbsp;if,&nbsp;upon&nbsp;completing&nbsp;the&nbsp;most&nbsp;recent&nbsp;step,&nbsp;all&nbsp;the&nbsp;required&nbsp;steps<br>
+&nbsp;&nbsp;&nbsp;&nbsp;have&nbsp;been&nbsp;completed.<br>
+`parameters`&nbsp;:&nbsp;`dict`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Any&nbsp;additional&nbsp;parameters&nbsp;used/generated&nbsp;in&nbsp;the&nbsp;most&nbsp;recent&nbsp;step&nbsp;that&nbsp;need<br>
+&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;be&nbsp;specified.<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="gym.core.html#Env">gym.core.Env</a>:<br>
+<dl><dt><a name="LabManager-__enter__"><strong>__enter__</strong></a>(self)</dt><dd><tt>Support&nbsp;with-statement&nbsp;for&nbsp;the&nbsp;environment.</tt></dd></dl>
+
+<dl><dt><a name="LabManager-__exit__"><strong>__exit__</strong></a>(self, *args)</dt><dd><tt>Support&nbsp;with-statement&nbsp;for&nbsp;the&nbsp;environment.</tt></dd></dl>
+
+<dl><dt><a name="LabManager-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>Return&nbsp;str(self).</tt></dd></dl>
+
+<dl><dt><a name="LabManager-close"><strong>close</strong></a>(self)</dt><dd><tt>Override&nbsp;close&nbsp;in&nbsp;your&nbsp;subclass&nbsp;to&nbsp;perform&nbsp;any&nbsp;necessary&nbsp;cleanup.<br>
+&nbsp;<br>
+Environments&nbsp;will&nbsp;automatically&nbsp;<a href="#LabManager-close">close</a>()&nbsp;themselves&nbsp;when<br>
+garbage&nbsp;collected&nbsp;or&nbsp;when&nbsp;the&nbsp;program&nbsp;exits.</tt></dd></dl>
+
+<dl><dt><a name="LabManager-seed"><strong>seed</strong></a>(self, seed=None)</dt><dd><tt>Sets&nbsp;the&nbsp;seed&nbsp;for&nbsp;this&nbsp;env's&nbsp;random&nbsp;number&nbsp;generator(s).<br>
+&nbsp;<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Some&nbsp;environments&nbsp;use&nbsp;multiple&nbsp;pseudorandom&nbsp;number&nbsp;generators.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;We&nbsp;want&nbsp;to&nbsp;capture&nbsp;all&nbsp;such&nbsp;seeds&nbsp;used&nbsp;in&nbsp;order&nbsp;to&nbsp;ensure&nbsp;that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;there&nbsp;aren't&nbsp;accidental&nbsp;correlations&nbsp;between&nbsp;multiple&nbsp;generators.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list&lt;bigint&gt;:&nbsp;Returns&nbsp;the&nbsp;list&nbsp;of&nbsp;seeds&nbsp;used&nbsp;in&nbsp;this&nbsp;env's&nbsp;random<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number&nbsp;generators.&nbsp;The&nbsp;first&nbsp;value&nbsp;in&nbsp;the&nbsp;list&nbsp;should&nbsp;be&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"main"&nbsp;seed,&nbsp;or&nbsp;the&nbsp;value&nbsp;which&nbsp;a&nbsp;reproducer&nbsp;should&nbsp;pass&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'seed'.&nbsp;Often,&nbsp;the&nbsp;main&nbsp;seed&nbsp;equals&nbsp;the&nbsp;provided&nbsp;'seed',&nbsp;but<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;won't&nbsp;be&nbsp;true&nbsp;if&nbsp;seed=None,&nbsp;for&nbsp;example.</tt></dd></dl>
+
+<hr>
+Readonly properties inherited from <a href="gym.core.html#Env">gym.core.Env</a>:<br>
+<dl><dt><strong>unwrapped</strong></dt>
+<dd><tt>Completely&nbsp;unwrap&nbsp;this&nbsp;env.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gym.Env:&nbsp;The&nbsp;base&nbsp;non-wrapped&nbsp;gym.Env&nbsp;instance</tt></dd>
+</dl>
+<hr>
+Data descriptors inherited from <a href="gym.core.html#Env">gym.core.Env</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="gym.core.html#Env">gym.core.Env</a>:<br>
+<dl><dt><strong>action_space</strong> = None</dl>
+
+<dl><dt><strong>metadata</strong> = {'render.modes': []}</dl>
+
+<dl><dt><strong>observation_space</strong> = None</dl>
+
+<dl><dt><strong>reward_range</strong> = (-inf, inf)</dl>
+
+<dl><dt><strong>spec</strong> = None</dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-get_environments"><strong>get_environments</strong></a>()</dt><dd><tt>Function&nbsp;to&nbsp;acquire&nbsp;all&nbsp;of&nbsp;the&nbsp;environments&nbsp;available&nbsp;to&nbsp;the&nbsp;lab&nbsp;manager.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`n_steps`&nbsp;:&nbsp;`int`&nbsp;(default=`100`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;time&nbsp;steps&nbsp;to&nbsp;be&nbsp;taken&nbsp;during&nbsp;each&nbsp;action.<br>
+`environments`&nbsp;:&nbsp;`list`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;environments&nbsp;available&nbsp;to&nbsp;the&nbsp;lab&nbsp;manager.<br>
+`out_vessel_path`&nbsp;:&nbsp;`str`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;string&nbsp;indicating&nbsp;the&nbsp;path&nbsp;to&nbsp;a&nbsp;vessel&nbsp;intended&nbsp;to&nbsp;be&nbsp;loaded&nbsp;into&nbsp;this&nbsp;module.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+`envs_list`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;registered&nbsp;environments&nbsp;that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;are&nbsp;allowed&nbsp;to&nbsp;be&nbsp;accessed&nbsp;by&nbsp;the&nbsp;Lab&nbsp;Manager.<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+</td></tr></table>
+</body></html>

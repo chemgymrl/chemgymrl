@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module wurtz_v0</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>wurtz_v0</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5C16133%5Cdesktop%5Ccoop%5Cdev%5Cchemistrygym%5Cchemistrylab%5Cextract_algorithms%5Cextractions%5Cwurtz_v0.py">c:\users\16133\desktop\coop\dev\chemistrygym\chemistrylab\extract_algorithms\extractions\wurtz_v0.py</a></font></td></tr></table>
+    <p><tt>Module&nbsp;to&nbsp;describe&nbsp;the&nbsp;extraction&nbsp;of&nbsp;a&nbsp;desired&nbsp;material&nbsp;generated&nbsp;in&nbsp;a&nbsp;Wurtz&nbsp;reaction.<br>
+&nbsp;<br>
+:title:&nbsp;wurtz_v0.py<br>
+&nbsp;<br>
+:author:&nbsp;Mitchell&nbsp;Shahen<br>
+&nbsp;<br>
+:history:&nbsp;2020-06-27<br>
+&nbsp;<br>
+Available&nbsp;Actions&nbsp;for&nbsp;this&nbsp;<a href="#Extraction">Extraction</a>&nbsp;Experiment&nbsp;are&nbsp;included&nbsp;below.<br>
+&nbsp;<br>
+0:&nbsp;Valve&nbsp;(Speed&nbsp;multiplier,&nbsp;relative&nbsp;to&nbsp;max_valve_speed)<br>
+1:&nbsp;Mix&nbsp;ExV&nbsp;(mixing&nbsp;coefficient,&nbsp;*-1&nbsp;when&nbsp;passed&nbsp;into&nbsp;mix&nbsp;function)<br>
+2:&nbsp;Pour&nbsp;B1&nbsp;into&nbsp;ExV&nbsp;(Volume&nbsp;multiplier,&nbsp;relative&nbsp;to&nbsp;max_vessel_volume)<br>
+3:&nbsp;Pour&nbsp;B2&nbsp;into&nbsp;ExV&nbsp;(Volume&nbsp;multiplier,&nbsp;relative&nbsp;to&nbsp;max_vessel_volume)<br>
+4:&nbsp;Pour&nbsp;ExV&nbsp;into&nbsp;B2&nbsp;(Volume&nbsp;multiplier,&nbsp;relative&nbsp;to&nbsp;max_vessel_volume)<br>
+5:&nbsp;Pour&nbsp;S1&nbsp;into&nbsp;ExV&nbsp;(Volume&nbsp;multiplier,&nbsp;relative&nbsp;to&nbsp;max_vessel_volume)<br>
+6:&nbsp;Pour&nbsp;S2&nbsp;into&nbsp;ExV&nbsp;(Volume&nbsp;multiplier,&nbsp;relative&nbsp;to&nbsp;max_vessel_volume)<br>
+7:&nbsp;Done&nbsp;(Value&nbsp;doesn't&nbsp;matter)</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="copy.html">copy</a><br>
+<a href="gym.html">gym</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="chemistrylab.chem_algorithms.util.html">chemistrylab.chem_algorithms.util</a><br>
+</td><td width="25%" valign=top><a href="chemistrylab.chem_algorithms.vessel.html">chemistrylab.chem_algorithms.vessel</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="wurtz_v0.html#Extraction">Extraction</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Extraction">class <strong>Extraction</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Extraction">Extraction</a>(extraction_vessel,&nbsp;solute,&nbsp;target_material,&nbsp;n_empty_vessels=2,&nbsp;solute_volume=1000000000,&nbsp;dt=0.05,&nbsp;max_vessel_volume=1000.0,&nbsp;n_vessel_pixels=100,&nbsp;max_valve_speed=10,&nbsp;n_actions=8)<br>
+&nbsp;<br>
+Class&nbsp;<a href="builtins.html#object">object</a>&nbsp;for&nbsp;a&nbsp;Wurtz&nbsp;extraction&nbsp;experiment.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`extraction_vessel`&nbsp;:&nbsp;`vessel`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;vessel&nbsp;<a href="builtins.html#object">object</a>&nbsp;containing&nbsp;state&nbsp;variables,&nbsp;materials,&nbsp;solutes,&nbsp;and&nbsp;spectral&nbsp;data.<br>
+`solute`&nbsp;:&nbsp;`str`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;added&nbsp;solute.<br>
+`target_material`&nbsp;:&nbsp;`str`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;required&nbsp;output&nbsp;material&nbsp;designated&nbsp;as&nbsp;reward.<br>
+`nempty_vessels`&nbsp;:&nbsp;`int`&nbsp;(default=`2`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;empty&nbsp;vessels&nbsp;to&nbsp;add.<br>
+`solute_volume`&nbsp;:&nbsp;`int`&nbsp;(default=`1000000000`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;amount&nbsp;of&nbsp;`solute`&nbsp;available&nbsp;to&nbsp;add&nbsp;during&nbsp;the&nbsp;extraction.<br>
+`dt`&nbsp;:&nbsp;`float`&nbsp;(default=`0.01`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;default&nbsp;time-step.<br>
+`max_vessel_volume`&nbsp;:&nbsp;`float`&nbsp;(default=`1000.0`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;maximal&nbsp;volume&nbsp;of&nbsp;an&nbsp;added&nbsp;vessel.<br>
+`n_vessel_pixels`&nbsp;:&nbsp;`int`&nbsp;(default=`100`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;pixels&nbsp;in&nbsp;a&nbsp;vessel.<br>
+`max_valve_speed`&nbsp;:&nbsp;`int`&nbsp;(default=`10`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;maximal&nbsp;amount&nbsp;of&nbsp;material&nbsp;flowing&nbsp;through&nbsp;the&nbsp;valve&nbsp;in&nbsp;a&nbsp;given&nbsp;time-step.<br>
+`n_actions`&nbsp;:&nbsp;`int`&nbsp;(default=`8`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;number&nbsp;of&nbsp;actions&nbsp;included&nbsp;in&nbsp;this&nbsp;extraction&nbsp;experiment.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Extraction-__init__"><strong>__init__</strong></a>(self, extraction_vessel, solute, target_material, n_empty_vessels=2, solute_volume=1000000000, dt=0.05, max_vessel_volume=1000.0, n_vessel_pixels=100, max_valve_speed=10, n_actions=8)</dt><dd><tt>Constructor&nbsp;class&nbsp;for&nbsp;the&nbsp;Wurtz&nbsp;<a href="#Extraction">Extraction</a>&nbsp;class</tt></dd></dl>
+
+<dl><dt><a name="Extraction-done_reward"><strong>done_reward</strong></a>(self, beaker)</dt><dd><tt>Method&nbsp;to&nbsp;calculate&nbsp;the&nbsp;full&nbsp;reward&nbsp;once&nbsp;the&nbsp;final&nbsp;action&nbsp;has&nbsp;taken&nbsp;place.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`beaker`&nbsp;:&nbsp;`vessel.Vessel`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;vessel&nbsp;<a href="builtins.html#object">object</a>&nbsp;that&nbsp;contains&nbsp;all&nbsp;of&nbsp;the&nbsp;extracted&nbsp;materials&nbsp;and&nbsp;solutes.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+`reward`&nbsp;:&nbsp;`float`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;amount&nbsp;of&nbsp;the&nbsp;target&nbsp;material&nbsp;that&nbsp;has&nbsp;been&nbsp;generated&nbsp;by&nbsp;the&nbsp;most&nbsp;recent&nbsp;action.<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+`AssertionError`:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Raised&nbsp;if&nbsp;no&nbsp;target&nbsp;material&nbsp;is&nbsp;found&nbsp;in&nbsp;the&nbsp;extraction&nbsp;vessel.</tt></dd></dl>
+
+<dl><dt><a name="Extraction-get_action_space"><strong>get_action_space</strong></a>(self)</dt><dd><tt>Method&nbsp;to&nbsp;describe&nbsp;the&nbsp;actions&nbsp;index&nbsp;and&nbsp;multipliers&nbsp;available.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+None<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+`action_space`&nbsp;:&nbsp;`MultiDiscrete`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;MultiDiscrete&nbsp;<a href="builtins.html#object">object</a>&nbsp;indicating&nbsp;the&nbsp;options&nbsp;for&nbsp;selecting&nbsp;actions&nbsp;and&nbsp;multipliers.<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<dl><dt><a name="Extraction-perform_action"><strong>perform_action</strong></a>(self, vessels, external_vessels, action)</dt><dd><tt>Method&nbsp;to&nbsp;perform&nbsp;the&nbsp;action&nbsp;designated&nbsp;by&nbsp;`action`&nbsp;and&nbsp;update<br>
+the&nbsp;state,&nbsp;vessels,&nbsp;external&nbsp;vessels,&nbsp;and&nbsp;generate&nbsp;reward.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`vessels`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;vessel&nbsp;objects&nbsp;that&nbsp;contain&nbsp;materials&nbsp;and&nbsp;solutes.<br>
+`external_vessels`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;the&nbsp;external&nbsp;vessels,&nbsp;beakers,&nbsp;to&nbsp;be&nbsp;used&nbsp;in&nbsp;the&nbsp;extraction.<br>
+`action`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;two&nbsp;numbers&nbsp;indicating&nbsp;the&nbsp;index&nbsp;of&nbsp;an&nbsp;action&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;perform&nbsp;and&nbsp;a&nbsp;multiplier&nbsp;used&nbsp;when&nbsp;performin&nbsp;the&nbsp;action.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+`vessels`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;vessel&nbsp;objects&nbsp;that&nbsp;contain&nbsp;materials&nbsp;and&nbsp;solutes.<br>
+`external_vessels`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;the&nbsp;external&nbsp;vessels,&nbsp;beakers,&nbsp;to&nbsp;be&nbsp;used&nbsp;in&nbsp;the&nbsp;extraction.<br>
+`reward`&nbsp;:&nbsp;`float`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;amount&nbsp;of&nbsp;the&nbsp;target&nbsp;material&nbsp;that&nbsp;has&nbsp;been&nbsp;generated&nbsp;by&nbsp;the&nbsp;most&nbsp;recent&nbsp;action.<br>
+`done`&nbsp;:&nbsp;`bool`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;boolean&nbsp;indicating&nbsp;if&nbsp;all&nbsp;of&nbsp;the&nbsp;required&nbsp;actions&nbsp;have&nbsp;now&nbsp;been&nbsp;completed.<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<dl><dt><a name="Extraction-reset"><strong>reset</strong></a>(self, extraction_vessel)</dt><dd><tt>Method&nbsp;to&nbsp;reset&nbsp;the&nbsp;environment.<br>
+&nbsp;<br>
+Parameters<br>
+---------------<br>
+`extraction_vessel`&nbsp;:&nbsp;`vessel`&nbsp;(default=`None`)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;vessel&nbsp;<a href="builtins.html#object">object</a>&nbsp;containing&nbsp;state&nbsp;variables,&nbsp;materials,&nbsp;solutes,&nbsp;and&nbsp;spectral&nbsp;data.<br>
+&nbsp;<br>
+Returns<br>
+---------------<br>
+`vessels`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;all&nbsp;the&nbsp;vessel&nbsp;objects&nbsp;that&nbsp;contain&nbsp;materials&nbsp;and&nbsp;solutes.<br>
+`external_vessels`&nbsp;:&nbsp;`list`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;the&nbsp;external&nbsp;vessels,&nbsp;beakers,&nbsp;to&nbsp;be&nbsp;used&nbsp;in&nbsp;the&nbsp;extraction.<br>
+`state`&nbsp;:&nbsp;`np.array`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;array&nbsp;containing&nbsp;state&nbsp;variables,&nbsp;material&nbsp;concentrations,&nbsp;and&nbsp;spectral&nbsp;data.<br>
+&nbsp;<br>
+Raises<br>
+---------------<br>
+None</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>
