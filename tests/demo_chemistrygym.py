@@ -80,30 +80,33 @@ while not done:
 
     i += 1
 
-# open and check the material dict
-vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
-with open(vessel_path, 'rb') as open_file:
-    v = pickle.load(open_file)
+show_stats = input("Show Reaction Vessel Stats ('Y'/'N') >>> ")
 
-print("")
-print("---------- VESSEL ----------")
-print("Label: {}".format(v.label))
+if show_stats.lower() in ["y", "yes"]:
+    # open and check the material dict
+    vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
+    with open(vessel_path, 'rb') as open_file:
+        v = pickle.load(open_file)
 
-print("")
-print("---------- THERMODYNAMIC VARIABLES ----------")
-print("Temperature (in K): {:e}".format(v.temperature))
-print("Volume (in L): {:e}".format(v.volume))
-print("Pressure (in kPa): {:e}".format(v.pressure))
+    print("")
+    print("---------- VESSEL ----------")
+    print("Label: {}".format(v.label))
 
-print("")
-print("---------- MATERIAL_DICT ----------")
-for material, value_list in v._material_dict.items():
-    print("{} : {}".format(material, value_list))
+    print("")
+    print("---------- THERMODYNAMIC VARIABLES ----------")
+    print("Temperature (in K): {:e}".format(v.temperature))
+    print("Volume (in L): {:e}".format(v.volume))
+    print("Pressure (in kPa): {:e}".format(v.pressure))
 
-print("")
-print("---------- SOLUTE_DICT ----------")
-for solute, value_list in v._solute_dict.items():
-    print("{} : {}".format(solute, value_list))
+    print("")
+    print("---------- MATERIAL_DICT ----------")
+    for material, value_list in v._material_dict.items():
+        print("{} : {}".format(material, value_list))
+
+    print("")
+    print("---------- SOLUTE_DICT ----------")
+    for solute, value_list in v._solute_dict.items():
+        print("{} : {}".format(solute, value_list))
 
 __ = input("PRESS ENTER TO CONTINUE")
 

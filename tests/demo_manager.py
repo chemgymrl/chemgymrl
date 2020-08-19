@@ -48,25 +48,24 @@ i = 0
 total_reward = 0.0
 
 while not done:
-    # get the complete environment space to select an environment from
-    #   env_space = 0 indicates the reaction bench
-    #   env_space = 1 indicates the extraction bench
-    #   env_space = 2 indicates the distillation bench
+    # get the complete environment space to select an environment from;
+    # `env_space` is a number indicating the index of the selected environment
+    # in the list outputted by `manager_v1.py`'s `get_environments` function
     env_space = m_env.env_space
 
     # select an environment from the environment space
     env_index = env_space.sample()[0]
 
-    # set the environment in the lab manager engine
+    # set the selected environment in the lab manager engine
     m_env.set_environment(env_index)
 
-    # get list containing the action spaces of each environment
+    # get an array containing the action spaces of each available environment
     action_spaces = m_env.action_space_array
 
     # get the action spaces for the selected environment
     action_space = action_spaces[env_index]
 
-    # select a random action from the action space
+    # select an action from the action space
     action = action_space.sample()
 
     # perform the action and update the reward
