@@ -125,3 +125,9 @@ acquired form vessel.get_layers()
 ```bash
 pip install ./
 ```
+
+## To Access Documentation:
+```bash
+cd chemistrygym
+start chemistrylab.html
+```
