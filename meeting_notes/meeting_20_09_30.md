@@ -1,5 +1,5 @@
-# Proj Deep Chem RL
-## Meeting Sep 30, 2020
+# Meeting Notes
+## Date: September 30, 2020
 ### Compute
 - computing instructions are in the mail and on the wiki Issac has sent
 - V100s with 32GB per card, 96 Gb memory, 120 nodes (or cores)
