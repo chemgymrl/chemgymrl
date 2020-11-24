@@ -72,6 +72,7 @@ while not done:
 
     # perform the action and update the reward
     state, reward, done, __ = r_env.step(action)
+    print(reward)
     total_reward += reward
 
     # render the plot and wait before continuing
