@@ -31,6 +31,22 @@ from chemistrylab.chem_algorithms import material
 
 class ReactionReward:
     '''
+    Class object to define a reward function for the Reaction Bench environment.
+
+    Parameters
+    ---------------
+    `vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `desired_material` : `str` (default=`""`)
+        The name of the required output material that has been designated as reward.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
     def __init__(
@@ -39,6 +55,7 @@ class ReactionReward:
         desired_material=""
     ):
         '''
+        Constructor class for `ReactionReward` environment.
         '''
 
         self.vessel, self.desired_material = self._check_parameters(
@@ -46,8 +63,29 @@ class ReactionReward:
             desired_material=desired_material
         )
 
-    def _check_parameters(self, vessel, desired_material):
+    def _check_parameters(self, vessel=None, desired_material=""):
         '''
+        Method to validate the inputted parameters. The desired material must be a string object
+        and present in the vessel's `material_dict`. The vessel must be a vessel object and
+        contain at least one material.
+
+        Parameters
+        ---------------
+        `vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+        `desired_material` : `str` (default=`None`)
+            The name of the required output material that has been designated as reward.
+
+        Returns
+        ---------------
+        `vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+        `desired_material` : `str` (default=`None`)
+            The name of the required output material that has been designated as reward.
+
+        Raises
+        ---------------
+        None
         '''
 
         # ensure the desired material is represented by a string
@@ -73,6 +111,10 @@ class ReactionReward:
 
     def calc_reward(self):
         '''
+        Method to calculate the reward accumulated from completing the Reaction Bench. The reward
+        is calculated using the purity of the desired material in the outputted vessel object. The
+        ratio of desired material to total material gives the purity reward. Therefore, the reward
+        value must range between 0 and 1.
         '''
 
         # create variables to contain the material amounts
@@ -87,7 +129,8 @@ class ReactionReward:
             # add the amount of material to the list of total material
             total_material_amount += material_amount
 
-            # check if the current material is the desired material
+            # check if the current material is the desired material;
+            # if so, set the amount of desired material produced
             if material == self.desired_material:
                 desired_material_amount = material_amount
 
@@ -100,15 +143,35 @@ class ReactionReward:
 
 class ExtractionReward:
     '''
+    Class object to define a reward function for the Extraction Bench environment.
+
+    Parameters
+    ---------------
+    `vessels` : `list` (default=`[]`)
+        A list of vessel objects outputted by the Extraction Bench environment.
+    `desired_material` : `str` (default=`""`)
+        The name of the required output material that has been designated as reward.
+    `initial_target_material` : `float` (default=`0.0`)
+        The initial amount of target material in the vessel first provided to the Extraction Bench
+        environment.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
     def __init__(
             self,
             vessels=[],
             desired_material="",
-            initial_target_amount=0
+            initial_target_amount=0.0
     ):
         '''
+        Constructor class for the `ExtractionReward` environment.
         '''
 
         self.vessels, self.desired_material, self.desired_vessels = self._check_parameters(
@@ -120,6 +183,27 @@ class ExtractionReward:
 
     def _check_parameters(self, vessels, desired_material):
         '''
+        Method to validate the inputted parameters. The desired material must be a string object
+        and present in the vessel's `material_dict`. The vessel must be a vessel object and
+        contain at least one material.
+
+        Parameters
+        ---------------
+        `vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+        `desired_material` : `str` (default=`None`)
+            The name of the required output material that has been designated as reward.
+
+        Returns
+        ---------------
+        `vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+        `desired_material` : `str` (default=`None`)
+            The name of the required output material that has been designated as reward.
+
+        Raises
+        ---------------
+        None
         '''
 
         # ensure the desired material is represented by a string
@@ -169,11 +253,17 @@ class ExtractionReward:
         ---------------
         `vessel` : `vessel.Vessel`
             A vessel object that contains all of the extracted materials and solutes.
+        `desired_material` : `str`
+            The name of the required output material that has been designated as reward.
+        `initial_target_amount` : `float`
+            The initial amount of target material in the vessel first provided to the Extraction Bench
+            environment.
 
         Returns
         ---------------
         `reward` : `float`
-            The amount of the target material that has been generated by the most recent action.
+            The purity of the desired material with respect to the total desired material available in
+            the original vessel provided by the Reaction Bench.
 
         Raises
         ---------------
@@ -181,15 +271,19 @@ class ExtractionReward:
             Raised if no target material is found in the extraction vessel.
         '''
 
+        # acquire the amount of desired material from the `vessel` parameter
         material_amount = vessel.get_material_amount(desired_material)
 
+        # set a negative reward if no desired material was made available to the Extraction Bench
         if abs(material_amount - 0) < 1e-6:
-            reward = -100
+            reward = -1.0
         else:
             try:
+                # ensure the initial, available desired material is non-negligible
                 assert abs(initial_target_amount - 0.0) > 1e-6
 
-                reward = (material_amount / initial_target_amount) * 100
+                # find the ratio of the current desired material to the available desired material
+                reward = material_amount / initial_target_amount
 
                 print(
                     "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
@@ -208,10 +302,30 @@ class ExtractionReward:
 
     def calc_reward(self):
         '''
+        Method to calculate the reward accumulated from completing the Extraction Bench. Upon
+        completing the Extraction Bench, several vessels are outputted each containing materials
+        that may or may not include the desired material. No material is lost, so the amount of
+        target material in the initial extraction vessel is spead about the vessels upon completing
+        the Extraction Bench. Therefore, a greater reward should be given to a greater purity and
+        the desired material being present in fewer separate vessels.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `reward` : `float`
+            The final reward calculated from all vessels outputted by the Extraction Bench.
+
+        Raises
+        ---------------
+        None
         '''
 
         total_reward = 0
 
+        # calculate the purity reward in each vessel (ranges between 0 and 1)
         for vessel in self.desired_vessels:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
@@ -219,6 +333,8 @@ class ExtractionReward:
                 initial_target_amount=self.initial_target_amount
             )
 
+        # calculate the final reward by dividing the sum of the purity rewards by the number of
+        # vessels containing at least some of the desired material
         final_reward = total_reward / len(self.desired_vessels)
 
         return final_reward
@@ -227,6 +343,22 @@ class ExtractionReward:
 
 class DistillationReward:
     '''
+    Class object to define a reward function for the Distillation Bench environment.
+
+    Parameters
+    ---------------
+    `vessels` : `list` (default=`[]`)
+        A list of vessel objects outputted by the Distillation Bench environment.
+    `desired_material` : `str` (default=`""`)
+        The name of the required output material that has been designated as reward.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
     def __init__(
@@ -235,8 +367,10 @@ class DistillationReward:
             desired_material=""
     ):
         '''
+        Constructor class for the `DistillationReward` environment.
         '''
 
+        # validate the inputted parameters
         self.vessels, self.desired_material, self.desired_vessels = self._check_parameters(
             vessels=vessels,
             desired_material=desired_material
@@ -244,6 +378,28 @@ class DistillationReward:
 
     def _check_parameters(self, vessels, desired_material):
         '''
+        Method to validate the parameters defined by the constructor class.
+
+        Parameters
+        ---------------
+        `vessels` : `list` (default=`[]`)
+            A list of vessel objects outputted by the Distillation Bench environment.
+        `desired_material` : `str` (default=`""`)
+            The name of the required output material that has been designated as reward.
+
+        Returns
+        ---------------
+        `vessels` : `list` (default=`[]`)
+            A list of vessel objects outputted by the Distillation Bench environment.
+        `desired_material` : `str` (default=`""`)
+            The name of the required output material that has been designated as reward.
+        `desired_vessels` : `list` (default=`[]`)
+            A list of vessel objects outputted by the Distillation Bench environment that include
+            the desired material.
+
+        Raises
+        ---------------
+        None
         '''
 
         # ensure the desired material is represented by a string
@@ -262,9 +418,12 @@ class DistillationReward:
             # acquire all the materials from the inputted vessel
             all_materials = [material for material, __ in vessel._material_dict.items()]
 
-            # check that the input vessel has at least one material
+            # check that the input vessel has at least one material;
+            # if it does not change the ith element in `is_present` to False
             if not all_materials:
+                is_present[i] = False
                 print("{} has no materials.".format(label))
+                
 
             # check that the inputted vessel has the desired material;
             # if it does not change the ith element in `is_present` to False
@@ -287,17 +446,20 @@ class DistillationReward:
     @staticmethod
     def calc_vessel_purity(vessel, desired_material):
         '''
-        Method to calculate the full reward once the final action has taken place.
+        Method to calculate the purity reward of the current vessel with respect to the other
+        materials in the vessel.
 
         Parameters
         ---------------
         `beaker` : `vessel.Vessel`
             A vessel object that contains all of the extracted materials and solutes.
+        `desired_material` : `str`
+            The name of the required output material that has been designated as reward.
 
         Returns
         ---------------
         `reward` : `float`
-            The amount of the target material that has been generated by the most recent action.
+            The purity ratio of the desired material with respect to the total material in the vessel.
 
         Raises
         ---------------
@@ -325,7 +487,7 @@ class DistillationReward:
             total_material_amount += material_amount
 
         # calculate the reward as the purity of the target material in the vessel
-        reward = 100 * target_material_amount / total_material_amount
+        reward = target_material_amount / total_material_amount
 
         # print the results to the terminal
         print("Done Reward in {}:".format(label))
@@ -337,16 +499,39 @@ class DistillationReward:
 
     def calc_reward(self):
         '''
+        Method to calculate the total reward using all vessels from the Distillation Bench. Upon
+        completing the Distillation Bench, several vessels are outputted each containing materials
+        that may or may not include the desired material. No material is lost, so the amount of
+        target material in the initial extraction vessel is spead about the vessels upon completing
+        the Distillation Bench. The purpose of Distillation Bench is to isolate the desired material
+        in its own vessel. Therefore, a greater reward should be given to a greater purity and the
+        desired material being present in fewer separate vessels, similar to the reward generated
+        by the Extraction Bench.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `final_reward` : `float`
+            The final reward calculated from each vessel.
+
+        Raises
+        ---------------
+        None 
         '''
 
         total_reward = 0
 
+        # sum the rewards from each vessel containing at least some of the desired material
         for vessel in self.desired_vessels:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
                 desired_material=self.desired_material
             )
 
+        # divide the sum reward by the number of vessels containing some of the desired material
         final_reward = total_reward / len(self.desired_vessels)
 
         return final_reward
