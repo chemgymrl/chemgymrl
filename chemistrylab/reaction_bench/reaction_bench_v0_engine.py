@@ -29,6 +29,7 @@ import sys
 
 sys.path.append("../../") # to access chemistrylab
 sys.path.append("../reactions/") # to access all reactions
+from chemistrylab.chem_algorithms.reward import ReactionReward
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.chem_algorithms.logger import Logger
 from chemistrylab.reactions.wurtz_reaction import Reaction
@@ -111,6 +112,8 @@ class ReactionBenchEnv(gym.Env):
 
         self.name = "experiment_0"
         self.step_num = 1
+
+        self.desired = desired
 
         self.n_steps = n_steps # Time steps per action
         self.dt = dt # Time step of reaction (s)
@@ -297,6 +300,8 @@ class ReactionBenchEnv(gym.Env):
             solute_name = self.reaction.solute_labels[i]
             solute_class = self.reaction.solute_classes[i]
             amount = self.reaction.initial_solutes[i]
+
+            # create the new solute dictionary to be appended to a new vessel object
             new_solute_dict[solute_name] = [solute_class, amount]
 
         # create a new vessel and update it with new data
@@ -384,7 +389,7 @@ class ReactionBenchEnv(gym.Env):
         # reinitialize the reaction class
         self.reaction.reset(n_init=self.n_init)
 
-        # save the necessary temperatures,  volumes, and pressure
+        # save the necessary temperatures, volumes, and pressure
         Ti = self.vessels.get_temperature()
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
@@ -449,17 +454,20 @@ class ReactionBenchEnv(gym.Env):
         # the reward for this step is set to 0
         reward = 0.0
 
+        # pull from the action parameter, the amount of each reactant to add
+        add_reactants = action[2:]
+
         for i, reactant in enumerate(self.reaction.cur_in_hand):
             # Actions [1:] add reactants to system, 0.0 = 0%, 1.0 = 100%
             # If action [i] is larger than the amount of the current reactant, all is added
             if all([
-                    action[i+2] > reactant,
+                    add_reactants[i] > reactant,
                     reactant != 0
             ]):
                 # in the case of over-use we apply a penalty unless no reactants are left to add
-                reward -= 0.1 * (action[i+2] - reactant)
+                reward -= 0.1 * (add_reactants[i] - reactant)
 
-            dn = np.min([action[i+2], reactant])
+            dn = np.min([add_reactants[i], reactant])
             self.reaction.n[i] += dn
             self.reaction.cur_in_hand[i] -= dn
 
@@ -478,13 +486,22 @@ class ReactionBenchEnv(gym.Env):
                 np.max([self.V, self.vessels.get_min_volume() / 1000]),
                 self.vessels.get_max_volume() / 1000
             ])
-            d_reward = self.reaction.update(
+
+            # perform the reaction and update the molar concentrations of the reactants and products
+            self.reaction.update(
                 self.T,
                 self.V,
                 self.vessels.get_defaultdt()
             )
-            self.t += self.dt # Increase time by time step
-            reward += d_reward # Reward is change in concentration of desired material
+
+            # Increase time by time step
+            self.t += self.dt
+
+            # update the overall reward with the reward from the current step
+            reward += ReactionReward(
+                vessel=self.vessels,
+                desired_material=self.desired
+            ).calc_reward()
 
             # Record time data
             self.plot_data_state[0].append(self.t)
@@ -505,6 +522,7 @@ class ReactionBenchEnv(gym.Env):
                 self.P/self.vessels.get_pmax()
             )
 
+            # calculate and record the molar concentrations of the reactants and products
             C = self.reaction.get_concentration(self.V)
             for j in range(self.reaction.n.shape[0]):
                 self.plot_data_mol[j].append(self.reaction.n[j])

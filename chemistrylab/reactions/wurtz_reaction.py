@@ -54,8 +54,8 @@ E5 = 1.0
 A6 = 1.0
 E6 = 1.0
 
-# the gas constant (in kPa * m**3 * mol**-1 * K**-1)
-R = 0.008314462619
+# the gas constant (in kPa * L * mol**-1 * K**-1)
+R = 8.314462619
 
 # names of the reactants and products in all reactions
 REACTANTS = ["1-chlorohexane", "2-chlorohexane", "3-chlorohexane", "Na"]
@@ -245,7 +245,7 @@ class Reaction():
         V : np.float32
             The volume of the system in Litres
         dt : np.float32
-            The time-step demarcating steps
+            The time-step demarcating separate steps
 
         Returns
         ---------------
@@ -257,7 +257,7 @@ class Reaction():
         None
         '''
 
-        # obtain the concentration (all concentrations are in mol/m**3)
+        # obtain the concentration of each reactant to be used up (all concentrations are in mol/m**3)
         C = self.get_concentration(V)
 
         # define a space to contain the changes in concentration to each chemical
@@ -271,26 +271,34 @@ class Reaction():
         k5 = A5 * np.exp((-1 * E5)/(R * T))
         k6 = A6 * np.exp((-1 * E6)/(R * T))
 
-        # define the rate of each reaction
-        self.rate[0] = k1 * (C[0] ** 2) * (C[3] ** 2) * dt
-        self.rate[1] = k2 * C[0] * C[1] * (C[3] ** 2) * dt
-        self.rate[2] = k3 * C[0] * C[2] * (C[3] ** 2) * dt
-        self.rate[3] = k4 * (C[1] ** 2) * (C[3] ** 2) * dt
-        self.rate[4] = k5 * C[1] * C[2] * (C[3] ** 2) * dt
-        self.rate[5] = k6 * (C[2] ** 2) * (C[3] ** 2) * dt
+        # define the rate of each reaction;
+        # note the reactants in C match the order of the reactants in REACTANTS:
+        self.rate[0] = k1 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[1] = k2 * (C[0] ** 1) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[2] = k3 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
+        self.rate[3] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[4] = k5 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
+        self.rate[5] = k6 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
 
-        # calculate and store the changes in concentration of each chemical
-        dC[0] = (-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2]) # change in 1-chlorohexane
-        dC[1] = (-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4]) # change in 2-chlorohexane
-        dC[2] = (-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5]) # change in 3-chlorohexane
-        dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) # change in Na
-        dC[4] = 1.0 * self.rate[0] # change in dodecane
-        dC[5] = 1.0 * self.rate[1] # change in 5-methylundecane
-        dC[6] = 1.0 * self.rate[2] # change in 4-ethyldecane
-        dC[7] = 1.0 * self.rate[3] # change in 5,6-dimethyldecane
-        dC[8] = 1.0 * self.rate[4] # change in 4-ethyl-5-methylnonane
-        dC[9] = 1.0 * self.rate[5] # change in 4,5-diethyloctane
-        dC[10] = 2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) # change in NaCl
+        # calculate and store the changes in concentration of each chemical;
+        # recall: change in concentration = molar concentration * rate * dt
+        # ie. for A + 2B --> C and A + C --> D as parallel reactions
+        # change in A = (-1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
+        # change in B = (-2 * rate of reaction 1 * dt)
+        # change in C = (+1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
+        # change in D = (+1 * rate of reaction 2 * dt)
+        # assuming both reactions have the same time-step, which is true for all reactions in this file
+        dC[0] = (-2.0 * self.rate[0] * dt) + (-1.0 * self.rate[1] * dt) + (-1.0 * self.rate[2] * dt) # change in 1-chlorohexane
+        dC[1] = (-1.0 * self.rate[1] * dt) + (-2.0 * self.rate[3] * dt) + (-1.0 * self.rate[4] * dt) # change in 2-chlorohexane
+        dC[2] = (-2.0 * self.rate[2] * dt) + (-1.0 * self.rate[4] * dt) + (-2.0 * self.rate[5] * dt) # change in 3-chlorohexane
+        dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in Na
+        dC[4] = 1.0 * self.rate[0] * dt # change in dodecane
+        dC[5] = 1.0 * self.rate[1] * dt # change in 5-methylundecane
+        dC[6] = 1.0 * self.rate[2] * dt # change in 4-ethyldecane
+        dC[7] = 1.0 * self.rate[3] * dt # change in 5,6-dimethyldecane
+        dC[8] = 1.0 * self.rate[4] * dt # change in 4-ethyl-5-methylnonane
+        dC[9] = 1.0 * self.rate[5] * dt # change in 4,5-diethyloctane
+        dC[10] = 2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in NaCl
 
         # update the concentrations of each chemical
         for i in range(self.n.shape[0]):
@@ -298,13 +306,15 @@ class Reaction():
             dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
 
+        '''
         # calculate the reward (new molar amount of the desired chemical, if present)
         d_reward = 0
         if self.desired_material in ALL_MATERIALS:
             index = ALL_MATERIALS.index(self.desired_material)
-            d_reward = dC[index] * V * 0.001
+            d_reward = dC[index] * V
 
         return d_reward
+        '''
 
     def get_total_pressure(self, V, T=300):
         '''
@@ -313,7 +323,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system in Litres
+            The volume of the system in L
         T : np.float32 (default=300)
             The temperature of the system in Kelvin
 
@@ -330,13 +340,7 @@ class Reaction():
         # calculate the total pressure of all chemicals
         P_total = 0
         for i in range(self.n.shape[0]):
-            P_total += self.n[i] * R * T / (V * 1000)
-            '''
-            print(self.n[i])
-            print(V)
-            print(P_total)
-            print("")
-            '''
+            P_total += self.n[i] * R * T / V
 
         return P_total
 
@@ -347,7 +351,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system in Litres
+            The volume of the system in L
         T : np.float32 (default=300)
             The temperature of the system in Kelvin
 
@@ -364,7 +368,7 @@ class Reaction():
         # create an array of all the pressures of each chemical individually
         P = np.zeros(self.n.shape[0], dtype=np.float32)
         for i in range(self.n.shape[0]):
-            P[i] = self.n[i] * R * T / (V * 1000)
+            P[i] = self.n[i] * R * T / V
 
         return P
 
@@ -375,7 +379,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32 (default=0.1)
-            The volume of the system in Litres
+            The volume of the system in m**3
 
         Returns
         ---------------
@@ -390,7 +394,7 @@ class Reaction():
         # create an array containing the concentrations of each chemical
         C = np.zeros(self.n.shape[0], dtype=np.float32)
         for i in range(self.n.shape[0]):
-            C[i] = self.n[i] / (V * 1000)
+            C[i] = self.n[i] / V
 
         return C
 
@@ -412,6 +416,9 @@ class Reaction():
         ---------------
         None
         '''
+
+        # convert the volume in litres to the volume in m**3
+        V = V / 1000
 
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
@@ -449,7 +456,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system.
+            The volume of the system in litres.
 
         Returns
         ---------------
@@ -460,6 +467,9 @@ class Reaction():
         ---------------
         None
         '''
+
+        # convert the volume in litres to the volume in m**3
+        V = V / 1000
 
         # get the concentration of each chemical
         C = self.get_concentration(V)
@@ -515,6 +525,9 @@ class Reaction():
         ---------------
         None
         '''
+
+        # convert the volume in litres to the volume in m**3
+        V = V / 1000
 
         dash_spectra = []
         C = self.get_concentration(V)

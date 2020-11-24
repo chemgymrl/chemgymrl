@@ -23,6 +23,7 @@ import sys
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import util
+from chemistrylab.chem_algorithms.reward import DistillationReward
 from chemistrylab.distillations import distill_v0
 
 class DistillationBenchEnv(gym.Env):
@@ -87,38 +88,6 @@ class DistillationBenchEnv(gym.Env):
 
         # set up the intended path for the final distillation vessel to be stored
         self.out_vessel_path = out_vessel_path
-
-    def _calc_reward(self):
-        '''
-        Method to calculate the generated reward in every vessel in `self.vessels`.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        `total_reward` : `float`
-            The sum of reward found in each vessel.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        total_reward = 0
-
-        # search every vessel's material_dict for the target material
-        for vessel_obj in self.vessels:
-            material_names = vessel_obj._material_dict.keys()
-
-            if self.target_material in material_names:
-                total_reward += self.distillation.done_reward(beaker=vessel_obj)
-
-        if total_reward == 0:
-            print("Error: No target material found in any vessel!")
-
-        return total_reward
 
     def _save_vessel(self, vessel):
         '''
@@ -249,7 +218,10 @@ class DistillationBenchEnv(gym.Env):
             self.done = True
 
             # after the last step, calculate the final reward
-            reward = self._calc_reward()
+            reward = DistillationReward(
+                vessels=vessels,
+                desired_material=self.target_material
+            ).calc_reward()
 
             # option to save any final vessels here
             # self._save_vessel(vessel=self.vessels[0])

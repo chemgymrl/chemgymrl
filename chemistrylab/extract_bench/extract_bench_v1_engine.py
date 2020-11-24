@@ -35,6 +35,7 @@ import pickle
 # import local modules
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util
+from chemistrylab.chem_algorithms.reward import ExtractionReward
 from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0
 from chemistrylab.extract_algorithms import separate
 
@@ -108,6 +109,10 @@ class ExtractBenchEnv(gym.Env):
             target_material=self.target_material
         )
 
+        self.initial_target_amount = self.extraction_vessel.get_material_amount(
+            self.target_material
+        )
+
         self.vessels = None
         self.external_vessels = None
         self.state = None
@@ -118,38 +123,6 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self._plot_fig = None
         self._plot_axs = None
-
-    def _calc_reward(self):
-        '''
-        Method to calculate the generated reward in every vessel in `self.vessels`.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        `total_reward` : `float`
-            The sum of reward found in each vessel.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        total_reward = 0
-
-        # search every vessel's material_dict for the target material
-        for vessel_obj in self.vessels:
-            mat_dict = vessel_obj._material_dict
-
-            if self.target_material in mat_dict:
-                total_reward += self.extraction.done_reward(beaker=vessel_obj)
-
-        if total_reward == 0:
-            print("Error: No target material found in any vessel!")
-
-        return total_reward
 
     def _save_vessel(self, extract_vessel):
         '''
@@ -264,7 +237,11 @@ class ExtractBenchEnv(gym.Env):
         # once all the steps have been completed, calculate the final reward and save any vessels
         if self.done:
             # after the last iteration, calculate the amount of target material in each vessel
-            reward = self._calc_reward()
+            reward = ExtractionReward(
+                vessels=self.vessels,
+                desired_material=self.target_material,
+                initial_target_amount=self.initial_target_amount
+            )
 
             # save the final extraction vessel
             self._save_vessel(self.vessels[0])
