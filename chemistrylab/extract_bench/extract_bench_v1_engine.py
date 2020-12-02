@@ -117,6 +117,11 @@ class ExtractBenchEnv(gym.Env):
         self.external_vessels = None
         self.state = None
 
+        # the minimum purity of desired material in relation to total material that a finalized
+        # extraction vessel must have to be qualified for use in other processes (the vessel is
+        # saved if it exceeds this minimum purity threshold)
+        self.min_purity_threshold = 0.5
+
         # self.observation_space = self.extraction.get_observation_space()
         self.action_space = self.extraction.get_action_space()
         self.done = False
@@ -124,13 +129,16 @@ class ExtractBenchEnv(gym.Env):
         self._plot_fig = None
         self._plot_axs = None
 
-    def _save_vessel(self, extract_vessel):
+    def _save_vessel(self, extract_vessel=None, name=""):
         '''
         Method to save a vessel as a pickle file.
         
         Parameters
         ---------------
-        None
+        `extract_vessel` : `vessel.Vessel` (default=`None`)
+            The vessel object designated to be saved.
+        `name` : `str` (default="")
+            The intended name/identifier of the pickle file to which the vessel is being saved.
 
         Returns
         ---------------
@@ -143,7 +151,7 @@ class ExtractBenchEnv(gym.Env):
 
         # specify a vessel path for saving the extract vessel
         file_directory = os.getcwd()
-        filename = "extract_vessel.pickle"
+        filename = "{}.pickle".format(name)
         open_file = os.path.join(file_directory, filename)
 
         # delete any existing vessel files to ensure the vessel is saved as intended
@@ -241,10 +249,24 @@ class ExtractBenchEnv(gym.Env):
                 vessels=self.vessels,
                 desired_material=self.target_material,
                 initial_target_amount=self.initial_target_amount
+            ).calc_reward()
+
+            # use the extraction reward class's `validate_vessels` method to output only the
+            # vessels that pass a certain reward threshold;
+            valid_vessels = ExtractionReward(
+                vessels=self.vessels,
+                desired_material=self.target_material,
+                initial_target_amount=self.initial_target_amount
+            ).validate_vessels(
+                purity_threshold=self.min_purity_threshold
             )
 
-            # save the final extraction vessel
-            self._save_vessel(self.vessels[0])
+            # save each validated vessel as pickle files
+            for i, vessel in enumerate(valid_vessels):
+                self._save_vessel(
+                    extract_vessel=vessel,
+                    name="extract_vessel_{}".format(i)
+                )
 
         return self.state, reward, self.done, {}
 
