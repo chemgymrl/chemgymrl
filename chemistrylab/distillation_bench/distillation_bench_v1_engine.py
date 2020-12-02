@@ -89,13 +89,21 @@ class DistillationBenchEnv(gym.Env):
         # set up the intended path for the final distillation vessel to be stored
         self.out_vessel_path = out_vessel_path
 
-    def _save_vessel(self, vessel):
+        # the minimum purity of desired material in relation to total material that a finalized
+        # distillation vessel must have to be qualified for use in other processes (the vessel
+        # is saved if it exceeds this minimum purity threshold)
+        self.min_purity_threshold = 0.5
+
+    def _save_vessel(self, distillation_vessel=None, name=""):
         '''
         Method to save a vessel as a pickle file.
         
         Parameters
         ---------------
-        None
+        `distillation_vessel` : `vessel.Vessel` (default=`None`)
+            The vessel object designated to be saved.
+        `name` : `str` (default="")
+            The intended name/identifier of the pickle file to which the vessel is being saved.
 
         Returns
         ---------------
@@ -112,26 +120,16 @@ class DistillationBenchEnv(gym.Env):
         # otherwise, save the vessels in the current working directory
         else:
             file_directory = os.getcwd()
-            filename = "vessel_distillation.pickle"
+            filename = "{}.pickle".format(name)
             open_file = os.path.join(file_directory, filename)
 
         # delete any existing vessel files to ensure the vessel is saved as intended
-        num = 0
-        while os.path.exists(open_file):
-            # rename the filename by adding a number
-            start_filename = filename.split(".")[0]
-            new_start_filename = "{}_{}".format(start_filename, num)
-            new_filename = "{}.pickle".format(new_start_filename)
-
-            # recreate the open_file variable
-            open_file = os.path.join(file_directory, new_filename)
-
-            # increase the arbitrary marker by 1
-            num += 1
+        if os.path.exists(open_file):
+            os.remove(open_file)
 
         # open the intended vessel file and save the vessel as a pickle file
         with open(open_file, 'wb') as vessel_file:
-            pickle.dump(vessel, vessel_file)
+            pickle.dump(distillation_vessel, vessel_file)
 
     def reset(self):
         '''
@@ -219,12 +217,25 @@ class DistillationBenchEnv(gym.Env):
 
             # after the last step, calculate the final reward
             reward = DistillationReward(
-                vessels=vessels,
+                vessels=self.vessels,
                 desired_material=self.target_material
             ).calc_reward()
 
-            # option to save any final vessels here
-            # self._save_vessel(vessel=self.vessels[0])
+            # obtain a list of the vessels that contain the desired
+            # material and obey the minimum purity requirements
+            valid_vessels = DistillationReward(
+                vessels=self.vessels,
+                desired_material=self.target_material
+            ).validate_vessels(
+                purity_threshold=self.min_purity_threshold
+            )
+
+            # save any finalized, validated vessels for future use or reference
+            for i, vessel in enumerate(valid_vessels):
+                self._save_vessel(
+                    distillation_vessel=vessel,
+                    name="distillation_vessel_{}".format(i)
+                )
 
         return self.state, reward, self.done, {}
 
