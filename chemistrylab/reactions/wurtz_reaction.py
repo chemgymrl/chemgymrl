@@ -272,7 +272,18 @@ class Reaction():
         k6 = A6 * np.exp((-1 * E6)/(R * T))
 
         # define the rate of each reaction;
-        # note the reactants in C match the order of the reactants in REACTANTS:
+        # note the reactants in the concentration array (C) are in
+        # the order of the reactants in the `REACTANTS` variable;
+        # using the stoichiometric ratio in the rate exponentials gives the following rates:
+        # self.rate[0] = k1 * (C[0] ** 2) * (C[1] ** 0) * (C[2] ** 0) * (C[3] ** 1)
+        # self.rate[1] = k2 * (C[0] ** 1) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
+        # self.rate[2] = k3 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
+        # self.rate[3] = k4 * (C[0] ** 0) * (C[1] ** 2) * (C[2] ** 0) * (C[3] ** 1)
+        # self.rate[4] = k5 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
+        # self.rate[5] = k6 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 2) * (C[3] ** 1)
+        # this is however not common practice in chemistry calculations, rather the exponentials
+        # are determined experimentally, so using the stoichiometric ratios is commented out and
+        # an alternate solution (assigning all rate exponentials as 1) is being used (temporarily);
         self.rate[0] = k1 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 0) * (C[3] ** 1)
         self.rate[1] = k2 * (C[0] ** 1) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
         self.rate[2] = k3 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)

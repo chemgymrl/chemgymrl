@@ -451,7 +451,7 @@ class ReactionBenchEnv(gym.Env):
         None
         '''
 
-        # the reward for this step is set to 0
+        # the reward for this step is set to 0 initially
         reward = 0.0
 
         # pull from the action parameter, the amount of each reactant to add
@@ -497,12 +497,6 @@ class ReactionBenchEnv(gym.Env):
             # Increase time by time step
             self.t += self.dt
 
-            # update the overall reward with the reward from the current step
-            reward += ReactionReward(
-                vessel=self.vessels,
-                desired_material=self.desired
-            ).calc_reward()
-
             # Record time data
             self.plot_data_state[0].append(self.t)
 
@@ -533,6 +527,12 @@ class ReactionBenchEnv(gym.Env):
 
         # update the vessels variable
         self._update_vessel()
+
+        # calculate the reward for this step
+        reward = ReactionReward(
+            vessel=self.vessels,
+            desired_material=self.desired
+        ).calc_reward()
 
         # ---------- ADD ---------- #
         # add option to save or print intermediary vessel
