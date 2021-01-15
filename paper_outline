@@ -1,0 +1,26 @@
+Lab manager:
+    - an agent whose task is to transform some initial feedstock chemicals into a new, useful material
+    - the manager has the ability to assign sub-agents to benches
+    - sub-agents take a chemical input, and have the ability to modify it using the bench
+    
+Benches:
+
+    - chemical reaction vessel
+    - extraction (isolating the different materials from the mixture)
+    - 
+    
+In this paper, the LM is rule based. Essentially this means that the user is the LM.
+    
+Paper 1
+
+Introduction to the gym
+Introduction to the problems of RL in chemistry (e.g. cost of information), 
+
+Markovian and non-Markovian measurements.
+
+
+
+
+Paper 2
+
+The lab manager is no longer user controlled, but themselves an agent which must determine a control policy for the sub agents. This is a command-and-control problem. Interestingly, the optimal policy (i.e. the order of benches which should be applied) depends on the abilities of the bench agents. Bench agents which are very good at their task allow the LM to develop 
