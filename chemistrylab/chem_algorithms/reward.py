@@ -99,7 +99,7 @@ class ReactionReward:
         '''
 
         # ensure the desired material is represented by a string
-        if not isinstance(self.desired_material, str):
+        if not isinstance(desired_material, str):
             print("Invalid Parameter Type: `desired_material` must be a string.")
             desired_material = ""
 
