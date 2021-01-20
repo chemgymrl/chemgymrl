@@ -77,31 +77,31 @@ def oil_vessel():
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
     # initialize H2O
-    H2O = material.H2O()
+    H2O = material.H2O
 
     # initialize Na
-    Na = material.Na()
-    Na.set_charge(1.0)
-    Na.set_solute_flag(True)
-    Na.set_polarity(2.0)
+    Na = material.Na
+    Na().set_charge(1.0)
+    Na().set_solute_flag(True)
+    Na().set_polarity(2.0)
 
     # initialize Cl
-    Cl = material.Cl()
-    Cl.set_charge(-1.0)
-    Cl.set_solute_flag(True)
-    Cl.set_polarity(2.0)
+    Cl = material.Cl
+    Cl().set_charge(-1.0)
+    Cl().set_solute_flag(True)
+    Cl().set_polarity(2.0)
 
     # material_dict
     material_dict = {
-        H2O.get_name(): [H2O, 30.0],
-        Na.get_name(): [Na, 1.0],
-        Cl.get_name(): [Cl, 1.0]
+        H2O().get_name(): [H2O, 30.0],
+        Na().get_name(): [Na, 1.0],
+        Cl().get_name(): [Cl, 1.0]
     }
 
     # solute_dict
     solute_dict = {
-        Na.get_name(): [H2O.get_name(), 1.0],
-        Cl.get_name(): [H2O.get_name(), 1.0],
+        Na().get_name(): [H2O().get_name(), 1.0],
+        Cl().get_name(): [H2O().get_name(), 1.0],
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
