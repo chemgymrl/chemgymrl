@@ -135,7 +135,7 @@ class ExtractWorld_v1(ExtractBenchEnv):
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=None
             ),
-            solute="ethoxyethane",
+            solute="H2O",
             target_material='dodecane'
         )
 
