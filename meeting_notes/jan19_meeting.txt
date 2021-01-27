@@ -1,0 +1,10 @@
+- Aid the new co-ops in difficulties understanding the project
+
+- Add the automatic search for compatible reactions adds a lot of utility
+
+- Finalize the reward function?
+- Adding logging functions (I did this but it got swept under the rug)
+- Improve uniformity between the benches (ie. the extraction bench does not match the discrete/continuous nature of the observation spaces of the other benches)
+- Adding an observation state to all the benches
+- Fixing issues with setup.py
+- *Stuff that was added during the fall term but was not addressed*
