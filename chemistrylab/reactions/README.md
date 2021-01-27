@@ -11,7 +11,7 @@ Modules defining reactions available to the reaction bench
 - reaction_4 : Performs a set of three sample reactions involving two completely parallel reactions.
 - reaction_5 : Performs a set of three sample reactions involving three parallel reactions using 5 different reactants and producing 4 different products.
 - reaction_6 : Performs a set of five sample reactions involving multiple parallel reactions using 4 different reactants and producing 4 different products.
-- wurtz_reaction : Performs a set of six Wurtz reactions, which are the reactions relating to the six different isomers of chlorohexane reacting with sodium to produce large chlorohydrocarbons.
+- wurtz_reaction : Performs a set of six Wurtz reactions, which are the reactions relating to the six different isomers of chlorohexane reacting with sodium to produce large hydrocarbons.
 
 ## Overview
 
