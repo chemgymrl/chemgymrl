@@ -188,6 +188,7 @@ class H2O(Material):
                          molar_mass=18.015,
                          color=0.2,
                          charge=0.0,
+                         solute=False,
                          solvent=True,
                          specific_heat=4.1813,
                          index=1
@@ -620,7 +621,8 @@ class Ethoxyethane(Material):
             charge=0.0,
             boiling_point=34.6,
             melting_point=-116.3,
-            solute=True,
+            solute=False,
+            solvent=True,
             specific_heat=2.253,
             enthalpy_fusion=7190.0,
             enthalpy_vapor=27250.0,
