@@ -24,6 +24,12 @@ register(
     max_episode_steps=100
 )
 
+register(
+    id='Lesson_1-v1',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_v2',
+    max_episode_steps=100
+)
+
 ############################ ReactBench ####################################
 
 register(
