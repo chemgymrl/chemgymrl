@@ -112,7 +112,7 @@ class ReactionReward:
 
         # check that the inputted vessel has the desired material
         if any([
-                desired_material,
+                not desired_material,
                 desired_material not in all_materials
         ]):
             print("Desired material not found in input vessel.")
@@ -239,7 +239,7 @@ class ExtractionReward:
             # check that the inputted vessel has the desired material;
             # if it does not change the ith element in `is_present` to False
             if any([
-                    desired_material,
+                    not desired_material,
                     desired_material not in all_materials
             ]):
                 is_present[i] = False
@@ -489,7 +489,7 @@ class DistillationReward:
             # check that the inputted vessel has the desired material;
             # if it does not change the ith element in `is_present` to False
             if any([
-                    desired_material,
+                    not desired_material,
                     desired_material not in all_materials
             ]):
                 is_present[i] = False

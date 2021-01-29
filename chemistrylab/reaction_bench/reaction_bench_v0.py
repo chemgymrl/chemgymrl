@@ -26,7 +26,7 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
                 {"Material": "Na", "Initial": 1}
             ],
             solutes=[
-                {"Solute": "ethoxyethane", "Initial": 1}
+                {"Solute": "H2O", "Initial": 1}
             ],
             desired="dodecane",
             overlap=False

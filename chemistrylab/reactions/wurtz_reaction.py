@@ -317,16 +317,6 @@ class Reaction():
             dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
 
-        '''
-        # calculate the reward (new molar amount of the desired chemical, if present)
-        d_reward = 0
-        if self.desired_material in ALL_MATERIALS:
-            index = ALL_MATERIALS.index(self.desired_material)
-            d_reward = dC[index] * V
-
-        return d_reward
-        '''
-
     def get_total_pressure(self, V, T=300):
         '''
         Method to obtain the total pressure of all chemicals.
