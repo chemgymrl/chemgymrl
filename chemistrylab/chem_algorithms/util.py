@@ -121,7 +121,6 @@ def generate_state(vessel_list,
 
         # solute_dict:
         for solute in solute_dict:
-            print(solute)
             solute_class = all_materials[1][all_materials[0].index(solute)]()
             solute_index = solute_class.get_index()
             for solvent in solute_dict[solute]:
