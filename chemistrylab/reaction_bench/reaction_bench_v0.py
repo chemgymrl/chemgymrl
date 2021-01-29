@@ -15,6 +15,7 @@ import sys
 
 sys.path.append("../../")
 from chemistrylab.reaction_bench.reaction_bench_v0_engine import ReactionBenchEnv
+from chemistrylab.reaction_bench.reaction_bench_v0_engine_dissasociation import ReactionBenchEnvDissasociation
 
 class ReactionBenchEnv_0(ReactionBenchEnv):
     def __init__(self):
@@ -45,3 +46,17 @@ class ReactionBenchEnv_0_Overlap(ReactionBenchEnv):
             desired="dodecane",
             overlap=True
         )
+
+class ReactionBenchEnv_1(ReactionBenchEnvDissasociation):
+    def __init__(self):
+        super(ReactionBenchEnv_1, self).__init__(
+            materials=[
+                {"Material": "NaCl", "Initial": 1},
+            ],
+            solutes=[
+                {"Solute": "H2O", "Initial": 1}
+            ],
+            desired="Na",
+            overlap=False
+        )
+

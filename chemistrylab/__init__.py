@@ -25,8 +25,8 @@ register(
 )
 
 register(
-    id='Lesson_1-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_v2',
+    id='Lesson_1_Extract-v1',
+    entry_point='chemistrylab.extract_bench.lesson_1:ExtractWorld_Lesson1',
     max_episode_steps=100
 )
 
@@ -41,6 +41,12 @@ register(
 register(
     id='WurtzReact_overlap-v0',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0_Overlap',
+    max_episode_steps=20
+)
+
+register(
+    id='DecompReactLesson-v0',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_1',
     max_episode_steps=20
 )
 

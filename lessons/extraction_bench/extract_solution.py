@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../../../transfer/')
+sys.path.append('../../')
 sys.path.append('../../chemistrylab/reactions')
 import gym
 import chemistrylab
