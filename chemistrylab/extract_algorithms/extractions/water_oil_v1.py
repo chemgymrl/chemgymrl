@@ -23,7 +23,8 @@ class Extraction:
         max_vessel_volume=1000.0,  # max volume of empty vessels / g
         n_vessel_pixels=100,  # number of pixels for each vessel
         max_valve_speed=10,  # maximum draining speed (pixels/step)
-        n_actions=9
+        n_actions=9,
+        solute=None
     ):
         '''
         '''
@@ -57,7 +58,6 @@ class Extraction:
         6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
         7: Add Oil to ExV （Volume multiplier, relative to max_vessel_volume)
         8: Done (Value doesn't matter)
-
         :return: action_space
         '''
 
@@ -94,8 +94,8 @@ class Extraction:
         )
 
         oil_vessel_material_dict = {}
-        C6H14 = material.C6H14()
-        oil_vessel_material_dict[C6H14.get_name()] = [C6H14, self.oil_volume]
+        C6H14 = material.C6H14
+        oil_vessel_material_dict[C6H14().get_name()] = [C6H14, self.oil_volume]
         oil_vessel_material_dict, _, _ = util.check_overflow(
             material_dict=oil_vessel_material_dict,
             solute_dict={},
@@ -119,7 +119,6 @@ class Extraction:
         6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
         7: Add Oil to ExV （Volume multiplier, relative to max_vessel_volume)
         8: Done (Value doesn't matter)
-
         :param oil_vessel:
         :param vessels: a list containing three vessels
         :param action: a tuple of two elements, first one represents action, second one is a multiplier
