@@ -75,6 +75,7 @@ def check_overflow(material_dict,
 
 def generate_state(vessel_list,
                    max_n_vessel=5):
+    all_materials = [[mat().get_name() for mat in material.Material.__subclasses__()], material.Material.__subclasses__()]
     # check error
     if len(vessel_list) > max_n_vessel:
         raise ValueError('number of vessels exceeds the max')
@@ -120,10 +121,10 @@ def generate_state(vessel_list,
 
         # solute_dict:
         for solute in solute_dict:
-            solute_class = solute_dict[solute][0]()
+            solute_class = all_materials[1][all_materials[0].index(solute)]()
             solute_index = solute_class.get_index()
             for solvent in solute_dict[solute]:
-                solvent_index = solute_dict[solvent][0]().get_index()
+                solvent_index = all_materials[1][all_materials[0].index(solvent)]().get_index()
                 solute_dict_matrix[solute_index, solvent_index] = solute_dict[solute][solvent]
 
         current_vessel_state = [material_dict_matrix, solute_dict_matrix, layer_vector]
