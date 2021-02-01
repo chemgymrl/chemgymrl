@@ -205,12 +205,6 @@ class ReactionBenchEnv(gym.Env):
         # Reset the environment upon calling the class
         self.reset()
 
-        # initialize the logger
-        # log_file = os.path.join(os.getcwd(), "log-v0")
-        # self.logging = Logger(log_file=log_file, log_format="default", print_messages=True)
-        # self.logging.initialize()
-        # self.logging.add_log(message="Initialized Logging in {} for {}".format(self.__class__, self.reaction.name))
-
     def _update_state(self):
         '''
         Method to update the state vector with the current time, temperature, volume,

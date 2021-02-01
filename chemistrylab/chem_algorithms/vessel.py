@@ -1,10 +1,7 @@
 '''
 Module to define the vessel object and it's associated functionality.
-
 :title: vessel.py
-
 :author: Chris Beeler and Mitchell Shahen
-
 :history: 2020-07-22
 '''
 

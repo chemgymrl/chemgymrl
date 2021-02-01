@@ -58,7 +58,6 @@ class Extraction:
         6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
         7: Add Oil to ExV （Volume multiplier, relative to max_vessel_volume)
         8: Done (Value doesn't matter)
-
         :return: action_space
         '''
 
@@ -120,7 +119,6 @@ class Extraction:
         6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
         7: Add Oil to ExV （Volume multiplier, relative to max_vessel_volume)
         8: Done (Value doesn't matter)
-
         :param oil_vessel:
         :param vessels: a list containing three vessels
         :param action: a tuple of two elements, first one represents action, second one is a multiplier
