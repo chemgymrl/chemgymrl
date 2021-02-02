@@ -669,8 +669,8 @@ class MethylRed(Material):
             molar_mass=88.106,
             color=0.6,
             charge=0.0,
-            boiling_point=350,
-            melting_point=189.6,
+            boiling_point=630,
+            melting_point=455,
             solute=False,
             specific_heat=1.904, # in J/g*K
             enthalpy_fusion=10480,
