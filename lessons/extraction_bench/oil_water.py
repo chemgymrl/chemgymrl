@@ -14,7 +14,7 @@ env = gym.make(env_ids[select_env])
 render_mode = "human"
 
 action_set = ['Draining from ExV to Beaker1', 'Mix ExV', "Mix B1", "Mix B2", "Pour from B1 to ExV", "Pour from B1 to B2",
-              'Pour from ExV to B2', 'Add oil, pour from Oil Vessel to ExV', 'Done']
+              'Pour from ExV to B2', 'Add oil, pour from Oil Vessel to ExV', 'wait', 'Done']
 print(len(action_set))
 print(env.action_space.shape)
 

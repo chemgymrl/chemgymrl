@@ -416,7 +416,9 @@ class F2(Material):
                          index=15
                          )
 
+
 ## ---------- ## HYDROCARBONS ## ---------- ##
+
 
 class Dodecane(Material):
     def __init__(self):
@@ -628,6 +630,79 @@ class Ethoxyethane(Material):
             enthalpy_vapor=27250.0,
             index=25
         )
+
+
+class EthylAcetate(Material):
+    def __init__(self):
+        super().__init__(
+            name='ethyl acetate',
+            density=0.902,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=88.106,
+            color=0.05,
+            charge=0.0,
+            boiling_point=350,
+            melting_point=189.6,
+            solute=False,
+            specific_heat=1.904, # in J/g*K
+            enthalpy_fusion=10480,
+            enthalpy_vapor=31940,
+            index=26
+        )
+
+
+##------Indicators------##
+
+
+class MethylRed(Material):
+    def __init__(self):
+        super().__init__(
+            name='methyl red',
+            density=0.902,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=88.106,
+            color=0.6,
+            charge=0.0,
+            boiling_point=350,
+            melting_point=189.6,
+            solute=False,
+            specific_heat=1.904, # in J/g*K
+            enthalpy_fusion=10480,
+            enthalpy_vapor=31940,
+            index=27
+        )
+
+
+##-------Acids-------##
+
+
+class HCl(Material):
+    def __init__(self):
+        super().__init__(
+            name='HCl',
+            density=1.48e-3,
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='g',
+            molar_mass=88.106,
+            color=0.3,
+            charge=0.0,
+            boiling_point=350,
+            melting_point=189.6,
+            solute=False,
+            specific_heat=1.904, # in J/g*K
+            enthalpy_fusion=10480,
+            enthalpy_vapor=31940,
+            index=27
+        )
+
 
 def get_materials():
     '''

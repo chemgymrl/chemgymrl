@@ -5,6 +5,7 @@ import gym
 import chemistrylab
 import numpy as np
 from gym import envs
+from time import sleep
 
 all_envs = envs.registry.all()
 env_ids = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
@@ -21,6 +22,7 @@ total_reward = 0
 reward = 0
 while not done:
     env.render(mode=render_mode)
+    sleep(1)
     # action = np.zeros(env.action_space.shape[0])
     print(f'reward: {reward}')
     print(f'total_reward: {total_reward}')

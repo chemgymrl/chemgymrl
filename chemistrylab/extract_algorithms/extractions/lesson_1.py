@@ -16,7 +16,8 @@ class Extraction:
                  max_vessel_volume=1000.0,  # max volume of empty vessels / g
                  n_vessel_pixels=100,  # number of pixels for each vessel
                  max_valve_speed=10,  # maximum draining speed (pixels/step)
-                 n_actions=15
+                 n_actions=15,
+                 solute=None
                  ):
         # set self variable
         self.dt = dt
@@ -86,26 +87,26 @@ class Extraction:
                                           layer_switch=False,
                                           )
 
-        H2O = material.H2O()
-        Na = material.Na()
-        Cl = material.Cl()
-        Li = material.Li()
-        F = material.F()
+        H2O = material.H2O
+        Na = material.Na
+        Cl = material.Cl
+        Li = material.Li
+        F = material.F
 
-        solution_1_vessel_material_dict = {H2O.get_name(): [H2O, 30.0],
-                                           Na.get_name(): [Na, 1.0],
-                                           Cl.get_name(): [Cl, 1.0]
+        solution_1_vessel_material_dict = {H2O().get_name(): [H2O, 30.0],
+                                           Na().get_name(): [Na, 1.0],
+                                           Cl().get_name(): [Cl, 1.0]
                                            }
-        solution_1_solute_dict = {Na.get_name(): {H2O.get_name(): 1.0},
-                                  Cl.get_name(): {H2O.get_name(): 1.0},
+        solution_1_solute_dict = {Na().get_name(): {H2O().get_name(): 1.0},
+                                  Cl().get_name(): {H2O().get_name(): 1.0},
                                   }
 
-        solution_2_vessel_material_dict = {H2O.get_name(): [H2O, 30.0],
-                                           Li.get_name(): [Na, 1.0],
-                                           F.get_name(): [Cl, 1.0]
+        solution_2_vessel_material_dict = {H2O().get_name(): [H2O, 30.0],
+                                           Li().get_name(): [Li, 1.0],
+                                           F().get_name(): [F, 1.0]
                                            }
-        solution_2_solute_dict = {Li.get_name(): {H2O.get_name(): 1.0},
-                                  F.get_name(): {H2O.get_name(): 1.0},
+        solution_2_solute_dict = {Li().get_name(): {H2O().get_name(): 1.0},
+                                  F().get_name(): {H2O().get_name(): 1.0},
                                   }
 
         solution_1_vessel_material_dict, solution_1_solute_dict, _ = util.check_overflow(
@@ -340,10 +341,11 @@ class Extraction:
                 vessels[3].push_event_to_queue(dt=self.dt)
 
         elif 13 == int(action[0]):  # do nothing
-            vessels[0].push_event_to_queue(dt=self.dt)
-            vessels[1].push_event_to_queue(dt=self.dt)
-            vessels[2].push_event_to_queue(dt=self.dt)
-            vessels[3].push_event_to_queue(dt=self.dt)
+            wait_time = self.dt*(action[1] + 1)
+            vessels[0].push_event_to_queue(dt=wait_time)
+            vessels[1].push_event_to_queue(dt=wait_time)
+            vessels[2].push_event_to_queue(dt=wait_time)
+            vessels[3].push_event_to_queue(dt=wait_time)
 
         elif 14 == int(action[0]):  # 8: Done (Value doesn't matter)
             done = True
@@ -356,7 +358,7 @@ class Extraction:
         if abs(beaker_2.get_material_amount(self.target_material[0]) - 0) < 1e-6:
             reward -= 100
 
-        if abs(beaker_3.get_material_amount(self.target_material[1]) - 0) < 1e-6:
+        elif abs(beaker_3.get_material_amount(self.target_material[1]) - 0) < 1e-6:
             reward -= 100
 
         else:

@@ -36,15 +36,17 @@ import pickle
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util
 from chemistrylab.chem_algorithms.reward import ExtractionReward
-from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1
+from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red
 from chemistrylab.extract_algorithms import separate
 
 # a dictionary of available extractions
 extraction_dict = {
     'water_oil': water_oil_v1,
     "wurtz": wurtz_v0,
-    'lesson_1': lesson_1
+    'lesson_1': lesson_1,
+    'methyl_red': methyl_red,
 }
+
 
 class ExtractBenchEnv(gym.Env):
     '''
@@ -223,7 +225,7 @@ class ExtractBenchEnv(gym.Env):
         # perform the inputted action in the extraction module
         vessels, ext_vessels, reward, done = self.extraction.perform_action(
             vessels=vessels,
-            external_vessels=ext_vessels,
+            ext_vessel=ext_vessels,
             action=action
         )
 
@@ -245,29 +247,30 @@ class ExtractBenchEnv(gym.Env):
 
         # once all the steps have been completed, calculate the final reward and save any vessels
         if self.done:
+            pass
             # after the last iteration, calculate the amount of target material in each vessel
-            reward = ExtractionReward(
-                vessels=self.vessels,
-                desired_material=self.target_material,
-                initial_target_amount=self.initial_target_amount
-            ).calc_reward()
-
-            # use the extraction reward class's `validate_vessels` method to output only the
-            # vessels that pass a certain reward threshold;
-            valid_vessels = ExtractionReward(
-                vessels=self.vessels,
-                desired_material=self.target_material,
-                initial_target_amount=self.initial_target_amount
-            ).validate_vessels(
-                purity_threshold=self.min_purity_threshold
-            )
-
-            # save each validated vessel as pickle files
-            for i, vessel in enumerate(valid_vessels):
-                self._save_vessel(
-                    extract_vessel=vessel,
-                    name="extract_vessel_{}".format(i)
-                )
+            # reward = ExtractionReward(
+            #     vessels=self.vessels,
+            #     desired_material=self.target_material,
+            #     initial_target_amount=self.initial_target_amount
+            # ).calc_reward()
+            #
+            # # use the extraction reward class's `validate_vessels` method to output only the
+            # # vessels that pass a certain reward threshold;
+            # valid_vessels = ExtractionReward(
+            #     vessels=self.vessels,
+            #     desired_material=self.target_material,
+            #     initial_target_amount=self.initial_target_amount
+            # ).validate_vessels(
+            #     purity_threshold=self.min_purity_threshold
+            # )
+            #
+            # # save each validated vessel as pickle files
+            # for i, vessel in enumerate(valid_vessels):
+            #     self._save_vessel(
+            #         extract_vessel=vessel,
+            #         name="extract_vessel_{}".format(i)
+            #     )
 
         return self.state, reward, self.done, {}
 
