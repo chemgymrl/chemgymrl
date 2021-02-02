@@ -22,10 +22,10 @@ material_dict = {H2O().get_name(): [H2O, 30.0],
                  Li().get_name(): [Li, 1.0],
                  F().get_name(): [F, 1.0]
                  }
-solute_dict = {Na().get_name(): {H2O().get_name(): 1.0},
-               Cl().get_name(): {H2O().get_name(): 1.0},
-               Li().get_name(): {H2O().get_name(): 1.0},
-               F().get_name(): {H2O().get_name(): 1.0}
+solute_dict = {Na().get_name(): {H2O().get_name(): [1.0]},
+               Cl().get_name(): {H2O().get_name(): [1.0]},
+               Li().get_name(): {H2O().get_name(): [1.0]},
+               F().get_name(): {H2O().get_name(): [1.0]}
                }
 
 material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,

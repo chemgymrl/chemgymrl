@@ -19,8 +19,8 @@ material_dict = {H2O().get_name(): [H2O, 27.7],
                  HCl().get_name(): [HCl, 2.5e-4],
                  MethylRed().get_name(): [MethylRed, 9.28e-4],
                  }
-solute_dict = {HCl().get_name(): {H2O().get_name(): 27.7},
-               MethylRed().get_name(): {H2O().get_name(): 27.7},
+solute_dict = {HCl().get_name(): {H2O().get_name(): [27.7]},
+               MethylRed().get_name(): {H2O().get_name(): [27.7]},
                }
 
 material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
