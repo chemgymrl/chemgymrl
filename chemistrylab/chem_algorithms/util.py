@@ -29,6 +29,8 @@ def convert_material_dict_to_volume(material_dict,
             volume = mass / material_dict[M][0]().get_density() # in mL
             volume_dict[M] = volume
             total_volume += volume
+    print(volume_dict)
+    print(total_volume)
     return volume_dict, total_volume
 
 
@@ -68,6 +70,7 @@ def check_overflow(material_dict,
                    v_max,
                    ):
     __, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
+    print(v_max)
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow

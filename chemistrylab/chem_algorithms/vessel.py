@@ -55,14 +55,17 @@ class Vessel:
         Constructor class for the Vessel object.
         '''
 
+        self._material_dict = {}
+        self._solute_dict = {}
+
         # initialize parameters
         self.label = label
         self.w2v = None
         self.temperature = temperature
         self.pressure = pressure
-        self.volume = self.set_volume(volume, unit)
-        self.v_max = self.set_volume(v_max, unit)
-        self.v_min = self.set_volume(v_min, unit)
+        self.set_volume(volume, unit)
+        self.set_v_max(v_max, unit)
+        self.set_v_min(v_min, unit)
         self.Tmax = Tmax
         self.Tmin = Tmin
         self.p_max = p_max
@@ -982,6 +985,12 @@ class Vessel:
             self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
+
+    def set_v_min(self, volume: float, unit='ml'):
+        self.v_min = util.convert_volume(volume, unit)
+
+    def set_v_max(self, volume: float, unit='ml'):
+        self.v_max = util.convert_volume(volume, unit)
 
     # functions to access private properties
     def get_material_amount(
