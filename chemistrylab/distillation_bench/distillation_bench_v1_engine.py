@@ -59,9 +59,12 @@ class DistillationBenchEnv(gym.Env):
         Constructor class for the Distillation environment.
         '''
 
+        # obtain the boil vessel and ensure it is labelled properly
+        self.boil_vessel = boil_vessel
+        self.boil_vessel.label = "boil_vessel"
+
         # set necessary variables
         self.n_steps = n_steps
-        self.boil_vessel = boil_vessel
         self.target_material = target_material
 
         # call the distillation class
