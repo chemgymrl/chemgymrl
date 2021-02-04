@@ -18,7 +18,7 @@ class Extraction:
         extraction_vessel,
         target_material,
         n_empty_vessels=2,  # number of empty vessels
-        ethyl_volume=1000000000,  # the amount of oil available (unlimited)
+        extractor_volume=1000000000,  # the amount of oil available (unlimited)
         dt=0.05,  # time for each step (time for separation)
         max_vessel_volume=1000.0,  # max volume of empty vessels / g
         n_vessel_pixels=100,  # number of pixels for each vessel
@@ -34,13 +34,14 @@ class Extraction:
         self.dt = dt
         self.n_actions = n_actions
         self.max_vessel_volume = max_vessel_volume
-        self.ethyl_volume = ethyl_volume
+        self.extractor_volume = extractor_volume
         self.n_empty_vessels = n_empty_vessels
         self.n_total_vessels = n_empty_vessels + 1  # (empty + input)
         self.n_vessel_pixels = n_vessel_pixels
         self.max_valve_speed = max_valve_speed
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
+        self.extractor = extractor
 
     # def get_observation_space(self):
     #     obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
@@ -86,30 +87,30 @@ class Extraction:
             )
             vessels.append(temp_vessel)
 
-        # generate oil vessel
-        ethyl_vessel = vessel.Vessel(
-            label='ethyl_vessel',
-            v_max=self.ethyl_volume,
+        # generate extractor vessel
+        extractor_vessel = vessel.Vessel(
+            label='extractor_vessel',
+            v_max=self.extractor_volume,
             n_pixels=self.n_vessel_pixels,
             settling_switch=False,
             layer_switch=False,
         )
 
-        ethyl = material.EthylAcetate
+        extractor = self.extractor
 
-        ethyl_vessel_material_dict = {ethyl().get_name(): [ethyl, self.ethyl_volume]}
+        extractor_vessel_material_dict = {extractor().get_name(): [extractor, self.extractor_volume]}
 
-        ethyl_vessel_material_dict, _, _ = util.check_overflow(
-            material_dict=ethyl_vessel_material_dict,
+        extractor_vessel_material_dict, _, _ = util.check_overflow(
+            material_dict=extractor_vessel_material_dict,
             solute_dict={},
-            v_max=ethyl_vessel.get_max_volume()
+            v_max=extractor_vessel.get_max_volume()
         )
-        event = ['update material dict', ethyl_vessel_material_dict]
-        ethyl_vessel.push_event_to_queue(feedback=[event], dt=0)
+        event = ['update material dict', extractor_vessel_material_dict]
+        extractor_vessel.push_event_to_queue(feedback=[event], dt=0)
 
         state = util.generate_state(vessels, max_n_vessel=self.n_total_vessels)
 
-        return vessels, ethyl_vessel, state
+        return vessels, extractor_vessel, state
 
     def perform_action(self, vessels, ext_vessel, action):
         '''

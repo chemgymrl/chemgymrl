@@ -17,7 +17,8 @@ class Extraction:
                  n_vessel_pixels=100,  # number of pixels for each vessel
                  max_valve_speed=10,  # maximum draining speed (pixels/step)
                  n_actions=15,
-                 solute=None
+                 solute=None,
+                 extractor=None
                  ):
         # set self variable
         self.dt = dt

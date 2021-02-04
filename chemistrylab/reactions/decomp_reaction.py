@@ -49,7 +49,7 @@ class Reaction():
         None
         '''
 
-        self.name = "wurtz_reaction"
+        self.name = "demo_reaction"
 
         # get the initial amounts of each reactant material
         initial_materials = np.zeros(len(REACTANTS))

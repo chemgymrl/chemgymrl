@@ -10,22 +10,21 @@ extraction_vessel = vessel.Vessel(label='extraction_vessel',
 
 # initialize materials
 H2O = material.H2O
-Na = material.Na
+HCl = material.HCl
+H = material.H
 Cl = material.Cl
-Li = material.Li
-F = material.F
+MethylRed = material.MethylRed
+EthylAcetate = material.EthylAcetate
 
 # material_dict
-material_dict = {H2O().get_name(): [H2O, 30.0],
-                 Na().get_name(): [Na, 1.0],
-                 Cl().get_name(): [Cl, 1.0],
-                 Li().get_name(): [Li, 1.0],
-                 F().get_name(): [F, 1.0]
+material_dict = {H2O().get_name(): [H2O, 27.7],
+                 H().get_name(): [H, 2.5e-4],
+                 Cl().get_name(): [Cl, 2.5e-4],
+                 MethylRed().get_name(): [MethylRed, 9.28e-4],
                  }
-solute_dict = {Na().get_name(): {H2O().get_name(): [1.0]},
-               Cl().get_name(): {H2O().get_name(): [1.0]},
-               Li().get_name(): {H2O().get_name(): [1.0]},
-               F().get_name(): {H2O().get_name(): [1.0]}
+solute_dict = {H().get_name(): {H2O().get_name(): [27.7, 'mol']},
+               Cl().get_name(): {H2O().get_name(): [27.7, 'mol']},
+               MethylRed().get_name(): {H2O().get_name(): [500, 'ml']},
                }
 
 material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
@@ -42,10 +41,11 @@ extraction_vessel.push_event_to_queue(events=None, feedback=[event_2], dt=0)
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_3], dt=0)
 
 
-class ExtractWorld_Lesson1(ExtractBenchEnv):
+class ExtractWorld_MethylRed(ExtractBenchEnv):
     def __init__(self):
-        super(ExtractWorld_Lesson1, self).__init__(
-            extraction='lesson_1',
+        super(ExtractWorld_MethylRed, self).__init__(
+            extraction='extraction_0',
             extraction_vessel=extraction_vessel,
-            target_material=['Na', 'Li'],
+            target_material='methyl red',
+            extractor=EthylAcetate
         )

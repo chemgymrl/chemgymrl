@@ -36,7 +36,7 @@ import pickle
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util
 from chemistrylab.chem_algorithms.reward import ExtractionReward
-from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red
+from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red, extraction_0
 from chemistrylab.extract_algorithms import separate
 
 # a dictionary of available extractions
@@ -45,6 +45,7 @@ extraction_dict = {
     "wurtz": wurtz_v0,
     'lesson_1': lesson_1,
     'methyl_red': methyl_red,
+    'extraction_0': extraction_0,
 }
 
 
@@ -89,7 +90,8 @@ class ExtractBenchEnv(gym.Env):
             max_valve_speed=10,
             extraction_vessel=None,
             solute=None,
-            target_material=None
+            target_material=None,
+            extractor=None
     ):
         '''
         Constructor class method for the Extract Bench Environment
@@ -103,13 +105,15 @@ class ExtractBenchEnv(gym.Env):
         # print(self.extraction_vessel._solute_dict)
         self.solute = solute
         self.target_material = target_material
+        self.extractor = extractor
 
         self.extraction = extraction_dict[extraction].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
             solute=self.solute,
-            target_material=self.target_material
+            target_material=self.target_material,
+            extractor=self.extractor
         )
 
         self.initial_target_amount = self.extraction_vessel.get_material_amount(

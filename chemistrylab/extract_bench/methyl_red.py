@@ -11,16 +11,20 @@ extraction_vessel = vessel.Vessel(label='extraction_vessel',
 # initialize materials
 H2O = material.H2O
 HCl = material.HCl
+H = material.H
+Cl = material.Cl
 MethylRed = material.MethylRed
 EthylAcetate = material.EthylAcetate
 
 # material_dict
 material_dict = {H2O().get_name(): [H2O, 27.7],
-                 HCl().get_name(): [HCl, 2.5e-4],
+                 H().get_name(): [H, 2.5e-4],
+                 Cl().get_name(): [Cl, 2.5e-4],
                  MethylRed().get_name(): [MethylRed, 9.28e-4],
                  }
-solute_dict = {HCl().get_name(): {H2O().get_name(): [27.7]},
-               MethylRed().get_name(): {H2O().get_name(): [27.7]},
+solute_dict = {H().get_name(): {H2O().get_name(): [27.7, 'mol']},
+               Cl().get_name(): {H2O().get_name(): [27.7, 'mol']},
+               MethylRed().get_name(): {H2O().get_name(): [500, 'ml']},
                }
 
 material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,

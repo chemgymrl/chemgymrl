@@ -25,14 +25,14 @@ register(
 )
 
 register(
-    id='Lesson_1_Extract-v1',
-    entry_point='chemistrylab.extract_bench.lesson_1:ExtractWorld_Lesson1',
+    id='MethylRed_Extract-v1',
+    entry_point='chemistrylab.extract_bench.methyl_red:ExtractWorld_MethylRed',
     max_episode_steps=100
 )
 
 register(
-    id='MethylRed_Extract-v1',
-    entry_point='chemistrylab.extract_bench.methyl_red:ExtractWorld_MethylRed',
+    id='MethylRed_Extract-v2',
+    entry_point='chemistrylab.extract_bench.extraction_0:ExtractWorld_MethylRed',
     max_episode_steps=100
 )
 

@@ -32,7 +32,7 @@ sys.path.append("../reactions/") # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.chem_algorithms.logger import Logger
-from chemistrylab.reactions.reaction_0_1 import Reaction
+from chemistrylab.reactions.decomp_reaction import Reaction
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
