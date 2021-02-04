@@ -22,7 +22,7 @@ import pickle
 import sys
 
 sys.path.append("../../")
-from chemistrylab.chem_algorithms import util
+from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import DistillationReward
 from chemistrylab.distillations import distill_v0
 
@@ -59,13 +59,19 @@ class DistillationBenchEnv(gym.Env):
         Constructor class for the Distillation environment.
         '''
 
-        # obtain the boil vessel and ensure it is labelled properly
-        self.boil_vessel = boil_vessel
-        self.boil_vessel.label = "boil_vessel"
+        # validate and assign the inputted parameters
+        input_parameters = self._validate_parameters(
+            n_steps=n_steps,
+            boil_vessel=boil_vessel,
+            target_material=target_material,
+            out_vessel_path=out_vessel_path
+        )
 
-        # set necessary variables
-        self.n_steps = n_steps
-        self.target_material = target_material
+        # set the input parameters
+        self.n_steps = input_parameters["n_steps"]
+        self.boil_vessel = input_parameters["boil_vessel"]
+        self.target_material = input_parameters["target_material"]
+        self.out_vessel_path = input_parameters["out_vessel_path"]
 
         # call the distillation class
         self.distillation = distill_v0.Distillation(
@@ -89,15 +95,97 @@ class DistillationBenchEnv(gym.Env):
         self._plot_fig = None
         self._plot_axs = None
 
-        # set up the intended path for the final distillation vessel to be stored
-        self.out_vessel_path = out_vessel_path
-
         # the minimum purity of desired material in relation to total material that a finalized
         # distillation vessel must have to be qualified for use in other processes (the vessel
         # is saved if it exceeds this minimum purity threshold)
         self.min_purity_threshold = 0.5
 
-    def _save_vessel(self, distillation_vessel=None, name=""):
+    @staticmethod
+    def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, out_vessel_path=None):
+        '''
+        Checks and validates the input parameters submitted to the distillation bench.
+
+        Parameters
+        ---------------
+        `n_steps` : `int` (default=`None`)
+            The number of incremental steps to perform per action.
+        `boil_vessel` : `vessel.Vessel` (default=`None`)
+            The vessel object designated to be saved.
+        `target_material` : `str` (default=`None`)
+            The material in the boil vessel that is to be isolated.
+        `out_vessel_path` : `str` (default=`None`)
+            The directory path where the vessel object is to be saved.
+
+        Returns
+        ---------------
+        `n_steps` : `int` (default=`100`)
+            The number of incremental steps to perform per action.
+        `boil_vessel` : `vessel.Vessel` (default=`None`)
+            The vessel object designated to be saved.
+        `target_material` : `str` (default=`None`)
+            The material in the boil vessel that is to be isolated.
+        `out_vessel_path` : `str` (default=`None`)
+            The directory path where the vessel object is to be saved.
+
+        Raises
+        ---------------
+        `TypeError`:
+            Raised when the `boil_vessel` parameter is invalid or incompatible.
+        '''
+
+        # check the number of steps per action is an integer and non-negative
+        if any([
+                not isinstance(n_steps, int),
+                n_steps <= 0
+        ]):
+            print("Invalid 'Number of Steps per Action' type. The default will be provided.")
+            n_steps = 1
+
+        # check that the boil vessel is a vessel object and is properly labelled
+        if not isinstance(boil_vessel, vessel.Vessel):
+            raise TypeError("The boil vessel provided is of an incorrect/incompatible type.")
+
+        # ensure that the boil vessel is properly labelled
+        boil_vessel.label = "boil_vessel"
+
+        # ensure that the target material is given as a string
+        if not isinstance(target_material, str):
+            print("Invalid 'Target Material' type. The default will be provided.")
+            target_material = ""
+
+        # check that the target material is present in the boil vessel
+        if not target_material in boil_vessel._material_dict.keys():
+            print(
+                "The target material, {}, is not present in the boil vessel's material dictionary.".format(
+                    target_material
+                )
+            )
+            target_material = ""
+
+        # ensure that the output vessel path parameter is provided as a string
+        if not isinstance(out_vessel_path, str):
+            print("Invalid 'Output Vessel Path' type. The default will be provided.")
+            out_vessel_path = os.getcwd()
+
+        # validate that the output vessel path given exists and is reachable
+        if not os.path.isdir(out_vessel_path):
+            print(
+                "The given output vessel path parameter is invalid. "
+                "The default parameter is given instead."
+            )
+            out_vessel_path = os.getcwd()
+
+        # collect the input parameters into a labelled list
+        input_parameters = {
+            "n_steps" : n_steps,
+            "boil_vessel" : boil_vessel,
+            "target_material" : target_material,
+            "out_vessel_path" : out_vessel_path
+        }
+
+        return input_parameters
+
+    def _save_vessel(self, distillation_vessel=None, vessel_rootname=""):
         '''
         Method to save a vessel as a pickle file.
         
@@ -105,7 +193,7 @@ class DistillationBenchEnv(gym.Env):
         ---------------
         `distillation_vessel` : `vessel.Vessel` (default=`None`)
             The vessel object designated to be saved.
-        `name` : `str` (default="")
+        `vessel_rootname` : `str` (default="")
             The intended name/identifier of the pickle file to which the vessel is being saved.
 
         Returns
@@ -117,14 +205,10 @@ class DistillationBenchEnv(gym.Env):
         None
         '''
 
-        # if a vessel path was provided when the environment was initialized, use it for saving vessels
-        if isinstance(self.out_vessel_path, str):
-            open_file = self.out_vessel_path
-        # otherwise, save the vessels in the current working directory
-        else:
-            file_directory = os.getcwd()
-            filename = "{}.pickle".format(name)
-            open_file = os.path.join(file_directory, filename)
+        # specify a file to save the distillation vessel
+        file_directory = self.out_vessel_path
+        filename = "{}.pickle".format(vessel_rootname)
+        open_file = os.path.join(file_directory, filename)
 
         # delete any existing vessel files to ensure the vessel is saved as intended
         if os.path.exists(open_file):
@@ -237,7 +321,7 @@ class DistillationBenchEnv(gym.Env):
             for i, vessel in enumerate(valid_vessels):
                 self._save_vessel(
                     distillation_vessel=vessel,
-                    name="distillation_vessel_{}".format(i)
+                    vessel_rootname="distillation_vessel_{}".format(i)
                 )
 
         return self.state, reward, self.done, {}
