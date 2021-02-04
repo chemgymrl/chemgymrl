@@ -34,7 +34,7 @@ import pickle
 
 # import local modules
 sys.path.append("../../") # access chemistrylab
-from chemistrylab.chem_algorithms import util
+from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
 from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0
 from chemistrylab.extract_algorithms import separate
@@ -63,9 +63,9 @@ class ExtractBenchEnv(gym.Env):
         The maximal amount of material flowing through the valve in a given time-step.
     `extraction_vessel` : `vessel` (default=`None`)
         A vessel object containing state variables, materials, solutes, and spectral data.
-    `solute` : `str` (default=`None`)
+    `solute` : `str` (default=`""`)
         The name of the added solute.
-    `target_material` : `str` (default=`None`)
+    `target_material` : `str` (default=`""`)
         The name of the required output material designated as reward.
 
     Returns
@@ -85,23 +85,38 @@ class ExtractBenchEnv(gym.Env):
             n_vessel_pixels=100,
             max_valve_speed=10,
             extraction_vessel=None,
-            solute=None,
-            target_material=None
+            solute="",
+            target_material="",
+            out_vessel_path=""
     ):
         '''
         Constructor class method for the Extract Bench Environment
         '''
 
-        self.n_steps = n_steps
-        self.dt = dt
-        self.n_vessel_pixels = n_vessel_pixels
-        self.max_valve_speed = max_valve_speed
-        self.extraction_vessel = extraction_vessel
-        # print(self.extraction_vessel._solute_dict)
-        self.solute = solute
-        self.target_material = target_material
+        # validate the input parameters provided to the extract bench engine
+        input_parameters = self._validate_parameters(
+            n_steps=n_steps,
+            dt=dt,
+            extraction=extraction,
+            n_vessel_pixels=n_vessel_pixels,
+            max_valve_speed=max_valve_speed,
+            extraction_vessel=extraction_vessel,
+            solute=solute,
+            target_material=target_material,
+            out_vessel_path=out_vessel_path
+        )
 
-        self.extraction = extraction_dict[extraction].Extraction(
+        # set the validated input parameters
+        self.n_steps = input_parameters["n_steps"]
+        self.dt = input_parameters["dt"]
+        self.n_vessel_pixels = input_parameters["n_vessel_pixels"]
+        self.max_valve_speed = input_parameters["max_valve_speed"]
+        self.extraction_vessel = input_parameters["extraction_vessel"]
+        self.solute = input_parameters["solute"]
+        self.target_material = input_parameters["target_material"]
+        self.out_vessel_path = input_parameters["out_vessel_path"]
+
+        self.extraction = extraction_dict[input_parameters["extraction"]].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -129,7 +144,142 @@ class ExtractBenchEnv(gym.Env):
         self._plot_fig = None
         self._plot_axs = None
 
-    def _save_vessel(self, extract_vessel=None, name=""):
+    @staticmethod
+    def _validate_parameters(
+        n_steps=0,
+        dt=0.0,
+        extraction="",
+        n_vessel_pixels=0,
+        max_valve_speed=0,
+        extraction_vessel=None,
+        solute="",
+        target_material="",
+        out_vessel_path=""
+    ):
+        '''
+        Method to validate the parameters inputted to the extraction bench engine.
+
+        Parameters
+        ---------------
+        `n_steps` : `int` (default=`0`)
+            The number of steps in an episode.
+        `dt` : `float` (default=`0.0`)
+            The default time-step.
+        `extraction` : `str` (default="")
+            The name/title of the extraction.
+        `n_vessel_pixels` : `int` (default=`0`)
+            The number of pixels in a vessel.
+        `max_valve_speed` : `int` (default=`0`)
+            The maximal amount of material flowing through the valve in a given time-step.
+        `extraction_vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+        `solute` : `str` (default=`""`)
+            The name of the added solute.
+        `target_material` : `str` (default=`""`)
+            The name of the required output material designated as reward.
+        `out_vessel_path` : `str` (default=`""`)
+            A string indicating the path to a directory where the final output vessel is saved.
+
+        Returns
+        ---------------
+        `input_parameters` : `dict`
+            A dictionary containing all the validated input parameters.
+
+        Raises
+        ---------------
+        `TypeError`:
+            Raised when either the `extraction` parameter is invalid or the `extraction_vessel`
+            parameter is invalid or incompatible.
+        '''
+
+        # ensure the n_steps parameter is a non-zero, non-negative integer
+        if any([
+                not isinstance(n_steps, int),
+                n_steps <= 0
+        ]):
+            print("Invalid 'Number of Steps per Action' type. The default will be provided.")
+            n_steps = 1
+
+        # the default timestep parameter must be a non-zero, non-negative floating point value
+        if any([
+                not isinstance(dt, float),
+                dt <= 0.0
+        ]):
+            print("Invalid 'Default Timestep' type. The default will be provided.")
+            dt = 1.0
+
+        # ensure the extraction parameter is a string indicating a valid extraction
+        if any([
+                not isinstance(extraction, str),
+                extraction not in extraction_dict.keys()
+        ]):
+            raise TypeError("Invalid 'extraction' given.")
+
+        # ensure the n_vessel_pixels parameter is a non-zero, non-negative integer
+        if any([
+                not isinstance(n_vessel_pixels, int),
+                n_vessel_pixels <= 0
+        ]):
+            print("Invalid 'Number of Pixels per Vessel' type. The default will be provided.")
+            n_vessel_pixels = 1
+
+        # ensure the max_valve_speed parameter is a non-zero, non-negative integer
+        if any([
+                not isinstance(max_valve_speed, int),
+                max_valve_speed <= 0
+        ]):
+            print("Invalid 'Maximal Valve Speed' type. The default will be provided.")
+            max_valve_speed = 1
+
+        # ensure the extraction_vessel is a vessel object
+        if not isinstance(extraction_vessel, vessel.Vessel):
+            raise TypeError("Invalid `extraction vessel` type.")
+
+        # ensure the added solute parameter is a string
+        if not isinstance(solute, str):
+            print("Invalid `solute` type. The default will be provided.")
+            solute = ""
+
+        # ensure the target material parameter is a string
+        if not isinstance(target_material, str):
+            print("Invalid `desired` type. The default will be provided.")
+            target_material = ""
+
+        # check that the target material is present in the extraction vessel
+        if not target_material in extraction_vessel._material_dict.keys():
+            print(
+                "The target material, {}, is not present in the extraction vessel's material dictionary.".format(
+                    target_material
+                )
+            )
+            target_material = ""
+
+        # ensure the output vessel parameter points to a legitimate directory
+        if not isinstance(out_vessel_path, str):
+            print("The provided output vessel path is invalid. The default will be provided.")
+            out_vessel_path = os.getcwd()
+        elif os.path.isdir(out_vessel_path):
+            pass
+        else:
+            print("The provided output vessel path is invalid. The default will be provided.")
+            out_vessel_path = os.getcwd()
+
+        # collect the input parameters in a labelled dictionary
+        input_parameters = {
+            "n_steps" : n_steps,
+            "dt" : dt,
+            "extraction" : extraction,
+            "n_vessel_pixels" : n_vessel_pixels,
+            "max_valve_speed" : max_valve_speed,
+            "extraction_vessel" : extraction_vessel,
+            "solute" : solute,
+            "target_material" : target_material,
+            "out_vessel_path" : out_vessel_path
+        }
+
+        return input_parameters
+
+    def _save_vessel(self, extract_vessel=None, vessel_rootname=""):
         '''
         Method to save a vessel as a pickle file.
         
@@ -137,7 +287,7 @@ class ExtractBenchEnv(gym.Env):
         ---------------
         `extract_vessel` : `vessel.Vessel` (default=`None`)
             The vessel object designated to be saved.
-        `name` : `str` (default="")
+        `vessel_rootname` : `str` (default="")
             The intended name/identifier of the pickle file to which the vessel is being saved.
 
         Returns
@@ -150,8 +300,8 @@ class ExtractBenchEnv(gym.Env):
         '''
 
         # specify a vessel path for saving the extract vessel
-        file_directory = os.getcwd()
-        filename = "{}.pickle".format(name)
+        file_directory = self.out_vessel_path
+        filename = "{}.pickle".format(vessel_rootname)
         open_file = os.path.join(file_directory, filename)
 
         # delete any existing vessel files to ensure the vessel is saved as intended
@@ -265,7 +415,7 @@ class ExtractBenchEnv(gym.Env):
             for i, vessel in enumerate(valid_vessels):
                 self._save_vessel(
                     extract_vessel=vessel,
-                    name="extract_vessel_{}".format(i)
+                    vessel_rootname="extract_vessel_{}".format(i)
                 )
 
         return self.state, reward, self.done, {}

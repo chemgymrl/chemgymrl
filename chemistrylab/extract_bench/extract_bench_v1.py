@@ -132,11 +132,12 @@ class ExtractWorld_v1(ExtractBenchEnv):
         super(ExtractWorld_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
-                vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
+                vessel_path=os.path.join(os.getcwd(), "test_react_vessel.pickle"),
                 extract_vessel=None
             ),
             solute="H2O",
-            target_material='dodecane'
+            target_material='dodecane',
+            out_vessel_path=os.getcwd()
         )
 
 class ExtractWorld_v2(ExtractBenchEnv):
