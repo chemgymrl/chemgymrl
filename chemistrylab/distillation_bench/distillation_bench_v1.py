@@ -44,7 +44,7 @@ def get_vessel(vessel_path=None, in_vessel=None):
 
     # ensure that at least one of the methods to obtain a vessel is provided
     if all([not os.path.exists(vessel_path), not in_vessel]):
-        raise IOError("No vessel acquisition method specified.")
+        raise IOError("Invalid vessel acquisition method specified.")
 
     # if a vessel object is provided, use it;
     # otherwise locate and extract the vessel object as a pickle file
