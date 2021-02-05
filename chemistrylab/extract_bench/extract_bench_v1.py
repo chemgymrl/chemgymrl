@@ -93,15 +93,15 @@ def oil_vessel():
 
     # material_dict
     material_dict = {
-        H2O().get_name(): [H2O, 30.0],
-        Na().get_name(): [Na, 1.0],
-        Cl().get_name(): [Cl, 1.0]
+        H2O().get_name(): [H2O, 30.0, 'mol'],
+        Na().get_name(): [Na, 1.0, 'mol'],
+        Cl().get_name(): [Cl, 1.0, 'mol']
     }
 
     # solute_dict
     solute_dict = {
-        Na().get_name(): {H2O().get_name(): [1.0]},
-        Cl().get_name(): {H2O().get_name(): [1.0]},
+        Na().get_name(): {H2O().get_name(): [30.0, 'mol']},
+        Cl().get_name(): {H2O().get_name(): [30.0, 'mol']},
     }
 
     material_dict, solute_dict, _ = util.check_overflow(

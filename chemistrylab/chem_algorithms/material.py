@@ -653,6 +653,27 @@ class EthylAcetate(Material):
             index=26
         )
 
+class DiEthylEther(Material):
+    def __init__(self):
+        super().__init__(
+            name='diethyl ether',
+            density=0.7134,
+            polarity=1.3,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=74.123,
+            color=0.05,
+            charge=0.0,
+            boiling_point=307.8,
+            melting_point=156.8,
+            solvent=True,
+            specific_heat=119.46, # in J/g*K
+            enthalpy_fusion=-252.7e3,
+            enthalpy_vapor=27.247e3,
+            index=29
+        )
+
 
 ##------Indicators------##
 
@@ -671,7 +692,7 @@ class MethylRed(Material):
             charge=0.0,
             boiling_point=630,
             melting_point=455,
-            solute=False,
+            solute=True,
             specific_heat=1.904, # in J/g*K
             enthalpy_fusion=10480,
             enthalpy_vapor=31940,
@@ -696,11 +717,11 @@ class HCl(Material):
             charge=0.0,
             boiling_point=350,
             melting_point=189.6,
-            solute=False,
+            solute=True,
             specific_heat=1.904, # in J/g*K
             enthalpy_fusion=10480,
             enthalpy_vapor=31940,
-            index=27
+            index=28
         )
 
 
