@@ -36,13 +36,13 @@ class Vessel:
             label, # Name of the vessel
             temperature=297, # K
             pressure=1.0, # Kpa
-            volume=1000.0, # mL
+            volume=1.0, # L
             materials={}, # moles of materials
             solutes={}, # moles of solutes
-            v_max=1000.0, # ml
-            v_min=1000.0, # mL
-            Tmax=500, # Kelvin
-            Tmin=250, # Kelvin
+            v_max=1.0, # L
+            v_min=1.0, # L
+            Tmax=500.0, # Kelvin
+            Tmin=250.0, # Kelvin
             p_max=1.5, # atm
             default_dt=0.05, # Default time for each step
             n_pixels=100, # Number of pixel to represent layers
