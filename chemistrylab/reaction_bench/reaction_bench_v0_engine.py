@@ -323,17 +323,18 @@ class ReactionBenchEnv(gym.Env):
             raise TypeError("Invalid `Reaction Class` type. Unable to Proceed.")
 
         # ensure the input vessel parameter points to a legitimate location or is `None`
-        if not isinstance(in_vessel_path, str):
-            print("The provided input vessel path is invalid. The default will be provided.")
-            in_vessel_path = None
-        elif os.path.isfile(in_vessel_path):
-            if in_vessel_path.split(".")[-1] == "pickle":
-                pass
+        if in_vessel_path is not None:
+            if not isinstance(in_vessel_path, str):
+                print("The provided input vessel path is invalid. The default will be provided.")
+                in_vessel_path = None
+            elif os.path.isfile(in_vessel_path):
+                if in_vessel_path.split(".")[-1] == "pickle":
+                    pass
+                else:
+                    print("The provided input vessel path is invalid. The default will be provided.")
             else:
                 print("The provided input vessel path is invalid. The default will be provided.")
-        else:
-            print("The provided input vessel path is invalid. The default will be provided.")
-            in_vessel_path = None
+                in_vessel_path = None
 
         # ensure the output vessel parameter points to a legitimate directory
         if not isinstance(out_vessel_path, str):
@@ -536,8 +537,8 @@ class ReactionBenchEnv(gym.Env):
         self.state[1] = (self.T - Tmin) / (Tmax - Tmin)
 
         # state[2] = volume
-        Vmin = self.vessels.get_min_volume() / 1000
-        Vmax = self.vessels.get_max_volume() / 1000
+        Vmin = self.vessels.get_min_volume() / 1000 # convert the minimal vessel volume from L to mL
+        Vmax = self.vessels.get_max_volume() / 1000 # convert the maximum vessel volume from L to mL
         self.state[2] = (self.V - Vmin) / (Vmax - Vmin)
 
         # state[3] = pressure
@@ -596,8 +597,8 @@ class ReactionBenchEnv(gym.Env):
             'react_vessel',
             temperature=self.Ti,
             p_max=self.Pmax,
-            v_max=self.Vmax * 1000,
-            v_min=self.Vmin * 1000,
+            v_max=self.Vmax * 1000, # convert the volume properties from L to mL
+            v_min=self.Vmin * 1000, # convert the volume properties from L to mL
             Tmax=self.Tmax,
             Tmin=self.Tmin,
             default_dt=self.dt
@@ -678,8 +679,8 @@ class ReactionBenchEnv(gym.Env):
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
         Vi = self.Vi
-        Vmin = self.vessels.get_min_volume() / 1000
-        Vmax = self.vessels.get_max_volume() / 1000
+        Vmin = self.vessels.get_min_volume() / 1000 # convert the volume properties from mL to L
+        Vmax = self.vessels.get_max_volume() / 1000 # convert the volume properties from mL to L
         total_pressure = self.reaction.get_total_pressure(self.V, self.T)
 
         # populate the state with the above variables
