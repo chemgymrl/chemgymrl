@@ -255,12 +255,22 @@ class Reaction():
         # reaction rate for each reaction used in the exponential formula k = A * e^(-E/RT);
         # the units for the pre-exponential constants are (L**2)/(mol**2 * s);
         # we will scale the pre-exponential constants using each reactant concentration
-        A0 = 1.0 / (abs((C[0] * C[1] * C[2] * C[3]))**(1/2)) # Reaction 0
-        A1 = 1.0 / (abs((C[0] * C[1] * C[2] * C[3]))**(1/2)) # Reaction 1
-        A2 = 1.0 / (abs((C[0] * C[1] * C[2] * C[3]))**(1/2)) # Reaction 2
-        A3 = 1.0 / (abs((C[0] * C[1] * C[2] * C[3]))**(1/2)) # Reaction 3
-        A4 = 1.0 / (abs((C[0] * C[1] * C[2] * C[3]))**(1/2)) # Reaction 4
-        A5 = 1.0 / (abs((C[0] * C[1] * C[2] * C[3]))**(1/2)) # Reaction 5
+        # scaling_factor = abs((C[0] * C[1] * C[2] * C[3]))**(1/2)
+        agg_conc = 1
+        reactant_conc = [C[i] for i in range(len(REACTANTS))]
+        non_zero_conc = [conc for conc in reactant_conc if conc != 0.0]
+        for conc in non_zero_conc:
+            agg_conc *= conc
+        exponent = 2 / len(non_zero_conc)
+        scaling_factor = (abs(agg_conc))**exponent
+
+        # set the pre-exponential constant using the above scaling factor for proper dimensionality
+        A0 = 1.0 / scaling_factor # Reaction 0
+        A1 = 1.0 / scaling_factor # Reaction 1
+        A2 = 1.0 / scaling_factor # Reaction 2
+        A3 = 1.0 / scaling_factor # Reaction 3
+        A4 = 1.0 / scaling_factor # Reaction 4
+        A5 = 1.0 / scaling_factor # Reaction 5
 
         # set the activation energies for each reaction constant
         E0 = 1.0
@@ -288,15 +298,6 @@ class Reaction():
         self.rate[3] = k3 * (C[0] ** 0) * (C[1] ** 2) * (C[2] ** 0) * (C[3] ** 1)
         self.rate[4] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
         self.rate[5] = k5 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 2) * (C[3] ** 1)
-        # this is however not common practice in chemistry calculations, rather the exponentials
-        # are determined experimentally, so using the stoichiometric ratios is commented out and
-        # an alternate solution (assigning all rate exponentials as 1) is being used (temporarily)
-        # self.rate[0] = k1 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 0) * (C[3] ** 1)
-        # self.rate[1] = k2 * (C[0] ** 1) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
-        # self.rate[2] = k3 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
-        # self.rate[3] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
-        # self.rate[4] = k5 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
-        # self.rate[5] = k6 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
 
         # calculate and store the changes in concentration of each chemical;
         # recall: change in concentration = molar concentration * rate * dt
@@ -318,11 +319,23 @@ class Reaction():
         dC[9] = 1.0 * self.rate[5] * dt # change in 4,5-diethyloctane
         dC[10] = 2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in NaCl
 
+        # ensure the changes in reactant concentration do not exceed the concentrations available
+        dC[0] = np.max([dC[0], -1.0 * C[0]])
+        dC[1] = np.max([dC[1], -1.0 * C[1]])
+        dC[2] = np.max([dC[2], -1.0 * C[2]])
+        dC[3] = np.max([dC[3], -1.0 * C[3]])
+
         # update the concentrations of each chemical
         for i in range(self.n.shape[0]):
             # convert back to moles
             dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
+
+            # check the list of molar amounts and set negligible amounts to 0
+            for i, amount in enumerate(self.n):
+                if amount < 1e-8:
+                    self.n[i] = 0
+
 
     def get_total_pressure(self, V, T=300):
         '''

@@ -187,22 +187,27 @@ class ReactionBenchEnv(gym.Env):
                 'default',
                 temperature=self.Ti,
                 p_max=self.Pmax,
-                v_max=self.Vmax * 1000, # convert L to mL
-                v_min=self.Vmin * 1000, # convert L to mL
+                v_max=self.Vmax,
+                v_min=self.Vmin,
                 Tmax=self.Tmax,
                 Tmin=self.Tmin,
                 default_dt=self.dt
             )
+
+            '''
             for i in range(self.reaction.initial_in_hand.shape[0]):
                 self.n_init[i] = self.reaction.initial_in_hand[i]
+            '''
         else:
             with open(self.in_vessel_path, 'rb') as handle:
                 v = pickle.load(handle)
                 self.vessels = v
 
+            '''
             for i in range(self.n_init.shape[0]):
                 material_name = self.reaction.labels[i]
                 self.n_init[i] = self.vessels._material_dict[material_name][1]
+            '''
 
         # reset the inputted reaction before performing any steps
         self.reaction.reset(n_init=self.n_init)
@@ -537,8 +542,8 @@ class ReactionBenchEnv(gym.Env):
         self.state[1] = (self.T - Tmin) / (Tmax - Tmin)
 
         # state[2] = volume
-        Vmin = self.vessels.get_min_volume() / 1000 # convert the minimal vessel volume from L to mL
-        Vmax = self.vessels.get_max_volume() / 1000 # convert the maximum vessel volume from L to mL
+        Vmin = self.vessels.get_min_volume()
+        Vmax = self.vessels.get_max_volume()
         self.state[2] = (self.V - Vmin) / (Vmax - Vmin)
 
         # state[3] = pressure
@@ -597,8 +602,8 @@ class ReactionBenchEnv(gym.Env):
             'react_vessel',
             temperature=self.Ti,
             p_max=self.Pmax,
-            v_max=self.Vmax * 1000, # convert the volume properties from L to mL
-            v_min=self.Vmin * 1000, # convert the volume properties from L to mL
+            v_max=self.Vmax,
+            v_min=self.Vmin,
             Tmax=self.Tmax,
             Tmin=self.Tmin,
             default_dt=self.dt
@@ -679,8 +684,8 @@ class ReactionBenchEnv(gym.Env):
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
         Vi = self.Vi
-        Vmin = self.vessels.get_min_volume() / 1000 # convert the volume properties from mL to L
-        Vmax = self.vessels.get_max_volume() / 1000 # convert the volume properties from mL to L
+        Vmin = self.vessels.get_min_volume()
+        Vmax = self.vessels.get_max_volume()
         total_pressure = self.reaction.get_total_pressure(self.V, self.T)
 
         # populate the state with the above variables
@@ -739,37 +744,51 @@ class ReactionBenchEnv(gym.Env):
         # the reward for this step is set to 0 initially
         reward = 0.0
 
-        # pull from the action parameter, the amount of each reactant to add
-        add_reactants = action[2:]
+        # the first two action variables are changes to temperature and volume, respectively;
+        # these changes need to be scaled according to the maximum allowed change, dT and dV;
+        # action[0] = 1.0 gives a temperature change of dT, while action[0] = 0.0 corresponds to -dT
+        # action[1] = 1.0 gives a temperature change of dV, while action[1] = 0.0 corresponds to -dV
+        temperature_change = 2.0 * (action[0] - 0.5) * self.dT # in Kelvin
+        volume_change = 2.0 * (action[1] - 0.5) * self.dV # in Litres
 
-        for i, reactant in enumerate(self.reaction.cur_in_hand):
-            # Actions [1:] add reactants to system, 0.0 = 0%, 1.0 = 100%
-            # If action [i] is larger than the amount of the current reactant, all is added
-            if all([
-                    add_reactants[i] > reactant,
-                    reactant != 0
-            ]):
-                # in the case of over-use we apply a penalty unless no reactants are left to add
-                reward -= 0.1 * (add_reactants[i] - reactant)
+        # the remaining action variables are the proportions of reactants to be added
+        add_reactant_proportions = action[2:]
 
-            dn = np.min([add_reactants[i], reactant])
+        # scale the action value by the amount of reactant available
+        for i, reactant_amount in enumerate(self.reaction.cur_in_hand):
+            # determine how much of the available reactant is to be added
+            proportion = add_reactant_proportions[i]
+
+            # determine the amount of the reactant available
+            amount_available = reactant_amount
+
+            # determine the amount of reactant to add (in mol)
+            dn = proportion * amount_available
+
+            # modify the reaction properties accordingly
             self.reaction.n[i] += dn
             self.reaction.cur_in_hand[i] -= dn
 
+            # set a penalty for trying to add unavailable material (tentatively set to 0)
+            # reward -= 0
+
+            # if the amount that is in hand is below a certain threshold set it to 0
+            if self.reaction.cur_in_hand[i] < 1e-6:
+                self.reaction.cur_in_hand[i] = 0.0
+
         for i in range(self.n_steps):
-            # Action [0] changes temperature by, 0.0 = -dT, 0.5 = 0, 1.0 = +dT (all in Kelvin)
-            # Temperature change is linear between frames
-            self.T += 2.0 * self.dT * (action[0] - 0.5) / self.n_steps
+            # split the overall temperature change into increments
+            self.T += temperature_change / self.n_steps
             self.T = np.min([
                 np.max([self.T, self.vessels.get_Tmin()]),
                 self.vessels.get_Tmax()
             ])
 
-            # action[1] changes volume by: 0.0 = -dV, 0.5 = 0, 1.0 = dV (all in Litres)
-            self.V += 2.0 * self.dV * (action[1] - 0.5) / self.n_steps
+            # split the overall volume change into increments
+            self.V += volume_change / self.n_steps
             self.V = np.min([
-                np.max([self.V, self.vessels.get_min_volume() / 1000]),
-                self.vessels.get_max_volume() / 1000
+                np.max([self.V, self.vessels.get_min_volume()]),
+                self.vessels.get_max_volume()
             ])
 
             # perform the reaction and update the molar concentrations of the reactants and products
@@ -791,8 +810,8 @@ class ReactionBenchEnv(gym.Env):
             self.plot_data_state[1].append((self.T - Tmin)/(Tmax - Tmin))
 
             # record volume data
-            Vmin = self.vessels.get_min_volume() / 1000
-            Vmax = self.vessels.get_max_volume() / 1000
+            Vmin = self.vessels.get_min_volume()
+            Vmax = self.vessels.get_max_volume()
             self.plot_data_state[2].append((self.V - Vmin)/(Vmax - Vmin))
 
             # record pressure data
