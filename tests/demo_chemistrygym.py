@@ -85,7 +85,7 @@ show_stats = input("Show Reaction Vessel Stats ('Y'/'N') >>> ")
 
 if show_stats.lower() in ["y", "yes"]:
     # open and check the material dict
-    vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
+    vessel_path = os.path.join(os.getcwd(), "react_vessel.pickle")
     with open(vessel_path, 'rb') as open_file:
         v = pickle.load(open_file)
 
