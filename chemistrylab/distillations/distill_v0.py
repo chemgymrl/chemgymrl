@@ -97,7 +97,7 @@ class Distillation:
             n_empty_vessels=2,
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
-            max_vessel_volume=1000.0, # maximal volume of empty vessels
+            max_vessel_volume=1.0, # maximal volume of empty vessels
             n_actions=6 # number of available actions
     ):
         '''
@@ -178,7 +178,7 @@ class Distillation:
         for i in range(self.n_empty_vessels):
             beaker = vessel.Vessel(
                 label="beaker_{}".format(i),
-                temperature=293.15,
+                temperature=293.15, # room temp in Kelvin
                 v_max=self.max_vessel_volume,
                 default_dt=self.dt
             )

@@ -84,7 +84,7 @@ class Extraction:
             n_empty_vessels=2,  # number of empty vessels
             solute_volume=1000000000,  # the amount of solute available (unlimited)
             dt=0.05,  # time for each step (time for separation)
-            max_vessel_volume=1000.0,  # max volume of empty vessels / g
+            max_vessel_volume=1.0,  # max volume of empty vessels in L
             n_vessel_pixels=100,  # number of pixels for each vessel
             max_valve_speed=10,  # maximum draining speed (pixels/step)
             n_actions=8
@@ -334,7 +334,7 @@ class Extraction:
             # Pour the Extraction Vessel into Beaker 2
             if do_action == 4:
                 # determine the volume to pour from the extraction vessel into the second beaker
-                d_volume = 1000.0 * multiplier # use the default volume for the extraction vessel
+                d_volume = 1.0 * multiplier # use the default volume for the extraction vessel
 
                 # push the event to the extraction vessel
                 event = ['pour by volume', beaker_2, d_volume]
