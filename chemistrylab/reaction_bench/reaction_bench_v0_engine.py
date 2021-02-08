@@ -209,6 +209,9 @@ class ReactionBenchEnv(gym.Env):
                 self.n_init[i] = self.vessels._material_dict[material_name][1]
             '''
 
+        # set up a state variable
+        self.state = None
+
         # reset the inputted reaction before performing any steps
         self.reaction.reset(n_init=self.n_init)
 
