@@ -67,5 +67,5 @@ class Distillation_v1(DistillationBenchEnv):
                 in_vessel=None
             ),
             target_material="dodecane",
-            out_vessel_path=None
+            out_vessel_path=os.getcwd()
         )

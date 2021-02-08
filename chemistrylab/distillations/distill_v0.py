@@ -184,13 +184,7 @@ class Distillation:
             )
             vessels.append(beaker)
 
-        # generate the state
-        state = util.generate_state(
-            vessel_list=vessels,
-            max_n_vessel=self.n_total_vessels
-        )
-
-        return vessels, state
+        return vessels
 
     def perform_action(self, vessels, action):
         '''

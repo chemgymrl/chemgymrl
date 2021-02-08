@@ -218,6 +218,72 @@ class DistillationBenchEnv(gym.Env):
         with open(open_file, 'wb') as vessel_file:
             pickle.dump(distillation_vessel, vessel_file)
 
+    def _update_state(self):
+        '''
+        Method to update the state variable.
+        
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # define the state variable using information from each available vessel
+        # state[i] = array describing the ith vessel
+        # state[i][0] = vessel name
+        # state[i][1] = temperature
+        # state[i][2] = volume
+        # state[i][3] = pressure
+        # state[i][4:] = array containing the materials in the ith vessel
+
+        # set up the base state variable
+        base_state = [[] for __ in enumerate(self.vessels)]
+
+        # iterate through each available vessel
+        for i, vessel in enumerate(self.vessels):
+            # get the vessel name
+            vessel_name = vessel.label
+            base_state[i].append(vessel_name)
+
+            # set up the temperature
+            Tmin = vessel.get_Tmin()
+            Tmax = vessel.get_Tmax()
+            temp = vessel.get_temperature()
+            normalized_temp = (temp - Tmin) / (Tmax - Tmin)
+            base_state[i].append(normalized_temp)
+
+            # set up the volume
+            Vmin = vessel.get_min_volume()
+            Vmax = vessel.get_max_volume()
+            volume = vessel.get_volume()
+            normalized_volume = (volume - Vmin) / (Vmax - Vmin)
+            base_state[i].append(normalized_volume)
+
+            # set up the pressure
+            Pmax = vessel.get_pmax()
+            total_pressure = vessel.get_pressure()
+            normalized_pressure = total_pressure / Pmax
+            base_state[i].append(normalized_pressure)
+
+            # set up each set of material properties as separate packages (as lists)
+            # each list has three elements: [material_name, material_class, material_amount]
+            material_packages = []
+            for material_name, [material_class, material_amount] in vessel._material_dict.items():
+                material_package = [material_name, material_class, material_amount]
+                material_packages.append(material_package)
+            for material_package in material_packages:
+                base_state[i].append(material_package)
+
+        # convert the base state to a numpy array to be accessible for all methods
+        self.state = np.array(base_state)
+
     def reset(self):
         '''
         Initialize the environment
@@ -236,18 +302,20 @@ class DistillationBenchEnv(gym.Env):
         None
         '''
 
-        # reset done and plotting parameters to initial values
+        # reset the done and plotting parameters to initial values
         self.done = False
         self._first_render = True
 
-        # acquire the initial vessels and state from the distillation class
-        vessels, state = self.distillation.reset(
+        # acquire the initial vessels from the distillation class
+        vessels = self.distillation.reset(
             boil_vessel=self.boil_vessel
         )
 
-        # redefine the existing vessels and state variables
+        # re-define the existing vessels
         self.vessels = vessels
-        self.state = state
+
+        # update the state variables
+        self._update_state()
 
         return self.state
 
@@ -277,6 +345,9 @@ class DistillationBenchEnv(gym.Env):
         None
         '''
 
+        print(self.state)
+        __ = input("Wait...")
+
         # obtain the necessary variables
         vessels = self.vessels
         done = self.done
@@ -291,15 +362,12 @@ class DistillationBenchEnv(gym.Env):
         self.vessels = vessels
         self.done = done
 
-        # generate the state variable
-        self.state = util.generate_state(
-            vessel_list=self.vessels,
-            max_n_vessel=self.distillation.n_total_vessels
-        )
+        # update the state variable
+        self._update_state()
 
         # update the number of steps left to complete
         self.n_steps -= 1
-        if self.n_steps == 0:
+        if any([self.n_steps == 0, self.done]):
             self.done = True
 
             # after the last step, calculate the final reward
@@ -445,4 +513,3 @@ class DistillationBenchEnv(gym.Env):
             # draw on the existing graph
             self._plot_fig.canvas.draw()
             plt.pause(0.000001)
-
