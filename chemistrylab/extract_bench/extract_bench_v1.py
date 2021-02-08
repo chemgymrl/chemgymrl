@@ -132,7 +132,7 @@ class ExtractWorld_v1(ExtractBenchEnv):
         super(ExtractWorld_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
-                vessel_path=os.path.join(os.getcwd(), "test_react_vessel.pickle"),
+                vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=None
             ),
             solute="H2O",
