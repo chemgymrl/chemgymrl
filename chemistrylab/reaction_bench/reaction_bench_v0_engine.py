@@ -754,6 +754,9 @@ class ReactionBenchEnv(gym.Env):
         # the remaining action variables are the proportions of reactants to be added
         add_reactant_proportions = action[2:]
 
+        # set up a variable to contain the amount of change in each reactant
+        delta_n_array = np.zeros(len(self.reaction.cur_in_hand))
+
         # scale the action value by the amount of reactant available
         for i, reactant_amount in enumerate(self.reaction.cur_in_hand):
             # determine how much of the available reactant is to be added
@@ -763,18 +766,10 @@ class ReactionBenchEnv(gym.Env):
             amount_available = reactant_amount
 
             # determine the amount of reactant to add (in mol)
-            dn = proportion * amount_available
+            delta_n = proportion * amount_available
 
-            # modify the reaction properties accordingly
-            self.reaction.n[i] += dn
-            self.reaction.cur_in_hand[i] -= dn
-
-            # set a penalty for trying to add unavailable material (tentatively set to 0)
-            # reward -= 0
-
-            # if the amount that is in hand is below a certain threshold set it to 0
-            if self.reaction.cur_in_hand[i] < 1e-6:
-                self.reaction.cur_in_hand[i] = 0.0
+            # add the overall change in materials to the array of molar amounts
+            delta_n_array[i] = delta_n
 
         for i in range(self.n_steps):
             # split the overall temperature change into increments
@@ -790,6 +785,19 @@ class ReactionBenchEnv(gym.Env):
                 np.max([self.V, self.vessels.get_min_volume()]),
                 self.vessels.get_max_volume()
             ])
+
+            # split the overall molar changes into increments
+            for i, delta_n in enumerate(delta_n_array):
+                dn = delta_n / self.n_steps
+                self.reaction.n[i] += dn
+                self.reaction.cur_in_hand[i] -= dn
+
+                # set a penalty for trying to add unavailable material (tentatively set to 0)
+                # reward -= 0
+
+                # if the amount that is in hand is below a certain threshold set it to 0
+                if self.reaction.cur_in_hand[i] < 1e-8:
+                    self.reaction.cur_in_hand[i] = 0.0
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.reaction.update(
