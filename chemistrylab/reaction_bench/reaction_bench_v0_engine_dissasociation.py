@@ -11,11 +11,8 @@ Reaction Bench Engine Class
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=import-error
 # pylint: disable=invalid-name
-# pylint: disable=protected-access
 # pylint: disable=too-many-arguments
-# pylint: disable=too-many-branches
 # pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-lines
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-statements
 # pylint: disable=unsubscriptable-object
@@ -34,13 +31,14 @@ sys.path.append("../../") # to access chemistrylab
 sys.path.append("../reactions/") # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
 from chemistrylab.chem_algorithms import vessel
-from chemistrylab.reactions.wurtz_reaction import Reaction
+from chemistrylab.chem_algorithms.logger import Logger
+from chemistrylab.reactions.decomp_reaction import Reaction
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
 wave_min = 200
 
-class ReactionBenchEnv(gym.Env):
+class ReactionBenchEnvDissasociation(gym.Env):
     '''
     Class to define elements of an engine to represent a reaction.
     '''
@@ -48,22 +46,21 @@ class ReactionBenchEnv(gym.Env):
     def __init__(
             self,
             reaction=Reaction,
-            in_vessel_path=None,
-            out_vessel_path=None,
             materials=None,
             solutes=None,
             desired="",
             n_steps=50,
             dt=0.01,
-            Ti=300.0,
-            Tmin=250.0,
-            Tmax=500.0,
-            dT=50.0,
+            Ti=300,
+            Tmin=250,
+            Tmax=500,
+            dT=50,
             Vi=0.002,
             Vmin=0.001,
             Vmax=0.005,
             dV=0.0005,
-            overlap=False
+            overlap=False,
+            vessel_path=None
     ):
         '''
         Constructor class method to pass thermodynamic variables to class methods.
@@ -73,10 +70,6 @@ class ReactionBenchEnv(gym.Env):
         `reaction` : `class`
             A reaction class containing various methods that
             properly define a reaction to be carried out.
-        `in_vessel_path` : `str` (default=`None`)
-            A string indicating the path to a vessel intended to be loaded into this module.
-        `out_vessel_path` : `str` (default=`None`)
-            A string indicating the path to a directory where the final output vessel is saved.
         `materials` : `list` (default=`None`)
             A list of dictionaries including initial material names, classes, and amounts.
         `solutes` : `list` (default=`None`)
@@ -87,13 +80,13 @@ class ReactionBenchEnv(gym.Env):
             The number of time steps to be taken during each action.
         `dt` : `float` (default=`0.01`)
             The amount of time taken in each time step.
-        `Ti` : `float` (default=`300.0`)
+        `Ti` : `int` (default=`300`)
             The initial temperature of the system in Kelvin.
-        `Tmin` : `float` (default=`250.0`)
+        `Tmin` : `int` (default=`250`)
             The minimal temperature of the system in Kelvin.
-        `Tmax` : `float` (default=`500.0`)
+        `Tmax` : `int` (default=`500`)
             The maximal temperature of the system in Kelvin.
-        `dT` : `float` (default=`50.0`)
+        `dT` : `int` (default=`50`)
             The maximal allowed temperature change, in Kelvin, for a single action.
         `Vi` : `float` (default=`0.002`)
             The initial volume of the system in litres.
@@ -105,6 +98,8 @@ class ReactionBenchEnv(gym.Env):
             The maximal allowed volume change, in litres, for a single action.
         `overlap` : `boolean` (default=`False`)
             Indicates if the spectral plots show overlapping signatures.
+        `vessel_path` : `str` (default=`None`)
+            A string indicating the path to a vessel intended to be loaded into this module.
 
         Returns
         ---------------
@@ -115,98 +110,60 @@ class ReactionBenchEnv(gym.Env):
         None
         '''
 
-        # assign an identifier to this bench
-        self.name = "react_bench"
+        self.name = "experiment_0"
+        self.step_num = 1
 
-        # validate the parameters inputted to the reaction bench engine
-        input_parameters = self._validate_parameters(
-            reaction=reaction,
-            in_vessel_path=in_vessel_path,
-            out_vessel_path=out_vessel_path,
-            materials=materials,
-            solutes=solutes,
-            desired=desired,
-            n_steps=n_steps,
-            dt=dt,
-            Ti=Ti,
-            Tmin=Tmin,
-            Tmax=Tmax,
-            dT=dT,
-            Vi=Vi,
-            Vmin=Vmin,
-            Vmax=Vmax,
-            dV=dV,
-            overlap=overlap
-        )
+        self.desired = desired
 
-        # set the input vessel path
-        self.in_vessel_path = input_parameters["in_vessel_path"]
+        self.n_steps = n_steps # Time steps per action
+        self.dt = dt # Time step of reaction (s)
+        self.tmax = n_steps * dt * 20 # Maximum time (s) (20 is the registered max_episode_steps)
+        self.Ti = Ti # Initial temperature (K)
+        self.Tmin = Tmin # Minimum temperature of the system (K)
+        self.Tmax = Tmax # Maximum temperature of the system (K)
+        self.dT = dT # Maximum change in temperature per action (K)
 
-        # set the output vessel path
-        self.out_vessel_path = input_parameters["out_vessel_path"]
-
-        # set initial material, solute, and overlap parameters
-        materials = input_parameters["materials"]
-        solutes = input_parameters["solutes"]
-        overlap = input_parameters["overlap"]
-
-        # set the remaining input parameters
-        self.desired = input_parameters["desired"] # the desired material
-        self.n_steps = input_parameters["n_steps"] # Time steps per action
-        self.dt = input_parameters["dt"] # Time step of reaction (s)
-        self.Ti = input_parameters["Ti"] # Initial temperature (K)
-        self.Tmin = input_parameters["Tmin"] # Minimum temperature of the system (K)
-        self.Tmax = input_parameters["Tmax"] # Maximum temperature of the system (K)
-        self.dT = input_parameters["dT"] # Maximum change in temperature per action (K)
-        self.Vi = input_parameters["Vi"] # Initial Volume (L)
-        self.Vmin = input_parameters["Vmin"] # Minimum Volume of the system (L)
-        self.Vmax = input_parameters["Vmax"] # Maximum Volume of the system (L)
-        self.dV = input_parameters["dV"] # Maximum change in Volume per action (L)
+        self.Vi = Vi # Initial Volume (m**3)
+        self.Vmin = Vmin # Minimum Volume of the system (L)
+        self.Vmax = Vmax # Maximum Volume of the system (L)
+        self.dV = dV # Maximum change in Volume per action (L)
 
         # initialize the reaction
-        self.reaction = input_parameters["reaction"](
+        self.reaction = reaction(
             overlap=overlap,
             materials=materials,
             solutes=solutes,
-            desired=self.desired
+            desired=desired
         )
 
-        # Maximum time (s) (20 is the registered max_episode_steps)
-        self.tmax = self.n_steps * dt * 20
-
-        # initialize a step counter
-        self.step_num = 1
+        # set the maximum pressure
+        Pmax = self.reaction.max_mol * R * Tmax / Vmin
+        self.Pmax = Pmax
 
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
-        if self.in_vessel_path is None:
+        self.vessel_path = vessel_path
+        if vessel_path == None:
             self.vessels = vessel.Vessel(
                 'default',
-                temperature=self.Ti,
-                v_max=self.Vmax,
-                v_min=self.Vmin,
-                Tmax=self.Tmax,
-                Tmin=self.Tmin,
-                default_dt=self.dt
+                temperature=Ti,
+                p_max=Pmax,
+                v_max=Vmax * 1000,
+                v_min=Vmin * 1000,
+                Tmax=Tmax,
+                Tmin=Tmin,
+                default_dt=dt
             )
-
-            '''
             for i in range(self.reaction.initial_in_hand.shape[0]):
                 self.n_init[i] = self.reaction.initial_in_hand[i]
-            '''
         else:
-            with open(self.in_vessel_path, 'rb') as handle:
-                v = pickle.load(handle)
-                self.vessels = v
+            with open(vessel_path, 'rb') as handle:
+                b = pickle.load(handle)
+                self.vessels = b
 
-            '''
             for i in range(self.n_init.shape[0]):
                 material_name = self.reaction.labels[i]
                 self.n_init[i] = self.vessels._material_dict[material_name][1]
-            '''
-
-        # set up a state variable
-        self.state = None
 
         # reset the inputted reaction before performing any steps
         self.reaction.reset(n_init=self.n_init)
@@ -248,260 +205,11 @@ class ReactionBenchEnv(gym.Env):
         # Reset the environment upon calling the class
         self.reset()
 
-    @staticmethod
-    def _validate_parameters(
-            reaction=None,
-            in_vessel_path="",
-            out_vessel_path="",
-            materials=None,
-            solutes=None,
-            desired="",
-            n_steps=0,
-            dt=0.0,
-            Ti=0.0,
-            Tmin=0.0,
-            Tmax=0.0,
-            dT=0.0,
-            Vi=0.0,
-            Vmin=0.0,
-            Vmax=0.0,
-            dV=0.0,
-            overlap=False
-    ):
-        '''
-        Method to validate the parameters inputted to the reaction class.
-
-        Parameters
-        ---------------
-        `reaction` : `class`
-            A reaction class containing various methods that
-            properly define a reaction to be carried out.
-        `in_vessel_path` : `str` (default=`""`)
-            A string indicating the path to a vessel intended to be loaded into this module.
-        `out_vessel_path` : `str` (default=`""`)
-            A string indicating the path to a directory where the final output vessel is saved.
-        `materials` : `list` (default=`None`)
-            A list of dictionaries including initial material names, classes, and amounts.
-        `solutes` : `list` (default=`None`)
-            A list of dictionaries including initial solute names, classes, and amounts.
-        `desired` : `str` (default="")
-            A string indicating the desired output material.
-        `n_steps` : `int` (default=`0`)
-            The number of time steps to be taken during each action.
-        `dt` : `float` (default=`0.0`)
-            The amount of time taken in each time step.
-        `Ti` : `float` (default=`1.0`)
-            The initial temperature of the system in Kelvin.
-        `Tmin` : `float` (default=`1.0`)
-            The minimal temperature of the system in Kelvin.
-        `Tmax` : `float` (default=`1.0`)
-            The maximal temperature of the system in Kelvin.
-        `dT` : `float` (default=`0.0`)
-            The maximal allowed temperature change, in Kelvin, for a single action.
-        `Vi` : `float` (default=`1.0`)
-            The initial volume of the system in litres.
-        `Vmin` : `float` (default=`1.0`)
-            The minimal volume of the system in litres.
-        `Vmax` : `float` (default=`1.0`)
-            The maximal volume of the system in litres.
-        `dV` : `float` (default=`0.0`)
-            The maximal allowed volume change, in litres, for a single action.
-        `overlap` : `boolean` (default=`False`)
-            Indicates if the spectral plots show overlapping signatures.
-
-        Returns
-        ---------------
-        `input_parameters` : `dict`
-            A dictionary containing all the validated input parameters.
-
-        Raises
-        ---------------
-        `TypeError`:
-            Raised when the `reaction` parameter is invalid.
-        '''
-
-        ## ----- ## CHECK PARAMETER TYPES ## ----- ##
-
-        # ensure the reaction class is a class type object
-        if not isinstance(reaction, type):
-            raise TypeError("Invalid `Reaction Class` type. Unable to Proceed.")
-
-        # ensure the input vessel parameter points to a legitimate location or is `None`
-        if in_vessel_path is not None:
-            if not isinstance(in_vessel_path, str):
-                print("The provided input vessel path is invalid. The default will be provided.")
-                in_vessel_path = None
-            elif os.path.isfile(in_vessel_path):
-                if in_vessel_path.split(".")[-1] == "pickle":
-                    pass
-                else:
-                    print("The provided input vessel path is invalid. The default will be provided.")
-            else:
-                print("The provided input vessel path is invalid. The default will be provided.")
-                in_vessel_path = None
-
-        # ensure the output vessel parameter points to a legitimate directory
-        if not isinstance(out_vessel_path, str):
-            print("The provided output vessel path is invalid. The default will be provided.")
-            out_vessel_path = os.getcwd()
-        elif os.path.isdir(out_vessel_path):
-            pass
-        else:
-            print("The provided output vessel path is invalid. The default will be provided.")
-            out_vessel_path = os.getcwd()
-
-        # ensure the materials parameter is a non-empty list
-        if not isinstance(materials, list):
-            print("Invalid `materials` type. The default will be provided.")
-            materials = []
-        if len(materials) == 0:
-            print("Error: The materials list contains no elements.")
-
-        # ensure the solutes parameter is a non-empty list
-        if not isinstance(solutes, list):
-            print("Invalid `materials` type. The default will be provided.")
-            solutes = []
-        if len(solutes) == 0:
-            print("Error: The materials list contains no elements.")
-
-        # ensure the desired material parameter is a string
-        if not isinstance(desired, str):
-            print("Invalid `desired` type. The default will be provided.")
-            desired = ""
-
-        # ensure the n_steps parameter is a non-zero, non-negative integer
-        if any([
-                not isinstance(n_steps, int),
-                n_steps <= 0
-        ]):
-            print("Invalid 'Number of Steps per Action' type. The default will be provided.")
-            n_steps = 1
-
-        # the default timestep parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(dt, float),
-                dt <= 0.0
-        ]):
-            print("Invalid 'Default Timestep' type. The default will be provided.")
-            dt = 1.0
-
-        # the initial temperature parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Ti, float),
-                Ti <= 0.0
-        ]):
-            print("Invalid 'Initial Temperature' type. The default will be provided.")
-            Ti = 1.0
-
-        # the minimum temperature parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Tmin, float),
-                Tmin <= 0.0
-        ]):
-            print("Invalid 'Minimum Temperature' type. The default will be provided.")
-            Tmin = 1.0
-
-        # the maximum temperature parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Tmax, float),
-                Tmax <= 0.0
-        ]):
-            print("Invalid 'Maximum Temperature' type. The default will be provided.")
-            Tmax = 1.0
-
-        # the temperature increment parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(dT, float),
-                dT <= 0.0
-        ]):
-            print("Invalid 'Temperature Increment' type. The default will be provided.")
-            dT = 1.0
-
-        # the initial volume parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Vi, float),
-                Vi <= 0.0
-        ]):
-            print("Invalid 'Initial Volume' type. The default will be provided.")
-            Vi = 1.0
-
-        # the minimum volume parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Vmin, float),
-                Vmin <= 0.0
-        ]):
-            print("Invalid 'Minimum Volume' type. The default will be provided.")
-            Vmin = 1.0
-
-        # the maximum volume parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Vmax, float),
-                Vmax <= 0.0
-        ]):
-            print("Invalid 'Maximum Volume' type. The default will be provided.")
-            Vmax = 1.0
-
-        # the volume increment parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(dV, float),
-                dV <= 0.0
-        ]):
-            print("Invalid 'Volume Increment' type. The default will be provided.")
-            dV = 1.0
-
-        # the overlap parameter must be a boolean
-        if not isinstance(overlap, bool):
-            print("Invalid 'Overlap Spectra' type. The default will be provided.")
-            overlap = False
-
-        ## ----- ## CHECK THERMODYNAMIC VARIABLES ## ----- ##
-
-        # the minimum temperature parameter must be smaller than or equal to the maximum temperature
-        if Tmin > Tmax:
-            Tmin = Tmax
-
-        # the maximum temperature parameter must be larger than or equal to the minimum volume
-        if Tmax < Tmin:
-            Tmax = Tmin
-
-        # the initial temperature must be between the minimal and maximal temperature parameters
-        if not Tmin <= Ti <= Tmax:
-            Ti = Tmin + ((Tmax - Tmin) / 2)
-
-        # the minimum volume parameter must be smaller than or equal to the maximum volume
-        if Vmin > Vmax:
-            Vmin = Vmax
-
-        # the maximum volume parameter must be larger than or equal to the minimum volume
-        if Vmax < Vmin:
-            Vmax = Vmin
-
-        # the initial temperature must be between the minimal and maximal temperature parameters
-        if not Vmin <= Vi <= Vmax:
-            Vi = Vmin + ((Vmax - Vmin) / 2)
-
-        # collect all the input parameters in a labelled dictionary
-        input_parameters = {
-            "reaction" : reaction,
-            "in_vessel_path" : in_vessel_path,
-            "out_vessel_path" : out_vessel_path,
-            "materials" : materials,
-            "solutes" : solutes,
-            "desired" : desired,
-            "n_steps" : n_steps,
-            "dt" : dt,
-            "Ti" : Ti,
-            "Tmin" : Tmin,
-            "Tmax" : Tmax,
-            "dT" : dT,
-            "Vi" : Vi,
-            "Vmin" : Vmin,
-            "Vmax" : Vmax,
-            "dV" : dV,
-            "overlap" : overlap
-        }
-
-        return input_parameters
+        # initialize the logger
+        # log_file = os.path.join(os.getcwd(), "log-v0")
+        # self.logging = Logger(log_file=log_file, log_format="default", print_messages=True)
+        # self.logging.initialize()
+        # self.logging.add_log(message="Initialized Logging in {} for {}".format(self.__class__, self.reaction.name))
 
     def _update_state(self):
         '''
@@ -541,8 +249,8 @@ class ReactionBenchEnv(gym.Env):
         self.state[1] = (self.T - Tmin) / (Tmax - Tmin)
 
         # state[2] = volume
-        Vmin = self.vessels.get_min_volume()
-        Vmax = self.vessels.get_max_volume()
+        Vmin = self.vessels.get_min_volume() / 1000
+        Vmax = self.vessels.get_max_volume() / 1000
         self.state[2] = (self.V - Vmin) / (Vmax - Vmin)
 
         # state[3] = pressure
@@ -559,7 +267,7 @@ class ReactionBenchEnv(gym.Env):
     def _update_vessel(self):
         '''
         Method to update the information stored in the vessel upon completing a step.
-
+        
         Parameters
         ---------------
         None
@@ -584,9 +292,8 @@ class ReactionBenchEnv(gym.Env):
             material_name = self.reaction.labels[i]
             material_class = self.reaction.material_classes[i]
             amount = self.reaction.n[i]
-            print(amount)
-            new_material_dict[material_name] = [material_class, amount, 'mol']
-        print("=============================================")
+            new_material_dict[material_name] = [material_class, amount]
+
         # tabulate all the solutes and their values
         new_solute_dict = {}
         for i in range(self.reaction.initial_solutes.shape[0]):
@@ -595,14 +302,15 @@ class ReactionBenchEnv(gym.Env):
             amount = self.reaction.initial_solutes[i]
 
             # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = {solute_class().get_name(): [amount, 'mol']}
+            new_solute_dict[solute_name] = [solute_class, amount]
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
             'react_vessel',
             temperature=self.Ti,
-            v_max=self.Vmax,
-            v_min=self.Vmin,
+            p_max=self.Pmax,
+            v_max=self.Vmax * 1000,
+            v_min=self.Vmin * 1000,
             Tmax=self.Tmax,
             Tmin=self.Tmin,
             default_dt=self.dt
@@ -616,14 +324,13 @@ class ReactionBenchEnv(gym.Env):
         # replace the old vessel with the updated version
         self.vessels = new_vessel
 
-    def _save_vessel(self, vessel_rootname=""):
+    def _save_vessel(self):
         '''
         Method to save a vessel as a pickle file.
-
+        
         Parameters
         ---------------
-        `vessel_rootname` : `str` (default="")
-            The intended file root of the vessel (no extension; not the absolute path).
+        None
 
         Returns
         ---------------
@@ -634,10 +341,14 @@ class ReactionBenchEnv(gym.Env):
         None
         '''
 
-        # use the vessel path that was given upon initialization or during parameter verification
-        output_directory = self.out_vessel_path
-        vessel_filename = "{}.pickle".format(vessel_rootname)
-        open_file = os.path.join(output_directory, vessel_filename)
+        # if a vessel path was provided when the environment was initialized, use it for saving vessels
+        if isinstance(self.vessel_path, str):
+            open_file = self.vessel_path
+        # otherwise, save the vessels in the current working directory
+        else:
+            file_directory = os.getcwd()
+            filename = "react_vessel.pickle"
+            open_file = os.path.join(file_directory, filename)
 
         # delete any existing vessel files to ensure the vessel is saved as intended
         if os.path.exists(open_file):
@@ -683,8 +394,8 @@ class ReactionBenchEnv(gym.Env):
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
         Vi = self.Vi
-        Vmin = self.vessels.get_min_volume()
-        Vmax = self.vessels.get_max_volume()
+        Vmin = self.vessels.get_min_volume() / 1000
+        Vmax = self.vessels.get_max_volume() / 1000
         total_pressure = self.reaction.get_total_pressure(self.V, self.T)
 
         # populate the state with the above variables
@@ -743,60 +454,38 @@ class ReactionBenchEnv(gym.Env):
         # the reward for this step is set to 0 initially
         reward = 0.0
 
-        # the first two action variables are changes to temperature and volume, respectively;
-        # these changes need to be scaled according to the maximum allowed change, dT and dV;
-        # action[0] = 1.0 gives a temperature change of dT, while action[0] = 0.0 corresponds to -dT
-        # action[1] = 1.0 gives a temperature change of dV, while action[1] = 0.0 corresponds to -dV
-        temperature_change = 2.0 * (action[0] - 0.5) * self.dT # in Kelvin
-        volume_change = 2.0 * (action[1] - 0.5) * self.dV # in Litres
+        # pull from the action parameter, the amount of each reactant to add
+        add_reactants = action[2:]
 
-        # the remaining action variables are the proportions of reactants to be added
-        add_reactant_proportions = action[2:]
+        for i, reactant in enumerate(self.reaction.cur_in_hand):
+            # Actions [1:] add reactants to system, 0.0 = 0%, 1.0 = 100%
+            # If action [i] is larger than the amount of the current reactant, all is added
+            if all([
+                    add_reactants[i] > reactant,
+                    reactant != 0
+            ]):
+                # in the case of over-use we apply a penalty unless no reactants are left to add
+                reward -= 0.1 * (add_reactants[i] - reactant)
 
-        # set up a variable to contain the amount of change in each reactant
-        delta_n_array = np.zeros(len(self.reaction.cur_in_hand))
-
-        # scale the action value by the amount of reactant available
-        for i, reactant_amount in enumerate(self.reaction.cur_in_hand):
-            # determine how much of the available reactant is to be added
-            proportion = add_reactant_proportions[i]
-
-            # determine the amount of the reactant available
-            amount_available = reactant_amount
-
-            # determine the amount of reactant to add (in mol)
-            delta_n = proportion * amount_available
-
-            # add the overall change in materials to the array of molar amounts
-            delta_n_array[i] = delta_n
+            dn = np.min([add_reactants[i], reactant])
+            self.reaction.n[i] += dn
+            self.reaction.cur_in_hand[i] -= dn
 
         for i in range(self.n_steps):
-            # split the overall temperature change into increments
-            self.T += temperature_change / self.n_steps
+            # Action [0] changes temperature by, 0.0 = -dT, 0.5 = 0, 1.0 = +dT (all in Kelvin)
+            # Temperature change is linear between frames
+            self.T += 2.0 * self.dT * (action[0] - 0.5) / self.n_steps
             self.T = np.min([
                 np.max([self.T, self.vessels.get_Tmin()]),
                 self.vessels.get_Tmax()
             ])
 
-            # split the overall volume change into increments
-            self.V += volume_change / self.n_steps
+            # action[1] changes volume by: 0.0 = -dV, 0.5 = 0, 1.0 = dV (all in Litres)
+            self.V += 2.0 * self.dV * (action[1] - 0.5) / self.n_steps
             self.V = np.min([
-                np.max([self.V, self.vessels.get_min_volume()]),
-                self.vessels.get_max_volume()
+                np.max([self.V, self.vessels.get_min_volume() / 1000]),
+                self.vessels.get_max_volume() / 1000
             ])
-
-            # split the overall molar changes into increments
-            for i, delta_n in enumerate(delta_n_array):
-                dn = delta_n / self.n_steps
-                self.reaction.n[i] += dn
-                self.reaction.cur_in_hand[i] -= dn
-
-                # set a penalty for trying to add unavailable material (tentatively set to 0)
-                # reward -= 0
-
-                # if the amount that is in hand is below a certain threshold set it to 0
-                if self.reaction.cur_in_hand[i] < 1e-8:
-                    self.reaction.cur_in_hand[i] = 0.0
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.reaction.update(
@@ -817,8 +506,8 @@ class ReactionBenchEnv(gym.Env):
             self.plot_data_state[1].append((self.T - Tmin)/(Tmax - Tmin))
 
             # record volume data
-            Vmin = self.vessels.get_min_volume()
-            Vmax = self.vessels.get_max_volume()
+            Vmin = self.vessels.get_min_volume() / 1000
+            Vmax = self.vessels.get_max_volume() / 1000
             self.plot_data_state[2].append((self.V - Vmin)/(Vmax - Vmin))
 
             # record pressure data
@@ -850,7 +539,7 @@ class ReactionBenchEnv(gym.Env):
 
         # save the vessel when the final step is complete
         if any([self.done, self.step_num == 20]):
-            self._save_vessel(vessel_rootname="react_vessel")
+            self._save_vessel()
 
         # update the step counter
         self.step_num += 1

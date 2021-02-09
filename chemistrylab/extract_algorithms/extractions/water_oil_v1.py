@@ -23,8 +23,9 @@ class Extraction:
         max_vessel_volume=1000.0,  # max volume of empty vessels / g
         n_vessel_pixels=100,  # number of pixels for each vessel
         max_valve_speed=10,  # maximum draining speed (pixels/step)
-        n_actions=9,
-        solute=None
+        n_actions=10,
+        solute=None,
+        extractor=None
     ):
         '''
         '''
@@ -108,7 +109,7 @@ class Extraction:
 
         return vessels, oil_vessel, state
 
-    def perform_action(self, vessels, oil_vessel, action):
+    def perform_action(self, vessels, ext_vessel, action):
         '''
         0: Valve (Speed multiplier, relative to max_valve_speed)
         1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
@@ -119,7 +120,7 @@ class Extraction:
         6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
         7: Add Oil to ExV （Volume multiplier, relative to max_vessel_volume)
         8: Done (Value doesn't matter)
-        :param oil_vessel:
+        :param ext_vessel:
         :param vessels: a list containing three vessels
         :param action: a tuple of two elements, first one represents action, second one is a multiplier
         :return: new vessels, oil vessel, reward, done
@@ -215,15 +216,21 @@ class Extraction:
             else:
                 d_volume = vessels[0].get_max_volume() * multiplier
                 event = ['pour by volume', vessels[0], d_volume]
-                reward = oil_vessel.push_event_to_queue(events=[event], dt=self.dt)
+                reward = ext_vessel.push_event_to_queue(events=[event], dt=self.dt)
                 vessels[1].push_event_to_queue(dt=self.dt)
                 vessels[2].push_event_to_queue(dt=self.dt)
-        # 8: Done
-        elif 8 == int(action[0]):
+        # 8: Wait
+        elif 8 == int(action[0]):  # wait
+            wait_time = self.dt*(action[1] + 1)
+            vessels[0].push_event_to_queue(dt=wait_time)
+            vessels[1].push_event_to_queue(dt=wait_time)
+            vessels[2].push_event_to_queue(dt=wait_time)
+        # 9: Done
+        elif 9 == int(action[0]):
             done = True
             reward = self.done_reward(vessels[2])
 
-        return vessels, oil_vessel, reward, done
+        return vessels, ext_vessel, reward, done
 
     def done_reward(self, beaker_2):
         '''
