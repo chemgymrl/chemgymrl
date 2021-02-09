@@ -154,4 +154,4 @@ print(env_ids)
 #['WurtzReact-v0', 'WurtzReact_overlap-v0', 'DecompReactLesson-v0']
 ```
 
-Here we can clearly see that our environment has noe been added!
+Here we can clearly see that our environment has been added!
