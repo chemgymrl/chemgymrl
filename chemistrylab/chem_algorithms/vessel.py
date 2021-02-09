@@ -874,22 +874,26 @@ class Vessel:
             if M == 'Air':  # skip Air for now
                 continue
 
-            # if the material is a solvent
-            if self._material_dict[M][0]().is_solvent():
-                solvent_volume.append(self_volume_dict[M])
-                solvent_polarity.append(self._material_dict[M][0]().get_polarity())
-                solute_counter = 0
+            # if material exists in dictionary
+            if M in self._material_dict.keys():
+                # if the material is a solvent
+                if self._material_dict[M][0]().is_solvent():
+                    solvent_volume.append(self_volume_dict[M])
+                    solvent_polarity.append(self._material_dict[M][0]().get_polarity())
+                    solute_counter = 0
 
-                if self._solute_dict:
-                    # fill in solute_amount
-                    for Solute in self._solute_dict:
-                        solute_amount[solute_counter].append(self._solute_dict[Solute][M])
-                        solute_counter += 1
-                else:
-                    solute_amount[0].append(0.0)
+                    if self._solute_dict:
+                        # fill in solute_amount
+                        for Solute in self._solute_dict:
+                            solute_amount[solute_counter].append(self._solute_dict[Solute][M])
+                            solute_counter += 1
+                    else:
+                        solute_amount[0].append(0.0)
 
-            layers_position.append(self._layers_position_dict[M])
-            layers_density.append(self._material_dict[M][0]().get_density())
+            # if material exists in dictionary
+            if M in self._material_dict.keys():
+                layers_position.append(self._layers_position_dict[M])
+                layers_density.append(self._material_dict[M][0]().get_density())
 
         # Add Air
         layers_position.append(self._layers_position_dict['Air'])
@@ -950,9 +954,12 @@ class Vessel:
         for M in self._layers_position_dict:
             if M == 'Air':
                 continue
-            layers_amount.append(self_volume_dict[M])
-            layers_position.append((self._layers_position_dict[M]))
-            layers_color.append(self._material_dict[M][0]().get_color())
+
+            # if material exists in dictionary
+            if M in self._material_dict.keys():
+                layers_amount.append(self_volume_dict[M])
+                layers_position.append((self._layers_position_dict[M]))
+                layers_color.append(self._material_dict[M][0]().get_color())
 
         # calculate air
         air_volume = self.v_max - self_total_volume
