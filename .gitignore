@@ -3,4 +3,5 @@
 .pytest_cache/
 .idea/
 *.png
+*.mp4
 
