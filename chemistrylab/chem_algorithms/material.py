@@ -188,9 +188,11 @@ class H2O(Material):
                          molar_mass=18.015,
                          color=0.2,
                          charge=0.0,
+                         boiling_point=373.15,
                          solute=False,
                          solvent=True,
                          specific_heat=4.1813,
+                         enthalpy_vapor=40650.0,
                          index=1
                          )
 
