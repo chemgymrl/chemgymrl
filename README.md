@@ -17,12 +17,12 @@ The reward function is crucial such that it is how the agents determine which ac
 ### Vessel
 Important Variables |Structure | Description
 ---|---|---
-_material_dict|{'material.name': [material(), amount, unit(mol, g, kg, etc.)], ...}|a dictionary holding all the material inside this vessel
-_solute_dict|{'solute.name': {solvent.name: [amount, unit(mol, ml, etc.)], ...}, ...}|dictionary that represents the solution
+_material_dict|{'material.name': [material(), amount], ...}|a dictionary holding all the material inside this vessel
+_solute_dict|{'solute.name': {solvent.name: amount, ...}, ...}|dictionary that represents the solution
 _event_dict|{'function name': function}|a dictionary holds the event functions of a vessel
 _event_queue|[['event', parameters], ['event', parameters] ... ]|a queue of events to be performed by vessel
 _feedback_queue|[['event', parameters], ['event', parameters] ... ]|a queue holding collected feedback from materials and unfinished events
-*note that the unit parameter is optional in all cases, if left empty mol is assumed*
+
 #### An example of _material_dict and _solute_dict
 (vessel with Na and Cl dissolved in H2O and C6H14)
 ```bash

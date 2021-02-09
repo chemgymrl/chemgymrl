@@ -315,7 +315,6 @@ class Na(Material):
                          molar_mass=22.990,
                          color=0.85,
                          charge=0.0,
-                         solute=True,
                          boiling_point=1156.0,
                          specific_heat=1.23,
                          enthalpy_fusion=2600.0,
@@ -335,7 +334,6 @@ class Cl(Material):
                          molar_mass=35.453,
                          color=0.8,
                          charge=0.0,
-                         solute=True,
                          specific_heat=0.48,
                          enthalpy_fusion=3200.0,
                          enthalpy_vapor=10200.0,
@@ -418,9 +416,7 @@ class F2(Material):
                          index=15
                          )
 
-
 ## ---------- ## HYDROCARBONS ## ---------- ##
-
 
 class Dodecane(Material):
     def __init__(self):
@@ -632,100 +628,6 @@ class Ethoxyethane(Material):
             enthalpy_vapor=27250.0,
             index=25
         )
-
-
-class EthylAcetate(Material):
-    def __init__(self):
-        super().__init__(
-            name='ethyl acetate',
-            density=0.902,
-            polarity=0.654,
-            temperature=298,
-            pressure=1,
-            phase='l',
-            molar_mass=88.106,
-            color=0.05,
-            charge=0.0,
-            boiling_point=350,
-            melting_point=189.6,
-            solvent=True,
-            specific_heat=1.904, # in J/g*K
-            enthalpy_fusion=10480,
-            enthalpy_vapor=31940,
-            index=26
-        )
-
-class DiEthylEther(Material):
-    def __init__(self):
-        super().__init__(
-            name='diethyl ether',
-            density=0.7134,
-            polarity=1.3,
-            temperature=298,
-            pressure=1,
-            phase='l',
-            molar_mass=74.123,
-            color=0.05,
-            charge=0.0,
-            boiling_point=307.8,
-            melting_point=156.8,
-            solvent=True,
-            specific_heat=119.46, # in J/g*K
-            enthalpy_fusion=-252.7e3,
-            enthalpy_vapor=27.247e3,
-            index=29
-        )
-
-
-##------Indicators------##
-
-
-class MethylRed(Material):
-    def __init__(self):
-        super().__init__(
-            name='methyl red',
-            density=0.902,
-            polarity=0.0,
-            temperature=298,
-            pressure=1,
-            phase='s',
-            molar_mass=88.106,
-            color=0.6,
-            charge=0.0,
-            boiling_point=630,
-            melting_point=455,
-            solute=True,
-            specific_heat=1.904, # in J/g*K
-            enthalpy_fusion=10480,
-            enthalpy_vapor=31940,
-            index=27
-        )
-
-
-##-------Acids-------##
-
-
-class HCl(Material):
-    def __init__(self):
-        super().__init__(
-            name='HCl',
-            density=1.48e-3,
-            polarity=0.0,
-            temperature=298,
-            pressure=1,
-            phase='g',
-            molar_mass=88.106,
-            color=0.3,
-            charge=0.0,
-            boiling_point=350,
-            melting_point=189.6,
-            solute=True,
-            specific_heat=1.904, # in J/g*K
-            enthalpy_fusion=10480,
-            enthalpy_vapor=31940,
-            index=28
-        )
-
 
 def get_materials():
     '''

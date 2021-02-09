@@ -93,15 +93,15 @@ def oil_vessel():
 
     # material_dict
     material_dict = {
-        H2O().get_name(): [H2O, 30.0, 'mol'],
-        Na().get_name(): [Na, 1.0, 'mol'],
-        Cl().get_name(): [Cl, 1.0, 'mol']
+        H2O().get_name(): [H2O, 30.0],
+        Na().get_name(): [Na, 1.0],
+        Cl().get_name(): [Cl, 1.0]
     }
 
     # solute_dict
     solute_dict = {
-        Na().get_name(): {H2O().get_name(): [1]},
-        Cl().get_name(): {H2O().get_name(): [1]},
+        Na().get_name(): [H2O().get_name(), 1.0],
+        Cl().get_name(): [H2O().get_name(), 1.0],
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
@@ -151,5 +151,3 @@ class ExtractWorld_v2(ExtractBenchEnv):
             extraction_vessel=oil_vessel(),
             target_material='Na'
         )
-
-

@@ -177,12 +177,16 @@ class ReactionBenchEnv(gym.Env):
         # initialize a step counter
         self.step_num = 1
 
+        # set the maximum pressure
+        self.Pmax = self.reaction.max_mol * R * self.Tmax / self.Vmin
+
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
         if self.in_vessel_path is None:
             self.vessels = vessel.Vessel(
                 'default',
                 temperature=self.Ti,
+                p_max=self.Pmax,
                 v_max=self.Vmax,
                 v_min=self.Vmin,
                 Tmax=self.Tmax,
@@ -584,9 +588,8 @@ class ReactionBenchEnv(gym.Env):
             material_name = self.reaction.labels[i]
             material_class = self.reaction.material_classes[i]
             amount = self.reaction.n[i]
-            print(amount)
-            new_material_dict[material_name] = [material_class, amount, 'mol']
-        print("=============================================")
+            new_material_dict[material_name] = [material_class, amount]
+
         # tabulate all the solutes and their values
         new_solute_dict = {}
         for i in range(self.reaction.initial_solutes.shape[0]):
@@ -595,12 +598,13 @@ class ReactionBenchEnv(gym.Env):
             amount = self.reaction.initial_solutes[i]
 
             # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = {solute_class().get_name(): [amount, 'mol']}
+            new_solute_dict[solute_name] = [solute_class, amount]
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
             'react_vessel',
             temperature=self.Ti,
+            p_max=self.Pmax,
             v_max=self.Vmax,
             v_min=self.Vmin,
             Tmax=self.Tmax,
