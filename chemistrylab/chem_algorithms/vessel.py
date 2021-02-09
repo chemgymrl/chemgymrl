@@ -38,7 +38,6 @@ class Vessel:
             self,
             label, # Name of the vessel
             temperature=297, # K
-            pressure=1.0, # Kpa
             volume=1.0, # L
             materials={}, # moles of materials
             solutes={}, # moles of solutes
@@ -60,7 +59,7 @@ class Vessel:
         self.label = label
         self.w2v = None
         self.temperature = temperature
-        self.pressure = pressure
+        self.pressure = self.get_pressure()
         self.volume = volume
         self.v_max = v_max
         self.v_min = v_min
