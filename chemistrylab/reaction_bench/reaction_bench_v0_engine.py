@@ -177,16 +177,12 @@ class ReactionBenchEnv(gym.Env):
         # initialize a step counter
         self.step_num = 1
 
-        # set the maximum pressure
-        self.Pmax = self.reaction.max_mol * R * self.Tmax / self.Vmin
-
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
         if self.in_vessel_path is None:
             self.vessels = vessel.Vessel(
                 'default',
                 temperature=self.Ti,
-                p_max=self.Pmax,
                 v_max=self.Vmax,
                 v_min=self.Vmin,
                 Tmax=self.Tmax,
@@ -604,7 +600,6 @@ class ReactionBenchEnv(gym.Env):
         new_vessel = vessel.Vessel(
             'react_vessel',
             temperature=self.Ti,
-            p_max=self.Pmax,
             v_max=self.Vmax,
             v_min=self.Vmin,
             Tmax=self.Tmax,
