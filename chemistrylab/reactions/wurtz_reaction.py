@@ -261,7 +261,7 @@ class Reaction():
         non_zero_conc = [conc for conc in reactant_conc if conc != 0.0]
         for conc in non_zero_conc:
             agg_conc *= conc
-        exponent = 2 / len(non_zero_conc)
+        exponent = 2 / len(non_zero_conc) if len(non_zero_conc) != 0 else 1
         scaling_factor = (abs(agg_conc))**exponent
 
         # set the pre-exponential constant using the above scaling factor for proper dimensionality
