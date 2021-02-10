@@ -1,6 +1,6 @@
-## Distillation Bench: Lesson 1
+## Distillation Bench: Lesson 2
 
-### Familiarizing Actions for the Distillation Bench
+### Simple experiment with the distillation bench
 
 In this tutorial we will perform two similar experiments. In one we will turn up the temperature to the maximum 
 temperature for the boiling vessel. In the other we will turn in down to the minimum. We will see the difference in both
