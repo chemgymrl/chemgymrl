@@ -77,7 +77,8 @@ class DistillationBenchEnv(gym.Env):
         self.distillation = distill_v0.Distillation(
             boil_vessel=self.boil_vessel,
             target_material=self.target_material,
-            dQ=1e+5
+            dQ=1e+5,
+            n_increments=50
         )
 
         # set up vessel and state variables
@@ -344,9 +345,6 @@ class DistillationBenchEnv(gym.Env):
         ---------------
         None
         '''
-
-        print(self.state)
-        __ = input("Wait...")
 
         # obtain the necessary variables
         vessels = self.vessels
