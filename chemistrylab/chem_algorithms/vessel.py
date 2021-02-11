@@ -894,7 +894,7 @@ class Vessel:
                     if self._solute_dict:
                         # fill in solute_amount
                         for Solute in self._solute_dict:
-                            solute_amount[solute_counter].append(self._solute_dict[Solute][M])
+                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][0])
                             solute_counter += 1
                     else:
                         solute_amount[0].append(0.0)

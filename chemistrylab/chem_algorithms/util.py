@@ -29,8 +29,6 @@ def convert_material_dict_to_volume(material_dict,
             volume = mass / material_dict[M][0]().get_density() # in L
             volume_dict[M] = volume
             total_volume += volume
-    print(volume_dict)
-    print(total_volume)
     return volume_dict, total_volume
 
 
@@ -70,7 +68,6 @@ def check_overflow(material_dict,
                    v_max,
                    ):
     __, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
-    print(v_max)
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow
@@ -214,7 +211,6 @@ def convert_material_dict_units(material_dict):
     for key, item in material_dict.items():
         unit = 'mol'
         if len(item) == 3:
-            print(key, item)
             unit = item[2]
         new_material_dict[key] = [item[0], convert_unit_to_mol(item[0], item[1], unit), 'mol']
     return new_material_dict
@@ -227,8 +223,6 @@ def convert_solute_dict_units(solute_dict):
         for solvent, item in solvents.items():
             unit = 'mol'
             if len(item) == 2:
-                print(solvent, item)
-                unit = item[2]
                 unit = item[1]
             new_solute_dict[solute][solvent] = [convert_unit_to_mol(solvent, item[0], unit)]
     return new_solute_dict

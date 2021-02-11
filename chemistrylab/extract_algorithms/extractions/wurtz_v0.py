@@ -87,7 +87,8 @@ class Extraction:
             max_vessel_volume=1.0,  # max volume of empty vessels in L
             n_vessel_pixels=100,  # number of pixels for each vessel
             max_valve_speed=10,  # maximum draining speed (pixels/step)
-            n_actions=8
+            n_actions=8,
+            extractor=None
     ):
         '''
         Constructor class for the Wurtz Extraction class

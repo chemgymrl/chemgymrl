@@ -36,14 +36,18 @@ import pickle
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
-from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0
+from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red, extraction_0
 from chemistrylab.extract_algorithms import separate
 
 # a dictionary of available extractions
 extraction_dict = {
     'water_oil': water_oil_v1,
-    "wurtz": wurtz_v0
+    "wurtz": wurtz_v0,
+    'lesson_1': lesson_1,
+    'methyl_red': methyl_red,
+    'extraction_0': extraction_0,
 }
+
 
 class ExtractBenchEnv(gym.Env):
     '''
@@ -85,13 +89,16 @@ class ExtractBenchEnv(gym.Env):
             n_vessel_pixels=100,
             max_valve_speed=10,
             extraction_vessel=None,
+
             solute="",
             target_material="",
-            out_vessel_path=""
+            out_vessel_path="",
+            extractor=None
     ):
         '''
         Constructor class method for the Extract Bench Environment
         '''
+
 
         # validate the input parameters provided to the extract bench engine
         input_parameters = self._validate_parameters(
@@ -106,6 +113,7 @@ class ExtractBenchEnv(gym.Env):
             out_vessel_path=out_vessel_path
         )
 
+
         # set the validated input parameters
         self.n_steps = input_parameters["n_steps"]
         self.dt = input_parameters["dt"]
@@ -115,13 +123,14 @@ class ExtractBenchEnv(gym.Env):
         self.solute = input_parameters["solute"]
         self.target_material = input_parameters["target_material"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
-
+        self.extractor = extractor
         self.extraction = extraction_dict[input_parameters["extraction"]].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
             solute=self.solute,
-            target_material=self.target_material
+            target_material=self.target_material,
+            extractor=self.extractor
         )
 
         self.initial_target_amount = self.extraction_vessel.get_material_amount(
@@ -282,7 +291,7 @@ class ExtractBenchEnv(gym.Env):
     def _save_vessel(self, extract_vessel=None, vessel_rootname=""):
         '''
         Method to save a vessel as a pickle file.
-        
+
         Parameters
         ---------------
         `extract_vessel` : `vessel.Vessel` (default=`None`)
@@ -372,7 +381,7 @@ class ExtractBenchEnv(gym.Env):
         # perform the inputted action in the extraction module
         vessels, ext_vessels, reward, done = self.extraction.perform_action(
             vessels=vessels,
-            external_vessels=ext_vessels,
+            ext_vessel=ext_vessels,
             action=action
         )
 
@@ -394,7 +403,9 @@ class ExtractBenchEnv(gym.Env):
 
         # once all the steps have been completed, calculate the final reward and save any vessels
         if self.done:
+            pass
             # after the last iteration, calculate the amount of target material in each vessel
+
             reward = ExtractionReward(
                 vessels=self.vessels,
                 desired_material=self.target_material,
@@ -417,6 +428,7 @@ class ExtractBenchEnv(gym.Env):
                     extract_vessel=vessel,
                     vessel_rootname="extract_vessel_{}".format(i)
                 )
+
 
         return self.state, reward, self.done, {}
 

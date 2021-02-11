@@ -136,7 +136,6 @@ class ReactionBenchEnv(gym.Env):
             Vi=Vi,
             Vmin=Vmin,
             Vmax=Vmax,
-            Pmax=Pmax,
             dV=dV,
             overlap=overlap
         )
@@ -164,7 +163,7 @@ class ReactionBenchEnv(gym.Env):
         self.Vmin = input_parameters["Vmin"] # Minimum Volume of the system (L)
         self.Vmax = input_parameters["Vmax"] # Maximum Volume of the system (L)
         self.dV = input_parameters["dV"] # Maximum change in Volume per action (L)
-        self.Pmax = input_parameters["Pmax"]
+        self.Pmax = Pmax
 
         # initialize the reaction
         self.reaction = input_parameters["reaction"](
