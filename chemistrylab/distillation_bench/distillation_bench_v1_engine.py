@@ -77,7 +77,8 @@ class DistillationBenchEnv(gym.Env):
         self.distillation = distill_v0.Distillation(
             boil_vessel=self.boil_vessel,
             target_material=self.target_material,
-            dQ=1e+5
+            dQ=1e+5,
+            n_increments=50
         )
 
         # set up vessel and state variables
@@ -282,7 +283,7 @@ class DistillationBenchEnv(gym.Env):
                 base_state[i].append(material_package)
 
         # convert the base state to a numpy array to be accessible for all methods
-        self.state = np.array(base_state)
+        self.state = np.array(base_state, dtype=object)
 
     def reset(self):
         '''
@@ -345,9 +346,6 @@ class DistillationBenchEnv(gym.Env):
         None
         '''
 
-        print(self.state)
-        __ = input("Wait...")
-
         # obtain the necessary variables
         vessels = self.vessels
         done = self.done
@@ -370,18 +368,18 @@ class DistillationBenchEnv(gym.Env):
         if any([self.n_steps == 0, self.done]):
             self.done = True
 
-            # after the last step, calculate the final reward
-            reward = DistillationReward(
+            # initialize the distillation reward class
+            d_reward = DistillationReward(
                 vessels=self.vessels,
                 desired_material=self.target_material
-            ).calc_reward()
+            )
+
+            # after the last step, calculate the final reward
+            reward = d_reward.calc_reward()
 
             # obtain a list of the vessels that contain the desired
             # material and obey the minimum purity requirements
-            valid_vessels = DistillationReward(
-                vessels=self.vessels,
-                desired_material=self.target_material
-            ).validate_vessels(
+            valid_vessels = d_reward.validate_vessels(
                 purity_threshold=self.min_purity_threshold
             )
 

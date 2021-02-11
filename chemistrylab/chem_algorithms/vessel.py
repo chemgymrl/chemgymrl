@@ -56,8 +56,9 @@ class Vessel:
         Constructor class for the Vessel object.
         '''
 
-        self._material_dict = {}
-        self._solute_dict = {}
+        # define the Material Dict and Solute Dict first
+        self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = solutes  # solute.name: [solvent(), amount]; amount is in mole
 
         # initialize parameters
         self.label = label
@@ -79,10 +80,6 @@ class Vessel:
 
         # create Air （not in material dict)
         self.Air = material.Air()
-
-        # Material Dict and Solute Dict
-        self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount, unit]; amount is in mole
-        self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
 
         # for vessel's pixel representation
         # layer's pixel representation, initially filled with Air's color

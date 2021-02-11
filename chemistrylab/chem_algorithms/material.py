@@ -6,41 +6,41 @@ import sys
 
 class Material:
     def __init__(self,
-                 name=None,
-                 density=None,
-                 polarity=None,
-                 temperature=None,
-                 pressure=None,
-                 phase=None,
-                 charge=None,
-                 molar_mass=None,
-                 color=None,
-                 solute=False,
-                 solvent=False,
-                 boiling_point=None,
-                 melting_point=None,
-                 specific_heat=None,
-                 enthalpy_fusion=None,
-                 enthalpy_vapor=None,
+                 name="",
+                 density=1.0, # in g/cm**3
+                 polarity=0.0,
+                 temperature=1.0, # in K
+                 pressure=1.0, # in kPa
+                 phase="", # one of "s", "l", or "g" at temperature
+                 charge=0.0,
+                 molar_mass=1.0, # in g/mol
+                 color=0.0, # color scale from 0 to 1
+                 solute=False, # is material a solute
+                 solvent=False, # is material a solvent
+                 boiling_point=1.0, # in K
+                 melting_point=1.0, # in K
+                 specific_heat=1.0, # in J/g*K
+                 enthalpy_fusion=1.0, # in J/mol
+                 enthalpy_vapor=1.0, # in J/mol
                  index=None
-                 ):
+    ):
         self._name = name
-        self.w2v = None  # not used
-        self._density = density  # g/mL
+        self.w2v = None
+        self._density = density
         self._polarity = polarity
-        self._temperature = temperature  # K
-        self._pressure = pressure  # kPa
+        self._temperature = temperature
+        self._pressure = pressure
         self._phase = phase
         self._charge = charge
-        self._molar_mass = molar_mass  # g/mol
+        self._molar_mass = molar_mass
         self._color = color
         self._solute = solute
         self._solvent = solvent
         self._boiling_point = boiling_point
         self._melting_point = melting_point
-        self._specific_heat = specific_heat  # J/g*K
-        self._enthalpy_fusion = enthalpy_fusion  # J/mol
-        self._enthalpy_vapor = enthalpy_vapor  # J/mol
+        self._specific_heat = specific_heat
+        self._enthalpy_fusion = enthalpy_fusion
+        self._enthalpy_vapor = enthalpy_vapor
         self._index = index
 
     def _update_properties(self,
@@ -109,19 +109,19 @@ class Material:
     def is_solvent(self):
         return self._solvent
 
-    def get_boiling_point(self, in_kelvin=False):
+    def get_boiling_point(self, in_kelvin=True):
         temp = self._boiling_point
 
-        if in_kelvin:
-            temp = temp + 273.15
+        if not in_kelvin:
+            temp = temp - 273.15
 
         return temp
 
-    def get_melting_point(self, in_kelvin=False):
+    def get_melting_point(self, in_kelvin=True):
         temp = self._melting_point
 
-        if in_kelvin:
-            temp = temp + 273.15
+        if not in_kelvin:
+            temp = temp - 273.15
 
         return temp
 
@@ -164,7 +164,6 @@ class Material:
     def get_index(self):
         return self._index
 
-
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
@@ -178,7 +177,6 @@ class Air(Material):
                          index=0
                          )
 
-
 class H2O(Material):
     def __init__(self):
         super().__init__(name='H2O',
@@ -190,12 +188,13 @@ class H2O(Material):
                          molar_mass=18.015,
                          color=0.2,
                          charge=0.0,
+                         boiling_point=373.15,
                          solute=False,
                          solvent=True,
                          specific_heat=4.1813,
+                         enthalpy_vapor=40650.0,
                          index=1
                          )
-
 
 class H(Material):
     def __init__(self):
@@ -212,7 +211,6 @@ class H(Material):
                          index=2
                          )
 
-
 class H2(Material):
     def __init__(self):
         super().__init__(name='H2',
@@ -227,7 +225,6 @@ class H2(Material):
                          specific_heat=None,
                          index=3
                          )
-
 
 class O(Material):
     def __init__(self):
@@ -244,7 +241,6 @@ class O(Material):
                          index=4
                          )
 
-
 class O2(Material):
     def __init__(self):
         super().__init__(name='O2',
@@ -259,7 +255,6 @@ class O2(Material):
                          specific_heat=None,
                          index=5
                          )
-
 
 class O3(Material):
     def __init__(self):
@@ -276,7 +271,6 @@ class O3(Material):
                          index=6
                          )
 
-
 class C6H14(Material):
     def __init__(self):
         super().__init__(name='C6H14',
@@ -292,7 +286,6 @@ class C6H14(Material):
                          specific_heat=2.26,
                          index=7
                          )
-
 
 class NaCl(Material):
     def __init__(self):
@@ -312,7 +305,6 @@ class NaCl(Material):
                          index=8
                          )
 
-
 # Polarity is dependant on charge for atoms
 class Na(Material):
     def __init__(self):
@@ -325,14 +317,12 @@ class Na(Material):
                          molar_mass=22.990,
                          color=0.85,
                          charge=0.0,
-                         solute=True,
                          boiling_point=1156.0,
                          specific_heat=1.23,
                          enthalpy_fusion=2600.0,
                          enthalpy_vapor=97700.0,
                          index=9
                          )
-
 
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
@@ -346,13 +336,11 @@ class Cl(Material):
                          molar_mass=35.453,
                          color=0.8,
                          charge=0.0,
-                         solute=True,
                          specific_heat=0.48,
                          enthalpy_fusion=3200.0,
                          enthalpy_vapor=10200.0,
                          index=10
                          )
-
 
 class Cl2(Material):
     def __init__(self):
@@ -369,7 +357,6 @@ class Cl2(Material):
                          index=11
                          )
 
-
 class LiF(Material):
     def __init__(self):
         super().__init__(name='LiF',
@@ -385,7 +372,6 @@ class LiF(Material):
                          index=12
                          )
 
-
 class Li(Material):
     def __init__(self):
         super().__init__(name='Li',
@@ -400,7 +386,6 @@ class Li(Material):
                          specific_heat=1.0,
                          index=13
                          )
-
 
 # Note: F is very unstable when not an aqueous ion
 class F(Material):
@@ -418,7 +403,6 @@ class F(Material):
                          index=14
                          )
 
-
 class F2(Material):
     def __init__(self):
         super().__init__(name='F2',
@@ -434,9 +418,7 @@ class F2(Material):
                          index=15
                          )
 
-
 ## ---------- ## HYDROCARBONS ## ---------- ##
-
 
 class Dodecane(Material):
     def __init__(self):
@@ -459,7 +441,6 @@ class Dodecane(Material):
             index=16
         )
 
-
 class OneChlorohexane(Material):
     def __init__(self):
         super().__init__(
@@ -480,7 +461,6 @@ class OneChlorohexane(Material):
             enthalpy_vapor=42800.0,
             index=17
         )
-
 
 class TwoChlorohexane(Material):
     def __init__(self):
@@ -503,7 +483,6 @@ class TwoChlorohexane(Material):
             index=18
         )
 
-
 class ThreeChlorohexane(Material):
     def __init__(self):
         super().__init__(
@@ -524,7 +503,6 @@ class ThreeChlorohexane(Material):
             enthalpy_vapor=32950.0,
             index=19
         )
-
 
 class FiveMethylundecane(Material):
     def __init__(self):
@@ -547,7 +525,6 @@ class FiveMethylundecane(Material):
             index=20
         )
 
-
 class FourEthyldecane(Material):
     def __init__(self):
         super().__init__(
@@ -568,7 +545,6 @@ class FourEthyldecane(Material):
             enthalpy_vapor=41530.0,
             index=21
         )
-
 
 class FiveSixDimethyldecane(Material):
     def __init__(self):
@@ -591,7 +567,6 @@ class FiveSixDimethyldecane(Material):
             index=22
         )
 
-
 class FourEthylFiveMethylnonane(Material):
     def __init__(self):
         super().__init__(
@@ -613,7 +588,6 @@ class FourEthylFiveMethylnonane(Material):
             index=23
         )
 
-
 class FourFiveDiethyloctane(Material):
     def __init__(self):
         super().__init__(
@@ -634,7 +608,6 @@ class FourFiveDiethyloctane(Material):
             enthalpy_vapor=41530.0,
             index=24
         )
-
 
 class Ethoxyethane(Material):
     def __init__(self):
