@@ -7,7 +7,7 @@ import chemistrylab
 import numpy as np
 
 
-class DistillationTestCase(unittest.TestCase):
+class DecompositionTestCase(unittest.TestCase):
     def test_init(self):
         env = gym.make('DecompReactLesson-v0')
         state = env.reset()
@@ -60,8 +60,8 @@ class DistillationTestCase(unittest.TestCase):
         action = np.ones(env.action_space.shape)
         action[0] = 1 / 2
         action[1] = 1 / 2
-        state_after, __ = env.step(action)
-        self.assertNotEqual(state_after, state_before)
+        env.step(action)
+        self.assertIn('NaCl', env.vessel.get_material_dict())
 
 
 if __name__ == '__main__':
