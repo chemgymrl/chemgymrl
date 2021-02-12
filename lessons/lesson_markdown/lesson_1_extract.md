@@ -1,7 +1,7 @@
 ## Extraction Bench: Lesson 1
 ### Using a non-polar solute to extract a solute from water
 
-In this tutorial, I am going to walk you through how our environment works and hopefully give some insight into how an
+In this tutorial, we am going to walk you through how our environment works and hopefully give some insight into how an
 RL agent might interact with the envirionment. In this extraction we are going to be using oil to extract sodium and
 chlorine from water. We are going to be using this file `lessons/extraction_bench/oil_water.py` in order to interact
 with the environment and to try and achieve a high reward!
@@ -80,4 +80,4 @@ we want to see how well we did so now we enter the done command.
 
 ![image of command](../../sample_figures/tutorial/oil_water_console_7.png)
 
-I hope this tutorial helped with your understanding of how an agent might interact with the extraction environmenment!
+We hope this tutorial helped with your understanding of how an agent might interact with the extraction environmenment!

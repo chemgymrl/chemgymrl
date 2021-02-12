@@ -1,19 +1,21 @@
 ## Building A Custom Extraction File
 
-For this tutorial I will be showing you how to create a custom extraction environment to train an RL agent on!
+For this tutorial we will be showing you how to create a custom extraction environment to train an RL agent on!
 
 In this case we will be doing the extraction of Methyl Red from a solution of hydrochloric acid into Ethyl Acetate.
 The procedure and set up of this reaction can be found at this
 [link](https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Book%3A_Organic_Chemistry_Lab_Techniques_(Nichols)/04%3A_Extraction/4.06%3A_Step-by-Step_Procedures_For_Extractions).
 Now let's get started.
 
-The extraction bench is one of the more somplicated environments to build since there are a lot more actions to take in
+![extraction environment]()
+
+The extraction bench is one of the more complicated environments to build since there are a lot more actions to take in
 the environment and as a result a lot more to set up. As a result we are starting with a very simple, single extraction
 but after having implemented this it should be obvious how to extend this to larger more complicated extractions.
 
 
 Typically in a new reaction or extraction it will be important to define the new materials in 
-`chemistrylab/chem_algorithms/material.py` but for this case I have implemented the 2 new materials
+`chemistrylab/chem_algorithms/material.py` but for this case we have implemented the 2 new materials
 (methyl red and ethyl acetate). Go into the material file and look at the materials and familiarize yourself with the
 properties of each material. In your own project after creating the new materials it is then time to create the
 extraction environment space and the actions that can be performed in that extraction. For a simple single extraction

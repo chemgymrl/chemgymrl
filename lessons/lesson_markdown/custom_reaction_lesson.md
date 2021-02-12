@@ -88,7 +88,7 @@ this can be seen in `wurtz_reaction.py`
 
 As far as the reaction file, it is now set up and ready to go. Now inorder to use the reaction we need to make a simple
 change to the reaction bench engine located ```chemistrylab/reaction_bench/reaction_bench_v0_engine.py``` in this case
-you should duplicate this file and rename the file, I named it ```reaction_bench_v0_engine_decomp```
+you should duplicate this file and rename the file ```reaction_bench_v0_engine_decomp```
 
 at the top of the file you should see a line like the one below where we import the reaction that the engine will use:
 
