@@ -447,7 +447,7 @@ class Vessel:
 
                 for Solvent in self._solute_dict[Solute]:
                     # calculate the change of amount in each solvent and update the solute dict
-                    d_mole = self._solute_dict[Solute][Solvent] * d_percentage
+                    d_mole = self._solute_dict[Solute][Solvent][0] * d_percentage
                     self._solute_dict[Solute][Solvent][0] -= d_mole
 
                     # check if the solvent is in target material and update the vessel accordingly
