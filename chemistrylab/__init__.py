@@ -56,6 +56,18 @@ register(
     max_episode_steps=20
 )
 
+register(
+    id='EquilReactLesson-v0',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_2',
+    max_episode_steps=20
+)
+
+register(
+    id='SolutionReactLesson-v0',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_3',
+    max_episode_steps=20
+)
+
 ############################ DistillationBench ####################################
 
 register(

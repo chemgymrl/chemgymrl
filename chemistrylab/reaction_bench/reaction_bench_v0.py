@@ -23,6 +23,8 @@ import gym.spaces
 sys.path.append("../../")
 from chemistrylab.reaction_bench.reaction_bench_v0_engine import ReactionBenchEnv
 from chemistrylab.reaction_bench.reaction_bench_v0_engine_dissasociation import ReactionBenchEnvDissasociation
+from chemistrylab.reaction_bench.reaction__bench_v0_engine_equilibrium import ReactionBenchEnv_Equilibrium
+from chemistrylab.reaction_bench.reaction_bench_v0_engine_solute import ReactionBenchEnv_Solute
 
 class ReactionBenchEnv_0(ReactionBenchEnv):
     '''
@@ -84,5 +86,31 @@ class ReactionBenchEnv_1(ReactionBenchEnvDissasociation):
                 {"Solute": "H2O", "Initial": 1}
             ],
             desired="Na",
+            overlap=False
+        )
+
+
+class ReactionBenchEnv_2(ReactionBenchEnv_Equilibrium):
+    def __init__(self):
+        super(ReactionBenchEnv_2, self).__init__(
+            materials=[
+                {"Material": "A", "Initial": 1},
+                {"Material": "B", "Initial": 1},
+                {"Material": "C", "Initial": 1}
+            ],
+            solutes=[
+                {"Solute": "H2O", "Initial": 1}
+            ],
+            desired="C",
+            overlap=False
+        )
+
+class ReactionBenchEnv_3(ReactionBenchEnv_Solute):
+    def __init__(self):
+        super(ReactionBenchEnv_3, self).__init__(
+            materials=[
+                {"Material": "B", "Initial": 1},
+            ],
+            desired="C",
             overlap=False
         )

@@ -1218,3 +1218,6 @@ class Vessel:
         '''
 
         return self.volume
+
+    def get_current_volume(self):
+        return util.convert_material_dict_to_volume(self._material_dict)

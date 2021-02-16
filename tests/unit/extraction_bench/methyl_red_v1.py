@@ -31,22 +31,20 @@ class OilWaterTestCase(unittest.TestCase):
     def test_drain(self):
         env = gym.make(ENV_NAME)
         env.reset()
-        v0_initial = env.vessels[0].get_volume()
-        v1_initial = env.vessels[1].get_volume()
+        v0_initial = env.vessels[0].get_current_volume()[-1]
+        v1_initial = env.vessels[1].get_current_volume()[-1]
         action = np.zeros(env.action_space.shape)
         action[0] = 0
         action[1] = 1
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
-        print(vessels)
-        self.assertLess(vessels[0].get_volume(), v0_initial)
-        self.assertLess(v1_initial, vessels[1].get_volume())
+        self.assertLess(vessels[0].get_current_volume()[-1], v0_initial)
+        self.assertLess(v1_initial, vessels[1].get_current_volume()[-1])
 
 
     def test_mix_exv(self):
         env = gym.make(ENV_NAME)
         env.reset()
-
         action = np.zeros(env.action_space.shape)
         action[0] = 7
         action[1] = 5
@@ -104,28 +102,29 @@ class OilWaterTestCase(unittest.TestCase):
     def test_add_b1_to_exv(self):
         env = gym.make(ENV_NAME)
         env.reset()
-        v0_initial = env.vessels[0].get_volume()
-        v1_initial = env.vessels[1].get_volume()
+        v0_initial = env.vessels[0].get_current_volume()[-1]
+        v1_initial = env.vessels[1].get_current_volume()[-1]
         action = np.zeros(env.action_space.shape)
         action[0] = 4
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
-        self.assertLessEqual(v0_initial, vessels[0].get_volume())
-        self.assertLessEqual(vessels[1].get_volume(), v1_initial)
+        self.assertLessEqual(v0_initial, vessels[0].get_current_volume()[-1])
+        self.assertLessEqual(vessels[1].get_current_volume()[-1], v1_initial)
 
     def test_add_b1_to_b2(self):
         env = gym.make(ENV_NAME)
         env.reset()
-        v0_initial = env.vessels[0].get_volume()
-        v2_initial = env.vessels[2].get_volume()
+        v0_initial = env.vessels[0].get_current_volume()[-1]
+        v2_initial = env.vessels[2].get_current_volume()[-1]
+
         action = np.zeros(env.action_space.shape)
         action[0] = 5
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
-        self.assertLessEqual(v0_initial, vessels[0].get_volume())
-        self.assertLessEqual(vessels[2].get_volume(), v2_initial)
+        self.assertLessEqual(v0_initial, vessels[0].get_current_volume()[-1])
+        self.assertLessEqual(vessels[2].get_current_volume()[-1], v2_initial)
 
     def test_add_exv_to_b2(self):
         env = gym.make(ENV_NAME)
@@ -136,15 +135,15 @@ class OilWaterTestCase(unittest.TestCase):
         action[1] = 5
         state, reward, done, _ = env.step(action)
 
-        v0_initial = env.vessels[0].get_volume()
-        v2_initial = env.vessels[2].get_volume()
+        v0_initial = env.vessels[0].get_current_volume()[-1]
+        v2_initial = env.vessels[2].get_current_volume()[-1]
         action = np.zeros(env.action_space.shape)
         action[0] = 6
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
-        self.assertLess(vessels[0].get_volume(), v0_initial)
-        self.assertLess(v2_initial, vessels[2].get_volume())
+        self.assertLess(vessels[0].get_current_volume()[-1], v0_initial)
+        self.assertLess(v2_initial, vessels[2].get_current_volume()[-1])
 
     def test_add_oil_to_exv(self):
         env = gym.make(ENV_NAME)
