@@ -20,7 +20,7 @@ class Extraction:
         n_empty_vessels=2,  # number of empty vessels
         oil_volume=1000000000,  # the amount of oil available (unlimited)
         dt=0.05,  # time for each step (time for separation)
-        max_vessel_volume=1000.0,  # max volume of empty vessels / g
+        max_vessel_volume=1,  # max volume of empty vessels L
         n_vessel_pixels=100,  # number of pixels for each vessel
         max_valve_speed=10,  # maximum draining speed (pixels/step)
         n_actions=10,
