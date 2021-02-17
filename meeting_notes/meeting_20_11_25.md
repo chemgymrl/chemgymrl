@@ -2,7 +2,11 @@
 ## Date: November 25, 2020
 - **Meeting Summary:** Focussed on implementation of reward model in current design of chemistry gym.
 - **Present** : Isaac, Mark, Mitchell, Sriram
+
+
+
 ### Michell 
+
 - looking for standard settings for constant settings of Wurz reaction
 - also looked at reward function details
 
