@@ -31,6 +31,7 @@
 
 - Mitchell:
 	- Lead the discussion about the log file, save log files in memory during an episode, allow the user to acquire certain elements in the log file, specify the precision
+		- Log Files should be split into 2 parts: history (saves everything such that we can stop and experiment and use the history to restart it again from that point, used to make movies of multiple episodes) and lab notebook (what a scientist writes down in his notebook beside his desk (does not have access to the internal software of the system))
 	- Merge the mshahen-2 branch into master
 
 - Chris:
