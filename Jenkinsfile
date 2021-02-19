@@ -19,7 +19,7 @@ pipeline {
         stage('set up venv and install dependencies'){
             steps {
                 sh 'python -m venv test'
-                sh 'source test/bin/activate'
+                sh 'source ./test/bin/activate'
             }
         }
         stage(' Unit Testing Reaction') {
