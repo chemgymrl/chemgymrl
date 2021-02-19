@@ -16,14 +16,16 @@ pipeline {
                 git branch: 'nicholas_fix', credentialsId: '1de24870-cdba-4190-a8fb-f0508d298280', url: 'https://github.com/CLEANit/chemistrygym.git'
             }
         }
-        stage(' Unit Testing') {
+        stage(' Unit Testing Reaction') {
             steps {
-                sh 'python -V'
+                sh 'cd tests/unit/reaction_bench'
+                sh 'python -m unittest discover -p "*_test.py"'
             }
         }
-        stage(' Unit Testing_2') {
+        stage(' Unit Testing Extraction') {
             steps {
-                sh 'ls'
+                sh 'cd ../tests/unit/extraction_bench'
+                sh 'python -m unittest discover -p "*_test.py"'
             }
         }
         stage(' Unit Testing_3') {
