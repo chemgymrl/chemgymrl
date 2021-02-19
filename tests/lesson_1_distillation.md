@@ -49,6 +49,8 @@ into the condensation vessel/beaker 1. The amount of energy required to raise th
 vessel are dependent on their specific heat properties, which can be found in the `chemistrylab/chem_algorithms/material.py`
 file. 
 
+![distillation](../sample_figures/lesson_1d_aestheticimg_0)
+
 As more heat is added we will eventually reach the lowest boiling point of the materials in the vessel, and any more 
 heat added will act to evaporate this material. The now gaseous material will rise out of the boiling vessel into the 
 tube that feeds into the condensation vessel where it will condense back into its liquid form. In this virtual experiment 
@@ -58,6 +60,8 @@ vapour of material being evaporated.
 Once the entirety of the material has been boiled off, the condensation vessel is drained into the storage vessel. Now 
 the condensation vessel is empty, the boiling vessel's temperature can then be raised more until the next lowest boiling 
 point is reached, thus repeating the process.
+
+![evaporation](../sample_figures/lesson_1d_aestheticimg_1)
 
 The process is repeated until the desired material has been completely evaporated from the boiling vessel into 
 condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample.
