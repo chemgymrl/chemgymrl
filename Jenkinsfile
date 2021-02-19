@@ -13,20 +13,17 @@ pipeline {
             }
         }
 
-        stage('Code Checkout') {
-            steps {
-                checkout([
-                    $class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
-                    userRemoteConfigs: [[url: 'https://github.com/CLEANit/chemistrygym.git']]
-                ])
-            }
-        }
-
         stage(' Unit Testing') {
             steps {
                 sh """
                 echo "Running Unit Tests"
+                """
+            }
+        }
+        stage(' Unit Testing_2') {
+            steps {
+                sh """
+                ls
                 """
             }
         }

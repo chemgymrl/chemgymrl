@@ -5,6 +5,7 @@ sys.path.append('../../../chemistrylab/reactions')
 import gym
 import chemistrylab
 import numpy as np
+from chemistrylab.chem_algorithms.material import *
 
 ENV_NAME = 'MethylRed_Extract-v1'
 
@@ -47,7 +48,7 @@ class OilWaterTestCase(unittest.TestCase):
         env.reset()
         action = np.zeros(env.action_space.shape)
         action[0] = 7
-        action[1] = 5
+        action[1] = 2
         state, reward, done, _ = env.step(action)
 
         v0_initial_layers = env.vessels[0].get_layers()
@@ -65,12 +66,28 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
-        action = np.zeros(env.action_space.shape)
-        action[0] = 7
-        action[1] = 5
-        state, reward, done, _ = env.step(action)
+        v1_initial_layers = env.vessels[1].get_layers()
+        print()
+        print()
+        print("before adding new materials")
+        print(v1_initial_layers)
+        print(env.vessels[1].get_material_dict())
+
+        material_dict = {'H2O': [H2O, 100, 'mol'], 'C6H14': [C6H14, 30, 'mol']}
+
+        event_1 = ['update material dict', material_dict]
+        event_2 = ['update_layer']
+
+        env.vessels[1].push_event_to_queue(events=None, feedback=[event_1, event_2], dt=0)
+
 
         v1_initial_layers = env.vessels[1].get_layers()
+        print()
+        print()
+        print("after adding new materials")
+        print(v1_initial_layers)
+        print(env.vessels[1].get_material_dict())
+        print(env.vessels[1].get_volume())
         action = np.zeros(env.action_space.shape)
         action[0] = 2
         action[1] = 5
@@ -84,10 +101,13 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
-        action = np.zeros(env.action_space.shape)
-        action[0] = 7
-        action[1] = 5
-        state, reward, done, _ = env.step(action)
+        material_dict = {'H2O': [H2O, 30], 'C6H14': [C6H14, 30]}
+
+        event_1 = ['update material dict', material_dict]
+        event_2 = ['update_layer']
+
+        env.vessels[2].push_event_to_queue(events=None, feedback=[event_1, event_2], dt=0)
+
 
         v2_initial_layers = env.vessels[2].get_layers()
         action = np.zeros(env.action_space.shape)
