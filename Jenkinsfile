@@ -22,18 +22,19 @@ pipeline {
                 sh 'ls test_env'
                 sh 'ls test_env/bin'
                 sh '. ./test_env/bin/activate'
+                sh 'pip3 install -r requirements.txt'
             }
         }
         stage(' Unit Testing Reaction') {
             steps {
                 sh 'cd tests/unit/reaction_bench'
-                sh 'python -m unittest discover -p "*_test.py"'
+                sh 'python3 -m unittest discover -p "*_test.py"'
             }
         }
         stage(' Unit Testing Extraction') {
             steps {
                 sh 'cd ../tests/unit/extraction_bench'
-                sh 'python -m unittest discover -p "*_test.py"'
+                sh 'python3 -m unittest discover -p "*_test.py"'
             }
         }
         stage(' Unit Testing_3') {
