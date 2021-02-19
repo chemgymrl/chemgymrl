@@ -18,8 +18,10 @@ pipeline {
         }
         stage('set up venv and install dependencies'){
             steps {
-                sh 'python -m venv test'
-                sh 'source ./test/bin/activate'
+                sh 'python -m venv test_env'
+                sh 'ls test_env'
+                sh 'ls test_env/bin'
+                sh 'source ./test_env/bin/activate'
             }
         }
         stage(' Unit Testing Reaction') {
