@@ -2,149 +2,254 @@
 
 ### Familiarizing Actions for the Distillation Bench
 
-In this tutorial, I will teach you how the distillation environment works. In this distillation we are taking the 
-`tests/test_extract_vessel.pickle` which is a pickle file generated when we ran the extraction bench. 
+In this tutorial, we will be going through how the distillation environment works. We will be taking the `tests/test_extract_vessel.pickle` which is a pickle file generated when we ran the extraction bench. 
 
-It is important to
-know that before running the distillation bench, you must first complete both reaction and extraction, in order to follow
-the workflow our environment. To find out more, take a look at the [readme.md](https://github.com/CLEANit/chemistrygym) file on our github.
+It is important to know that before running the distillation bench, you must first complete both reaction and extraction, in order to follow the workflow our environment. To find out more, take a look at the [readme.md](https://github.com/CLEANit/chemistrygym) file on our github.
 
-Start by running `/tests/demo_lesson_1d.py` and you should see a series of graphs appear:
+Before we start talking about loading and running the environment, let's first familiarize ourselves with what's actually going on in the experiment.
 
-![graph](../sample_figures/lesson_1d_image0.PNG)
+### Distillation Process Explained
 
-These graphs show the contents of our containers. There are 3 main containers:
-- boiling vessel
-- beaker 1
-- beaker 2
+In the distillation environment there are 3 main containers or vessels.
 
-The boiling vessel contains all the materials at the initial state of the experiment. Beaker 1 can be thought of as a 
-condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials 
-that are being boiled off. Beaker 2 is then the storage vessel, where the condensation vessel can be emptied, in order 
-to make room for other material.
+- boiling vessel (BV)
+- beaker 1       (B1)
+- beaker 2       (B2)
 
-Now after we load in our desired environment, we should be prompted with a message asking us to pick our desired action and 
-the multiplier.
+The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials  that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.
 
-![prompt](../sample_figures/lesson_1d_image1.PNG)
+![distillation](../sample_figures/lesson_1d_aestheticimg_2.png)
 
-Let me explain what this means by taking a look at our action space. 
+The point of the process is to extract a target material from the boiling vessel, which contains numerous materials, and we do this by utilizing the different material's boiling points. Typically the process begins by raising the temperature of the BV which allows certain materials in that vessel to boil off into the condensation vessel or B1. 
 
-Our action space is given by a matrix of shape {0, 1}<sup>n_action x multiplier</sup>. The agent at each time step 
-essentially picks from a set of actions, and then a multiplier for that given action. The multiplier affects each action
-differently. For example the way the agents chosen multiplier affects heat change is by the following code:
+![distillation](../sample_figures/lesson_1d_aestheticimg_3.png)
 
-![heatchange](../sample_figures/lesson_1d_image2.PNG)
-
-In this case the heat change is affected by both the user's chosen multiplier and the dQ which is an attribute for the 
-maximum change in thermal energy. 
-
-Typically, an agent will choose actions based on what will give a higher reward, and higher rewards are given by getting
-a high molar amount of the desired material, in this case, dodecane, as well as a high purity in one particular vessel.
-
-From a chemistry point of view, what's happening is that the agent is extracting a material from the boiling vessel, 
-which contains multiple materials, and it does this by utilizing the different material's boiling points. The experiment
-begins by raising the temperature of the boiling vessel which will allow certain materials in that vessel to boil off 
-into the condensation vessel/beaker 1. The amount of energy required to raise the temperature of the materials in the 
-vessel are dependent on their specific heat properties, which can be found in the `chemistrylab/chem_algorithms/material.py`
-file. 
-
-![distillation](../sample_figures/lesson_1d_aestheticimg_0)
-
-As more heat is added we will eventually reach the lowest boiling point of the materials in the vessel, and any more 
-heat added will act to evaporate this material. The now gaseous material will rise out of the boiling vessel into the 
-tube that feeds into the condensation vessel where it will condense back into its liquid form. In this virtual experiment 
-it is assumed that this takes place instantaneously. The amount of material evaporated is dependent on the enthalpy of 
-vapour of material being evaporated. 
+As a material's boiling point is reached, any more temperature added from this point will act to evaporate it.  The now gaseous material will rise out of the boiling vessel into the tube that feeds into the condensation vessel where it will condense back into its liquid form. In this virtual experiment  it is assumed that this takes place instantaneously. The amount of material evaporated is dependent on the enthalpy of vapour of material being evaporated. 
 
 Once the entirety of the material has been boiled off, the condensation vessel is drained into the storage vessel. Now 
-the condensation vessel is empty, the boiling vessel's temperature can then be raised more until the next lowest boiling 
-point is reached, thus repeating the process.
+the condensation vessel is empty, the boiling vessel's temperature can then be raised more until the next lowest boiling point is reached, thus repeating the process.
 
 ![evaporation](../sample_figures/lesson_1d_aestheticimg_1)
 
-The process is repeated until the desired material has been completely evaporated from the boiling vessel into 
-condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample.
-The agent can then choose action 5, or done, in order to end the experiment.
+The process is repeated until the desired material has been completely evaporated from the boiling vessel into  condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample. We can then choose to end the experiment.
 
-![distillation-diagram](../sample_figures/lesson_1d_image3.PNG)
+In lesson 3 in these sets of tutorial for the distillation bench, we will try to get a high reward by obtaining a high molar amount of pure dodecane in our condensation vessel. 
 
-In lesson 3 in these sets of tutorial for the distillation bench, we will try to get a high reward by obtaining a high 
-molar amount of pure dodecane in our condensation vessel. In this tutorial though, we will go ahead and show you the 
-basic actions that your agent can choose to do. 
+For this tutorial, we will just familiarize ourselves with the basic actions, fundamental theory behind distillation, and how you can run the environment on your own!
 
-For now, we will manually input the action and the multiplier at each time step, however the whole purpose of these 
-environments is to train the agent with reinforcement learning. Hopefully after finishing these lessons, you will give
-RL with these agents a go!
+### Running the environment
 
-Let's get started with the different actions!
+We will first start by importing the necessary required modules, both external and local. By now this step should seem very familiar as we have done them in the reaction and extraction lessons.
 
-**First let's start by adding temperature to the boiling vessel.** This can be acheived by setting the action to 0, and 
-making the multiplier an integer higher than 5. Note that a multiplier of 5 will not affect the temperature and any 
-lower will decrease temperature.
 
-![add-temp](../sample_figures/lesson_1d_image4.PNG)
+```python
+%matplotlib inline
+```
 
-Notice how the boiling vessel's temperature is now 374.6 Kelvin. The boiling point of H2O as specified in the material.py
-file is 373.15 K. So we are now exceeding this temperature which allows us to boil off water, in this case 0.276 mol of
-it. 
 
-We can see this boiled off H2O in our beaker_0 in the diagrams which you'll notice before was empty.
+```python
+# import all the required external modules
+import gym
+import numpy as np
+import os
+import pickle
+import sys
+from time import sleep
+from gym import envs
+import matplotlib.pyplot as plt
+import pandas as pd
+```
+
+
+```python
+# ensure all necessary modules can be found
+sys.path.append('../')
+sys.path.append("../chemistrylab/reactions") # to access all reactions
+```
+
+
+```python
+# import local modules
+import chemistrylab 
+```
+
+We can see all the possible variations of the distillation bench environment which can vary depending on the input vessel (in this case the `test_extract_vessel.pickle`), which is loaded into the boil vessel, as well as the target material. In this and following tutorials our target material will be dodecane
+
+
+```python
+# show all environments for distillation bench
+all_envs = envs.registry.all()
+env_ids = [env_spec.id for env_spec in all_envs if 'Distillation' in env_spec.id]
+print(env_ids)
+```
+
+We then get prompted with a message asking us to choose the environment we want to run. This is based off the indexing in the environment array we saw from the last cell.
+
+
+```python
+# allows user to pick which environment they want to use
+# initializes environment
+select_env = int(input(f"Enter a number to choose which environment you want to run (0 - {len(env_ids) - 1}): \n"))
+env = gym.make(env_ids[select_env])
+render_mode = "human" #select how graphs are rendered
+```
+
+We initialize done to False so our agent can run the experiment. We run reset() to return an initial observation.
+
+
+```python
+done = False
+__ = env.reset()
+print('\n')
+```
+
+Here we have the different possible actions that we can take with the environment. The **action_set is an array indexed correspondingly to the action we want to perform.**
+
+The action_space is a multidiscrete action space of shape [6 10].
+
+**The first index allows us to choose from the action set. The second index allows us to pick a multiplier that will affect the action variably depending on our chosen multiplier.**
+
+For example, the following pair of numbers will add a great amount of heat compared to a multiplier of 6. 
+
+Action: 0
+
+Action Multiplier: 10
+
+
+```python
+# shows # of actions available
+# for distillation bench there are two elements
+# action[0] is a number indicating the event to take place
+# action[1] is a number representing a multiplier for the event
+# Actions and multipliers include:
+#   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
+#   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
+#   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+#   3: Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)
+#   4: Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)
+#   5: Done (Value doesn't matter)
+
+action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
+assert env.action_space.shape[0] == 2
+
+total_steps=0
+total_reward=0
+```
+
+Note that the multiplier affects each action differently. For examply the way the agents chosen multiplier affects heat change is given by the following code:
+
+![heatchange](../sample_figures/lesson_1d_image2.PNG)
+
+Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentraion of the desired material (in our case dodecane) in a particular vessel.
+
+Please input the following action and multipliers:
+
+| Step   | Action   | Multiplier  |
+| ------ |:--------:| -----:      |
+| 0      | 0        | 8           |
+| 1      | 2        | 10          |
+| 2      | 0        | 6           |
+| 3      | 3        | 10          |
+| 4      | 1        | 10          |
+| 5      | 4        | 10          |
+| 6      | 5        | 0           |
+
+
+
+```python
+while not done:
+
+    action = np.zeros(env.action_space.shape[0])
+
+    for index, action_desc in enumerate(action_set):
+        print(f'{index}: {action_desc}')
+    print('Please enter an action and an action multiplier')
+    for i in range(2):
+        message = 'Action'
+        if i == 1:
+            message = 'Action Multiplier:'
+        action[i] = int(input(f'{message}: '))
+
+
+    # perform the action and update the reward
+    state, reward, done, __ = env.step(action)
+    print('-----------------------------------------')
+    print('total_steps: ', total_steps)
+    print('reward: %.2f ' % reward)
+    total_reward += reward
+    print('total reward: %.2f ' % total_reward)
+    print('Temperature of boiling vessel: %.1f ' % env.boil_vessel.temperature, ' K \n')
+    # print(state)
+    
+    # render the plot
+    env.render(mode=render_mode)
+    # sleep(1)
+    
+    #increment one step
+    total_steps += 1
+```
+
+#### Step 0: Adding temperature to the vessel
+
+- action: 0
+- multiplier: 8
+
+This will result in a temperature reaching the boiling point of water, which you will notice is now boiled off in beaker_0 (or the condensation vessel)
 
 ![add-temp](../sample_figures/lesson_1d_image5.PNG)
 
-**After, this we can test out pouring from the condensation vessel into the storage vessel.**
+#### Step 1: Pour from condensation to storage vessel
 
-![add-temp](../sample_figures/lesson_1d_image6.PNG)
+- action: 2
+- multiplier: 10
 
 We can then see that storage vessel is now filled with the H2O poured from the condensation vessel. 
 
-**Note there is a problem with the diagrams right now that should be fixed.**
+****plot not fixed yet****
 
 ![pour-beaker1](../sample_figures/lesson_1d_image7.PNG)
 
-**Next, let's increase the temperature one more time, and then test actions 1 and 3.**
+#### Step 2: Add some more temperature
 
-First Let's pour from the condensation vessel to boiling vessel after boiling some more materials.
-
-![add-temp](../sample_figures/lesson_1d_image8.PNG)
-
-Noticed that we now have boiled 0.17 mols 2-chlorohexane.
+- action: 0
+- multiplier: 6
 
 ![add-temp](../sample_figures/lesson_1d_image9.PNG)
 
-**The graph should no longer have H2O in beaker_1**
+#### Step 3: Pouring back from condensation vessel to boiling vessel
 
-Let's try pouring everything back to the boiling vessel
-
-![pour-to-bv](../sample_figures/lesson_1d_image10.PNG)
+- action: 3
+- multiplier: 10
 
 You should see now that everything from the condensation vessel is back in the boiling vessel.
 
-**---Should insert graph here but it doesn't show the action correctly---*
+**---Should insert graph here but it doesn't show the action correctly---**
 
-Now let's try pouring everything from the boiling vessel into the condensation vessel.
+#### Step 4: Pour everything from boiling vessel into condensation vessel
 
-![pour-to-b1](../sample_figures/lesson_1d_image11.PNG)
+- action: 1
+- multiplier: 10
 
 Notice now that all the materials are in the condensation vessel.
 
 ![pour-to-b1](../sample_figures/lesson_1d_image12.PNG)
 
-Next we can test pouring the H2O in the storage vessel into the boiling vessel which is the last action we can select.
+#### Step 5: Pour the originally boiled off H2O in the storage vessel into the boiling vessel
 
-![pour-to-bv](../sample_figures/lesson_1d_image13.PNG)
+- action: 4
+- multiplier: 10
 
 Now you can see that the H2O which was previously in the storage vessel, is now in the boiling vessel.
 
 ![pour-to-bv](../sample_figures/lesson_1d_image14.PNG)
 
-We can now then tell the agent to stop the experiment using action 5 and multiplier 0.
+#### Step 6: Ending the experiment
 
-![done](../sample_figures/lesson_1d_image15.PNG)
+- action: 5
+- multiplier: 0
 
-This concludes the end of our tutorial. Hopefully you got a chance to see how the basic actions in the distillation 
-environment works and see how you can use the agent in RL applications to maximize the distillation of a desired material.
+### End of the lesson
 
-In the next tutorial we will perform 2 experiments where we heat up the boiling vessel to the maximum temperature it can
-reach, and vice versa where we cool it to the lowest temperature.
+This concludes the end of our tutorial. Hopefully you got a chance to see how the basic actions in the distillation environment works and see how you can use the agent in RL applications to maximize the distillation of a desired material.
+
+In the next tutorial we will perform 2 experiments where we heat up the boiling vessel to the maximum temperature it can reach, and vice versa where we cool it to the lowest temperature.
