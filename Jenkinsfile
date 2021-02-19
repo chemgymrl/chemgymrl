@@ -15,19 +15,19 @@ pipeline {
 
         stage(' Unit Testing') {
             steps {
-                sh """
-                echo "Running Unit Tests"
-                """
+                sh 'python -V'
             }
         }
         stage(' Unit Testing_2') {
             steps {
-                sh """
-                ls
-                """
+                sh 'ls'
             }
         }
-
+        stage(' Unit Testing_3') {
+            steps {
+                sh 'pwd'
+            }
+        }
         stage('Code Analysis') {
             steps {
                 sh """
