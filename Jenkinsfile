@@ -21,7 +21,7 @@ pipeline {
                 sh 'python -m venv test_env'
                 sh 'ls test_env'
                 sh 'ls test_env/bin'
-                sh 'source ./test_env/bin/activate'
+                sh '. ./test_env/bin/activate'
             }
         }
         stage(' Unit Testing Reaction') {
