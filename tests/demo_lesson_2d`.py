@@ -52,7 +52,7 @@ while not done:
 
     # ACTION 1
     # increase temperature all the way up
-    #action = np.array([0,6])
+    action = np.array([0,6])
 
     # ACTION 2
     # results in temperature being too high and all material is boiled off in the vessel
@@ -60,7 +60,7 @@ while not done:
 
     # ACTION 3
     # decrease temperature all the way down
-    action = np.array([0,3])
+    # action = np.array([0,3])
 
 
 
@@ -68,16 +68,24 @@ while not done:
     state, reward, done, __ = env.step(action)
     print('-----------------------------------------')
     print('total_steps: ', total_steps)
-    print('reward: %.7f ' % reward)
+    print('reward: %.2f ' % reward)
     total_reward += reward
-    print('total reward: %.7f' % total_reward)
+    print('total reward: %.2f' % total_reward)
     print(action)
-    print('Temperature: ', env.boil_vessel.temperature, ' K \n')
+    print('Temperature of boiling vessel: %.1f ' % env.boil_vessel.temperature, ' K \n')
     # print(state)
 
     # render the plot
     env.render(mode=render_mode)
     # sleep(1)
+
+    multiplier = 2 * (6 / 10 - 0.5)
+    print(multiplier * 1)
+    print(env.boil_vessel.temperature)
+
+    print('hello: ', env.distillation.dQ)
+    print('hi: ', env.distillation.n_increments)
+
 
     #increment one step
     total_steps += 1

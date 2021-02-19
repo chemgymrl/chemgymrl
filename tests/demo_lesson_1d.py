@@ -45,6 +45,7 @@ print('\n')
 
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
 assert env.action_space.shape[0] == 2
+print(env.action_space)
 
 total_steps=0
 total_reward=0
@@ -66,15 +67,14 @@ while not done:
         action[i] = int(input(f'{message}: '))
 
 
-
     # perform the action and update the reward
     state, reward, done, __ = env.step(action)
     print('-----------------------------------------')
     print('total_steps: ', total_steps)
-    print('reward: %.7f ' % reward)
+    print('reward: %.2f ' % reward)
     total_reward += reward
-    print('total reward: %.7f ' % total_reward)
-    print('Temperature of boiling vessel: %.2f ' % env.boil_vessel.temperature, ' K \n')
+    print('total reward: %.2f ' % total_reward)
+    print('Temperature of boiling vessel: %.1f ' % env.boil_vessel.temperature, ' K \n')
     # print(state)
 
 
