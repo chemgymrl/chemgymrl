@@ -182,6 +182,7 @@ class ReactionBenchEnv_Equilibrium(gym.Env):
 
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+        self.n_init = np.array([20, 100, 20])
         if self.in_vessel_path is None:
             self.vessels = vessel.Vessel(
                 'default',
@@ -594,7 +595,7 @@ class ReactionBenchEnv_Equilibrium(gym.Env):
             material_name = self.reaction.labels[i]
             material_class = self.reaction.material_classes[i]
             amount = self.reaction.n[i]
-            new_material_dict[material_name] = [material_class, amount]
+            new_material_dict[material_name] = [material_class, amount, 'mol']
 
         # tabulate all the solutes and their values
         new_solute_dict = {}
@@ -604,7 +605,7 @@ class ReactionBenchEnv_Equilibrium(gym.Env):
             amount = self.reaction.initial_solutes[i]
 
             # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = [solute_class, amount]
+            new_solute_dict[solute_name] = {solute_class: [amount, 'mol']}
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(

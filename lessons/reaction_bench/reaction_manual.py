@@ -13,10 +13,10 @@ select_env = int(input(f"enter a number to chose which environment you want to r
 env = gym.make(env_ids[select_env])
 render_mode = "human"
 
-action_set = ['Temperature', 'Volume', "1-chlorohexane", "2-chlorohexane", "3-chlorohexane", "Na"]
+action_set = ['Temperature', 'Volume'] + env.reaction.reactants
 
 assert len(action_set) == env.action_space.shape[0]
-
+print(env.vessels.get_material_dict())
 done = False
 state = env.reset()
 total_reward = 0

@@ -102,7 +102,7 @@ class Reaction():
 
         # specify the desired material
         self.desired_material = desired
-
+        self.reactants = REACTANTS
         # convert the reactants and products to their class object representations
         self.reactant_classes = convert_to_class(materials=REACTANTS)
         self.product_classes = convert_to_class(materials=PRODUCTS)

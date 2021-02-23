@@ -49,7 +49,7 @@ class Reaction(object):
 
         # specify the desired material
         self.desired_material = desired
-
+        self.reactants = REACTANTS
         # convert the reactants and products to their class object representations
         self.reactant_classes = convert_to_class(materials=REACTANTS)
         self.product_classes = convert_to_class(materials=PRODUCTS)
@@ -58,17 +58,17 @@ class Reaction(object):
 
         # define the maximum of each chemical allowed at one time (in mol)
         self.nmax = np.array(
-            [1.0 for __ in ALL_MATERIALS]
+            [100.0 for __ in ALL_MATERIALS]
         )
 
         # create labels for each of the chemicals involved
         self.labels = ALL_MATERIALS
 
         # define a space to record all six reaction rates
-        self.rate = np.zeros(6)
+        self.rate = np.zeros(3)
 
         # define the maximal number of moles available for any chemical
-        self.max_mol = 2.0
+        self.max_mol = 100.0
         # Parameters to generate up to 3 Gaussian peaks per species
         self.params = []
         if overlap:
@@ -81,10 +81,9 @@ class Reaction(object):
             self.params.append(spec.S_1)  # spectra for A
             self.params.append(spec.S_3)  # spectra for B
             self.params.append(spec.S_5)  # spectra for C
-        self.reset()
 
     def get_ni_label(self):
-        return ['[A]', '[B]', '[C]']
+        return REACTANTS
 
     def get_ni_num(self):
         num_list = []
@@ -93,10 +92,29 @@ class Reaction(object):
         return num_list
 
     # Reinitializes the reaction for reset purpose in main function
-    def reset(self):
+    def reset(self, n_init):
+        '''
+        Method to reset the environment back to its initial state.
+        Populates two class instance attributes with initial data.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # define a class instance attribute for the available chemicals
         self.cur_in_hand = 1.0 * self.initial_in_hand
-        self.n = np.zeros(self.nmax.shape[0], dtype=np.float32)
-        # C[0] is A, C[1] is B, C[2] is C
+
+        # define a class instance attribute for the amount of each chemical
+        self.n = n_init
 
     # update the concentration of each chemical for a time step under tempurature T
     def update(self, T, V, dt):
@@ -172,9 +190,9 @@ class Reaction(object):
 
     # plot the hard-coded graph for visualization
     def plot_graph(self):
-        A = 1.0  # Initial A
-        B = 0.5  # Initial B
-        C = 0.0  # Initial C
+        A = 20  # Initial A
+        B = 100  # Initial B
+        C = 20  # Initial C
         dt = 0.01  # Time step (s)
         k1 = A1 * np.exp((-1 * E1) / (R * 300))  # Rate of reaction 1 a function to T and P
         n_steps = 500  # Number of steps to evolve system
