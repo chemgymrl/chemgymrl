@@ -4,6 +4,7 @@ import sys
 
 sys.path.append("../../")
 from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
+from chemistrylab.reactions.get_reactions import convert_to_class
 
 # Reactions
 # 1) A + B -> |C|
@@ -20,14 +21,54 @@ E1 = 8.0
 A2 = 2.0
 E2 = 10.0
 
+REACTANTS = ['CuSO4*5H2O', 'H2O', 'CuSO4']
+PRODUCTS = ['CuSO4*5H2O', 'H2O', 'CuSO4']
+ALL_MATERIALS = ['CuSO4*5H2O', 'H2O', 'CuSO4']
+SOLUTES = ['H2O']
 
 class Reaction(object):
-    def __init__(self, overlap=False):
-        self.initial_in_hand = np.array([1.0, 1.0])  # Amount of each reactant in hand (mols) avaliable
-        self.nmax = np.array([1.0, 1.0, 1.0])  # The maximum of each chemical (mols)
-        self.labels = ['[A]', '[B]', '[C]']
+    def __init__(self, materials=None, solutes=None, desired="", overlap=False):
+        self.name = "demo_reaction"
+
+        # get the initial amounts of each reactant material
+        initial_materials = np.zeros(len(REACTANTS))
+        for material in materials:
+            if material["Material"] in REACTANTS:
+                index = REACTANTS.index(material["Material"])
+                initial_materials[index] = material["Initial"]
+        self.initial_in_hand = initial_materials
+
+        # get the initial amount of each solute
+        initial_solutes = np.zeros(len(SOLUTES))
+        for solute in solutes:
+            if solute["Solute"] in SOLUTES:
+                index = SOLUTES.index(solute["Solute"])
+                initial_solutes[index] = solute["Initial"]
+        self.initial_solutes = initial_solutes
+        self.solute_labels = SOLUTES
+
+        # specify the desired material
+        self.desired_material = desired
+
+        # convert the reactants and products to their class object representations
+        self.reactant_classes = convert_to_class(materials=REACTANTS)
+        self.product_classes = convert_to_class(materials=PRODUCTS)
+        self.material_classes = convert_to_class(materials=ALL_MATERIALS)
+        self.solute_classes = convert_to_class(materials=SOLUTES)
+
+        # define the maximum of each chemical allowed at one time (in mol)
+        self.nmax = np.array(
+            [1.0 for __ in ALL_MATERIALS]
+        )
+
+        # create labels for each of the chemicals involved
+        self.labels = ALL_MATERIALS
+
+        # define a space to record all six reaction rates
+        self.rate = np.zeros(6)
+
+        # define the maximal number of moles available for any chemical
         self.max_mol = 2.0
-        self.rate = np.zeros(2)  # rate of each reaction
         # Parameters to generate up to 3 Gaussian peaks per species
         self.params = []
         if overlap:
@@ -66,8 +107,8 @@ class Reaction(object):
         self.rate[0] = k1 * C[0] * C[1] * dt  # Rate of reaction 1
         self.rate[1] = k2 * C[2]
         dC[0] = -1.0 * self.rate[0] + self.rate[1] # change of A
-        dC[1] = -1.0 * self.rate[0] + self.rate[1] # change of B
-        dC[2] = 1.0 * self.rate[0] - self.rate[1] # change of C
+        dC[1] = 1.0 * self.rate[0] + self.rate[1] # change of B
+        dC[2] = 5.0 * self.rate[0] - self.rate[1] # change of C
         # Update concentration of each chemical
         for i in range(C.shape[0]):
             self.n[i] += dC[i] * V * 1000  # need convert V from m^3 to L

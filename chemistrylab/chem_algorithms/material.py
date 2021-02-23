@@ -420,6 +420,44 @@ class F2(Material):
                          index=15
                          )
 
+class CuSO4(Material):
+    def __init__(self):
+        super().__init__(name='CuS04',
+                         density=3.6,
+                         polarity=1.5,
+                         temperature=298,
+                         pressure=1,
+                         phase='s',
+                         molar_mass=159.6,
+                         color=0.9,
+                         charge=0.0,
+                         boiling_point=923,
+                         melting_point=383,
+                         specific_heat=0.853,
+                         enthalpy_fusion=27950.0,
+                         enthalpy_vapor=229700.0,
+                         index=8
+                         )
+
+class CuSO4Pentahydrate(Material):
+    def __init__(self):
+        super().__init__(name='CuS04*5H2O',
+                         density=2.286,
+                         polarity=1.5,
+                         temperature=298,
+                         pressure=1,
+                         phase='s',
+                         molar_mass=249.68,
+                         color=0.9,
+                         charge=0.0,
+                         boiling_point=923,
+                         melting_point=383,
+                         specific_heat=0.853,
+                         enthalpy_fusion=27950.0,
+                         enthalpy_vapor=229700.0,
+                         index=8
+                         )
+
 ## ---------- ## HYDROCARBONS ## ---------- ##
 
 class Dodecane(Material):

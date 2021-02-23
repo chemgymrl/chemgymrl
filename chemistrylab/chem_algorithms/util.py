@@ -206,6 +206,13 @@ def convert_unit_to_mol(mat, measurement, unit):
         raise ValueError('the specified unit is either not convertible or not in any of our conversion tables')
 
 
+def convert_unit_to_percent(mat, measurement, unit, total):
+    if unit != '%':
+        return measurement/total
+    else:
+        return measurement
+
+
 def convert_material_dict_units(material_dict):
     new_material_dict = {}
     for key, item in material_dict.items():

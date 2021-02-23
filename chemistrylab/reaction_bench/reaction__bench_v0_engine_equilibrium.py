@@ -35,6 +35,7 @@ sys.path.append("../reactions/") # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.reactions.equilibrium_reaction import Reaction
+from chemistrylab.chem_algorithms.material import *
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
@@ -191,6 +192,13 @@ class ReactionBenchEnv_Equilibrium(gym.Env):
                 Tmin=self.Tmin,
                 default_dt=self.dt
             )
+            material_dict = {'CuSO4': [CuSO4, 20, 'mol'], 'CuS04*5H2O': [CuSO4Pentahydrate, 20, 'mol'], 'H2O': [H2O, 100, 'mol']}
+            solute_dict = {'CuSO4': {'H20': [1.0]}, 'CuSO4*5H2O': {'H20': [1.0]}}
+            event_1 = ['update material dict', material_dict]
+            event_2 = ['update solute dict', solute_dict]
+            event_3 = ['fully mix']
+
+            self.vessels.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], dt=0)
 
             '''
             for i in range(self.reaction.initial_in_hand.shape[0]):

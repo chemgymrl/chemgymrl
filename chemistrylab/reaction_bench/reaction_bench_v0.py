@@ -94,14 +94,14 @@ class ReactionBenchEnv_2(ReactionBenchEnv_Equilibrium):
     def __init__(self):
         super(ReactionBenchEnv_2, self).__init__(
             materials=[
-                {"Material": "A", "Initial": 1},
-                {"Material": "B", "Initial": 1},
-                {"Material": "C", "Initial": 1}
+                {"Material": "CuSO4", "Initial": 20},
+                {"Material": "CuS04*5H2O", "Initial": 20},
+                {"Material": "H2O", "Initial": 100}
             ],
             solutes=[
-                {"Solute": "H2O", "Initial": 1}
+                {"Solute": "H2O", "Initial": 100}
             ],
-            desired="C",
+            desired="CuSO4",
             overlap=False
         )
 
