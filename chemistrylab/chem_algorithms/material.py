@@ -1,8 +1,42 @@
+'''
+Materials File
+
+:title: material.py
+
+:author:
+
+:history: 2021-02-18
+
+This file is intended to define the Material class, where materials and their properties can be
+defined, and numerous, already defined materials available for use. For consistency, the material
+properties must be consistent. The properties and their intended units are included below.
+
+Property : Intended Units -- Object Type -- Brief Description
+    - `name` : N/A -- `str` -- The name of the material, used for identification purposes.
+    - `density` : g/cm**3 -- `float` -- The density of the material at STP.
+    - `polarity` : N/A -- `float` -- The polarity of the material.
+    - `temperature` : K -- `float` -- The initial temperature of the material upon being called.
+    - `pressure` : kPa -- `float` -- The initial pressure of the material upon being called.
+    - `phase` : N/A -- `str` -- The state of the material at the initial temperature.
+    - `charge` : C -- `float` -- The electric charge associated with the material.
+    - `molar_mass` : g/mol -- `float` -- The most common molar mass of the material.
+    - `color` : N/A -- `float` -- A number representing the color of the material using a 0 -> 1 scale.
+    - `solute` : N/A -- `bool` -- A boolean indicating if the material is to be used as a solute.
+    - `solvent` : N/A -- `bool` -- A boolean indicating if the material is to be used as a solvent.
+    - `boiling_point` : K -- `float` -- The boiling point of the material.
+    - `melting_point` : K -- `float` -- The melting point of the material.
+    - `specific_heat` : J/g*K -- `float` -- The specific heat capacity of the material.
+    - `enthalpy_fusion` : J/mol -- `float` -- The material's enthalpy of fusion.
+    - `enthalpy_vapor` : J/mol -- `float` -- The material's enthalpy of vapor.
+    - `index` : N/A -- `int` -- An additional index used for identification purposes.
+
+Moreover, the `get_materials` function gives a list of the already available materials.
+'''
+
 import inspect
 import numpy as np
 import math
 import sys
-
 
 class Material:
     def __init__(self,
@@ -163,6 +197,8 @@ class Material:
 
     def get_index(self):
         return self._index
+
+## ---------- ## PRE-DEFINED MATERIALS ## ---------- ##
 
 class Air(Material):
     def __init__(self):
@@ -633,10 +669,31 @@ class Ethoxyethane(Material):
 
 def get_materials():
     '''
+    Function to get a tuple containing a list of the names of all the available materials as well
+    as their class object instances.
+
+    Parameters
+    ---------------
+    `boil_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `target_material` : `str` (default=`None`)
+        The name of the required output material designated as reward.
+    `n_steps` : `int` (default=`100`)
+        The number of steps in an episode.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
+    # construct empty lists to contain the names and class instances of the materials.
     names_list = []
     objects_list = []
+
     for name, obj in inspect.getmembers(sys.modules[__name__]):
         if all([
             inspect.isclass(obj),
@@ -647,23 +704,5 @@ def get_materials():
     
     return (names_list, objects_list)
 
+# get the number of materials available in this file
 total_num_material = len(Material.__subclasses__())
-
-#
-#
-# class T1(Material):
-#     def __init__(self):
-#         super().__init__(name='temp1',
-#                          density=0.655,
-#                          polarity=0.9,
-#                          temperature=298,
-#                          )
-#
-#
-# class T2(Material):
-#     def __init__(self):
-#         super().__init__(name='temp2',
-#                          density=0.655,
-#                          polarity=0.1,
-#                          temperature=298,
-#                          )
