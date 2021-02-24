@@ -60,7 +60,7 @@ else:
     self.params.append(spec.S_1) # spectra for the Na
     self.params.append(spec.S_3) # spectra for the Cl
 ```
-
+A note on the spectra that the numbers have no significance, so feel free to pick any spectra you wish. 
 Now that we have our spectra corrected we now have to change the update function of our file. For these reactions we use
 an ODE solver to calculate the change in concentration over time. As such we have to change some parameters on how we
 update the rates of reaction.
@@ -80,11 +80,70 @@ self.rate[0] = k1 * C[0] * dt
 
 # calculate and store the changes in concentration of each chemical
 dC[0] = (-1.0 * self.rate[0])
+dC[1] = (1.0 * self.rate[0])
+dc[2] = (1.0 * self.rate[0])
 ```
 
 In this case we don't need to update these parameters but depending on the number of simultaneous reactions
 and the rates and how they relate to the concentration of a substance there will need to be additional parameters added,
-this can be seen in `wurtz_reaction.py`
+this can be seen in `wurtz_reaction.py`:
+
+```python
+# set the pre-exponential constant using the above scaling factor for proper dimensionality
+        A0 = 1.0 / scaling_factor # Reaction 0
+        A1 = 1.0 / scaling_factor # Reaction 1
+        A2 = 1.0 / scaling_factor # Reaction 2
+        A3 = 1.0 / scaling_factor # Reaction 3
+        A4 = 1.0 / scaling_factor # Reaction 4
+        A5 = 1.0 / scaling_factor # Reaction 5
+
+        # set the activation energies for each reaction constant
+        E0 = 1.0
+        E1 = 1.0
+        E2 = 1.0
+        E3 = 1.0
+        E4 = 1.0
+        E5 = 1.0
+
+        # define the reaction constant for each reaction;
+        k0 = A0 * np.exp((-1 * E0)/(R * T))
+        k1 = A1 * np.exp((-1 * E1)/(R * T))
+        k2 = A2 * np.exp((-1 * E2)/(R * T))
+        k3 = A3 * np.exp((-1 * E3)/(R * T))
+        k4 = A4 * np.exp((-1 * E4)/(R * T))
+        k5 = A5 * np.exp((-1 * E5)/(R * T))
+
+        # define the rate of each reaction;
+        # note the reactants in the concentration array (C) are in
+        # the order of the reactants in the `REACTANTS` variable;
+        # using the stoichiometric ratio in the rate exponentials gives the following rates:
+        self.rate[0] = k0 * (C[0] ** 2) * (C[1] ** 0) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[1] = k1 * (C[0] ** 1) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[2] = k2 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
+        self.rate[3] = k3 * (C[0] ** 0) * (C[1] ** 2) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[4] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
+        self.rate[5] = k5 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 2) * (C[3] ** 1)
+
+        # calculate and store the changes in concentration of each chemical;
+        # recall: change in concentration = molar concentration * rate * dt
+        # ie. for A + 2B --> C and A + C --> D as parallel reactions
+        # change in A = (-1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
+        # change in B = (-2 * rate of reaction 1 * dt)
+        # change in C = (+1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
+        # change in D = (+1 * rate of reaction 2 * dt)
+        # assuming both reactions have the same time-step, which is true for all reactions in this file
+        dC[0] = (-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2]) * dt # change in 1-chlorohexane
+        dC[1] = (-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4]) * dt # change in 2-chlorohexane
+        dC[2] = (-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5]) * dt # change in 3-chlorohexane
+        dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in Na
+        dC[4] = 1.0 * self.rate[0] * dt # change in dodecane
+        dC[5] = 1.0 * self.rate[1] * dt # change in 5-methylundecane
+        dC[6] = 1.0 * self.rate[2] * dt # change in 4-ethyldecane
+        dC[7] = 1.0 * self.rate[3] * dt # change in 5,6-dimethyldecane
+        dC[8] = 1.0 * self.rate[4] * dt # change in 4-ethyl-5-methylnonane
+        dC[9] = 1.0 * self.rate[5] * dt # change in 4,5-diethyloctane
+        dC[10] = 2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in NaCl
+```
 
 As far as the reaction file, it is now set up and ready to go. Now inorder to use the reaction we need to make a simple
 change to the reaction bench engine located ```chemistrylab/reaction_bench/reaction_bench_v0_engine.py``` in this case

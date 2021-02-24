@@ -14,13 +14,13 @@ the environment and as a result a lot more to set up. As a result we are startin
 but after having implemented this it should be obvious how to extend this to larger more complicated extractions.
 
 
-Typically in a new reaction or extraction it will be important to define the new materials in 
+Typically, in a new reaction or extraction it will be important to define the new materials in 
 `chemistrylab/chem_algorithms/material.py` but for this case we have implemented the 2 new materials
 (methyl red and ethyl acetate). Go into the material file and look at the materials and familiarize yourself with the
 properties of each material. In your own project after creating the new materials it is then time to create the
-extraction environment space and the actions that can be performed in that extraction. For a simple single extraction
+extraction environment space, and the actions that can be performed in that extraction. For a simple single extraction
 we can use a prebuilt environment in this case `chemistrylab/extract_bench/extraction_0.py`. Please take a read through
-the file and try to understand how actions are performed and how we set up vessels. Now we will create a new reaction
+the file and try to understand how actions are performed and how we set up vessels. Now we will create a new extraction
 bench file in the following directory `chemistrylab/extract_bench`, let's create a new file called `methyl_red.py`.
 In this new file we are going to use the following code:
 
@@ -69,7 +69,7 @@ material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
                                                     v_max=extraction_vessel.get_max_volume(),
                                                     )
 
-# Here we push events that update the material dictionary, solute dictionary and then mix oall of the materials together
+# Here we push events that update the material dictionary, solute dictionary and then mix all of the materials together
 event_1 = ['update material dict', material_dict]
 event_2 = ['update solute dict', solute_dict]
 event_3 = ['fully mix']
@@ -113,7 +113,7 @@ all_envs = envs.registry.all()
 env_ids = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
 print(env_ids)
 ```
-you should see in the output `MethylRed_Extract-v1`
+You should see in the output `MethylRed_Extract-v1`
 ```
 # ['WurtzExtract-v1', 'Oil_Water_Extract-v1', 'MethylRed_Extract-v1', 'MethylRed_Extract-v2']
 ```
