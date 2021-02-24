@@ -14,10 +14,19 @@ def convert_material_dict_to_volume(material_dict,
     total_volume = 0
     for M in material_dict:
         if not material_dict[M][0]().is_solute():
+            # get the mass (in grams) of the material using its molar mass (in grams/mol)
             mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
-            volume = mass / material_dict[M][0]().get_density() # in L
+
+            # get the volume (in cubic centimeters) of the material using its
+            # mass (in grams) and density (in grams per cubic centimeter)
+            volume = mass / material_dict[M][0]().get_density()
+
+            # convert volume in cm**3 to L
+            volume = 1000 * volume
+
             volume_dict[M] = volume
             total_volume += volume
+
     return volume_dict, total_volume
 
 
@@ -56,7 +65,7 @@ def check_overflow(material_dict,
                    solute_dict,
                    v_max,
                    ):
-    __, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
+    __, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to L
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow

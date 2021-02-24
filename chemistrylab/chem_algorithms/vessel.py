@@ -119,6 +119,7 @@ class Vessel:
         Method to assign events to occur by placing them in a queue.
         '''
 
+        # set the default reward to 0
         reward = 0
 
         # ensure the time-step is specified
@@ -247,7 +248,8 @@ class Vessel:
         heat_available = parameter[0]
         out_beaker = parameter[1]
 
-        print("Implement Heat Change of {} joules".format(heat_available))
+        # add logging message for heat change
+        # print("Implement Heat Change of {} joules".format(heat_available))
 
         while heat_available > 0:
             # get the necessary vessel properties
@@ -258,19 +260,21 @@ class Vessel:
             material_sp_heats = [material_obj()._specific_heat for material_obj in material_objs]
 
             # ensure all material boiling points are above the current vessel temperature
-            try:
+            if len(material_bps) == 0:
+                raise ValueError("No material remaining in the boil vessel.")
+            # ensure all material boiling points are above the current vessel temperature
+            else:
                 if min(material_bps) < self.temperature:
                     raise IOError(
                         "An error has caused the temperature of the vessel "
                         "to exceed the boiling point of at least one material."
                     )
-            except ValueError:
-                raise ValueError("No material remaining in the boil vessel.")
 
             # determine the material with the smallest boiling point and its value
             smallest_bp = min(material_bps)
 
-            # get characteristics pertaining to the material with the smallest boiling point
+            # get characteristics pertaining to the material with the smallest boiling point;
+            # this is the material to watch out for during the current iteration
             smallest_bp_index = material_bps.index(smallest_bp)
             smallest_bp_name = material_names[smallest_bp_index]
             smallest_bp_amount = material_amounts[smallest_bp_index]
@@ -281,7 +285,7 @@ class Vessel:
             # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
             temp_change_needed = smallest_bp - self.temperature
 
-            # calculate the total entropy of all the materials in J/K
+            # calculate the total entropy of all the materials (in J/K)
             total_entropy = 0
             for i, material_amount in enumerate(material_amounts):
                 specific_heat = material_sp_heats[i] # in J/g*K
@@ -295,9 +299,13 @@ class Vessel:
             # calculate the energy needed to get to the smallest boiling point
             heat_to_add = temp_change_needed * total_entropy
 
-            # if enough heat is available, modify the vessel temp and boil off the material
+            # if enough heat is available, change the vessel's temperature
+            # immediately to the lowest boiling point of the materials and
+            # use the remaining heat energy to boil off the material
             if heat_to_add < heat_available:
-                print("Raising Boil Vessel Temperature by {} Kelvin".format(temp_change_needed))
+                # add logging message
+                # print("Raising Boil Vessel Temperature by {} Kelvin".format(temp_change_needed))
+
                 # change the vessel temperature to the smallest boiling point
                 self.temperature = smallest_bp
 
@@ -307,13 +315,16 @@ class Vessel:
                 # calculate the amount of heat needed to boil off all of the material
                 heat_to_boil_all = smallest_bp_amount * smallest_bp_enth_vap
 
-                # ensure the beaker has an entry for the material to be boiled off
+                # ensure the beaker to contain the boiled off
+                # material has an entry for said material
                 if smallest_bp_name not in out_beaker._material_dict.keys():
                     out_beaker._material_dict[smallest_bp_name] = [smallest_bp_obj, 0.0]
 
-                # if enough heat is available, boil off all of the material
+                # if enough heat is available, boil off all of the material by deleting it from the
+                # boil vessel's material dictionary and adding all the material to the beaker
                 if heat_to_boil_all < heat_available:
-                    print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
+                    # add a logging message
+                    # print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
 
                     # remove the material from the boil vessel's material dictionary
                     del self._material_dict[smallest_bp_name]
@@ -321,7 +332,7 @@ class Vessel:
                     # add all the material to the beaker's material dictionary
                     out_beaker._material_dict[smallest_bp_name][1] = smallest_bp_amount
 
-                    # modify the heat_change available
+                    # modify the heat_change available to continue the while loop
                     heat_available -= heat_to_boil_all
 
                 # if not enough heat is available to boil off all the material,
@@ -330,7 +341,8 @@ class Vessel:
                     # calculate the material that is boiled off by using all of the remaining heat
                     boiled_material = heat_available / smallest_bp_enth_vap
 
-                    print("Boiling Off {} mol of {}".format(boiled_material, smallest_bp_name))
+                    # add a logging message
+                    # print("Boiling Off {} mol of {}".format(boiled_material, smallest_bp_name))
 
                     # subtract the boiled material from the boil vessel's material dictionary
                     self._material_dict[smallest_bp_name][1] -= boiled_material
@@ -341,12 +353,14 @@ class Vessel:
                     # reduce the available heat energy to 0
                     heat_available = 0
 
-            # raise the vessel temperature by using all of the available heat energy
+            # if the amount of heat energy is not sufficient to reach the lowest available boiling
+            # point, raise the vessel temperature by using all of the available heat energy
             else:
                 # calculate the change in vessel temperature if all heat is used
                 vessel_temp_change = heat_available / total_entropy
 
-                print("Raising Boil Vessel Temperature by {}".format(vessel_temp_change))
+                # add logging message
+                # print("Raising Boil Vessel Temperature by {}".format(vessel_temp_change))
 
                 # modify the boil vessel's temperature accordingly
                 self.temperature += vessel_temp_change
@@ -397,7 +411,8 @@ class Vessel:
         target_solute_dict = target_vessel.get_solute_dict()
         __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
 
-        reward = -1
+        # set the default reward to 0
+        reward = 0
 
         # if this vessel is empty or the d_volume is equal to zero, do nothing
         if any([
@@ -562,7 +577,8 @@ class Vessel:
             )
         )
 
-        reward = -1
+        # set the default reward to 0
+        reward = 0
 
         # if this vessel is empty or the d_volume is equal to zero, do nothing
         if any([
@@ -840,7 +856,8 @@ class Vessel:
         Method to mix a vessel.
         '''
 
-        reward = -1
+        # set the default reward to 0
+        reward = 0
 
         # get mixing parameter from parameter if mixing, or get dt as mixing parameter for settling
         mixing_parameter = parameter[0] if parameter[0] else dt

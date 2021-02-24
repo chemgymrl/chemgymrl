@@ -350,7 +350,7 @@ class DistillationBenchEnv(gym.Env):
         vessels = self.vessels
         done = self.done
 
-        # perform the action and update the vessels, reward, and done variables
+        # perform the action and update the vessels, interim reward, and done variables
         vessels, reward, done = self.distillation.perform_action(
             vessels=vessels,
             action=action
