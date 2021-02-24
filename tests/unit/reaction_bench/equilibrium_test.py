@@ -61,10 +61,10 @@ class DecompositionTestCase(unittest.TestCase):
     def test_add_nacl(self):
         env = gym.make(ENV_NAME)
         state_before = env.reset()
-        action = np.ones(env.action_space.shape)
-        action[0] = 1 / 2
-        action[1] = 1 / 2
-        env.step(action)
+        # action = np.ones(env.action_space.shape)
+        # action[0] = 1 / 2
+        # action[1] = 1 / 2
+        # env.step(action)
         self.assertIn('CuSO4', env.vessels.get_material_dict())
         self.assertIn('CuSO4*5H2O', env.vessels.get_material_dict())
         self.assertIn('H2O', env.vessels.get_material_dict())
