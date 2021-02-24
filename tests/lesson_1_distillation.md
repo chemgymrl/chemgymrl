@@ -12,9 +12,11 @@ Before we start talking about loading and running the environment, let's first f
 
 In the distillation environment there are 3 main containers or vessels.
 
-- boiling vessel (BV)
-- beaker 1       (B1)
-- beaker 2       (B2)
+| vessel                       | label |
+|------------------------------|-------|
+| boiling vessel               | BV    |
+| beaker 1/condensation vessel | B1    |
+| beaker 2/storage vessel      | B2    |
 
 The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials  that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.
 
@@ -115,20 +117,19 @@ Action: 0
 
 Action Multiplier: 10
 
+Here is a complete explanation of each action. Again, action[0] indicates the the event which is to take place. Action[1] is a number representing the multiplier for the event.
+
+| action[0] |                                                                          |
+|-----------|--------------------------------------------------------------------------|
+| 0         | Add/Remove Heat (Heat Value multiplier, relative of maximal heat change) |
+| 1         | Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)       |
+| 2         | Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)       |
+| 3         | Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)       |
+| 4         | Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)       |
+| 5         | Done (Value doesn't matter)                                              |
+
 
 ```python
-# shows # of actions available
-# for distillation bench there are two elements
-# action[0] is a number indicating the event to take place
-# action[1] is a number representing a multiplier for the event
-# Actions and multipliers include:
-#   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
-#   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
-#   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   3: Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)
-#   4: Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)
-#   5: Done (Value doesn't matter)
-
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
 assert env.action_space.shape[0] == 2
 
@@ -191,8 +192,9 @@ while not done:
 
 #### Step 0: Adding temperature to the vessel
 
-- action: 0
-- multiplier: 8
+| action | multiplier |
+|--------|------------|
+| 0      | 8          |
 
 This will result in a temperature reaching the boiling point of water, which you will notice is now boiled off in beaker_0 (or the condensation vessel)
 
@@ -200,8 +202,9 @@ This will result in a temperature reaching the boiling point of water, which you
 
 #### Step 1: Pour from condensation to storage vessel
 
-- action: 2
-- multiplier: 10
+| action | multiplier |
+|--------|------------|
+| 2      | 10          |
 
 We can then see that storage vessel is now filled with the H2O poured from the condensation vessel. 
 
@@ -211,15 +214,17 @@ We can then see that storage vessel is now filled with the H2O poured from the c
 
 #### Step 2: Add some more temperature
 
-- action: 0
-- multiplier: 6
+| action | multiplier |
+|--------|------------|
+| 0      | 6          |
 
 ![add-temp](../sample_figures/lesson_1d_image9.PNG)
 
 #### Step 3: Pouring back from condensation vessel to boiling vessel
 
-- action: 3
-- multiplier: 10
+| action | multiplier |
+|--------|------------|
+| 3      | 10         |
 
 You should see now that everything from the condensation vessel is back in the boiling vessel.
 
@@ -227,8 +232,9 @@ You should see now that everything from the condensation vessel is back in the b
 
 #### Step 4: Pour everything from boiling vessel into condensation vessel
 
-- action: 1
-- multiplier: 10
+| action | multiplier |
+|--------|------------|
+| 1      | 10         |
 
 Notice now that all the materials are in the condensation vessel.
 
@@ -236,8 +242,9 @@ Notice now that all the materials are in the condensation vessel.
 
 #### Step 5: Pour the originally boiled off H2O in the storage vessel into the boiling vessel
 
-- action: 4
-- multiplier: 10
+| action | multiplier |
+|--------|------------|
+| 4      | 10         |
 
 Now you can see that the H2O which was previously in the storage vessel, is now in the boiling vessel.
 
@@ -245,8 +252,9 @@ Now you can see that the H2O which was previously in the storage vessel, is now 
 
 #### Step 6: Ending the experiment
 
-- action: 5
-- multiplier: 0
+| action | multiplier |
+|--------|------------|
+| 5      | 0          |
 
 ### End of the lesson
 

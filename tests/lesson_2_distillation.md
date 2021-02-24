@@ -68,28 +68,20 @@ done = False
 __ = env.reset()
 print('\n')
 ```
-
-    
-    
-    
-
+| action[0] |                                                                          |
+|-----------|--------------------------------------------------------------------------|
+| 0         | Add/Remove Heat (Heat Value multiplier, relative of maximal heat change) |
+| 1         | Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)       |
+| 2         | Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)       |
+| 3         | Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)       |
+| 4         | Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)       |
+| 5         | Done (Value doesn't matter)                                              |
 
 ```python
-# shows # of actions available
-# for distillation bench there are two elements
-# action[0] is a number indicating the event to take place
-# action[1] is a number representing a multiplier for the event
-# Actions and multipliers include:
-#   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
-#   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
-#   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   3: Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)
-#   4: Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)
-#   5: Done (Value doesn't matter)
+
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
 assert env.action_space.shape[0] == 2
 ```
-
 
 ```python
 total_steps=0
@@ -98,6 +90,11 @@ total_reward=0
 
 Here we see that there are 3 main actions, where 2 are commented out. Based on which part of the lesson you're on, please uncomment the needed action.
 
+| Action                                                           | Array | Significance                                                                                                                                 |
+|------------------------------------------------------------------|-------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| Increasing the temperature all the way up with a multiplier of 6 | [0,6] | This will allow us to increase the temperature to the maximum amount without resulting in all the materials  being boiled off in the vessel. |
+| Increasing the temperature all the way uo with a multiplier of 7 | [0,7] | This will increase the temperature to the maximum amount however all the materials will boil off resulting in an error.                      |
+| Decrease the temperature down                                    | [0,3] | Shows that there is a minimum temperature for the boiling vessel and that it will not go below this temperature.                             |
 
 ```python
 while not done:
@@ -145,6 +142,12 @@ while not done:
 
 ### Let's try increasing the temperature of the boiling vessel (ACTION 1)
 
+```python
+# ACTION 1
+# increase temperature all the way up
+action = np.array([0,6])
+```
+
 When we run this code we should see that for every timestep that there is a heat change of 19999.99 joules and that the 
 temperature eventually reaches 1738.0 Kelvin. We end up with a final graph that looks like this:
 
@@ -156,6 +159,12 @@ As you can see all the material is boiled off from the boiling vessel into the c
 
 ### Increasing the temperature with a higher multiplier (ACTION 2)
 
+```python
+# ACTION 2
+# results in temperature being too high and all material is boiled off in the vessel
+action = np.array([0,7])
+```
+
 For this we will uncomment action 2. Now running this code gives us an interesting result. Run it yourself to see that we will get:
 
 ![error](../sample_figures/lesson_2d_image3.PNG)
@@ -165,6 +174,12 @@ We get this error as since we increased the temperature by a higher multiplier w
 ** Still need to fix this error **
 
 ### Lower the temperature (ACTION 3)
+
+```python
+# ACTION 3
+# decrease temperature all the way down
+action = np.array([0,3])
+```
 
 We will now lower the temperature the absolute minimum it can be and see what happens. 
 

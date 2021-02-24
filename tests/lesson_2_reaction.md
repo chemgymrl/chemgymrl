@@ -14,7 +14,10 @@ From lesson 1 we know that our action space is a 6 element vector represented by
 
 |              | Temperature | Volume | 1-chlorohexane | 2 chlorohexane | 3-chlorohexane | Na  | 
 |--------------|-------------|--------|----------------|----------------|----------------|-----|
-| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1|
+| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1  |
+
+Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease.
+If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase.
 
 First let's start by importing all the modules we need.
 
@@ -101,7 +104,15 @@ continue. This means that we will only add 3-chlorohexane and Na with our action
 reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
 do this by running the following commands:
 
-![code](../sample_figures/lesson_2r_image0.PNG)
+```python
+if total_steps  < 20:
+action[0] = 1
+action[1] = 1
+action[2] = 0.05 # 1-chlorohexane
+action[3] = 0.05 # 2-chlorohexane
+action[4] = 1    # 3-chlorohexane
+action[5] = 1    # Na
+```
 
 Notice that we're only adding the reactants we need for the reaction to continue.
 
@@ -351,10 +362,18 @@ plt.show()
     
 
 
-For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again.
+For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again. Note that this is still the same simulation of the reaction stated at the start.
+We are just changing the reactants that we're adding.
 
-![code](../sample_figures/lesson_2r_image4.PNG)
-
+```python
+# Adding Reactants not needed:
+action[0] = 1
+action[1] = 1
+action[5] = 1
+action[4] = 1
+action[2] = 1
+action[3] = 1
+```
 If we run this code we'll notice that our reward is significantly lower. It is now only 0.63 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
 
 The next step for this reaction environment is to write an RL implementation that will allow the agent to solve this problem for you essentially maximizing our output of the desired material! 
