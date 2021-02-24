@@ -22,7 +22,7 @@ def convert_material_dict_to_volume(material_dict,
             volume = mass / material_dict[M][0]().get_density()
 
             # convert volume in cm**3 to L
-            volume = 1000 * volume
+            volume = volume / 1000
 
             volume_dict[M] = volume
             total_volume += volume
@@ -69,7 +69,7 @@ def check_overflow(material_dict,
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow
-        reward = -10  # punishment
+        reward = -1  # punishment
         d_percentage = v_max / total_volume  # calculate the percentage of material left
         for M in material_dict:
             material_dict[M][1] *= d_percentage
