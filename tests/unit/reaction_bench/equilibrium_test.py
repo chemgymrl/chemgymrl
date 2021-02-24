@@ -6,7 +6,7 @@ import gym
 import chemistrylab
 import numpy as np
 
-ENV_NAME = 'WurtzReact-v0'
+ENV_NAME = 'EquilReactLesson-v0'
 
 class DecompositionTestCase(unittest.TestCase):
     def test_init(self):
@@ -65,16 +65,10 @@ class DecompositionTestCase(unittest.TestCase):
         action[0] = 1 / 2
         action[1] = 1 / 2
         env.step(action)
-        self.assertIn('Na', env.vessel.get_material_dict())
-        self.assertIn('1-chlorohexane', env.vessel.get_material_dict())
-        self.assertIn('2-chlorohexane', env.vessel.get_material_dict())
-        self.assertIn('3-chlorohexane', env.vessel.get_material_dict())
+        self.assertIn('CuSO4', env.vessels.get_material_dict())
+        self.assertIn('CuSO4*5H2O', env.vessels.get_material_dict())
+        self.assertIn('H2O', env.vessels.get_material_dict())
 
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
-
-

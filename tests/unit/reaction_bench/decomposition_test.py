@@ -6,15 +6,16 @@ import gym
 import chemistrylab
 import numpy as np
 
+ENV_NAME = 'DecompReactLesson-v0'
 
 class DecompositionTestCase(unittest.TestCase):
     def test_init(self):
-        env = gym.make('DecompReactLesson-v0')
+        env = gym.make(ENV_NAME)
         state = env.reset()
         self.assertEqual(True, bool(state.shape))
 
     def test_temperature_increase(self):
-        env = gym.make('DecompReactLesson-v0')
+        env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
         action[0] = 1
@@ -25,7 +26,7 @@ class DecompositionTestCase(unittest.TestCase):
         self.assertEqual(desired_temp, actual_temp)
 
     def test_volume_increase(self):
-        env = gym.make('DecompReactLesson-v0')
+        env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
         action[0] = 1/2
@@ -36,7 +37,7 @@ class DecompositionTestCase(unittest.TestCase):
         self.assertAlmostEqual(desired_volume, actual_volume, places=6)
 
     def test_temperature_decrease(self):
-        env = gym.make('DecompReactLesson-v0')
+        env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
         action[0] = 0
@@ -47,7 +48,7 @@ class DecompositionTestCase(unittest.TestCase):
         self.assertEqual(desired_temp, actual_temp)
 
     def test_volume_decrease(self):
-        env = gym.make('DecompReactLesson-v0')
+        env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
         action[0] = 1 / 2
@@ -58,7 +59,7 @@ class DecompositionTestCase(unittest.TestCase):
         self.assertAlmostEqual(desired_volume, actual_volume, places=6)
 
     def test_add_nacl(self):
-        env = gym.make('DecompReactLesson-v0')
+        env = gym.make(ENV_NAME)
         state_before = env.reset()
         action = np.ones(env.action_space.shape)
         action[0] = 1 / 2
