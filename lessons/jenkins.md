@@ -1,8 +1,9 @@
 ## Jenkins: Pipelinefile
 
 Below here is the file that you must add to your branch, however there are a few changes that must be made for your
-branch. Create a file named `Jenkinsfile` and copy the text below into the file. Please then make the appropriate
-changes highlighted by the comments.
+branch. Create a file named `Jenkinsfile` at the root of the repository so in our case `chemistrygym/Jenkinsfile` and copy the text below into the file. Please then make the appropriate
+changes highlighted by the comments. This file tells jenkins what to buildand as such you must include the file inorder 
+for our tests to run.
 ```
 pipeline {
 
