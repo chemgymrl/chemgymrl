@@ -173,14 +173,6 @@ while not done:
     total_steps:  0
     reward: 0.28 
     total reward: 0.28
-    
-
-
-    
-![png](lesson_2_reaction_files/lesson_2_reaction_10_1.png)
-    
-
-
     -----------------------------------------
     total_steps:  1
     reward: 0.28 
@@ -355,12 +347,6 @@ fig.tight_layout()
 plt.savefig('Final Subplots Demo Lesson 3.png')
 plt.show()
 ```
-
-
-    
-![png](lesson_2_reaction_files/lesson_2_reaction_15_0.png)
-    
-
 
 For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again. Note that this is still the same simulation of the reaction stated at the start.
 We are just changing the reactants that we're adding.
