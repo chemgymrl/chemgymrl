@@ -170,7 +170,7 @@ class DistillationBenchEnv(gym.Env):
             target_material = ""
 
         # ensure that the maximal heat increment parameter is a float or an int value
-        if any([
+        if all([
                 not isinstance(dQ, float),
                 not isinstance(dQ, int)
         ]):
