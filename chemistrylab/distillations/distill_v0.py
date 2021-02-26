@@ -98,8 +98,7 @@ class Distillation:
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
             max_vessel_volume=1.0, # maximal volume of empty vessels
-            n_actions=6, # number of available actions
-            n_increments=1
+            n_actions=6 # number of available actions
     ):
         '''
         Constructor class for the Distillation class
@@ -122,9 +121,6 @@ class Distillation:
         # thermodynamic variables
         self.dt = dt
         self.dQ = dQ
-
-        # set the number of steps over which the heat is added
-        self.n_increments = n_increments
 
     def get_action_space(self):
         '''
@@ -240,22 +236,14 @@ class Distillation:
                 multiplier = 2 * (multiplier/10 - 0.5)
                 heat_change = multiplier * self.dQ
 
-                # perform the action incrementally
-                heat_increment = heat_change / self.n_increments
+                # add the event to perform the heat change
+                event = ['change_heat', heat_change, beaker_1]
 
-                # set up the aggregate reward
-                reward = 0
+                # push the event to the extraction vessel
+                reward = boil_vessel.push_event_to_queue(events=[event], dt=self.dt)
 
-                for __ in range(self.n_increments):
-
-                    # add the event to perform the heat change
-                    event = ['change_heat', heat_increment, beaker_1]
-
-                    # push the event to the extraction vessel
-                    reward += boil_vessel.push_event_to_queue(events=[event], dt=self.dt)
-
-                    # push no events to beaker 2
-                    __ = beaker_2.push_event_to_queue(dt=self.dt)
+                # push no events to beaker 2
+                __ = beaker_2.push_event_to_queue(dt=self.dt)
 
             # pour the Boil Vessel into Beaker 1
             if do_action == 1:

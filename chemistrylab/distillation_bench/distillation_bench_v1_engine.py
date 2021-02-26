@@ -53,6 +53,7 @@ class DistillationBenchEnv(gym.Env):
             n_steps=100,
             boil_vessel=None,
             target_material=None,
+            dQ=0.0,
             out_vessel_path=None
     ):
         '''
@@ -64,6 +65,7 @@ class DistillationBenchEnv(gym.Env):
             n_steps=n_steps,
             boil_vessel=boil_vessel,
             target_material=target_material,
+            dQ=dQ,
             out_vessel_path=out_vessel_path
         )
 
@@ -71,14 +73,14 @@ class DistillationBenchEnv(gym.Env):
         self.n_steps = input_parameters["n_steps"]
         self.boil_vessel = input_parameters["boil_vessel"]
         self.target_material = input_parameters["target_material"]
+        self.dQ = input_parameters["dQ"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
 
         # call the distillation class
         self.distillation = distill_v0.Distillation(
             boil_vessel=self.boil_vessel,
             target_material=self.target_material,
-            dQ=1e+5,
-            n_increments=50
+            dQ=self.dQ
         )
 
         # set up vessel and state variables
@@ -102,7 +104,7 @@ class DistillationBenchEnv(gym.Env):
         self.min_purity_threshold = 0.5
 
     @staticmethod
-    def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, out_vessel_path=None):
+    def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, dQ=0.0, out_vessel_path=None):
         '''
         Checks and validates the input parameters submitted to the distillation bench.
 
@@ -114,6 +116,8 @@ class DistillationBenchEnv(gym.Env):
             The vessel object designated to be saved.
         `target_material` : `str` (default=`None`)
             The material in the boil vessel that is to be isolated.
+        `dQ` : `float` (default=0.0):
+            The maximal amount of heat to add to the boil vessel in one action.
         `out_vessel_path` : `str` (default=`None`)
             The directory path where the vessel object is to be saved.
 
@@ -125,6 +129,8 @@ class DistillationBenchEnv(gym.Env):
             The vessel object designated to be saved.
         `target_material` : `str` (default=`None`)
             The material in the boil vessel that is to be isolated.
+        `dQ` : `float` (default=0.0):
+            The maximal amount of heat to add to the boil vessel in one action.
         `out_vessel_path` : `str` (default=`None`)
             The directory path where the vessel object is to be saved.
 
@@ -163,6 +169,17 @@ class DistillationBenchEnv(gym.Env):
             )
             target_material = ""
 
+        # ensure that the maximal heat increment parameter is a float or an int value
+        if all([
+                not isinstance(dQ, float),
+                not isinstance(dQ, int)
+        ]):
+            print("Invalid 'Maximal Heat Increment' type. The default will be provided.")
+            dQ = 0.0
+        else:
+            # ensure the heat increment is a float value
+            dQ = float(dQ)
+
         # ensure that the output vessel path parameter is provided as a string
         if not isinstance(out_vessel_path, str):
             print("Invalid 'Output Vessel Path' type. The default will be provided.")
@@ -181,6 +198,7 @@ class DistillationBenchEnv(gym.Env):
             "n_steps" : n_steps,
             "boil_vessel" : boil_vessel,
             "target_material" : target_material,
+            "dQ" : dQ,
             "out_vessel_path" : out_vessel_path
         }
 
