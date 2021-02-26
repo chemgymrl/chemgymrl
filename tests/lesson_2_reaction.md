@@ -116,7 +116,7 @@ action[5] = 1    # Na
 
 Notice that we're only adding the reactants we need for the reaction to continue.
 
-![reaction](../sample_figures/lesson_2r_image1.PNG)
+![reaction](../sample_figures/lesson_2r_image1.png)
 
 Let's run our program and see what happens!
 
