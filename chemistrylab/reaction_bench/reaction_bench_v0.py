@@ -98,9 +98,6 @@ class ReactionBenchEnv_2(ReactionBenchEnv_Equilibrium):
                 {"Material": "CuS04*5H2O", "Initial": 20},
                 {"Material": "H2O", "Initial": 100}
             ],
-            solutes=[
-                {"Solute": "H2O", "Initial": 100}
-            ],
             desired="CuSO4",
             overlap=False
         )

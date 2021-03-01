@@ -21,9 +21,12 @@ E1 = 8.0
 A2 = 2.0
 E2 = 10.0
 
-REACTANTS = ['CuSO4*5H2O', 'H2O', 'CuSO4']
-PRODUCTS = ['CuSO4*5H2O', 'H2O', 'CuSO4']
-ALL_MATERIALS = ['CuSO4*5H2O', 'H2O', 'CuSO4']
+pka = 9.0
+pkb = 5.0
+
+REACTANTS = ['weak acid', 'weak base', 'conjugate acid', 'conjugate base']
+PRODUCTS = REACTANTS
+ALL_MATERIALS = REACTANTS
 SOLUTES = ['H2O']
 
 class Reaction(object):

@@ -17,7 +17,7 @@ ENV_NAME = 'Oil_Water_Extract-v1'
 4: Add B1 to ExV (Volume multiplier, relative to max_vessel_volume)
 5: Add B1 to B2 (Volume multiplier, relative to max_vessel_volume)
 6: Add ExV to B2 （Volume multiplier, relative to max_vessel_volume)
-7: Add Ethyl Acetate to ExV （Volume multiplier, relative to max_vessel_volume)
+7: Add Oil to ExV （Volume multiplier, relative to max_vessel_volume)
 8: Wait (time multiplier)
 9: Done (Value doesn't matter)
 """
