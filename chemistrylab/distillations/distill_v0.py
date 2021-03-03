@@ -180,7 +180,9 @@ class Distillation:
                 label="beaker_{}".format(i),
                 temperature=293.15, # room temp in Kelvin
                 v_max=self.max_vessel_volume,
-                default_dt=self.dt
+                default_dt=self.dt,
+                materials={},  # moles of materials
+                solutes={}  # moles of solutes
             )
             vessels.append(beaker)
 
