@@ -497,6 +497,9 @@ class DistillationBenchEnv(gym.Env):
 
         # if the plot has already been rendered, simply add the new data to it
         else:
+            # clear the plot to be updated with new data
+            self._plot_axs[0, 0].clear()
+
             # reset the boil vessel plot with new vessel data
             __ = self._plot_axs[0, 0].bar(
                 [name[0:5] for name in boil_vessel._material_dict.keys()],
@@ -505,6 +508,9 @@ class DistillationBenchEnv(gym.Env):
             )
             self._plot_axs[0, 0].set_title("Boil Vessel")
             self._plot_axs[0, 0].set_ylabel("Molar Amount")
+
+            # clear the plot to be updated with new data
+            self._plot_axs[0, 1].clear()
 
             # reset the vessel temperature plot with new data
             __ = self._plot_axs[0, 1].bar(
@@ -517,6 +523,9 @@ class DistillationBenchEnv(gym.Env):
 
             # reset the data in each beaker plot
             for i, beaker_plot in enumerate(self._beaker_plots):
+                # clear the plot to be updated with new data
+                self._plot_axs[1, i].clear()
+
                 material_names = [name[0:5] for name in beakers[i]._material_dict.keys()]
                 material_amounts = [value[1] for value in beakers[i]._material_dict.values()]
 
