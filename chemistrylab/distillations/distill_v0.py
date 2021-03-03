@@ -1,4 +1,3 @@
- mshahen-2
 '''
 Module to perform actions to isolate a desired material generated in a Wurtz reaction.
 
