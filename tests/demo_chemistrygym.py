@@ -28,7 +28,7 @@ sys.path.append("../chemistrylab/reactions") # to access all reactions
 
 # import all local modules
 import chemistrylab
-
+'''
 # -------------------- # REACTION BENCH DEMO # -------------------- #
 __ = input("PRESS ENTER TO START REACTION BENCH.")
 
@@ -72,7 +72,6 @@ while not done:
 
     # perform the action and update the reward
     state, reward, done, __ = r_env.step(action)
-    print(reward)
     total_reward += reward
 
     # render the plot and wait before continuing
@@ -168,7 +167,7 @@ while not done:
     step_num += 1
 
 __ = input("PRESS ENTER TO CONTINUE.")
-
+'''
 # -------------------- # DISTILLATION BENCH DEMO # -------------------- #
 __ = input('PRESS ENTER TO START DISTILLATION BENCH.')
 
@@ -214,7 +213,9 @@ while not done:
             action = action_space.sample()
 
     # perform the random action and update the reward
+    print(action)
     state, reward, done, __ = d_env.step(action)
+    print(reward)
     total_reward += reward
 
     # render each of the vessel plots
