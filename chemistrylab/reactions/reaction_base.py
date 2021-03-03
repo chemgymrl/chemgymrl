@@ -1,7 +1,7 @@
 '''
 Module to model all six Wurtz chlorine hydrocarbon reactions.
 
-:title: wurtz_reaction.py
+:title: base_reaction.py
 
 :author: Mitchell Shahen
 
@@ -25,9 +25,10 @@ from chemistrylab.reactions.rate import Rates
 
 R = 8.314462619
 
-class _Reaction():
 
-    def __init__(self, reactants, products, materials, desired, const_coef, exp_coef, rate_fn: Rates, solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8):
+class _Reaction:
+
+    def __init__(self, initial_materials, initial_solutes, reactants, products, materials, desired, exp_coef, rate_fn: Rates, solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8):
         """
         Constructor class module for the Reaction class.
 
@@ -58,32 +59,35 @@ class _Reaction():
 
         # Change this!!!
         # get the initial amounts of each reactant material, we need to change this!!!!
-        initial_materials = np.zeros(len(reactants))
-        for material in materials:
+        _initial_materials = np.zeros(len(reactants))
+        for material in initial_materials:
             if material["Material"] in reactants:
                 index = reactants.index(material["Material"])
-                initial_materials[index] = material["Initial"]
+                _initial_materials[index] = material["Initial"]
 
-        self.initial_in_hand = initial_materials
-        self.cur_in_hand = initial_materials
+        self.initial_in_hand = _initial_materials
+        self.cur_in_hand = _initial_materials
 
-        self.n = initial_materials
+        # self.n = _initial_materials
+        print("initial_materials")
+        print(initial_materials)
+        print(_initial_materials)
 
         # Change this!!!
         # get the initial amount of each solute
-        initial_solutes = np.zeros(len(solutes))
-        for solute in solutes:
+        _initial_solutes = np.zeros(len(solutes))
+        for solute in initial_solutes:
             if solute["Solute"] in solutes:
                 index = solutes.index(solute["Solute"])
-                initial_solutes[index] = solute["Initial"]
-        self.initial_solutes = initial_solutes
-        self.solute_labels = solutes
+                _initial_solutes[index] = solute["Initial"]
+        self.initial_solutes = _initial_solutes
 
         # specify the desired material
         self.desired_material = desired
         self.reactants = reactants
         self.products = products
         self.materials = materials
+        self.solutes = solutes
 
         # Change this!!!
         # convert the reactants and products to their class object representations
@@ -97,19 +101,40 @@ class _Reaction():
             self.nmax = np.ones(len(self.material_classes))
         else:
             self.nmax = nmax
-
-        # create labels for each of the chemicals involved
-        self.labels = materials
-
         # store the class that calculates the reaction rates
         self.rate_fn = rate_fn
-        self.const_coef = const_coef
         self.exp_coef = exp_coef
         # define the maximal number of moles available for any chemical
         self.max_mol = max_mol
 
         # define parameters for generating spectra
-        self.params = [spec.S_1]*len(materials)
+        # self.params = [spec.S_1]*len(materials)
+
+        self.params = []
+        if overlap:
+            self.params.append(spec.S_1)  # spectra for the 1-chlorohexane
+            self.params.append(spec.S_2)  # spectra for the 2-chlorohexane
+            self.params.append(spec.S_3)  # spectra for the 3-chlorohexane
+            self.params.append(spec.S_4)  # spectra for Na
+            self.params.append(spec.S_2_3)  # spectra for dodecane
+            self.params.append(spec.S_2_3)  # spectra for 5-methylundecane
+            self.params.append(spec.S_2_3)  # spectra for 4-ethyldecane
+            self.params.append(spec.S_2_3)  # spectra for 5,6-dimethyldecane
+            self.params.append(spec.S_2_3)  # spectra for 4-ethyl-5-methylnonane
+            self.params.append(spec.S_2_3)  # spectra for 4,5-diethyloctane
+            self.params.append(spec.S_3_3)  # spectra for NaCl
+        else:
+            self.params.append(spec.S_1)  # spectra for the 1-chlorohexane
+            self.params.append(spec.S_2)  # spectra for the 2-chlorohexane
+            self.params.append(spec.S_3)  # spectra for the 3-chlorohexane
+            self.params.append(spec.S_4)  # spectra for Na
+            self.params.append(spec.S_8)  # spectra for dodecane
+            self.params.append(spec.S_8)  # spectra for 5-methylundecane
+            self.params.append(spec.S_8)  # spectra for 4-ethyldecane
+            self.params.append(spec.S_8)  # spectra for 5,6-dimethyldecane
+            self.params.append(spec.S_8)  # spectra for 4-ethyl-5-methylnonane
+            self.params.append(spec.S_8)  # spectra for 4,5-diethyloctane
+            self.params.append(spec.S_8)  # spectra for NaCl
 
     def get_ni_label(self):
         '''
@@ -178,18 +203,28 @@ class _Reaction():
 
         # define a class instance attribute for the available chemicals
         self.cur_in_hand = 1.0 * self.initial_in_hand
-
+        print('cur_in_hand')
+        print(self.cur_in_hand)
         # define a class instance attribute for the amount of each chemical
         self.n = n_init
 
-    def get_reaction_constants(self, temp):
-        k = self.const_coef * np.exp((-1*self.exp_coef)/(R*temp))
+    def get_reaction_constants(self, temp, conc):
+        agg_conc = 1
+        reactant_conc = [conc[i] for i in range(len(self.reactants))]
+        non_zero_conc = [_conc for _conc in reactant_conc if _conc != 0.0]
+        for conc in non_zero_conc:
+            agg_conc *= conc
+        exponent = 2 / len(non_zero_conc) if len(non_zero_conc) != 0 else 1
+        scaling_factor = (abs(agg_conc)) ** exponent
+
+        const_coef = 1 / scaling_factor
+        k = const_coef * np.exp((-1*self.exp_coef)/(R*temp))
         return k
 
     def get_rates(self, k, conc):
         return self.rate_fn.get_rates(k, conc)
 
-    def get_conc_change(self, rates, dt):
+    def get_conc_change(self, rates, conc, dt):
         # define the mechanics of the reaction concentration change here
         return np.array([])
 
@@ -217,18 +252,17 @@ class _Reaction():
         None
         '''
         conc = self.get_concentration(volume)
-        k = self.get_reaction_constants(temp)
+        k = self.get_reaction_constants(temp, conc)
         rates = self.get_rates(k, conc)
-        conc_change = self.get_conc_change(rates, dt)
+        conc_change = self.get_conc_change(rates, conc, dt)
         for i in range(self.n.shape[0]):
             # convert back to moles
             dn = conc_change[i] * volume
             self.n[i] += dn # update the molar amount array
-
-            # check the list of molar amounts and set negligible amounts to 0
-            for i, amount in enumerate(self.n):
-                if amount < self.threshold:
-                    self.n[i] = 0
+        # check the list of molar amounts and set negligible amounts to 0
+        for i, amount in enumerate(self.n):
+            if amount < self.threshold:
+                self.n[i] = 0
 
 
     def get_total_pressure(self, V, T=300):
@@ -480,7 +514,7 @@ class _Reaction():
         plt.figure()
 
         for i in range(conc.shape[1]):
-            plt.plot(t, conc[:, i], label=self.labels[i])
+            plt.plot(t, conc[:, i], label=self.materials[i])
 
         # set plotting parameters
         plt.xlim([t[0], t[-1]])

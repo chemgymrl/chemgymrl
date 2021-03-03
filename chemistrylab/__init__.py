@@ -45,6 +45,12 @@ register(
 )
 
 register(
+    id='WurtzReact-v1',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_0',
+    max_episode_steps=20
+)
+
+register(
     id='WurtzReact_overlap-v0',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0_Overlap',
     max_episode_steps=20

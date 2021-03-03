@@ -287,7 +287,7 @@ class Reaction():
         k3 = A3 * np.exp((-1 * E3)/(R * T))
         k4 = A4 * np.exp((-1 * E4)/(R * T))
         k5 = A5 * np.exp((-1 * E5)/(R * T))
-
+        print(k0)
         # define the rate of each reaction;
         # note the reactants in the concentration array (C) are in
         # the order of the reactants in the `REACTANTS` variable;
@@ -298,7 +298,6 @@ class Reaction():
         self.rate[3] = k3 * (C[0] ** 0) * (C[1] ** 2) * (C[2] ** 0) * (C[3] ** 1)
         self.rate[4] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
         self.rate[5] = k5 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 2) * (C[3] ** 1)
-
         # calculate and store the changes in concentration of each chemical;
         # recall: change in concentration = molar concentration * rate * dt
         # ie. for A + 2B --> C and A + C --> D as parallel reactions
@@ -330,11 +329,10 @@ class Reaction():
             # convert back to moles
             dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
-
-            # check the list of molar amounts and set negligible amounts to 0
-            for i, amount in enumerate(self.n):
-                if amount < 1e-8:
-                    self.n[i] = 0
+        # check the list of molar amounts and set negligible amounts to 0
+        for i, amount in enumerate(self.n):
+            if amount < 1e-8:
+                self.n[i] = 0
 
 
     def get_total_pressure(self, V, T=300):
