@@ -186,6 +186,15 @@ class DistillationBenchEnv(gym.Env):
 
         return input_parameters
 
+    def update_vessel(self, vessel):
+        self.boil_vessel = vessel
+        self.distillation = distill_v0.Distillation(
+            boil_vessel=self.boil_vessel,
+            target_material=self.target_material,
+            dQ=1e+5,
+            n_increments=50
+        )
+
     def _save_vessel(self, distillation_vessel=None, vessel_rootname=""):
         '''
         Method to save a vessel as a pickle file.
@@ -276,8 +285,8 @@ class DistillationBenchEnv(gym.Env):
             # set up each set of material properties as separate packages (as lists)
             # each list has three elements: [material_name, material_class, material_amount]
             material_packages = []
-            for material_name, [material_class, material_amount] in vessel._material_dict.items():
-                material_package = [material_name, material_class, material_amount]
+            for material_name, material_prop in vessel._material_dict.items():
+                material_package = [material_name, material_prop[0], material_prop[1]]
                 material_packages.append(material_package)
             for material_package in material_packages:
                 base_state[i].append(material_package)

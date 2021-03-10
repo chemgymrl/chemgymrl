@@ -21,6 +21,8 @@ import copy
 import math
 import numpy as np
 import sys
+import os
+import pickle
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import material, util
@@ -1222,3 +1224,89 @@ class Vessel:
 
     def get_current_volume(self):
         return util.convert_material_dict_to_volume(self._material_dict)
+
+    ## ---------- SAVING/LOADING FUNCTIONS ---------- ##
+
+    def save_vessel(self, vessel_rootname: str):
+        '''
+        Method to save a vessel as a pickle file.
+        Parameters
+        ---------------
+        `vessel_rootname` : `str` (default="")
+            The intended file root of the vessel (no extension; not the absolute path).
+        Returns
+        ---------------
+        None
+        Raises
+        ---------------
+        None
+        '''
+
+        # use the vessel path that was given upon initialization or during parameter verification
+        output_directory = os.path.dirname(os.path.realpath('reaction_bench_v0_engine.py'))
+        vessel_filename = "{}.pickle".format(vessel_rootname)
+        open_file = os.path.join(output_directory, vessel_filename)
+
+        # delete any existing vessel files to ensure the vessel is saved as intended
+        if os.path.exists(open_file):
+            os.remove(open_file)
+
+        # open the intended vessel file and save the vessel as a pickle file
+        with open(open_file, 'wb') as vessel_file:
+            pickle.dump(self, vessel_file)
+
+    def load_vessel(self, vessel_path: str):
+
+        with open(vessel_path, 'rb') as handle:
+            v = pickle.load(handle)
+            self._material_dict = v._material_dict  # material.name: [material(), amount]; amount is in mole
+            self._solute_dict = v._solute_dict  # solute.name: [solvent(), amount]; amount is in mole
+
+            # initialize parameters
+            self.label = v.label
+            self.w2v = v.w2v
+            self.temperature = v.temperature
+            self.pressure = v.pressure
+            self.volume = v.volume
+            self.v_max = v.v_max
+            self.v_min = v.v_min
+            self.Tmax = v.Tmax
+            self.Tmin = v.Tmin
+            self.open_vessel = v.open_vessel
+            self.default_dt = v.default_dt
+            self.n_pixels = v.n_pixels
+
+            # switches
+            self.settling_switch = v.settling_switch
+            self.layer_switch = v.layer_switch
+
+            # create Air （not in material dict)
+            self.Air = v.Air
+
+            # for vessel's pixel representation
+            # layer's pixel representation, initially filled with Air's color
+            self._layers = v._layers
+
+            # layers gaussian representation
+            self._layers_position_dict = v._layers_position_dict
+            self._layers_variance = v._layer_variance
+
+            # calculate the maximal pressure based on what material is in the vessel
+            self.pmax = v.pmax
+
+            # event dict holding all the event functions
+            self._event_dict = {
+                'temperature change': self._update_temperature,
+                'pour by volume': self._pour_by_volume,
+                'drain by pixel': self._drain_by_pixel,
+                'fully mix': self._fully_mix,
+                'update material dict': self._update_material_dict,
+                'update solute dict': self._update_solute_dict,
+                'mix': self._mix,
+                'update_layer': self._update_layers,
+                'change_heat': self._change_heat
+            }
+
+            # event queues
+            self._event_queue = v._event_queue  # [['event', parameters], ['event', parameters] ... ]
+            self._feedback_queue = v._feedback_queue  # [same structure as event queue]

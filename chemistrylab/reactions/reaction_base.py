@@ -21,6 +21,7 @@ sys.path.append("../../") # allows module to access chemistrylab
 from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.reactions.rate import Rates
+from chemistrylab.chem_algorithms import util, vessel
 
 
 R = 8.314462619
@@ -28,7 +29,9 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, initial_materials, initial_solutes, reactants, products, materials, desired, exp_coef, rate_fn: Rates, solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8):
+    def __init__(self, initial_materials, initial_solutes, reactants, products, materials, desired, exp_coef,
+                 rate_fn: Rates, solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8, Ti=0.0,
+            Tmin=0.0, Tmax=0.0, dT=0.0, Vi=0.0, Vmin=0.0, Vmax=0.0, dV=0.0, dt=0):
         """
         Constructor class module for the Reaction class.
 
@@ -107,6 +110,18 @@ class _Reaction:
         # define the maximal number of moles available for any chemical
         self.max_mol = max_mol
 
+        #define thermodynamic properties and volumetric properties for the reaction
+        self.Ti = Ti,
+        self.Tmin = Tmin
+        self.Tmax = Tmax
+        self.dT = dT
+        self.Vi = Vi
+        self.Vmin = Vmin
+        self.Vmax = Vmax
+        self.dV = dV
+
+        self.dt = dt
+
         # define parameters for generating spectra
         # self.params = [spec.S_1]*len(materials)
 
@@ -182,6 +197,7 @@ class _Reaction:
             num_list.append(self.cur_in_hand[i])
 
         return num_list
+
 
     def reset(self, n_init):
         '''
@@ -526,3 +542,232 @@ class _Reaction:
             plt.savefig(save_name)
         plt.show()
         plt.close()
+
+    def update_state(self, vessels: vessel.Vessel, t, tmax):
+        '''
+        Method to update the state vector with the current time, temperature, volume,
+        pressure, the amounts of each reactant, and spectral parameters.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        T = vessels.get_temperature()
+        V = vessels.get_volume()
+
+        absorb = self.get_spectra(V)
+
+        # create an array to contain all state variables
+        state = np.zeros(
+            4 + # time T V P
+            self.initial_in_hand.shape[0] + # reactants
+            absorb.shape[0], # spectra
+            dtype=np.float32
+        )
+
+        # populate the state array with updated state variables
+        # state[0] = time
+        state[0] = t / tmax
+
+        # state[1] = temperature
+        Tmin = self.vessels.get_Tmin()
+        Tmax = self.vessels.get_Tmax()
+        state[1] = (T - Tmin) / (Tmax - Tmin)
+
+        # state[2] = volume
+        Vmin = vessels.get_min_volume()
+        Vmax = vessels.get_max_volume()
+        state[2] = (V - Vmin) / (Vmax - Vmin)
+
+        # state[3] = pressure
+        total_pressure = self.get_total_pressure(V, T)
+        Pmax = vessels.get_pmax()
+        state[3] = total_pressure / Pmax
+
+        # remaining state variables pertain to reactant amounts and spectra
+        for i in range(self.initial_in_hand.shape[0]):
+            state[i+4] = self.n[i] / self.nmax[i]
+        for i in range(absorb.shape[0]):
+            state[i + self.initial_in_hand.shape[0] + 4] = absorb[i]
+
+        return state
+
+    def _update_vessel(self, vessels: vessel.Vessel, temperature, volume, pressure):
+        # tabulate all the materials used and their new values
+        new_material_dict = {}
+        for i in range(self.n.shape[0]):
+            material_name = self.materials[i]
+            material_class = self.material_classes[i]
+            amount = self.n[i]
+            new_material_dict[material_name] = [material_class, amount, 'mol']
+
+        # tabulate all the solutes and their values
+        new_solute_dict = {}
+        for i in range(self.initial_solutes.shape[0]):
+            solute_name = self.solutes[i]
+            solute_class = self.solute_classes[i]
+            amount = self.initial_solutes[i]
+
+            # create the new solute dictionary to be appended to a new vessel object
+            new_solute_dict[solute_name] = [solute_class, amount]
+
+        # create a new vessel and update it with new data
+        new_vessel = vessel.Vessel(
+            'react_vessel',
+            temperature=self.Ti,
+            v_max=self.Vmax,
+            v_min=self.Vmin,
+            Tmax=self.Tmax,
+            Tmin=self.Tmin,
+            default_dt=vessels.default_dt
+        )
+        new_vessel.temperature = temperature
+        new_vessel._material_dict = new_material_dict
+        new_vessel._solute_dict = new_solute_dict
+        new_vessel.volume = volume
+        new_vessel.pressure = pressure
+
+        return new_vessel
+
+    def step(self, action, vessels: vessel.Vessel, t, tmax, n_steps):
+        '''
+        Update the environment with processes defined in `action`.
+
+        Parameters
+        ---------------
+        `action` : `np.array`
+            An array containing elements describing the changes to be made, during the current
+            step, to each modifiable thermodynamic variable and reactant used in the reaction.
+
+        Returns
+        ---------------
+        `state` : `np.array`
+            An array containing updated values of all the thermodynamic variables,
+            reactants, and spectra generated by the most recent step.
+        `reward` : `float`
+            The amount of the desired product that has been created in the most recent step.
+        `done` : `boolean`
+            Indicates if, upon completing the most recent step, all the required steps
+            have been completed.
+        `parameters` : `dict`
+            Any additional parameters used/generated in the most recent step that need
+            to be specified.
+
+        Raises
+        ---------------
+        None
+        '''
+
+        T = vessels.get_temperature()
+        V = vessels.get_volume()
+        # the reward for this step is set to 0 initially
+
+        # the first two action variables are changes to temperature and volume, respectively;
+        # these changes need to be scaled according to the maximum allowed change, dT and dV;
+        # action[0] = 1.0 gives a temperature change of dT, while action[0] = 0.0 corresponds to -dT
+        # action[1] = 1.0 gives a temperature change of dV, while action[1] = 0.0 corresponds to -dV
+        temperature_change = 2.0 * (action[0] - 0.5) * self.dT # in Kelvin
+        volume_change = 2.0 * (action[1] - 0.5) * self.dV # in Litres
+
+        # the remaining action variables are the proportions of reactants to be added
+        add_reactant_proportions = action[2:]
+
+        # set up a variable to contain the amount of change in each reactant
+        delta_n_array = np.zeros(len(self.cur_in_hand))
+
+        # scale the action value by the amount of reactant available
+        for i, reactant_amount in enumerate(self.cur_in_hand):
+            # determine how much of the available reactant is to be added
+            proportion = add_reactant_proportions[i]
+
+            # determine the amount of the reactant available
+            amount_available = reactant_amount
+
+            # determine the amount of reactant to add (in mol)
+            delta_n = proportion * amount_available
+
+            # add the overall change in materials to the array of molar amounts
+            delta_n_array[i] = delta_n
+
+        plot_data_state = [[], [], [], []]
+        plot_data_mol = []
+        plot_data_concentration = []
+
+        for i in range(n_steps):
+            # split the overall temperature change into increments
+            T += temperature_change / n_steps
+            T = np.min([
+                np.max([T, self.vessels.get_Tmin()]),
+                self.vessels.get_Tmax()
+            ])
+
+            # split the overall volume change into increments
+            V += volume_change / n_steps
+            V = np.min([
+                np.max([V, self.vessels.get_min_volume()]),
+                self.vessels.get_max_volume()
+            ])
+
+            # split the overall molar changes into increments
+            for i, delta_n in enumerate(delta_n_array):
+                dn = delta_n / n_steps
+                self.n[i] += dn
+                self.cur_in_hand[i] -= dn
+
+                # set a penalty for trying to add unavailable material (tentatively set to 0)
+                # reward -= 0
+
+                # if the amount that is in hand is below a certain threshold set it to 0
+                if self.cur_in_hand[i] < 1e-8:
+                    self.cur_in_hand[i] = 0.0
+
+            # perform the reaction and update the molar concentrations of the reactants and products
+            self.update(
+                T,
+                V,
+                self.vessels.get_defaultdt()
+            )
+            # Record time data
+            plot_data_state[0].append(t)
+
+            # record temperature data
+            Tmin = self.vessels.get_Tmin()
+            Tmax = self.vessels.get_Tmax()
+            plot_data_state[1].append((T - Tmin)/(Tmax - Tmin))
+
+            # record volume data
+            Vmin = self.vessels.get_min_volume()
+            Vmax = self.vessels.get_max_volume()
+            plot_data_state[2].append((V - Vmin)/(Vmax - Vmin))
+
+            # record pressure data
+            P = self.get_total_pressure(V, T)
+            plot_data_state[3].append(
+                P/self.vessels.get_pmax()
+            )
+
+            # calculate and record the molar concentrations of the reactants and products
+            C = self.get_concentration(V)
+            for j in range(self.n.shape[0]):
+                plot_data_mol[j].append(self.n[j])
+                plot_data_concentration[j].append(C[j])
+
+            t += self.dt
+
+        # update the state variables with the changes during the last step
+        state = self.update_state(vessels, t, tmax)
+
+
+        # update the vessels variable
+        vessels = self._update_vessel(vessels)
+
+        return t, plot_data_state, plot_data_mol, plot_data_concentration

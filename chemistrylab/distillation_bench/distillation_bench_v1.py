@@ -19,6 +19,7 @@ import sys
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.distillation_bench.distillation_bench_v1_engine import DistillationBenchEnv
+from chemistrylab.chem_algorithms.vessel import Vessel
 
 def get_vessel(vessel_path=None, in_vessel=None):
     '''
@@ -63,8 +64,8 @@ class Distillation_v1(DistillationBenchEnv):
     def __init__(self):
         super(Distillation_v1, self).__init__(
             boil_vessel=get_vessel(
-                vessel_path=os.path.join(os.getcwd(), "test_extract_vessel.pickle"),
-                in_vessel=None
+                vessel_path='',
+                in_vessel=Vessel(label='temp')
             ),
             target_material="dodecane",
             out_vessel_path=os.getcwd()

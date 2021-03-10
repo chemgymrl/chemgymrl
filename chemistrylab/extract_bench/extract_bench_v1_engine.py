@@ -124,7 +124,8 @@ class ExtractBenchEnv(gym.Env):
         self.target_material = input_parameters["target_material"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
         self.extractor = extractor
-        self.extraction = extraction_dict[input_parameters["extraction"]].Extraction(
+        self.extraction_name = input_parameters["extraction"]
+        self.extraction = extraction_dict[self.extraction_name].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -287,6 +288,21 @@ class ExtractBenchEnv(gym.Env):
         }
 
         return input_parameters
+
+    def update_vessel(self, vessel):
+        self.extraction_vessel = vessel
+        self.extraction = extraction_dict[self.extraction_name].Extraction(
+            extraction_vessel=self.extraction_vessel,
+            n_vessel_pixels=self.n_vessel_pixels,
+            max_valve_speed=self.max_valve_speed,
+            solute=self.solute,
+            target_material=self.target_material,
+            extractor=self.extractor
+        )
+
+        self.initial_target_amount = self.extraction_vessel.get_material_amount(
+            self.target_material
+        )
 
     def _save_vessel(self, extract_vessel=None, vessel_rootname=""):
         '''

@@ -33,7 +33,7 @@ import sys
 sys.path.append("../../") # to access chemistrylab
 sys.path.append("../reactions/") # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
-from chemistrylab.chem_algorithms import vessel
+from chemistrylab.chem_algorithms import vessel, util
 from chemistrylab.reactions.wurtz_reaction import Reaction
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
@@ -147,36 +147,21 @@ class ReactionBenchEnv(gym.Env):
         # set the output vessel path
         self.out_vessel_path = input_parameters["out_vessel_path"]
 
-        # set initial material, solute, and overlap parameters
-        materials = input_parameters["materials"]
-        solutes = input_parameters["solutes"]
-        overlap = input_parameters["overlap"]
-
-        # set the remaining input parameters
-        self.desired = input_parameters["desired"] # the desired material
         self.n_steps = input_parameters["n_steps"] # Time steps per action
         self.dt = input_parameters["dt"] # Time step of reaction (s)
-        self.Ti = input_parameters["Ti"] # Initial temperature (K)
-        self.Tmin = input_parameters["Tmin"] # Minimum temperature of the system (K)
-        self.Tmax = input_parameters["Tmax"] # Maximum temperature of the system (K)
-        self.dT = input_parameters["dT"] # Maximum change in temperature per action (K)
-        self.Vi = input_parameters["Vi"] # Initial Volume (L)
-        self.Vmin = input_parameters["Vmin"] # Minimum Volume of the system (L)
-        self.Vmax = input_parameters["Vmax"] # Maximum Volume of the system (L)
-        self.dV = input_parameters["dV"] # Maximum change in Volume per action (L)
-        self.Pmax = Pmax
 
         # initialize the reaction
         self.reaction = input_parameters["reaction"](
             overlap=overlap,
             initial_materials=materials,
             initial_solutes=solutes,
-            desired=self.desired,
+            desired=desired,
             rate_fn=rate_fn,
         )
 
         # Maximum time (s) (20 is the registered max_episode_steps)
-        self.tmax = self.n_steps * dt * 20
+        self.tmax = self.n_steps * self.dt * 20
+        self.t = 0
 
         # initialize a step counter
         self.step_num = 1
@@ -186,11 +171,11 @@ class ReactionBenchEnv(gym.Env):
         if self.in_vessel_path is None:
             self.vessels = vessel.Vessel(
                 'default',
-                temperature=self.Ti,
-                v_max=self.Vmax,
-                v_min=self.Vmin,
-                Tmax=self.Tmax,
-                Tmin=self.Tmin,
+                temperature=Ti,
+                v_max=Vmax,
+                v_min=Vmin,
+                Tmax=Tmax,
+                Tmin=Tmin,
                 default_dt=self.dt
             )
 
@@ -214,8 +199,6 @@ class ReactionBenchEnv(gym.Env):
 
         # reset the inputted reaction before performing any steps
         self.reaction.reset(n_init=self.n_init)
-        print("n_init")
-        print(self.n_init)
 
         # Defining action and observation space for OpenAI Gym framework
         # shape[0] is the change in amount of each reactant
@@ -509,6 +492,19 @@ class ReactionBenchEnv(gym.Env):
 
         return input_parameters
 
+    def update_vessel(self, new_vessel: vessel.Vessel):
+        new_n = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+        mat_dict = util.convert_material_dict_units(new_vessel.get_material_dict())
+        for i, mat in enumerate(self.reaction.materials):
+            if mat in mat_dict:
+                amount = mat_dict[mat][1]
+                new_n[i] = amount
+
+        self.vessels = new_vessel
+        self.n_init = new_n
+        self.reaction.reset(new_n)
+        pass
+
     def _update_state(self):
         '''
         Method to update the state vector with the current time, temperature, volume,
@@ -621,37 +617,6 @@ class ReactionBenchEnv(gym.Env):
         # replace the old vessel with the updated version
         self.vessels = new_vessel
 
-    def _save_vessel(self, vessel_rootname=""):
-        '''
-        Method to save a vessel as a pickle file.
-
-        Parameters
-        ---------------
-        `vessel_rootname` : `str` (default="")
-            The intended file root of the vessel (no extension; not the absolute path).
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # use the vessel path that was given upon initialization or during parameter verification
-        output_directory = self.out_vessel_path
-        vessel_filename = "{}.pickle".format(vessel_rootname)
-        open_file = os.path.join(output_directory, vessel_filename)
-
-        # delete any existing vessel files to ensure the vessel is saved as intended
-        if os.path.exists(open_file):
-            os.remove(open_file)
-
-        # open the intended vessel file and save the vessel as a pickle file
-        with open(open_file, 'wb') as vessel_file:
-            pickle.dump(self.vessels, vessel_file)
-
     def reset(self):
         '''
         Class method to reinitialize the environment by setting
@@ -676,14 +641,10 @@ class ReactionBenchEnv(gym.Env):
 
         # reset the modifiable state variables
         self.t = 0.0
-        self.T = 1.0 * self.vessels.get_temperature()
-        self.V = 1.0 * self.Vi
-        self.P = 1.0 * self.vessels.get_pressure()
 
         # reinitialize the reaction class
         self.reaction.reset(n_init=self.n_init)
-
-        # save the necessary temperatures, volumes, and pressure
+        
         Ti = self.vessels.get_temperature()
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
@@ -748,106 +709,11 @@ class ReactionBenchEnv(gym.Env):
         # the reward for this step is set to 0 initially
         reward = 0.0
 
-        # the first two action variables are changes to temperature and volume, respectively;
-        # these changes need to be scaled according to the maximum allowed change, dT and dV;
-        # action[0] = 1.0 gives a temperature change of dT, while action[0] = 0.0 corresponds to -dT
-        # action[1] = 1.0 gives a temperature change of dV, while action[1] = 0.0 corresponds to -dV
-        temperature_change = 2.0 * (action[0] - 0.5) * self.dT # in Kelvin
-        volume_change = 2.0 * (action[1] - 0.5) * self.dV # in Litres
-
-        # the remaining action variables are the proportions of reactants to be added
-        add_reactant_proportions = action[2:]
-
-        # set up a variable to contain the amount of change in each reactant
-        delta_n_array = np.zeros(len(self.reaction.cur_in_hand))
-
-        # scale the action value by the amount of reactant available
-        for i, reactant_amount in enumerate(self.reaction.cur_in_hand):
-            # determine how much of the available reactant is to be added
-            proportion = add_reactant_proportions[i]
-
-            # determine the amount of the reactant available
-            amount_available = reactant_amount
-
-            # determine the amount of reactant to add (in mol)
-            delta_n = proportion * amount_available
-
-            # add the overall change in materials to the array of molar amounts
-            delta_n_array[i] = delta_n
-
-        for i in range(self.n_steps):
-            # split the overall temperature change into increments
-            self.T += temperature_change / self.n_steps
-            self.T = np.min([
-                np.max([self.T, self.vessels.get_Tmin()]),
-                self.vessels.get_Tmax()
-            ])
-
-            # split the overall volume change into increments
-            self.V += volume_change / self.n_steps
-            self.V = np.min([
-                np.max([self.V, self.vessels.get_min_volume()]),
-                self.vessels.get_max_volume()
-            ])
-
-            # split the overall molar changes into increments
-            for i, delta_n in enumerate(delta_n_array):
-                dn = delta_n / self.n_steps
-                self.reaction.n[i] += dn
-                self.reaction.cur_in_hand[i] -= dn
-
-                # set a penalty for trying to add unavailable material (tentatively set to 0)
-                # reward -= 0
-
-                # if the amount that is in hand is below a certain threshold set it to 0
-                if self.reaction.cur_in_hand[i] < 1e-8:
-                    self.reaction.cur_in_hand[i] = 0.0
-
-            # perform the reaction and update the molar concentrations of the reactants and products
-            self.reaction.update(
-                self.T,
-                self.V,
-                self.vessels.get_defaultdt()
-            )
-
-            # Increase time by time step
-            self.t += self.dt
-
-            # Record time data
-            self.plot_data_state[0].append(self.t)
-
-            # record temperature data
-            Tmin = self.vessels.get_Tmin()
-            Tmax = self.vessels.get_Tmax()
-            self.plot_data_state[1].append((self.T - Tmin)/(Tmax - Tmin))
-
-            # record volume data
-            Vmin = self.vessels.get_min_volume()
-            Vmax = self.vessels.get_max_volume()
-            self.plot_data_state[2].append((self.V - Vmin)/(Vmax - Vmin))
-
-            # record pressure data
-            self.P = self.reaction.get_total_pressure(self.V, self.T)
-            self.plot_data_state[3].append(
-                self.P/self.vessels.get_pmax()
-            )
-
-            # calculate and record the molar concentrations of the reactants and products
-            C = self.reaction.get_concentration(self.V)
-            for j in range(self.reaction.n.shape[0]):
-                self.plot_data_mol[j].append(self.reaction.n[j])
-                self.plot_data_concentration[j].append(C[j])
-
-        # update the state variables with the changes during the last step
-        self._update_state()
-
-        # update the vessels variable
-        self._update_vessel()
-
+        self.t, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
         # calculate the reward for this step
         reward = ReactionReward(
             vessel=self.vessels,
-            desired_material=self.desired
+            desired_material=self.reaction.desired
         ).calc_reward()
 
         # ---------- ADD ---------- #
@@ -855,7 +721,7 @@ class ReactionBenchEnv(gym.Env):
 
         # save the vessel when the final step is complete
         if any([self.done, self.step_num == 20]):
-            self._save_vessel(vessel_rootname="react_vessel")
+            self.vessels.save_vessel('reaction_vessel')
 
         # update the step counter
         self.step_num += 1

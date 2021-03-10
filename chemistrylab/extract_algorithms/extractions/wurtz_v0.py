@@ -234,7 +234,7 @@ class Extraction:
 
         return vessels, external_vessels, state
 
-    def perform_action(self, vessels, external_vessels, action):
+    def perform_action(self, vessels, ext_vessel, action):
         '''
         Method to perform the action designated by `action` and update
         the state, vessels, external vessels, and generate reward.
@@ -279,8 +279,8 @@ class Extraction:
             extract_vessel = vessels[0]
             beaker_1 = vessels[1]
             beaker_2 = vessels[2]
-            solute_vessel1 = external_vessels[0]
-            solute_vessel2 = external_vessels[1]
+            solute_vessel1 = ext_vessel[0]
+            solute_vessel2 = ext_vessel[1]
 
             # Open Valve (Speed multiplier)
             if do_action == 0:
@@ -380,6 +380,6 @@ class Extraction:
 
             # redefine the vessels and external_vessels parameters
             vessels = [extract_vessel, beaker_1, beaker_2]
-            external_vessels = [solute_vessel1, solute_vessel2]
+            ext_vessel = [solute_vessel1, solute_vessel2]
 
-        return vessels, external_vessels, reward, done
+        return vessels, ext_vessel, reward, done
