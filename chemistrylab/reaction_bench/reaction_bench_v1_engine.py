@@ -648,7 +648,7 @@ class ReactionBenchEnv(gym.Env):
         Ti = self.vessels.get_temperature()
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
-        Vi = self.Vi
+        Vi = self.vessels.get_volume()
         Vmin = self.vessels.get_min_volume()
         Vmax = self.vessels.get_max_volume()
         total_pressure = self.reaction.get_total_pressure(self.V, self.T)
