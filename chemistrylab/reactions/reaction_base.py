@@ -57,7 +57,6 @@ class _Reaction:
 
         self.name = "base_reaction"
 
-        self.vessels = None
         self.threshold = thresh
 
         # Change this!!!
@@ -542,64 +541,6 @@ class _Reaction:
         plt.show()
         plt.close()
 
-    def update_state(self, vessels: vessel.Vessel, t, tmax):
-        '''
-        Method to update the state vector with the current time, temperature, volume,
-        pressure, the amounts of each reactant, and spectral parameters.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        '''
-
-        T = vessels.get_temperature()
-        V = vessels.get_volume()
-
-        absorb = self.get_spectra(V)
-
-        # create an array to contain all state variables
-        state = np.zeros(
-            4 + # time T V P
-            self.initial_in_hand.shape[0] + # reactants
-            absorb.shape[0], # spectra
-            dtype=np.float32
-        )
-
-        # populate the state array with updated state variables
-        # state[0] = time
-        state[0] = t / tmax
-
-        # state[1] = temperature
-        Tmin = vessels.get_Tmin()
-        Tmax = vessels.get_Tmax()
-        state[1] = (T - Tmin) / (Tmax - Tmin)
-
-        # state[2] = volume
-        Vmin = vessels.get_min_volume()
-        Vmax = vessels.get_max_volume()
-        state[2] = (V - Vmin) / (Vmax - Vmin)
-
-        # state[3] = pressure
-        total_pressure = self.get_total_pressure(V, T)
-        Pmax = vessels.get_pmax()
-        state[3] = total_pressure / Pmax
-
-        # remaining state variables pertain to reactant amounts and spectra
-        for i in range(self.initial_in_hand.shape[0]):
-            state[i+4] = self.n[i] / self.nmax[i]
-        for i in range(absorb.shape[0]):
-            state[i + self.initial_in_hand.shape[0] + 4] = absorb[i]
-
-        return state
-
     def update_vessel(self, vessels: vessel.Vessel, temperature, volume, pressure):
         # tabulate all the materials used and their new values
         new_material_dict = {}
@@ -762,11 +703,8 @@ class _Reaction:
 
             t += self.dt
 
-        # update the state variables with the changes during the last step
-        state = self.update_state(vessels, t, tmax)
-
 
         # update the vessels variable
         vessels = self.update_vessel(vessels, T, V, self.get_total_pressure(V, T))
 
-        return t, state, vessels, plot_data_state, plot_data_mol, plot_data_concentration
+        return t, vessels, plot_data_state, plot_data_mol, plot_data_concentration

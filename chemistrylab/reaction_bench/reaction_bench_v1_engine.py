@@ -533,7 +533,46 @@ class ReactionBenchEnv(gym.Env):
         None
         '''
 
-        self.state = self.reaction.update_state(self.vessels, self.t, self.tmax)
+        T = self.vessels.get_temperature()
+        V = self.vessels.get_volume()
+
+        absorb = self.reaction.get_spectra(V)
+
+        # create an array to contain all state variables
+        state = np.zeros(
+            4 +  # time T V P
+            self.reaction.initial_in_hand.shape[0] +  # reactants
+            absorb.shape[0],  # spectra
+            dtype=np.float32
+        )
+
+        # populate the state array with updated state variables
+        # state[0] = time
+        state[0] = self.t / self.tmax
+
+        # state[1] = temperature
+        Tmin = self.vessels.get_Tmin()
+        Tmax = self.vessels.get_Tmax()
+        state[1] = (T - Tmin) / (Tmax - Tmin)
+
+        # state[2] = volume
+        Vmin = self.vessels.get_min_volume()
+        Vmax = self.vessels.get_max_volume()
+        state[2] = (V - Vmin) / (Vmax - Vmin)
+
+        # state[3] = pressure
+        total_pressure = self.reaction.get_total_pressure(V, T)
+        Pmax = self.vessels.get_pmax()
+        state[3] = total_pressure / Pmax
+
+        # remaining state variables pertain to reactant amounts and spectra
+        for i in range(self.reaction.initial_in_hand.shape[0]):
+            state[i + 4] = self.reaction.n[i] / self.reaction.nmax[i]
+        for i in range(absorb.shape[0]):
+            state[i + self.reaction.initial_in_hand.shape[0] + 4] = absorb[i]
+
+        self.state = state
+
 
     def _update_vessel(self, temp, vol, pre):
         '''
@@ -646,7 +685,10 @@ class ReactionBenchEnv(gym.Env):
 
         # the reward for this step is set to 0 initially
         reward = 0.0
-        self.t, self.state, self.vessels, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
+        self.t, self.vessels, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
+
+        self._update_state()
+
         # calculate the reward for this step
         reward = ReactionReward(
             vessel=self.vessels,
