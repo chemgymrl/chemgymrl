@@ -2,6 +2,7 @@ import sys
 import numpy as np
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.lab.lab import Lab
+import datetime as dt
 
 
 class Manager:
@@ -74,7 +75,10 @@ class Manager:
             print(f'{i}: {agent}')
         agent_ind = int(input('Please specify what agent you wish to use: '))
         agent = agents[agent_ind]
+        start = dt.datetime.now()
         self.load_bench(bench, env, vessel, agent)
+        finish = dt.datetime.now()
+        print(finish - start)
 
     def _agent_run(self):
         self.load_agent()

@@ -86,7 +86,7 @@ class _Reaction:
         self.initial_solutes = _initial_solutes
 
         # specify the desired material
-        self.desired_material = desired
+        self.desired = desired
         self.reactants = reactants
         self.products = products
         self.materials = materials
@@ -111,7 +111,7 @@ class _Reaction:
         self.max_mol = max_mol
 
         #define thermodynamic properties and volumetric properties for the reaction
-        self.Ti = Ti,
+        self.Ti = Ti
         self.Tmin = Tmin
         self.Tmax = Tmax
         self.dT = dT
@@ -219,8 +219,6 @@ class _Reaction:
 
         # define a class instance attribute for the available chemicals
         self.cur_in_hand = 1.0 * self.initial_in_hand
-        print('cur_in_hand')
-        print(self.cur_in_hand)
         # define a class instance attribute for the amount of each chemical
         self.n = n_init
 
@@ -304,6 +302,7 @@ class _Reaction:
 
         # calculate the total pressure of all chemicals
         P_total = 0
+
         for i in range(self.n.shape[0]):
             P_total += self.n[i] * R * T / V
 
@@ -579,8 +578,8 @@ class _Reaction:
         state[0] = t / tmax
 
         # state[1] = temperature
-        Tmin = self.vessels.get_Tmin()
-        Tmax = self.vessels.get_Tmax()
+        Tmin = vessels.get_Tmin()
+        Tmax = vessels.get_Tmax()
         state[1] = (T - Tmin) / (Tmax - Tmin)
 
         # state[2] = volume
@@ -601,7 +600,7 @@ class _Reaction:
 
         return state
 
-    def _update_vessel(self, vessels: vessel.Vessel, temperature, volume, pressure):
+    def update_vessel(self, vessels: vessel.Vessel, temperature, volume, pressure):
         # tabulate all the materials used and their new values
         new_material_dict = {}
         for i in range(self.n.shape[0]):
@@ -699,22 +698,22 @@ class _Reaction:
             delta_n_array[i] = delta_n
 
         plot_data_state = [[], [], [], []]
-        plot_data_mol = []
-        plot_data_concentration = []
+        plot_data_mol = [[] for _ in range(self.n.shape[0])]
+        plot_data_concentration = [[] for _ in range(self.n.shape[0])]
 
         for i in range(n_steps):
             # split the overall temperature change into increments
             T += temperature_change / n_steps
             T = np.min([
-                np.max([T, self.vessels.get_Tmin()]),
-                self.vessels.get_Tmax()
+                np.max([T, vessels.get_Tmin()]),
+                vessels.get_Tmax()
             ])
 
             # split the overall volume change into increments
             V += volume_change / n_steps
             V = np.min([
-                np.max([V, self.vessels.get_min_volume()]),
-                self.vessels.get_max_volume()
+                np.max([V, vessels.get_min_volume()]),
+                vessels.get_max_volume()
             ])
 
             # split the overall molar changes into increments
@@ -734,25 +733,25 @@ class _Reaction:
             self.update(
                 T,
                 V,
-                self.vessels.get_defaultdt()
+                vessels.get_defaultdt()
             )
             # Record time data
             plot_data_state[0].append(t)
 
             # record temperature data
-            Tmin = self.vessels.get_Tmin()
-            Tmax = self.vessels.get_Tmax()
+            Tmin = vessels.get_Tmin()
+            Tmax = vessels.get_Tmax()
             plot_data_state[1].append((T - Tmin)/(Tmax - Tmin))
 
             # record volume data
-            Vmin = self.vessels.get_min_volume()
-            Vmax = self.vessels.get_max_volume()
+            Vmin = vessels.get_min_volume()
+            Vmax = vessels.get_max_volume()
             plot_data_state[2].append((V - Vmin)/(Vmax - Vmin))
 
             # record pressure data
             P = self.get_total_pressure(V, T)
             plot_data_state[3].append(
-                P/self.vessels.get_pmax()
+                P/vessels.get_pmax()
             )
 
             # calculate and record the molar concentrations of the reactants and products
@@ -768,6 +767,6 @@ class _Reaction:
 
 
         # update the vessels variable
-        vessels = self._update_vessel(vessels)
+        vessels = self.update_vessel(vessels, T, V, self.get_total_pressure(V, T))
 
-        return t, plot_data_state, plot_data_mol, plot_data_concentration
+        return t, state, vessels, plot_data_state, plot_data_mol, plot_data_concentration

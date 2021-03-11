@@ -28,9 +28,11 @@ EXP_COEF = np.ones(6)
 
 class Reaction(_Reaction):
     def __init__(self, initial_materials, initial_solutes, desired, rate_fn: Rates, solutes=SOLUTES,
-                 reactants=REACTANTS, products=PRODUCTS, materials=ALL_MATERIALS, exp_coef=EXP_COEF, overlap=False, nmax=None, max_mol=2, thresh=1e-8):
+                 reactants=REACTANTS, products=PRODUCTS, materials=ALL_MATERIALS, exp_coef=EXP_COEF, overlap=False,
+                 nmax=None, max_mol=2, thresh=1e-8, Ti=0.0, Tmin=0.0, Tmax=0.0, dT=0.0, Vi=0.0, Vmin=0.0, Vmax=0.0,
+                 dV=0.0, dt=0):
         super(Reaction, self).__init__(initial_materials, initial_solutes, reactants, products, materials, desired, exp_coef, rate_fn, solutes,
-                 overlap, nmax, max_mol, thresh)
+                 overlap, nmax, max_mol, thresh, Ti, Tmin, Tmax, dT, Vi, Vmin, Vmax, dV, dt)
 
         self.name = 'wurtz_reaction'
 

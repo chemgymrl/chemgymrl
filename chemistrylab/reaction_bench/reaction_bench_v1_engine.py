@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import pickle
 import os
 import sys
+import datetime as dt
 
 sys.path.append("../../") # to access chemistrylab
 sys.path.append("../reactions/") # to access all reactions
@@ -157,6 +158,15 @@ class ReactionBenchEnv(gym.Env):
             initial_solutes=solutes,
             desired=desired,
             rate_fn=rate_fn,
+            Ti=Ti,
+            Tmin=Tmin,
+            Tmax=Tmax,
+            dT=dT,
+            Vi=Vi,
+            Vmin=Vmin,
+            Vmax=Vmax,
+            dV=dV,
+            dt=dt
         )
 
         # Maximum time (s) (20 is the registered max_episode_steps)
@@ -523,42 +533,9 @@ class ReactionBenchEnv(gym.Env):
         None
         '''
 
-        absorb = self.reaction.get_spectra(self.V)
+        self.state = self.reaction.update_state(self.vessels, self.t, self.tmax)
 
-        # create an array to contain all state variables
-        self.state = np.zeros(
-            4 + # time T V P
-            self.reaction.initial_in_hand.shape[0] + # reactants
-            absorb.shape[0], # spectra
-            dtype=np.float32
-        )
-
-        # populate the state array with updated state variables
-        # state[0] = time
-        self.state[0] = self.t / self.tmax
-
-        # state[1] = temperature
-        Tmin = self.vessels.get_Tmin()
-        Tmax = self.vessels.get_Tmax()
-        self.state[1] = (self.T - Tmin) / (Tmax - Tmin)
-
-        # state[2] = volume
-        Vmin = self.vessels.get_min_volume()
-        Vmax = self.vessels.get_max_volume()
-        self.state[2] = (self.V - Vmin) / (Vmax - Vmin)
-
-        # state[3] = pressure
-        total_pressure = self.reaction.get_total_pressure(self.V, self.T)
-        Pmax = self.vessels.get_pmax()
-        self.state[3] = total_pressure / Pmax
-
-        # remaining state variables pertain to reactant amounts and spectra
-        for i in range(self.reaction.initial_in_hand.shape[0]):
-            self.state[i+4] = self.reaction.n[i] / self.reaction.nmax[i]
-        for i in range(absorb.shape[0]):
-            self.state[i + self.reaction.initial_in_hand.shape[0] + 4] = absorb[i]
-
-    def _update_vessel(self):
+    def _update_vessel(self, temp, vol, pre):
         '''
         Method to update the information stored in the vessel upon completing a step.
 
@@ -575,46 +552,7 @@ class ReactionBenchEnv(gym.Env):
         None
         '''
 
-        # get the temperature and pressure from the state variables
-        temperature = self.T
-        volume = self.V
-        pressure = self.P
-
-        # tabulate all the materials used and their new values
-        new_material_dict = {}
-        for i in range(self.reaction.n.shape[0]):
-            material_name = self.reaction.materials[i]
-            material_class = self.reaction.material_classes[i]
-            amount = self.reaction.n[i]
-            new_material_dict[material_name] = [material_class, amount]
-
-        # tabulate all the solutes and their values
-        new_solute_dict = {}
-        for i in range(self.reaction.initial_solutes.shape[0]):
-            solute_name = self.reaction.solutes[i]
-            solute_class = self.reaction.solute_classes[i]
-            amount = self.reaction.initial_solutes[i]
-
-            # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = [solute_class, amount]
-
-        # create a new vessel and update it with new data
-        new_vessel = vessel.Vessel(
-            'react_vessel',
-            temperature=self.Ti,
-            v_max=self.Vmax,
-            v_min=self.Vmin,
-            Tmax=self.Tmax,
-            Tmin=self.Tmin,
-            default_dt=self.dt
-        )
-        new_vessel.temperature = temperature
-        new_vessel._material_dict = new_material_dict
-        new_vessel._solute_dict = new_solute_dict
-        new_vessel.volume = volume
-        new_vessel.pressure = pressure
-
-        # replace the old vessel with the updated version
+        new_vessel = self.reaction.update_vessel(self.vessels, temp, vol, pre)
         self.vessels = new_vessel
 
     def reset(self):
@@ -645,13 +583,13 @@ class ReactionBenchEnv(gym.Env):
         # reinitialize the reaction class
         self.reaction.reset(n_init=self.n_init)
         
-        Ti = self.vessels.get_temperature()
-        Tmin = self.vessels.get_Tmin()
-        Tmax = self.vessels.get_Tmax()
-        Vi = self.vessels.get_volume()
-        Vmin = self.vessels.get_min_volume()
-        Vmax = self.vessels.get_max_volume()
-        total_pressure = self.reaction.get_total_pressure(self.V, self.T)
+        Ti = self.reaction.Ti
+        Tmin = self.reaction.Tmin
+        Tmax = self.reaction.Tmax
+        Vi = self.reaction.Vi
+        Vmin = self.reaction.Vmin
+        Vmax = self.reaction.Vmax
+        total_pressure = self.reaction.get_total_pressure(Vi, Ti)
 
         # populate the state with the above variables
         self.plot_data_state = [
@@ -664,7 +602,7 @@ class ReactionBenchEnv(gym.Env):
         self.plot_data_concentration = []
 
         # [0] is time, [1] is Tempurature, [2:] is each species
-        C = self.reaction.get_concentration(self.V)
+        C = self.reaction.get_concentration(Vi)
         for i in range(self.reaction.nmax.shape[0]):
             self.plot_data_mol.append([self.reaction.n[i]])
             self.plot_data_concentration.append([C[i]])
@@ -673,7 +611,7 @@ class ReactionBenchEnv(gym.Env):
         self._update_state()
 
         # update the vessel variable
-        self._update_vessel()
+        self._update_vessel(Ti, Vi, total_pressure)
 
         return self.state
 
@@ -708,14 +646,12 @@ class ReactionBenchEnv(gym.Env):
 
         # the reward for this step is set to 0 initially
         reward = 0.0
-
-        self.t, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
+        self.t, self.state, self.vessels, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
         # calculate the reward for this step
         reward = ReactionReward(
             vessel=self.vessels,
             desired_material=self.reaction.desired
         ).calc_reward()
-
         # ---------- ADD ---------- #
         # add option to save or print intermediary vessel
 

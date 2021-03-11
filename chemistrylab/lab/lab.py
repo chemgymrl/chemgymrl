@@ -53,7 +53,7 @@ class Lab:
         state = env.reset()
         total_reward = 0
         while not done:
-            env.render(mode=self.render_mode)
+            # env.render(mode=self.render_mode)
             action = agent.run_step(env, state)
             state, reward, done, _ = env.step(action)
             total_reward += reward
