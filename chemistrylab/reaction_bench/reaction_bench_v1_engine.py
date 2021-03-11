@@ -687,6 +687,8 @@ class ReactionBenchEnv(gym.Env):
         reward = 0.0
         self.t, self.vessels, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
 
+        # call some function to get plotting data
+
         self._update_state()
 
         # calculate the reward for this step

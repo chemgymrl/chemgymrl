@@ -1,10 +1,7 @@
 '''
 Distillation Demo
-
 :title: distillation_bench_v1_engine.py
-
 :author: Mitchell Shahen
-
 :history: 2020-07-23
 '''
 
@@ -29,7 +26,6 @@ from chemistrylab.distillations import distill_v0
 class DistillationBenchEnv(gym.Env):
     '''
     Class object to create a Distillation environment.
-
     Parameters
     ---------------
     `boil_vessel` : `vessel` (default=`None`)
@@ -38,11 +34,9 @@ class DistillationBenchEnv(gym.Env):
         The name of the required output material designated as reward.
     `n_steps` : `int` (default=`100`)
         The number of steps in an episode.
-
     Returns
     ---------------
     None
-
     Raises
     ---------------
     None
@@ -53,6 +47,7 @@ class DistillationBenchEnv(gym.Env):
             n_steps=100,
             boil_vessel=None,
             target_material=None,
+            dQ=0.0,
             out_vessel_path=None
     ):
         '''
@@ -64,6 +59,7 @@ class DistillationBenchEnv(gym.Env):
             n_steps=n_steps,
             boil_vessel=boil_vessel,
             target_material=target_material,
+            dQ=dQ,
             out_vessel_path=out_vessel_path
         )
 
@@ -71,14 +67,14 @@ class DistillationBenchEnv(gym.Env):
         self.n_steps = input_parameters["n_steps"]
         self.boil_vessel = input_parameters["boil_vessel"]
         self.target_material = input_parameters["target_material"]
+        self.dQ = input_parameters["dQ"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
 
         # call the distillation class
         self.distillation = distill_v0.Distillation(
             boil_vessel=self.boil_vessel,
             target_material=self.target_material,
-            dQ=1e+5,
-            n_increments=50
+            dQ=self.dQ
         )
 
         # set up vessel and state variables
@@ -102,10 +98,9 @@ class DistillationBenchEnv(gym.Env):
         self.min_purity_threshold = 0.5
 
     @staticmethod
-    def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, out_vessel_path=None):
+    def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, dQ=0.0, out_vessel_path=None):
         '''
         Checks and validates the input parameters submitted to the distillation bench.
-
         Parameters
         ---------------
         `n_steps` : `int` (default=`None`)
@@ -114,9 +109,10 @@ class DistillationBenchEnv(gym.Env):
             The vessel object designated to be saved.
         `target_material` : `str` (default=`None`)
             The material in the boil vessel that is to be isolated.
+        `dQ` : `float` (default=0.0):
+            The maximal amount of heat to add to the boil vessel in one action.
         `out_vessel_path` : `str` (default=`None`)
             The directory path where the vessel object is to be saved.
-
         Returns
         ---------------
         `n_steps` : `int` (default=`100`)
@@ -125,9 +121,10 @@ class DistillationBenchEnv(gym.Env):
             The vessel object designated to be saved.
         `target_material` : `str` (default=`None`)
             The material in the boil vessel that is to be isolated.
+        `dQ` : `float` (default=0.0):
+            The maximal amount of heat to add to the boil vessel in one action.
         `out_vessel_path` : `str` (default=`None`)
             The directory path where the vessel object is to be saved.
-
         Raises
         ---------------
         `TypeError`:
@@ -163,6 +160,17 @@ class DistillationBenchEnv(gym.Env):
             )
             target_material = ""
 
+        # ensure that the maximal heat increment parameter is a float or an int value
+        if all([
+                not isinstance(dQ, float),
+                not isinstance(dQ, int)
+        ]):
+            print("Invalid 'Maximal Heat Increment' type. The default will be provided.")
+            dQ = 0.0
+        else:
+            # ensure the heat increment is a float value
+            dQ = float(dQ)
+
         # ensure that the output vessel path parameter is provided as a string
         if not isinstance(out_vessel_path, str):
             print("Invalid 'Output Vessel Path' type. The default will be provided.")
@@ -181,6 +189,7 @@ class DistillationBenchEnv(gym.Env):
             "n_steps" : n_steps,
             "boil_vessel" : boil_vessel,
             "target_material" : target_material,
+            "dQ" : dQ,
             "out_vessel_path" : out_vessel_path
         }
 
@@ -198,18 +207,16 @@ class DistillationBenchEnv(gym.Env):
     def _save_vessel(self, distillation_vessel=None, vessel_rootname=""):
         '''
         Method to save a vessel as a pickle file.
-        
+
         Parameters
         ---------------
         `distillation_vessel` : `vessel.Vessel` (default=`None`)
             The vessel object designated to be saved.
         `vessel_rootname` : `str` (default="")
             The intended name/identifier of the pickle file to which the vessel is being saved.
-
         Returns
         ---------------
         None
-
         Raises
         ---------------
         None
@@ -231,15 +238,13 @@ class DistillationBenchEnv(gym.Env):
     def _update_state(self):
         '''
         Method to update the state variable.
-        
+
         Parameters
         ---------------
         None
-
         Returns
         ---------------
         None
-
         Raises
         ---------------
         None
@@ -285,8 +290,8 @@ class DistillationBenchEnv(gym.Env):
             # set up each set of material properties as separate packages (as lists)
             # each list has three elements: [material_name, material_class, material_amount]
             material_packages = []
-            for material_name, material_prop in vessel._material_dict.items():
-                material_package = [material_name, material_prop[0], material_prop[1]]
+            for material_name, [material_class, material_amount] in vessel._material_dict.items():
+                material_package = [material_name, material_class, material_amount]
                 material_packages.append(material_package)
             for material_package in material_packages:
                 base_state[i].append(material_package)
@@ -297,16 +302,13 @@ class DistillationBenchEnv(gym.Env):
     def reset(self):
         '''
         Initialize the environment
-
         Parameters
         ---------------
         None
-
         Returns
         ---------------
         `state` : `np.array`
             A numpy array containing state variables, material concentrations, and spectral data.
-
         Raises
         ---------------
         None
@@ -332,13 +334,11 @@ class DistillationBenchEnv(gym.Env):
     def step(self, action):
         '''
         Update the environment by performing an action.
-
         Parameters
         ---------------
         `action` : `list`
             A list of two numbers indicating the index of the action to
             perform and a multiplier to use in completing the action.
-
         Returns
         ---------------
         `state` : `np.array`
@@ -349,7 +349,6 @@ class DistillationBenchEnv(gym.Env):
             A boolean indicting if all the steps in an episode have been completed.
         `params` : `dict`
             A dictionary containing additional parameters or information that may be useful.
-
         Raises
         ---------------
         None
@@ -359,7 +358,7 @@ class DistillationBenchEnv(gym.Env):
         vessels = self.vessels
         done = self.done
 
-        # perform the action and update the vessels, reward, and done variables
+        # perform the action and update the vessels, interim reward, and done variables
         vessels, reward, done = self.distillation.perform_action(
             vessels=vessels,
             action=action
@@ -404,16 +403,13 @@ class DistillationBenchEnv(gym.Env):
     def render(self, model):
         '''
         Select a render mode to display pertinent information.
-
         Parameters
         ---------------
         `model` : `str` (default=`human`)
             The name of the render mode to use.
-
         Returns
         ---------------
         None
-
         Raises
         ---------------
         None
@@ -488,6 +484,9 @@ class DistillationBenchEnv(gym.Env):
 
         # if the plot has already been rendered, simply add the new data to it
         else:
+            # clear the plot to be updated with new data
+            self._plot_axs[0, 0].clear()
+
             # reset the boil vessel plot with new vessel data
             __ = self._plot_axs[0, 0].bar(
                 [name[0:5] for name in boil_vessel._material_dict.keys()],
@@ -496,6 +495,9 @@ class DistillationBenchEnv(gym.Env):
             )
             self._plot_axs[0, 0].set_title("Boil Vessel")
             self._plot_axs[0, 0].set_ylabel("Molar Amount")
+
+            # clear the plot to be updated with new data
+            self._plot_axs[0, 1].clear()
 
             # reset the vessel temperature plot with new data
             __ = self._plot_axs[0, 1].bar(
@@ -508,6 +510,9 @@ class DistillationBenchEnv(gym.Env):
 
             # reset the data in each beaker plot
             for i, beaker_plot in enumerate(self._beaker_plots):
+                # clear the plot to be updated with new data
+                self._plot_axs[1, i].clear()
+
                 material_names = [name[0:5] for name in beakers[i]._material_dict.keys()]
                 material_amounts = [value[1] for value in beakers[i]._material_dict.values()]
 

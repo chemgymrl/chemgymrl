@@ -1,10 +1,7 @@
 '''
 Distillation Bench Environment
-
 :title: distillation_bench_v1.py
-
 :author: Mitchell Shahen
-
 :history: 2020-07-23
 '''
 
@@ -19,24 +16,20 @@ import sys
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.distillation_bench.distillation_bench_v1_engine import DistillationBenchEnv
-from chemistrylab.chem_algorithms.vessel import Vessel
 
 def get_vessel(vessel_path=None, in_vessel=None):
     '''
     Function to obtain a vessel.
-
     Parameters
     ---------------
     `vessel_path` : `str` (default=`None`)
         A string indicating the local of a pickle file containing the required vessel object.
     `in_vessel` : `vessel` (default=`None`)
         A vessel object containing state variables, materials, solutes, and spectral data.
-
     Returns
     ---------------
     `extract_vessel` : `vessel`
         A vessel object containing state variables, materials, solutes, and spectral data.
-
     Raises
     ---------------
     `IOError`:
@@ -64,9 +57,12 @@ class Distillation_v1(DistillationBenchEnv):
     def __init__(self):
         super(Distillation_v1, self).__init__(
             boil_vessel=get_vessel(
-                vessel_path='',
-                in_vessel=Vessel(label='temp')
+                vessel_path=os.path.join(os.getcwd(), "test_extract_vessel.pickle"),
+                in_vessel=None
             ),
             target_material="dodecane",
+            dQ=1000.0,
             out_vessel_path=os.getcwd()
         )
+
+

@@ -125,30 +125,11 @@ class _Reaction:
         # self.params = [spec.S_1]*len(materials)
 
         self.params = []
-        if overlap:
-            self.params.append(spec.S_1)  # spectra for the 1-chlorohexane
-            self.params.append(spec.S_2)  # spectra for the 2-chlorohexane
-            self.params.append(spec.S_3)  # spectra for the 3-chlorohexane
-            self.params.append(spec.S_4)  # spectra for Na
-            self.params.append(spec.S_2_3)  # spectra for dodecane
-            self.params.append(spec.S_2_3)  # spectra for 5-methylundecane
-            self.params.append(spec.S_2_3)  # spectra for 4-ethyldecane
-            self.params.append(spec.S_2_3)  # spectra for 5,6-dimethyldecane
-            self.params.append(spec.S_2_3)  # spectra for 4-ethyl-5-methylnonane
-            self.params.append(spec.S_2_3)  # spectra for 4,5-diethyloctane
-            self.params.append(spec.S_3_3)  # spectra for NaCl
-        else:
-            self.params.append(spec.S_1)  # spectra for the 1-chlorohexane
-            self.params.append(spec.S_2)  # spectra for the 2-chlorohexane
-            self.params.append(spec.S_3)  # spectra for the 3-chlorohexane
-            self.params.append(spec.S_4)  # spectra for Na
-            self.params.append(spec.S_8)  # spectra for dodecane
-            self.params.append(spec.S_8)  # spectra for 5-methylundecane
-            self.params.append(spec.S_8)  # spectra for 4-ethyldecane
-            self.params.append(spec.S_8)  # spectra for 5,6-dimethyldecane
-            self.params.append(spec.S_8)  # spectra for 4-ethyl-5-methylnonane
-            self.params.append(spec.S_8)  # spectra for 4,5-diethyloctane
-            self.params.append(spec.S_8)  # spectra for NaCl
+        for material in materials:
+            if overlap:
+                self.params.append(material.get_spectra_overlap())
+            else:
+                self.params.append(material.get_spectra_no_overlap())
 
     def get_ni_label(self):
         '''

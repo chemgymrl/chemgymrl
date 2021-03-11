@@ -2,28 +2,31 @@ import inspect
 import numpy as np
 import math
 import sys
+from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 
 
 class Material:
     def __init__(self,
                  name="",
-                 density=1.0, # in g/cm**3
+                 density=1.0,  # in g/cm**3
                  polarity=0.0,
-                 temperature=1.0, # in K
-                 pressure=1.0, # in kPa
-                 phase="", # one of "s", "l", or "g" at temperature
+                 temperature=1.0,  # in K
+                 pressure=1.0,  # in kPa
+                 phase="",  # one of "s", "l", or "g" at temperature
                  charge=0.0,
-                 molar_mass=1.0, # in g/mol
-                 color=0.0, # color scale from 0 to 1
-                 solute=False, # is material a solute
-                 solvent=False, # is material a solvent
-                 boiling_point=1.0, # in K
-                 melting_point=1.0, # in K
-                 specific_heat=1.0, # in J/g*K
-                 enthalpy_fusion=1.0, # in J/mol
-                 enthalpy_vapor=1.0, # in J/mol
+                 molar_mass=1.0,  # in g/mol
+                 color=0.0,  # color scale from 0 to 1
+                 solute=False,  # is material a solute
+                 solvent=False,  # is material a solvent
+                 boiling_point=1.0,  # in K
+                 melting_point=1.0,  # in K
+                 specific_heat=1.0,  # in J/g*K
+                 enthalpy_fusion=1.0,  # in J/mol
+                 enthalpy_vapor=1.0,  # in J/mol
+                 spectra_overlap=np.zeros((3, 3, 3), dtype=np.float32),
+                 spectra_no_overlap=np.zeros((3, 3, 3), dtype=np.float32),
                  index=None
-    ):
+                 ):
         self._name = name
         self.w2v = None
         self._density = density
@@ -41,6 +44,8 @@ class Material:
         self._specific_heat = specific_heat
         self._enthalpy_fusion = enthalpy_fusion
         self._enthalpy_vapor = enthalpy_vapor
+        self.spectra_overlap = spectra_overlap
+        self.spectra_no_overlap = spectra_no_overlap
         self._index = index
 
     def _update_properties(self,
@@ -161,8 +166,15 @@ class Material:
     def set_enthalpy_vapor(self, enthalpy_vapor):
         self._enthalpy_vapor = enthalpy_vapor
 
+    def get_spectra_overlap(self):
+        return self.spectra_overlap
+
+    def get_spectra_no_overlap(self):
+        return self.spectra_no_overlap
+
     def get_index(self):
         return self._index
+
 
 class Air(Material):
     def __init__(self):
@@ -176,6 +188,7 @@ class Air(Material):
                          specific_heat=1.0035,  # in J/g*K
                          index=0
                          )
+
 
 class H2O(Material):
     def __init__(self):
@@ -196,6 +209,7 @@ class H2O(Material):
                          index=1
                          )
 
+
 class H(Material):
     def __init__(self):
         super().__init__(name='H',
@@ -210,6 +224,7 @@ class H(Material):
                          specific_heat=None,
                          index=2
                          )
+
 
 class H2(Material):
     def __init__(self):
@@ -226,6 +241,7 @@ class H2(Material):
                          index=3
                          )
 
+
 class O(Material):
     def __init__(self):
         super().__init__(name='O',
@@ -240,6 +256,7 @@ class O(Material):
                          specific_heat=None,
                          index=4
                          )
+
 
 class O2(Material):
     def __init__(self):
@@ -256,6 +273,7 @@ class O2(Material):
                          index=5
                          )
 
+
 class O3(Material):
     def __init__(self):
         super().__init__(name='O3',
@@ -270,6 +288,7 @@ class O3(Material):
                          specific_heat=None,
                          index=6
                          )
+
 
 class C6H14(Material):
     def __init__(self):
@@ -287,6 +306,7 @@ class C6H14(Material):
                          index=7
                          )
 
+
 class NaCl(Material):
     def __init__(self):
         super().__init__(name='NaCl',
@@ -302,8 +322,11 @@ class NaCl(Material):
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,
                          enthalpy_vapor=229700.0,
+                         spectra_overlap=spec.S_3_3,
+                         spectra_no_overlap=spec.S_8,
                          index=8
                          )
+
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
@@ -322,8 +345,11 @@ class Na(Material):
                          specific_heat=1.23,
                          enthalpy_fusion=2600.0,
                          enthalpy_vapor=97700.0,
+                         spectra_overlap=spec.S_4,
+                         spectra_no_overlap=spec.S_4,
                          index=9
                          )
+
 
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
@@ -341,8 +367,11 @@ class Cl(Material):
                          specific_heat=0.48,
                          enthalpy_fusion=3200.0,
                          enthalpy_vapor=10200.0,
+                         spectra_overlap=spec.S_7,
+                         spectra_no_overlap=spec.S_3,
                          index=10
                          )
+
 
 class Cl2(Material):
     def __init__(self):
@@ -359,6 +388,7 @@ class Cl2(Material):
                          index=11
                          )
 
+
 class LiF(Material):
     def __init__(self):
         super().__init__(name='LiF',
@@ -374,6 +404,7 @@ class LiF(Material):
                          index=12
                          )
 
+
 class Li(Material):
     def __init__(self):
         super().__init__(name='Li',
@@ -388,6 +419,7 @@ class Li(Material):
                          specific_heat=1.0,
                          index=13
                          )
+
 
 # Note: F is very unstable when not an aqueous ion
 class F(Material):
@@ -405,6 +437,7 @@ class F(Material):
                          index=14
                          )
 
+
 class F2(Material):
     def __init__(self):
         super().__init__(name='F2',
@@ -419,6 +452,7 @@ class F2(Material):
                          specific_heat=None,
                          index=15
                          )
+
 
 class CuSO4(Material):
     def __init__(self):
@@ -439,6 +473,7 @@ class CuSO4(Material):
                          index=8
                          )
 
+
 class CuSO4Pentahydrate(Material):
     def __init__(self):
         super().__init__(name='CuS04*5H2O',
@@ -457,6 +492,7 @@ class CuSO4Pentahydrate(Material):
                          enthalpy_vapor=229700.0,
                          index=8
                          )
+
 
 ## ---------- ## HYDROCARBONS ## ---------- ##
 
@@ -478,8 +514,11 @@ class Dodecane(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_2_3,
+            spectra_no_overlap=spec.S_8,
             index=16
         )
+
 
 class OneChlorohexane(Material):
     def __init__(self):
@@ -499,8 +538,11 @@ class OneChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=15490.0,
             enthalpy_vapor=42800.0,
+            spectra_overlap=spec.S_1,
+            spectra_no_overlap=spec.S_1,
             index=17
         )
+
 
 class TwoChlorohexane(Material):
     def __init__(self):
@@ -520,8 +562,11 @@ class TwoChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=43820.0,
+            spectra_overlap=spec.S_2,
+            spectra_no_overlap=spec.S_2,
             index=18
         )
+
 
 class ThreeChlorohexane(Material):
     def __init__(self):
@@ -541,8 +586,11 @@ class ThreeChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=32950.0,
+            spectra_overlap=spec.S_3,
+            spectra_no_overlap=spec.S_3,
             index=19
         )
+
 
 class FiveMethylundecane(Material):
     def __init__(self):
@@ -562,8 +610,11 @@ class FiveMethylundecane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_2_3,
+            spectra_no_overlap=spec.S_8,
             index=20
         )
+
 
 class FourEthyldecane(Material):
     def __init__(self):
@@ -583,8 +634,11 @@ class FourEthyldecane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_2_3,
+            spectra_no_overlap=spec.S_8,
             index=21
         )
+
 
 class FiveSixDimethyldecane(Material):
     def __init__(self):
@@ -604,8 +658,11 @@ class FiveSixDimethyldecane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_2_3,
+            spectra_no_overlap=spec.S_8,
             index=22
         )
+
 
 class FourEthylFiveMethylnonane(Material):
     def __init__(self):
@@ -625,8 +682,11 @@ class FourEthylFiveMethylnonane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_2_3,
+            spectra_no_overlap=spec.S_8,
             index=23
         )
+
 
 class FourFiveDiethyloctane(Material):
     def __init__(self):
@@ -646,8 +706,11 @@ class FourFiveDiethyloctane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_2_3,
+            spectra_no_overlap=spec.S_8,
             index=24
         )
+
 
 class Ethoxyethane(Material):
     def __init__(self):
@@ -803,3 +866,4 @@ total_num_material = len(Material.__subclasses__())
 #                          polarity=0.1,
 #                          temperature=298,
 #                          )
+
