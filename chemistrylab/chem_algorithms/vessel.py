@@ -1289,7 +1289,7 @@ class Vessel:
 
             # layers gaussian representation
             self._layers_position_dict = v._layers_position_dict
-            self._layers_variance = v._layer_variance
+            self._layers_variance = v._layers_variance
 
             # calculate the maximal pressure based on what material is in the vessel
             self.pmax = v.pmax
