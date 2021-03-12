@@ -4,14 +4,15 @@ from abc import ABC
 import numpy as np
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.lab.lab import Lab
+from chemistrylab.lab.agent import RandomAgent
 import datetime as dt
 import gym
 
 
-class Manager():
+class Manager:
     def __init__(self, mode='human'):
         self.mode = mode
-        self.agents = {'random': None}
+        self.agents = {'random': RandomAgent}
         self.agent = None
         self.lab = Lab()
 
@@ -19,7 +20,7 @@ class Manager():
         if self.mode == 'human':
             self._human_run()
         elif self.mode in self.agents:
-            self.agent = self.agents[self.mode]
+            self.agent = self.agents[self.mode]()
             self._agent_run()
 
     def _human_run(self):
@@ -92,9 +93,9 @@ class Manager():
         total_reward = 0
         while not done:
             action = self.agent.run_step(self.lab, self.lab.shelf)
+            print(action)
             reward, done = self.lab.step(action)
             total_reward += reward
-
 
     def load_bench(self, bench, env_index, vessel_index, agent):
         self.lab.run_bench(bench,  env_index, vessel_index, agent)
@@ -119,5 +120,5 @@ class Manager():
 
 
 if __name__ == "__main__":
-    manager = Manager()
+    manager = Manager(mode='random')
     manager.run()

@@ -35,12 +35,15 @@ class Lab(gym.Env, ABC):
         self.observation_space = None
 
     def load_reaction_bench(self, index):
+        print(self.reactions[index])
         return gym.make(self.reactions[index])
 
     def load_extraction_bench(self, index):
+        print(self.extractions[index])
         return gym.make(self.extractions[index])
 
     def load_distillation_bench(self, index):
+        print(self.distillations[index])
         return gym.make(self.distillations[index])
 
     def run_bench(self, bench, env_index, vessel_index, agent_index=0):
@@ -54,7 +57,10 @@ class Lab(gym.Env, ABC):
                 total_reward -= 10
             else:
                 env = self.load_reaction_bench(env_index)
-                env.update_vessel(self.shelf.get_vessel(vessel_index))
+                if vessel_index > self.shelf.open_slot:
+                    total_reward -= 10
+                else:
+                    env.update_vessel(self.shelf.get_vessel(vessel_index))
             if agent_index >= len(list(self.react_agents.keys())):
                 total_reward -= 10
             else:
@@ -65,7 +71,10 @@ class Lab(gym.Env, ABC):
                 total_reward -= 10
             else:
                 env = self.load_extraction_bench(env_index)
-                env.update_vessel(self.shelf.get_vessel(vessel_index))
+                if vessel_index > self.shelf.open_slot:
+                    total_reward -= 10
+                else:
+                    env.update_vessel(self.shelf.get_vessel(vessel_index))
             if agent_index >= len(list(self.extract_agents.keys())):
                 total_reward -= 10
             else:
@@ -76,23 +85,29 @@ class Lab(gym.Env, ABC):
                 total_reward -= 10
             else:
                 env = self.load_distillation_bench(env_index)
-                env.update_vessel(self.shelf.get_vessel(vessel_index))
+                if vessel_index > self.shelf.open_slot:
+                    total_reward -= 10
+                else:
+                    env.update_vessel(self.shelf.get_vessel(vessel_index))
             if agent_index >= len(list(self.distill_agents.keys())):
                  total_reward -= 10
             else:
                 agent_name = list(self.distill_agents.keys())[agent_index]
                 agent = self.distill_agents[agent_name]
+        elif bench == 'analysis':
+            return 0
         else:
             raise KeyError(f'{bench} is not a recognized bench')
         done = total_reward < 0
-        state = env.reset()
-        while not done:
-            # env.render(mode=self.render_mode)
-            action = agent.run_step(env, state)
-            state, reward, done, _ = env.step(action)
-            total_reward += reward
-        rtn_vessel = env.vessels
-        self.shelf.return_vessel_to_shelf(vessel=rtn_vessel)
+        if not done:
+            state = env.reset()
+            while not done:
+                # env.render(mode=self.render_mode)
+                action = agent.run_step(env, state)
+                state, reward, done, _ = env.step(action)
+                total_reward += reward
+            rtn_vessel = env.vessels
+            self.shelf.return_vessel_to_shelf(vessel=rtn_vessel)
         return total_reward
 
     def step(self, action: list):
@@ -124,5 +139,6 @@ class Lab(gym.Env, ABC):
 
     def reset(self):
         self.shelf.reset()
+        return self.shelf.vessels
 
 

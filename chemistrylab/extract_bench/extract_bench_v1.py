@@ -133,7 +133,7 @@ class ExtractWorld_v1(ExtractBenchEnv):
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
-                extract_vessel=None
+                extract_vessel=vessel.Vessel(label='temp')
             ),
             solute="H2O",
             target_material='dodecane',

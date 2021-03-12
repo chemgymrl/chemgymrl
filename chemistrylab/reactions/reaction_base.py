@@ -125,11 +125,11 @@ class _Reaction:
         # self.params = [spec.S_1]*len(materials)
 
         self.params = []
-        for material in materials:
+        for material in self.material_classes:
             if overlap:
-                self.params.append(material.get_spectra_overlap())
+                self.params.append(material().get_spectra_overlap())
             else:
-                self.params.append(material.get_spectra_no_overlap())
+                self.params.append(material().get_spectra_no_overlap())
 
     def get_ni_label(self):
         '''
