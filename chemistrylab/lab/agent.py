@@ -9,7 +9,7 @@ class Agent:
     def __init__(self):
         self.name = 'agent'
 
-    def run(self, env, state):
+    def run_step(self, env, state):
         return np.array([])
 
 
