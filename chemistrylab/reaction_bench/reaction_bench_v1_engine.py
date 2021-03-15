@@ -35,7 +35,7 @@ sys.path.append("../../") # to access chemistrylab
 sys.path.append("../reactions/") # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
 from chemistrylab.chem_algorithms import vessel, util
-from chemistrylab.reactions.wurtz_reaction import Reaction
+from chemistrylab.reactions.reaction_base import _Reaction
 
 R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
@@ -48,24 +48,13 @@ class ReactionBenchEnv(gym.Env):
 
     def __init__(
             self,
-            reaction=Reaction,
+            reaction=_Reaction,
             in_vessel_path=None,
             out_vessel_path=None,
             materials=None,
             solutes=None,
-            desired="",
-            rate_fn=None,
             n_steps=50,
             dt=0.01,
-            Ti=300.0,
-            Tmin=250.0,
-            Tmax=500.0,
-            dT=50.0,
-            Vi=0.002,
-            Vmin=0.001,
-            Vmax=0.005,
-            dV=0.0005,
-            Pmax=1,
             overlap=False
     ):
         '''
@@ -84,28 +73,10 @@ class ReactionBenchEnv(gym.Env):
             A list of dictionaries including initial material names, classes, and amounts.
         `solutes` : `list` (default=`None`)
             A list of dictionaries including initial solute names, classes, and amounts.
-        `desired` : `str` (default="")
-            A string indicating the desired output material.
         `n_steps` : `int` (default=`50`)
             The number of time steps to be taken during each action.
         `dt` : `float` (default=`0.01`)
             The amount of time taken in each time step.
-        `Ti` : `float` (default=`300.0`)
-            The initial temperature of the system in Kelvin.
-        `Tmin` : `float` (default=`250.0`)
-            The minimal temperature of the system in Kelvin.
-        `Tmax` : `float` (default=`500.0`)
-            The maximal temperature of the system in Kelvin.
-        `dT` : `float` (default=`50.0`)
-            The maximal allowed temperature change, in Kelvin, for a single action.
-        `Vi` : `float` (default=`0.002`)
-            The initial volume of the system in litres.
-        `Vmin` : `float` (default=`0.001`)
-            The minimal volume of the system in litres.
-        `Vmax` : `float` (default=`0.005`)
-            The maximal volume of the system in litres.
-        `dV` : `float` (default=`0.0005`)
-            The maximal allowed volume change, in litres, for a single action.
         `overlap` : `boolean` (default=`False`)
             Indicates if the spectral plots show overlapping signatures.
 
@@ -128,17 +99,8 @@ class ReactionBenchEnv(gym.Env):
             out_vessel_path=out_vessel_path,
             materials=materials,
             solutes=solutes,
-            desired=desired,
             n_steps=n_steps,
             dt=dt,
-            Ti=Ti,
-            Tmin=Tmin,
-            Tmax=Tmax,
-            dT=dT,
-            Vi=Vi,
-            Vmin=Vmin,
-            Vmax=Vmax,
-            dV=dV,
             overlap=overlap
         )
 
@@ -152,22 +114,7 @@ class ReactionBenchEnv(gym.Env):
         self.dt = input_parameters["dt"] # Time step of reaction (s)
 
         # initialize the reaction
-        self.reaction = input_parameters["reaction"](
-            overlap=overlap,
-            initial_materials=materials,
-            initial_solutes=solutes,
-            desired=desired,
-            rate_fn=rate_fn,
-            Ti=Ti,
-            Tmin=Tmin,
-            Tmax=Tmax,
-            dT=dT,
-            Vi=Vi,
-            Vmin=Vmin,
-            Vmax=Vmax,
-            dV=dV,
-            dt=dt
-        )
+        self.reaction = input_parameters["reaction"](overlap=overlap)
 
         # Maximum time (s) (20 is the registered max_episode_steps)
         self.tmax = self.n_steps * self.dt * 20
@@ -181,11 +128,6 @@ class ReactionBenchEnv(gym.Env):
         if self.in_vessel_path is None:
             self.vessels = vessel.Vessel(
                 'default',
-                temperature=Ti,
-                v_max=Vmax,
-                v_min=Vmin,
-                Tmax=Tmax,
-                Tmin=Tmin,
                 default_dt=self.dt
             )
 
@@ -227,8 +169,9 @@ class ReactionBenchEnv(gym.Env):
         self.action_space = gym.spaces.Box(low=act_low, high=act_high)
 
         # this an array denoting spectral signatures (varying
-        # between 0.0 and 1.0) for a wide range of wavelengths
-        absorb = self.reaction.get_spectra(Vi)
+        # between 0.0 and 1.0) for a wide range of wavelengths;
+        # only needed for specifying the observation space so only the array size is required
+        absorb = self.reaction.get_spectra(self.vessels.get_current_volume())
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -254,17 +197,8 @@ class ReactionBenchEnv(gym.Env):
             out_vessel_path="",
             materials=None,
             solutes=None,
-            desired="",
             n_steps=0,
             dt=0.0,
-            Ti=0.0,
-            Tmin=0.0,
-            Tmax=0.0,
-            dT=0.0,
-            Vi=0.0,
-            Vmin=0.0,
-            Vmax=0.0,
-            dV=0.0,
             overlap=False
     ):
         '''
@@ -283,28 +217,10 @@ class ReactionBenchEnv(gym.Env):
             A list of dictionaries including initial material names, classes, and amounts.
         `solutes` : `list` (default=`None`)
             A list of dictionaries including initial solute names, classes, and amounts.
-        `desired` : `str` (default="")
-            A string indicating the desired output material.
         `n_steps` : `int` (default=`0`)
             The number of time steps to be taken during each action.
         `dt` : `float` (default=`0.0`)
             The amount of time taken in each time step.
-        `Ti` : `float` (default=`1.0`)
-            The initial temperature of the system in Kelvin.
-        `Tmin` : `float` (default=`1.0`)
-            The minimal temperature of the system in Kelvin.
-        `Tmax` : `float` (default=`1.0`)
-            The maximal temperature of the system in Kelvin.
-        `dT` : `float` (default=`0.0`)
-            The maximal allowed temperature change, in Kelvin, for a single action.
-        `Vi` : `float` (default=`1.0`)
-            The initial volume of the system in litres.
-        `Vmin` : `float` (default=`1.0`)
-            The minimal volume of the system in litres.
-        `Vmax` : `float` (default=`1.0`)
-            The maximal volume of the system in litres.
-        `dV` : `float` (default=`0.0`)
-            The maximal allowed volume change, in litres, for a single action.
         `overlap` : `boolean` (default=`False`)
             Indicates if the spectral plots show overlapping signatures.
 
@@ -363,11 +279,6 @@ class ReactionBenchEnv(gym.Env):
         if len(solutes) == 0:
             print("Error: The materials list contains no elements.")
 
-        # ensure the desired material parameter is a string
-        if not isinstance(desired, str):
-            print("Invalid `desired` type. The default will be provided.")
-            desired = ""
-
         # ensure the n_steps parameter is a non-zero, non-negative integer
         if any([
                 not isinstance(n_steps, int),
@@ -384,100 +295,10 @@ class ReactionBenchEnv(gym.Env):
             print("Invalid 'Default Timestep' type. The default will be provided.")
             dt = 1.0
 
-        # the initial temperature parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Ti, float),
-                Ti <= 0.0
-        ]):
-            print("Invalid 'Initial Temperature' type. The default will be provided.")
-            Ti = 1.0
-
-        # the minimum temperature parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Tmin, float),
-                Tmin <= 0.0
-        ]):
-            print("Invalid 'Minimum Temperature' type. The default will be provided.")
-            Tmin = 1.0
-
-        # the maximum temperature parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Tmax, float),
-                Tmax <= 0.0
-        ]):
-            print("Invalid 'Maximum Temperature' type. The default will be provided.")
-            Tmax = 1.0
-
-        # the temperature increment parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(dT, float),
-                dT <= 0.0
-        ]):
-            print("Invalid 'Temperature Increment' type. The default will be provided.")
-            dT = 1.0
-
-        # the initial volume parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Vi, float),
-                Vi <= 0.0
-        ]):
-            print("Invalid 'Initial Volume' type. The default will be provided.")
-            Vi = 1.0
-
-        # the minimum volume parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Vmin, float),
-                Vmin <= 0.0
-        ]):
-            print("Invalid 'Minimum Volume' type. The default will be provided.")
-            Vmin = 1.0
-
-        # the maximum volume parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(Vmax, float),
-                Vmax <= 0.0
-        ]):
-            print("Invalid 'Maximum Volume' type. The default will be provided.")
-            Vmax = 1.0
-
-        # the volume increment parameter must be a non-zero, non-negative floating point value
-        if any([
-                not isinstance(dV, float),
-                dV <= 0.0
-        ]):
-            print("Invalid 'Volume Increment' type. The default will be provided.")
-            dV = 1.0
-
         # the overlap parameter must be a boolean
         if not isinstance(overlap, bool):
             print("Invalid 'Overlap Spectra' type. The default will be provided.")
             overlap = False
-
-        ## ----- ## CHECK THERMODYNAMIC VARIABLES ## ----- ##
-
-        # the minimum temperature parameter must be smaller than or equal to the maximum temperature
-        if Tmin > Tmax:
-            Tmin = Tmax
-
-        # the maximum temperature parameter must be larger than or equal to the minimum volume
-        if Tmax < Tmin:
-            Tmax = Tmin
-
-        # the initial temperature must be between the minimal and maximal temperature parameters
-        if not Tmin <= Ti <= Tmax:
-            Ti = Tmin + ((Tmax - Tmin) / 2)
-
-        # the minimum volume parameter must be smaller than or equal to the maximum volume
-        if Vmin > Vmax:
-            Vmin = Vmax
-
-        # the maximum volume parameter must be larger than or equal to the minimum volume
-        if Vmax < Vmin:
-            Vmax = Vmin
-
-        # the initial temperature must be between the minimal and maximal temperature parameters
-        if not Vmin <= Vi <= Vmax:
-            Vi = Vmin + ((Vmax - Vmin) / 2)
 
         # collect all the input parameters in a labelled dictionary
         input_parameters = {
@@ -486,17 +307,8 @@ class ReactionBenchEnv(gym.Env):
             "out_vessel_path" : out_vessel_path,
             "materials" : materials,
             "solutes" : solutes,
-            "desired" : desired,
             "n_steps" : n_steps,
             "dt" : dt,
-            "Ti" : Ti,
-            "Tmin" : Tmin,
-            "Tmax" : Tmax,
-            "dT" : dT,
-            "Vi" : Vi,
-            "Vmin" : Vmin,
-            "Vmax" : Vmax,
-            "dV" : dV,
             "overlap" : overlap
         }
 
@@ -620,14 +432,14 @@ class ReactionBenchEnv(gym.Env):
         self.t = 0.0
 
         # reinitialize the reaction class
-        self.reaction.reset(n_init=self.n_init)
+        self.vessels = self.reaction.reset(vessels=self.vessels)
         
-        Ti = self.reaction.Ti
-        Tmin = self.reaction.Tmin
-        Tmax = self.reaction.Tmax
-        Vi = self.reaction.Vi
-        Vmin = self.reaction.Vmin
-        Vmax = self.reaction.Vmax
+        Ti = self.vessels.get_temperature()
+        Tmin = self.vessels.get_Tmin()
+        Tmax = self.vessels.get_Tmax
+        Vi = self.vessels.get_current_volume()
+        Vmin = self.vessels.get_min_volume()
+        Vmax = self.vessels.get_max_volume()
         total_pressure = self.reaction.get_total_pressure(Vi, Ti)
 
         # populate the state with the above variables
@@ -685,7 +497,9 @@ class ReactionBenchEnv(gym.Env):
 
         # the reward for this step is set to 0 initially
         reward = 0.0
-        self.t, self.vessels, self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.step(action, self.vessels, self.t, self.tmax, self.n_steps)
+
+        # pass the action and vessel to the reaction base class's perform action function
+        self.vessels = self.reaction.perform_action(action, self.vessels, self.n_steps)
 
         # call some function to get plotting data
 
@@ -883,8 +697,8 @@ class ReactionBenchEnv(gym.Env):
         label_list = ['t', 'T', 'V', 'P'] + reactants
 
         # get the spectral data peak and dashed spectral lines
-        peak = self.reaction.get_spectra_peak(self.V)
-        dash_spectra = self.reaction.get_dash_line_spectra(self.V)
+        peak = self.reaction.get_spectra_peak(self.vessels.get_current_volume())
+        dash_spectra = self.reaction.get_dash_line_spectra(self.vessels.get_current_volume())
 
         # The first render is required to initialize the figure
         if self._first_render:
