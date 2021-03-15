@@ -719,7 +719,7 @@ class ReactionBenchEnv_Equilibrium(gym.Env):
 
         return self.state
 
-    def step(self, action):
+    def step(self, action: list):
         '''
         Update the environment with processes defined in `action`.
 

@@ -37,25 +37,28 @@ class Reaction(_Reaction):
 
         self.name = 'wurtz_reaction'
 
-    def get_conc_change(self, rates, conc, dt):
+    def get_conc_change(self, rates, conc):
         dC = np.zeros(11)
-        dC[0] = ((-2.0 * rates[0]) + (-1.0 * rates[1]) + (-1.0 * rates[2])) * dt  # change in 1-chlorohexane
-        dC[1] = ((-1.0 * rates[1]) + (-2.0 * rates[3]) + (-1.0 * rates[4])) * dt  # change in 2-chlorohexane
-        dC[2] = ((-2.0 * rates[2]) + (-1.0 * rates[4]) + (-2.0 * rates[5])) * dt  # change in 3-chlorohexane
-        dC[3] = -2.0 * (rates[0] + rates[1] + rates[2] + rates[3] + rates[4] + rates[5]) * dt  # change in Na
-        dC[4] = 1.0 * rates[0] * dt  # change in dodecane
-        dC[5] = 1.0 * rates[1] * dt  # change in 5-methylundecane
-        dC[6] = 1.0 * rates[2] * dt  # change in 4-ethyldecane
-        dC[7] = 1.0 * rates[3] * dt  # change in 5,6-dimethyldecane
-        dC[8] = 1.0 * rates[4] * dt  # change in 4-ethyl-5-methylnonane
-        dC[9] = 1.0 * rates[5] * dt  # change in 4,5-diethyloctane
-        dC[10] = 2.0 * (rates[0] + rates[1] + rates[2] + rates[3] + rates[4] + rates[5]) * dt  # change in NaCl
+        dC[0] = ((-2.0 * rates[0]) + (-1.0 * rates[1]) + (-1.0 * rates[2]))  # change in 1-chlorohexane
+        dC[1] = ((-1.0 * rates[1]) + (-2.0 * rates[3]) + (-1.0 * rates[4]))  # change in 2-chlorohexane
+        dC[2] = ((-2.0 * rates[2]) + (-1.0 * rates[4]) + (-2.0 * rates[5]))  # change in 3-chlorohexane
+        dC[3] = -2.0 * (rates[0] + rates[1] + rates[2] + rates[3] + rates[4] + rates[5])  # change in Na
+        dC[4] = 1.0 * rates[0]  # change in dodecane
+        dC[5] = 1.0 * rates[1]  # change in 5-methylundecane
+        dC[6] = 1.0 * rates[2]  # change in 4-ethyldecane
+        dC[7] = 1.0 * rates[3]  # change in 5,6-dimethyldecane
+        dC[8] = 1.0 * rates[4]  # change in 4-ethyl-5-methylnonane
+        dC[9] = 1.0 * rates[5]  # change in 4,5-diethyloctane
+        dC[10] = 2.0 * (rates[0] + rates[1] + rates[2] + rates[3] + rates[4] + rates[5])  # change in NaCl
 
+        return dC
+
+    def conc_change_limits(self, dC, conc):
         # ensure the changes in reactant concentration do not exceed the concentrations available
         dC[0] = np.max([dC[0], -1.0 * conc[0]])
         dC[1] = np.max([dC[1], -1.0 * conc[1]])
         dC[2] = np.max([dC[2], -1.0 * conc[2]])
         dC[3] = np.max([dC[3], -1.0 * conc[3]])
-        return dC
 
+        return dC
 

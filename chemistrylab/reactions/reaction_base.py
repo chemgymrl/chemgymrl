@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 sys.path.append("../../") # allows module to access chemistrylab
 from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 from chemistrylab.reactions.get_reactions import convert_to_class
-from chemistrylab.reactions.rate import Rates
+from chemistrylab.lab.de import De
 from chemistrylab.chem_algorithms import util, vessel
 
 
@@ -29,8 +29,8 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, initial_materials, initial_solutes, reactants, products, materials, desired, exp_coef,
-                 rate_fn: Rates, solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8, Ti=0.0,
+    def __init__(self, initial_materials, initial_solutes, reactants, products, materials, desired,
+                 de: De, solver='newton', solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8, Ti=0.0,
             Tmin=0.0, Tmax=0.0, dT=0.0, Vi=0.0, Vmin=0.0, Vmax=0.0, dV=0.0, dt=0):
         """
         Constructor class module for the Reaction class.
@@ -104,8 +104,7 @@ class _Reaction:
         else:
             self.nmax = nmax
         # store the class that calculates the reaction rates
-        self.rate_fn = rate_fn
-        self.exp_coef = exp_coef
+        self.de = de
         # define the maximal number of moles available for any chemical
         self.max_mol = max_mol
 
@@ -120,6 +119,10 @@ class _Reaction:
         self.dV = dV
 
         self.dt = dt
+
+        self.solvers = {'newton': None}
+
+        self.solver = self.solvers[solver]
 
         # define parameters for generating spectra
         # self.params = [spec.S_1]*len(materials)
@@ -202,25 +205,9 @@ class _Reaction:
         # define a class instance attribute for the amount of each chemical
         self.n = n_init
 
-    def get_reaction_constants(self, temp, conc):
-        agg_conc = 1
-        reactant_conc = [conc[i] for i in range(len(self.reactants))]
-        non_zero_conc = [_conc for _conc in reactant_conc if _conc != 0.0]
-        for conc in non_zero_conc:
-            agg_conc *= conc
-        exponent = 2 / len(non_zero_conc) if len(non_zero_conc) != 0 else 1
-        scaling_factor = (abs(agg_conc)) ** exponent
-
-        const_coef = 1 / scaling_factor
-        k = const_coef * np.exp((-1*self.exp_coef)/(R*temp))
-        return k
-
-    def get_rates(self, k, conc):
-        return self.rate_fn.get_rates(k, conc)
-
-    def get_conc_change(self, rates, conc, dt):
-        # define the mechanics of the reaction concentration change here
-        return np.array([])
+    def solve_ode(self, conc, t):
+        if self.solver:
+            return self.solver
 
     def update(self, temp, volume, dt):
         '''
@@ -245,10 +232,9 @@ class _Reaction:
         ---------------
         None
         '''
+
         conc = self.get_concentration(volume)
-        k = self.get_reaction_constants(temp, conc)
-        rates = self.get_rates(k, conc)
-        conc_change = self.get_conc_change(rates, conc, dt)
+        conc_change = self.de.run(conc, temp)
         for i in range(self.n.shape[0]):
             # convert back to moles
             dn = conc_change[i] * volume
