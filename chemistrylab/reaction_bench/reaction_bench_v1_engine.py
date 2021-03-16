@@ -31,15 +31,17 @@ import os
 import sys
 import datetime as dt
 
-sys.path.append("../../") # to access chemistrylab
-sys.path.append("../reactions/") # to access all reactions
+sys.path.append("../../")  # to access chemistrylab
+sys.path.append("../reactions/")  # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
 from chemistrylab.chem_algorithms import vessel, util
+from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.reactions.reaction_base import _Reaction
 
-R = 0.008314462618 # Gas constant (kPa * m**3 * mol**-1 * K**-1)
+R = 0.008314462618  # Gas constant (kPa * m**3 * mol**-1 * K**-1)
 wave_max = 800
 wave_min = 200
+
 
 class ReactionBenchEnv(gym.Env):
     '''
@@ -49,14 +51,14 @@ class ReactionBenchEnv(gym.Env):
     def __init__(
             self,
             reaction=_Reaction,
+            reaction_file_identifier="",
             in_vessel_path=None,
             out_vessel_path=None,
             materials=None,
             solutes=None,
             n_steps=50,
             dt=0.01,
-            overlap=False,
-            reaction_file=""
+            overlap=False
     ):
         '''
         Constructor class method to pass thermodynamic variables to class methods.
@@ -96,14 +98,14 @@ class ReactionBenchEnv(gym.Env):
         # validate the parameters inputted to the reaction bench engine
         input_parameters = self._validate_parameters(
             reaction=reaction,
+            reaction_file_identifier=reaction_file_identifier,
             in_vessel_path=in_vessel_path,
             out_vessel_path=out_vessel_path,
             materials=materials,
             solutes=solutes,
             n_steps=n_steps,
             dt=dt,
-            overlap=overlap,
-            reaction_file=reaction_file
+            overlap=overlap
         )
 
         # set the input vessel path
@@ -112,11 +114,14 @@ class ReactionBenchEnv(gym.Env):
         # set the output vessel path
         self.out_vessel_path = input_parameters["out_vessel_path"]
 
-        self.n_steps = input_parameters["n_steps"] # Time steps per action
-        self.dt = input_parameters["dt"] # Time step of reaction (s)
+        self.n_steps = input_parameters["n_steps"]  # Time steps per action
+        self.dt = input_parameters["dt"]  # Time step of reaction (s)
 
         # initialize the reaction
-        self.reaction = input_parameters["reaction"](overlap=overlap, reaction_file_identifier=reaction_file)
+        self.reaction = input_parameters["reaction"](
+            reaction_file_identifier=input_parameters["reaction_file_identifier"],
+            overlap=input_parameters["overlap"]
+        )
 
         # Maximum time (s) (20 is the registered max_episode_steps)
         self.tmax = self.n_steps * self.dt * 20
@@ -128,31 +133,45 @@ class ReactionBenchEnv(gym.Env):
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
         if self.in_vessel_path is None:
-            self.vessels = vessel.Vessel(
-                label='default',
-                default_dt=self.dt,
-            )
+            # prepare the materials that have been provided
+            material_names = []
+            material_amounts = []
+            for material_params in input_parameters["materials"]:
+                material_names.append(material_params["Material"])
+                material_amounts.append(material_params["Initial"])
+            material_classes = convert_to_class(materials=material_names)
+            material_dict = {}
+            for i, material in enumerate(material_names):
+                material_dict[material] = [material_classes[i], material_amounts[i], 'mol']
 
-            '''
-            for i in range(self.reaction.initial_in_hand.shape[0]):
-                self.n_init[i] = self.reaction.initial_in_hand[i]
-            '''
+            # prepare the solutes that have been provided
+            solute_names = []
+            solute_amounts = []
+            for solute_params in input_parameters["solutes"]:
+                solute_names.append(solute_params["Solute"])
+                solute_amounts.append(solute_params["Initial"])
+            solute_classes = convert_to_class(materials=solute_names)
+            solute_dict = {}
+            for i, solute in enumerate(solute_names):
+                solute_dict[solute] = [solute_classes[i], solute_amounts[i], 'mol']
+
+            # add the materials and solutes to an empty vessel
+            self.vessels = vessel.Vessel(
+                'default',
+                materials=material_dict,
+                solutes=solute_dict,
+                default_dt=self.dt
+            )
         else:
             with open(self.in_vessel_path, 'rb') as handle:
                 v = pickle.load(handle)
                 self.vessels = v
 
-            '''
-            for i in range(self.n_init.shape[0]):
-                material_name = self.reaction.labels[i]
-                self.n_init[i] = self.vessels._material_dict[material_name][1]
-            '''
-
         # set up a state variable
         self.state = None
 
         # reset the inputted reaction before performing any steps
-        self.reaction.reset(self.vessels)
+        self.reaction.reset(vessels=self.vessels)
 
         # Defining action and observation space for OpenAI Gym framework
         # shape[0] is the change in amount of each reactant
@@ -173,7 +192,7 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = self.reaction.get_spectra(self.reaction.Vi)
+        absorb = self.reaction.get_spectra(self.vessels.get_volume())
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -195,14 +214,14 @@ class ReactionBenchEnv(gym.Env):
     @staticmethod
     def _validate_parameters(
             reaction=None,
+            reaction_file_identifier="",
             in_vessel_path="",
             out_vessel_path="",
             materials=None,
             solutes=None,
             n_steps=0,
             dt=0.0,
-            overlap=False,
-            reaction_file=""
+            overlap=False
     ):
         '''
         Method to validate the parameters inputted to the reaction class.
@@ -244,6 +263,10 @@ class ReactionBenchEnv(gym.Env):
         if not isinstance(reaction, type):
             raise TypeError("Invalid `Reaction Class` type. Unable to Proceed.")
 
+        # ensure the reaction file identifier is a string a points to a legitimate file
+        if not isinstance(reaction_file_identifier, str):
+            raise TypeError("Invalid `Reaction File Parameter` type. Unable to Proceed.")
+
         # ensure the input vessel parameter points to a legitimate location or is `None`
         if in_vessel_path is not None:
             if not isinstance(in_vessel_path, str):
@@ -284,16 +307,16 @@ class ReactionBenchEnv(gym.Env):
 
         # ensure the n_steps parameter is a non-zero, non-negative integer
         if any([
-                not isinstance(n_steps, int),
-                n_steps <= 0
+            not isinstance(n_steps, int),
+            n_steps <= 0
         ]):
             print("Invalid 'Number of Steps per Action' type. The default will be provided.")
             n_steps = 1
 
         # the default timestep parameter must be a non-zero, non-negative floating point value
         if any([
-                not isinstance(dt, float),
-                dt <= 0.0
+            not isinstance(dt, float),
+            dt <= 0.0
         ]):
             print("Invalid 'Default Timestep' type. The default will be provided.")
             dt = 1.0
@@ -303,36 +326,20 @@ class ReactionBenchEnv(gym.Env):
             print("Invalid 'Overlap Spectra' type. The default will be provided.")
             overlap = False
 
-        # ensure reaction file is a string that points to the correct reaction file
-        if not isinstance(reaction_file, str):
-            print("Invalid reaction file")
-
         # collect all the input parameters in a labelled dictionary
         input_parameters = {
-            "reaction" : reaction,
-            "in_vessel_path" : in_vessel_path,
-            "out_vessel_path" : out_vessel_path,
-            "materials" : materials,
-            "solutes" : solutes,
-            "n_steps" : n_steps,
-            "dt" : dt,
-            "overlap" : overlap
+            "reaction": reaction,
+            "reaction_file_identifier": reaction_file_identifier,
+            "in_vessel_path": in_vessel_path,
+            "out_vessel_path": out_vessel_path,
+            "materials": materials,
+            "solutes": solutes,
+            "n_steps": n_steps,
+            "dt": dt,
+            "overlap": overlap
         }
 
         return input_parameters
-
-    def update_vessel(self, new_vessel: vessel.Vessel):
-        new_n = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
-        mat_dict = util.convert_material_dict_units(new_vessel.get_material_dict())
-        for i, mat in enumerate(self.reaction.materials):
-            if mat in mat_dict:
-                amount = mat_dict[mat][1]
-                new_n[i] = amount
-
-        self.vessels = new_vessel
-        self.n_init = new_n
-        self.reaction.reset(new_n)
-        pass
 
     def _update_state(self):
         '''
@@ -360,7 +367,7 @@ class ReactionBenchEnv(gym.Env):
         # create an array to contain all state variables
         state = np.zeros(
             4 +  # time T V P
-            self.reaction.initial_in_hand.shape[0] +  # reactants
+            len(self.reaction.reactants) +  # reactants
             absorb.shape[0],  # spectra
             dtype=np.float32
         )
@@ -392,27 +399,6 @@ class ReactionBenchEnv(gym.Env):
 
         self.state = state
 
-
-    def _update_vessel(self, temp, vol, pre):
-        '''
-        Method to update the information stored in the vessel upon completing a step.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        '''
-
-        new_vessel = self.reaction.update_vessel(self.vessels, temp, vol, pre)
-        self.vessels = new_vessel
-
     def reset(self):
         '''
         Class method to reinitialize the environment by setting
@@ -440,21 +426,22 @@ class ReactionBenchEnv(gym.Env):
 
         # reinitialize the reaction class
         self.vessels = self.reaction.reset(vessels=self.vessels)
-        
+
         Ti = self.vessels.get_temperature()
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
-        Vi = self.reaction.Vi
+        Vi = self.vessels.get_volume()
         Vmin = self.vessels.get_min_volume()
         Vmax = self.vessels.get_max_volume()
         total_pressure = self.vessels.get_pressure()
+        Pmax = self.vessels.get_pmax()
 
         # populate the state with the above variables
         self.plot_data_state = [
-            [0.0],
-            [(Ti - Tmin) / (Tmax - Tmin)],
-            [(Vi - Vmin) / (Vmax - Vmin)],
-            [total_pressure]
+            [0.0],  # time
+            [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
+            [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume
+            [total_pressure / Pmax]  # normalized pressure
         ]
         self.plot_data_mol = []
         self.plot_data_concentration = []
@@ -467,9 +454,6 @@ class ReactionBenchEnv(gym.Env):
 
         # update the state variables with the initial values
         self._update_state()
-
-        # update the vessel variable
-        self._update_vessel(Ti, Vi, total_pressure)
 
         return self.state
 
@@ -589,11 +573,11 @@ class ReactionBenchEnv(gym.Env):
 
         # set a list of state variables and their labels
         num_list = [
-            self.state[0],
-            self.state[1],
-            self.state[2],
-            self.state[3]
-        ] + self.reaction.get_ni_num()
+                       self.state[0],
+                       self.state[1],
+                       self.state[2],
+                       self.state[3]
+                   ] + self.reaction.get_ni_num()
 
         reactants = []
         for reactant in self.reaction.reactants:
@@ -613,8 +597,8 @@ class ReactionBenchEnv(gym.Env):
 
             # plot spectra
             self._plot_line1 = self._plot_axs[0].plot(
-                wave, # wave range from wave_min to wave_max
-                absorb, # absorb spectra
+                wave,  # wave range from wave_min to wave_max
+                absorb,  # absorb spectra
             )[0]
             self._plot_axs[0].set_xlim([wave_min, wave_max])
             self._plot_axs[0].set_ylim([0, 1.2])
@@ -689,14 +673,14 @@ class ReactionBenchEnv(gym.Env):
 
         # obtain lists of the numbers and labels representing each
         num_list = [
-            self.state[0],
-            self.state[1],
-            self.state[2],
-            self.state[3]
-        ] + self.reaction.get_ni_num()
+                       self.state[0],
+                       self.state[1],
+                       self.state[2],
+                       self.state[3]
+                   ] + self.reaction.get_ni_num()
 
         reactants = []
-        for reactant in self.reaction.reactants():
+        for reactant in self.reaction.reactants:
             name = reactant.replace("[", "").replace("]", "")
             short_name = name[0:4]
             reactants.append(short_name)
@@ -704,8 +688,8 @@ class ReactionBenchEnv(gym.Env):
         label_list = ['t', 'T', 'V', 'P'] + reactants
 
         # get the spectral data peak and dashed spectral lines
-        peak = self.reaction.get_spectra_peak(self.vessels.get_current_volume())
-        dash_spectra = self.reaction.get_dash_line_spectra(self.vessels.get_current_volume())
+        peak = self.reaction.get_spectra_peak(self.vessels.get_volume())
+        dash_spectra = self.reaction.get_dash_line_spectra(self.vessels.get_volume())
 
         # The first render is required to initialize the figure
         if self._first_render:
@@ -718,9 +702,9 @@ class ReactionBenchEnv(gym.Env):
             for i in range(self.reaction.n.shape[0]):
                 self._plot_lines_amount.append(
                     self._plot_axs[0, 0].plot(
-                        self.plot_data_state[0], # time
-                        self.plot_data_mol[i], # mol of species C[i]
-                        label=self.reaction.materials[i] # names of species C[i]
+                        self.plot_data_state[0],  # time
+                        self.plot_data_mol[i],  # mol of species C[i]
+                        label=self.reaction.materials[i]  # names of species C[i]
                     )[0]
                 )
             self._plot_axs[0, 0].set_xlim([0.0, self.vessels.get_defaultdt() * self.n_steps])
@@ -734,14 +718,14 @@ class ReactionBenchEnv(gym.Env):
             for i in range(self.reaction.n.shape[0]):
                 self._plot_lines_concentration.append(
                     self._plot_axs[0, 1].plot(
-                        self.plot_data_state[0], # time
-                        self.plot_data_concentration[i], # concentrations of species C[i]
-                        label=self.reaction.materials[i] # names of species C[i]
+                        self.plot_data_state[0],  # time
+                        self.plot_data_concentration[i],  # concentrations of species C[i]
+                        label=self.reaction.materials[i]  # names of species C[i]
                     )[0]
                 )
             self._plot_axs[0, 1].set_xlim([0.0, self.vessels.get_defaultdt() * self.n_steps])
             self._plot_axs[0, 1].set_ylim([
-                0.0, np.max(self.reaction.nmax)/(self.vessels.get_min_volume())
+                0.0, np.max(self.reaction.nmax) / (self.vessels.get_min_volume())
             ])
             self._plot_axs[0, 1].set_xlabel('Time (s)')
             self._plot_axs[0, 1].set_ylabel('Molar Concentration (mol/L)')
@@ -749,13 +733,13 @@ class ReactionBenchEnv(gym.Env):
 
             # Time vs. Temperature + Time vs. Volume graph *************** Index: (0, 2)
             self._plot_line_1 = self._plot_axs[0, 2].plot(
-                self.plot_data_state[0], # time
-                self.plot_data_state[1], # Temperature
+                self.plot_data_state[0],  # time
+                self.plot_data_state[1],  # Temperature
                 label='T'
             )[0]
             self._plot_line_2 = self._plot_axs[0, 2].plot(
-                self.plot_data_state[0], # time
-                self.plot_data_state[2], # Volume
+                self.plot_data_state[0],  # time
+                self.plot_data_state[2],  # Volume
                 label='V'
             )[0]
             self._plot_axs[0, 2].set_xlim([0.0, self.vessels.get_defaultdt() * self.n_steps])
@@ -766,8 +750,8 @@ class ReactionBenchEnv(gym.Env):
 
             # Time vs. Pressure graph *************** Index: (1, 0)
             self._plot_line_3 = self._plot_axs[1, 0].plot(
-                self.plot_data_state[0], # time
-                self.plot_data_state[3] # Pressure
+                self.plot_data_state[0],  # time
+                self.plot_data_state[3]  # Pressure
             )[0]
             self._plot_axs[1, 0].set_xlim([0.0, self.vessels.get_defaultdt() * self.n_steps])
             self._plot_axs[1, 0].set_ylim([0, self.vessels.get_pmax()])
@@ -776,8 +760,8 @@ class ReactionBenchEnv(gym.Env):
 
             # Solid Spectra graph *************** Index: (1, 1)
             __ = self._plot_axs[1, 1].plot(
-                wave, # wavelength space (ranging from wave_min to wave_max)
-                absorb # absorb spectra
+                wave,  # wavelength space (ranging from wave_min to wave_max)
+                absorb  # absorb spectra
             )[0]
 
             # dash spectra
@@ -830,18 +814,18 @@ class ReactionBenchEnv(gym.Env):
             self._plot_line_1.set_ydata(self.plot_data_state[1])
             self._plot_line_2.set_xdata(self.plot_data_state[0])
             self._plot_line_2.set_ydata(self.plot_data_state[2])
-            self._plot_axs[0, 2].set_xlim([0.0, curent_time]) # reset xlime since t extend
+            self._plot_axs[0, 2].set_xlim([0.0, curent_time])  # reset xlime since t extend
 
             # set data for Time vs. Pressure graph *************** Index: (1, 0)
             self._plot_line_3.set_xdata(self.plot_data_state[0])
             self._plot_line_3.set_ydata(self.plot_data_state[3])
-            self._plot_axs[1, 0].set_xlim([0.0, curent_time]) # reset xlime since t extend
+            self._plot_axs[1, 0].set_xlim([0.0, curent_time])  # reset xlime since t extend
 
             # reset the Solid Spectra graph
             self._plot_axs[1, 1].cla()
             __ = self._plot_axs[1, 1].plot(
-                wave, # wavelength space (ranging from wave_min to wave_max)
-                absorb, # absorb spectra
+                wave,  # wavelength space (ranging from wave_min to wave_max)
+                absorb,  # absorb spectra
             )[0]
 
             # obtain the new dash spectra data

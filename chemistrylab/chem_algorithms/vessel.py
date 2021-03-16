@@ -66,8 +66,8 @@ class Vessel:
         self.label = label
         self.w2v = None
         self.temperature = temperature
-        self.pressure = self.get_pressure()
         self.volume = volume
+        self.pressure = self.get_pressure()
         self.v_max = v_max
         self.v_min = v_min
         self.Tmax = Tmax
@@ -992,8 +992,6 @@ class Vessel:
         elif override:
             self.volume = util.convert_volume(volume, unit)
             self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume)
-        elif self.label == 'react_vessel':
-            self.volume = util.convert_volume(volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
 
