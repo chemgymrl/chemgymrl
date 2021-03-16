@@ -7,13 +7,11 @@ class De:
         self.exp_coef = exp_coef
         self.reaction_coef = reaction_coef
         self.num_reagents = num_reagents
+        self.temp = 0
 
-    def __call__(self, t, y):
-        conc = y[:, 0]
-        temp = y[:, 1][0]
-        conc_change = self.run(conc, temp)
-        y[:, 0] = conc_change
-        return y
+    def __call__(self, t, conc):
+        conc_change = self.run(conc, self.temp)
+        return conc_change
 
     def run(self, conc, temp):
         k = self.get_reaction_constants(temp, conc)
