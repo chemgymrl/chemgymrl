@@ -10,6 +10,9 @@ Module to model all six Wurtz chlorine hydrocarbon reactions.
 
 # pylint: disable=import-error
 # pylint: disable=invalid-name
+# pylint: disable=protected-access
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
 # pylint: disable=unsubscriptable-object
 
 import importlib.util
@@ -20,13 +23,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 sys.path.append("../../") # allows module to access chemistrylab
-# from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
-from chemistrylab.reactions.get_reactions import convert_to_class
-from chemistrylab.chem_algorithms import util, vessel
 
+from chemistrylab.reactions.get_reactions import convert_to_class
+from chemistrylab.chem_algorithms import vessel
 
 R = 8.314462619
-
 
 class _Reaction:
 
@@ -117,11 +118,11 @@ class _Reaction:
         # self.params = [spec.S_1]*len(materials)
 
         self.params = []
-        for material in self.materials:
+        for material in self.material_classes:
             if overlap:
-                self.params.append(material.get_spectra_overlap())
+                self.params.append(material().get_spectra_overlap())
             else:
-                self.params.append(material.get_spectra_no_overlap())
+                self.params.append(material().get_spectra_no_overlap())
 
     @staticmethod
     def _find_reaction_file(reaction_file=""):
@@ -130,25 +131,30 @@ class _Reaction:
         reaction file is needed for specifying the requested reaction file.
         '''
 
-        ##### NEED TO BE ABLE TO SPECIFY THE AVAILABLE REACTIONS DIRECTORY FROM ANYWHERE ######
+        # acquire the path to the reactions directory containing
+        # this file and the available reactions directory
+        reaction_base_filepath = os.path.abspath(__file__)
+        reactions_dir = os.path.dirname(reaction_base_filepath)
 
         # acquire a list of the names of all the available reaction files;
         # specify the directory containing all reaction files
-        r_files_dir = os.path.join(os.getcwd(), "available_reactions")
+        r_files_dir = os.path.join(reactions_dir, "available_reactions")
 
-        # acquire the list of only files from the above directory
+        # obtain the list of only files from the above directory
         reaction_files = [
             r_file for r_file in os.listdir(r_files_dir) if os.path.isfile(
                 os.path.join(r_files_dir, r_file)
             )
         ]
 
+        # clip the files to omit their extensions (all available reaction files are `.py` files)
+        reaction_files_no_ext = [r_file.split(".")[0] for r_file in reaction_files]
+
         # look for the requested reaction file in the list of available reaction files
-        if reaction_file in reaction_files:
+        if reaction_file in reaction_files_no_ext:
             output_reaction_file = os.path.join(
-                os.getcwd(),
-                "available_reactions",
-                reaction_file
+                r_files_dir,
+                reaction_file + ".py" # re-add the extension
             )
         else:
             raise IOError("ERROR: Requested Reaction File Not Found in Directory!")
@@ -172,52 +178,24 @@ class _Reaction:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        # acquire the necessary parameters from the module:
-
-        # material lists
-        reactants = module.REACTANTS
-        products = module.PRODUCTS
-        solutes = module.SOLUTES
-
-        # desired material
-        desired = module.DESIRED
-
-        # initial thermodynamic variables
-        Ti = module.Ti
-        Vi = module.Vi
-
-        # additional vessel parameters
-        dt = module.dt
-        Tmin = module.Tmin
-        Tmax = module.Tmax
-        dT = module.dT
-        Vmin = module.Vmin
-        Vmax = module.Vmax
-        dV = module.dV
-
-        # calculation arrays
-        activ_energy_arr = module.activ_energy_arr
-        stoich_coeff_arr = module.stoich_coeff_arr
-        conc_coeff_arr = module.conc_coeff_arr
-
-        # combine all the parameters into a list
+        # acquire the necessary parameters from the module and add them to a dictionary
         output_params = {
-            "reactants" : reactants,
-            "products" : products,
-            "solutes" : solutes,
-            "desired" : desired,
-            "Ti" : Ti,
-            "Vi" : Vi,
-            "dt" : dt,
-            "Tmin" : Tmin,
-            "Tmax" : Tmax,
-            "dT" : dT,
-            "Vmin" : Vmin,
-            "Vmax" : Vmax,
-            "dV" : dV,
-            "activ_energy_arr" : activ_energy_arr,
-            "stoich_coeff_arr" : stoich_coeff_arr,
-            "conc_coeff_arr" : conc_coeff_arr
+            "reactants" : module.REACTANTS,
+            "products" : module.PRODUCTS,
+            "solutes" : module.SOLUTES,
+            "desired" : module.DESIRED,
+            "Ti" : module.Ti,
+            "Vi" : module.Vi,
+            "dt" : module.dt,
+            "Tmin" : module.Tmin,
+            "Tmax" : module.Tmax,
+            "dT" : module.dT,
+            "Vmin" : module.Vmin,
+            "Vmax" : module.Vmax,
+            "dV" : module.dV,
+            "activ_energy_arr" : module.activ_energy_arr,
+            "stoich_coeff_arr" : module.stoich_coeff_arr,
+            "conc_coeff_arr" : module.conc_coeff_arr
         }
 
         return output_params
@@ -343,10 +321,10 @@ class _Reaction:
         # ensure the entire initial materials in hand array is available
         self.cur_in_hand = 1.0 * initial_in_hand
 
-        # reset the vessel parameters back to their original values as specified in the reaction file
-        vessels.set_v_min(self.Vmin, unit="L")
-        vessels.set_v_max(self.Vmax, unit="L")
-        vessels.set_volume(self.Vi, unit="L", override=False)
+        # reset the vessel parameters to their original values as specified in the reaction file
+        vessels.set_v_min(self.Vmin, unit="l")
+        vessels.set_v_max(self.Vmax, unit="l")
+        vessels.set_volume(self.Vi, unit="l", override=True)
         vessels.temperature = self.Ti
         vessels.Tmin = self.Tmin
         vessels.Tmax = self.Tmax
@@ -511,7 +489,7 @@ class _Reaction:
 
         # iterate through the concentration coefficient array,
         # calculating the changes of each material
-        for i, row in enumerate(change_conc_arr):
+        for i, row in enumerate(conc_coeff_arr):
             # create a variable to contain the cumulative change of a material
             cumulative_change = 0
 
@@ -532,7 +510,7 @@ class _Reaction:
 
         # look through the changes to the reactant concentrations and make sure they
         # do not exceed the concentrations of reactants available
-        for i, available_conc in reactant_conc:
+        for i, available_conc in enumerate(reactant_conc):
             # get the intended concentration change
             conc_change = change_conc_arr[i]
 
@@ -586,6 +564,11 @@ class _Reaction:
         return temp_change, volume_change, delta_n_array
 
     def update_vessel(self, vessels: vessel.Vessel, temperature, volume, pressure):
+        '''
+        Method to update the provided vessel object with materials from the reaction base
+        and new thermodynamic variables.
+        '''
+
         # tabulate all the materials used and their new values
         new_material_dict = {}
         for i in range(self.n.shape[0]):
@@ -703,10 +686,10 @@ class _Reaction:
 
         # acquire the necessary thermodynamic parameters from the vessel
         T = vessels.get_temperature()
-        V = vessels.get_current_volume()
+        V = vessels.get_volume()
 
         # perform the complete action over a series of increments
-        for i in range(n_steps):
+        for __ in range(n_steps):
             # split the overall temperature change into increments
             T += temperature_change / n_steps
             T = np.min([
@@ -722,17 +705,17 @@ class _Reaction:
             ])
 
             # split the overall molar changes into increments
-            for i, delta_n in enumerate(delta_n_array):
+            for j, delta_n in enumerate(delta_n_array):
                 dn = delta_n / n_steps
-                self.n[i] += dn
-                self.cur_in_hand[i] -= dn
+                self.n[j] += dn
+                self.cur_in_hand[j] -= dn
 
                 # set a penalty for trying to add unavailable material (tentatively set to 0)
                 # reward -= 0
 
                 # if the amount that is in hand is below a certain threshold set it to 0
-                if self.cur_in_hand[i] < self.threshold:
-                    self.cur_in_hand[i] = 0.0
+                if self.cur_in_hand[j] < self.threshold:
+                    self.cur_in_hand[j] = 0.0
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
@@ -741,13 +724,10 @@ class _Reaction:
                 vessels.get_defaultdt()
             )
 
-            # update the time increment
-            t += self.dt
-
         # update the vessels variable
         vessels = self.update_vessel(vessels, T, V, vessels.get_pressure())
 
-        return t, vessels
+        return vessels
 
     def get_spectra(self, V):
         '''
@@ -889,11 +869,11 @@ class _Reaction:
         None
         '''
 
-        # set the default reaction constants
-        k = self.get_reaction_constants(temp)
+        # get the concentration array
+        conc = self.get_concentration(volume)
 
-        # set the default number of steps to evolve the system
-        n_steps = n_steps
+        # set the default reaction constants
+        k = self.get_reaction_constants(temp, conc)
 
         # set arrays to keep track of the time and concentration
         t = np.zeros(n_steps, dtype=np.float32)
@@ -905,7 +885,7 @@ class _Reaction:
         for i in range(1, n_steps):
             conc = self.get_concentration(volume)
             rates = self.get_rates(k, conc)
-            conc_change = self.get_conc_change(rates, dt)
+            conc_change = self.get_conc_change(rates, conc, dt)
 
             # update plotting info
             conc[i] = conc[i-1] + conc_change
