@@ -66,8 +66,8 @@ class Vessel:
         self.label = label
         self.w2v = None
         self.temperature = temperature
-        self.pressure = self.get_pressure()
         self.volume = volume
+        self.pressure = self.get_pressure()
         self.v_max = v_max
         self.v_min = v_min
         self.Tmax = Tmax
