@@ -117,11 +117,14 @@ class _Reaction:
         # self.params = [spec.S_1]*len(materials)
 
         self.params = []
-        for material in self.materials:
+
+        self.all_materials = convert_to_class(self.materials)
+
+        for material in self.all_materials:
             if overlap:
-                self.params.append(material.get_spectra_overlap())
+                self.params.append(material.get_spectra_overlap(material()))
             else:
-                self.params.append(material.get_spectra_no_overlap())
+                self.params.append(material.get_spectra_no_overlap(material()))
 
     @staticmethod
     def _find_reaction_file(reaction_file=""):
