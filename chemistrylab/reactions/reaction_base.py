@@ -347,9 +347,9 @@ class _Reaction:
         self.cur_in_hand = 1.0 * initial_in_hand
 
         # reset the vessel parameters back to their original values as specified in the reaction file
-        vessels.set_v_min(self.Vmin, unit="L")
-        vessels.set_v_max(self.Vmax, unit="L")
-        vessels.set_volume(self.Vi, unit="L", override=False)
+        vessels.set_v_min(self.Vmin, unit="l")
+        vessels.set_v_max(self.Vmax, unit="l")
+        vessels.set_volume(self.Vi, unit="l", override=False)
         vessels.temperature = self.Ti
         vessels.Tmin = self.Tmin
         vessels.Tmax = self.Tmax
@@ -706,7 +706,7 @@ class _Reaction:
 
         # acquire the necessary thermodynamic parameters from the vessel
         T = vessels.get_temperature()
-        V = vessels.get_current_volume()
+        V = vessels.get_volume()
 
         # perform the complete action over a series of increments
         for i in range(n_steps):

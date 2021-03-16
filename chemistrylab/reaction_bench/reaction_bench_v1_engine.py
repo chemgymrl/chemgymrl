@@ -55,7 +55,8 @@ class ReactionBenchEnv(gym.Env):
             solutes=None,
             n_steps=50,
             dt=0.01,
-            overlap=False
+            overlap=False,
+            reaction_file=""
     ):
         '''
         Constructor class method to pass thermodynamic variables to class methods.
@@ -101,7 +102,8 @@ class ReactionBenchEnv(gym.Env):
             solutes=solutes,
             n_steps=n_steps,
             dt=dt,
-            overlap=overlap
+            overlap=overlap,
+            reaction_file=reaction_file
         )
 
         # set the input vessel path
@@ -114,7 +116,7 @@ class ReactionBenchEnv(gym.Env):
         self.dt = input_parameters["dt"] # Time step of reaction (s)
 
         # initialize the reaction
-        self.reaction = input_parameters["reaction"](overlap=overlap)
+        self.reaction = input_parameters["reaction"](overlap=overlap, reaction_file_identifier=reaction_file)
 
         # Maximum time (s) (20 is the registered max_episode_steps)
         self.tmax = self.n_steps * self.dt * 20
@@ -127,8 +129,8 @@ class ReactionBenchEnv(gym.Env):
         self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
         if self.in_vessel_path is None:
             self.vessels = vessel.Vessel(
-                'default',
-                default_dt=self.dt
+                label='default',
+                default_dt=self.dt,
             )
 
             '''
@@ -150,7 +152,7 @@ class ReactionBenchEnv(gym.Env):
         self.state = None
 
         # reset the inputted reaction before performing any steps
-        self.reaction.reset(n_init=self.n_init)
+        self.reaction.reset(self.vessels)
 
         # Defining action and observation space for OpenAI Gym framework
         # shape[0] is the change in amount of each reactant
@@ -171,7 +173,7 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = self.reaction.get_spectra(self.vessels.get_current_volume())
+        absorb = self.reaction.get_spectra(self.reaction.Vi)
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -199,7 +201,8 @@ class ReactionBenchEnv(gym.Env):
             solutes=None,
             n_steps=0,
             dt=0.0,
-            overlap=False
+            overlap=False,
+            reaction_file=""
     ):
         '''
         Method to validate the parameters inputted to the reaction class.
@@ -300,6 +303,10 @@ class ReactionBenchEnv(gym.Env):
             print("Invalid 'Overlap Spectra' type. The default will be provided.")
             overlap = False
 
+        # ensure reaction file is a string that points to the correct reaction file
+        if not isinstance(reaction_file, str):
+            print("Invalid reaction file")
+
         # collect all the input parameters in a labelled dictionary
         input_parameters = {
             "reaction" : reaction,
@@ -373,7 +380,7 @@ class ReactionBenchEnv(gym.Env):
         state[2] = (V - Vmin) / (Vmax - Vmin)
 
         # state[3] = pressure
-        total_pressure = self.reaction.get_total_pressure(V, T)
+        total_pressure = self.vessels.get_pressure()
         Pmax = self.vessels.get_pmax()
         state[3] = total_pressure / Pmax
 
@@ -436,11 +443,11 @@ class ReactionBenchEnv(gym.Env):
         
         Ti = self.vessels.get_temperature()
         Tmin = self.vessels.get_Tmin()
-        Tmax = self.vessels.get_Tmax
-        Vi = self.vessels.get_current_volume()
+        Tmax = self.vessels.get_Tmax()
+        Vi = self.reaction.Vi
         Vmin = self.vessels.get_min_volume()
         Vmax = self.vessels.get_max_volume()
-        total_pressure = self.reaction.get_total_pressure(Vi, Ti)
+        total_pressure = self.vessels.get_pressure()
 
         # populate the state with the above variables
         self.plot_data_state = [
