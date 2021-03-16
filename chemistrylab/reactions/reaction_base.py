@@ -29,8 +29,8 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, initial_materials, initial_solutes, reactants, products, materials, desired,
-                 de: De, solver='newton', solutes=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8, Ti=0.0,
+    def __init__(self, initial_materials, initial_solutes, reactants, products, materials,
+                 de: De, solver='newton', solutes=None, desired=None, overlap=False, nmax=None, max_mol=2, thresh=1e-8, Ti=0.0,
             Tmin=0.0, Tmax=0.0, dT=0.0, Vi=0.0, Vmin=0.0, Vmax=0.0, dV=0.0, dt=0):
         """
         Constructor class module for the Reaction class.
@@ -84,7 +84,7 @@ class _Reaction:
                 _initial_solutes[index] = solute["Initial"]
         self.initial_solutes = _initial_solutes
 
-        # specify the desired material
+        # specify the materials
         self.desired = desired
         self.reactants = reactants
         self.products = products
@@ -181,7 +181,6 @@ class _Reaction:
 
         return num_list
 
-
     def reset(self, n_init):
         '''
         Method to reset the environment back to its initial state.
@@ -234,7 +233,7 @@ class _Reaction:
         '''
 
         conc = self.get_concentration(volume)
-        conc_change = self.de.run(conc, temp)
+        conc_change = self.de.run(conc, temp) * dt
         for i in range(self.n.shape[0]):
             # convert back to moles
             dn = conc_change[i] * volume

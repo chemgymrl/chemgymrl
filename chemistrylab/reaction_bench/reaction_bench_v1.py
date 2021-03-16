@@ -13,7 +13,7 @@ import gym.spaces
 
 sys.path.append("../../")
 from chemistrylab.reaction_bench.reaction_bench_v1_engine import ReactionBenchEnv
-from chemistrylab.reactions.wurtz_new import Reaction
+from chemistrylab.reactions.wurtz_new import WurtzReaction
 from chemistrylab.reactions.rate import *
 
 class ReactionBenchEnv_0(ReactionBenchEnv):
@@ -25,10 +25,8 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
         '''
         Constructor class for the ReactionBenchEnv_0 environment.
         '''
-        rate_fn = WurtzRates()
-
         super(ReactionBenchEnv_0, self).__init__(
-            reaction=Reaction,
+            reaction=WurtzReaction,
             in_vessel_path=None, # do not include an input vessel
             out_vessel_path=os.getcwd(), # include an output vessel directory
             materials=[ # initialize the bench with the following materials
@@ -42,5 +40,4 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
             ],
             desired="dodecane",
             overlap=False,
-            rate_fn=rate_fn
         )

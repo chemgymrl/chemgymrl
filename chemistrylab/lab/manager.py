@@ -81,9 +81,8 @@ class Manager:
         for i, agent in enumerate(agents):
             print(f'{i}: {agent}')
         agent_ind = int(input('Please specify what agent you wish to use: '))
-        agent = agents[agent_ind]
         start = dt.datetime.now()
-        self.load_bench(bench, env, vessel, agent)
+        self.load_bench(bench, env, vessel, agent_ind)
         finish = dt.datetime.now()
         print(finish - start)
 
@@ -120,5 +119,5 @@ class Manager:
 
 
 if __name__ == "__main__":
-    manager = Manager(mode='random')
+    manager = Manager()
     manager.run()
