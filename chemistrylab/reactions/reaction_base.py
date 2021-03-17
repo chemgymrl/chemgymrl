@@ -302,7 +302,8 @@ class _Reaction:
                 self.update(
                     T,
                     V,
-                    vessels.get_defaultdt()
+                    vessels.get_defaultdt(),
+                    n_steps
                 )
                 # Record time data
                 plot_data_state[0].append(t)
