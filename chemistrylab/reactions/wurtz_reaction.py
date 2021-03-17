@@ -307,9 +307,9 @@ class Reaction():
         # change in C = (+1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
         # change in D = (+1 * rate of reaction 2 * dt)
         # assuming both reactions have the same time-step, which is true for all reactions in this file
-        dC[0] = (-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2]) * dt # change in 1-chlorohexane
-        dC[1] = (-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4]) * dt # change in 2-chlorohexane
-        dC[2] = (-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5]) * dt # change in 3-chlorohexane
+        dC[0] = ((-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2])) * dt # change in 1-chlorohexane
+        dC[1] = ((-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4])) * dt # change in 2-chlorohexane
+        dC[2] = ((-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5])) * dt # change in 3-chlorohexane
         dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in Na
         dC[4] = 1.0 * self.rate[0] * dt # change in dodecane
         dC[5] = 1.0 * self.rate[1] * dt # change in 5-methylundecane
