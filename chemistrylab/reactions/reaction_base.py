@@ -26,6 +26,7 @@ sys.path.append("../../") # allows module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.chem_algorithms import vessel
+from chemistrylab.chem_algorithms import util
 
 R = 8.314462619
 
@@ -322,9 +323,10 @@ class _Reaction:
         self.cur_in_hand = 1.0 * initial_in_hand
 
         # reset the vessel parameters to their original values as specified in the reaction file
-        vessels.set_v_min(self.Vmin, unit="l")
-        vessels.set_v_max(self.Vmax, unit="l")
-        vessels.set_volume(self.Vi, unit="l", override=True)
+        vessels.set_v_min(self.Vmin, unit="ml")
+        vessels.set_v_max(self.Vmax, unit="ml")
+        # vessels.set_volume(self.Vi, unit="l", override=True)
+        vessels.set_v(self.Vi)
         vessels.temperature = self.Ti
         vessels.Tmin = self.Tmin
         vessels.Tmax = self.Tmax
@@ -687,6 +689,7 @@ class _Reaction:
         # acquire the necessary thermodynamic parameters from the vessel
         T = vessels.get_temperature()
         V = vessels.get_volume()
+        # V = vessels.get_volume() * 0.001
 
         # perform the complete action over a series of increments
         for __ in range(n_steps):
@@ -915,7 +918,8 @@ class _Reaction:
 
         # acquire the necessary parameters from the vessel
         T = vessels.get_temperature()
-        V = vessels.get_current_volume()
+        V = vessels.get_volume()
+        # V = 0.0025
 
         # create containers to hold the plotting parameters
         plot_data_state = [[], [], [], []]
@@ -937,6 +941,7 @@ class _Reaction:
 
         # record pressure data
         P = vessels.get_pressure()
+        # P = 1175.6600956686177
         plot_data_state[3].append(
             P/vessels.get_pmax()
         )

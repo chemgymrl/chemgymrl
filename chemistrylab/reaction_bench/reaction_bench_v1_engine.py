@@ -492,7 +492,14 @@ class ReactionBenchEnv(gym.Env):
         # pass the action and vessel to the reaction base class's perform action function
         self.vessels = self.reaction.perform_action(action, self.vessels, self.n_steps)
 
+        # Increase time by time step
+        for __ in range(self.n_steps):
+            self.t += self.dt
+
         # call some function to get plotting data
+        self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.plotting_step(
+            self.t, self.vessels
+        )
 
         self._update_state()
 
@@ -557,6 +564,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         '''
+
+        # self.reaction.plotting_step(self.t, self.vessels)
 
         # Wavelength array and array length for plotting
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]

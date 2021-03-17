@@ -995,6 +995,9 @@ class Vessel:
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
 
+    def set_v(self, volume: float):
+        self.volume = volume
+
     def set_v_min(self, volume: float, unit='ml'):
         self.v_min = util.convert_volume(volume, unit)
 
