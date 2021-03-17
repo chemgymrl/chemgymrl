@@ -30,7 +30,7 @@ SOLUTES = ["H2O"]
 DESIRED = "dodecane"
 
 # add the initial thermodynamic values
-Ti = 297 # in Kelvin
+Ti = 297.0 # in Kelvin
 Vi = 0.002 # in Litres
 
 # additional vessel parameters
