@@ -1,4 +1,4 @@
-# Reaction Bench Changes - Version 0.1
+# Reaction Bench Changes - Version 0.2
 
 ## Markdown File Detailing Changes to the Reaction Bench
 
