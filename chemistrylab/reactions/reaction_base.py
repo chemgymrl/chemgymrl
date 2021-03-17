@@ -665,9 +665,6 @@ class _Reaction:
         None
         '''
 
-        # set the default reaction constants
-        k = self.get_reaction_constants(temp)
-
         # set the default number of steps to evolve the system
         n_steps = n_steps
 
@@ -679,9 +676,7 @@ class _Reaction:
         conc[0] = conc[0] * self.initial_in_hand
 
         for i in range(1, n_steps):
-            conc = self.get_concentration(volume)
-            rates = self.get_rates(k, conc)
-            conc_change = self.get_conc_change(rates, dt)
+            conc_change = self.de.run(conc[i-1], temp)
 
             # update plotting info
             conc[i] = conc[i-1] + conc_change
