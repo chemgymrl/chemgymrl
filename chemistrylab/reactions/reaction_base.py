@@ -323,10 +323,10 @@ class _Reaction:
         self.cur_in_hand = 1.0 * initial_in_hand
 
         # reset the vessel parameters to their original values as specified in the reaction file
-        vessels.set_v_min(self.Vmin, unit="ml")
-        vessels.set_v_max(self.Vmax, unit="ml")
-        # vessels.set_volume(self.Vi, unit="l", override=True)
-        vessels.set_v(self.Vi)
+        vessels.set_v_min(self.Vmin, unit="l")
+        vessels.set_v_max(self.Vmax, unit="l")
+        vessels.set_volume(self.Vi, unit="l", override=True)
+        # vessels.set_v(self.Vi)
         vessels.temperature = self.Ti
         vessels.Tmin = self.Tmin
         vessels.Tmax = self.Tmax
