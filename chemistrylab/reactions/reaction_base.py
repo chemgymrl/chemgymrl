@@ -539,7 +539,7 @@ class _Reaction:
             amount = self.initial_solutes[i]
 
             # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = [solute_class, amount]
+            new_solute_dict[solute_name] = {solute_class.name: [amount]}
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
