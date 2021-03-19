@@ -4,10 +4,9 @@ site_description: ChemGymRL supporting documentation.
 site_author: Isaac Tamblyn, Mark Crowley, Amanuel Dawit
 theme: readthedocs
 
-repo_url: https://github.com/chemgymrl/Documentation 
+repo_url: https://github.com/chemgymrl/chemgymrl
 
-edit_uri: edit/main/docs/
-Disallow: edit/ghdocs/docs/
+edit_uri: edit/master/docs/
 
 nav:
 - Home: index.md
