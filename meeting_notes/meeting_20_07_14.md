@@ -42,4 +42,3 @@ Future work:
 * Begin working on the third bench (Distilation).
 
 * Once Distillation Bench is working, start working on getting a working version of ChemistryLab.
-

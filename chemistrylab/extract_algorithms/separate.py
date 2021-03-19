@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cmocean
 
+## ---------- ## DEFAULTS ## ---------- ##
+
 # Labels for plotting and index of arrays
 labels = ['Water', 'Oil', 'Air']
 
@@ -54,7 +56,8 @@ def map_to_state(A, B, C, colors=colors, x=x):
     t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
 
     # Number of pixels available for each phase
-    n = ((A / np.sum(A)) * L.shape[0]).astype(int)
+    sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
+    n = ((A / sum_A) * L.shape[0]).astype(int)
 
     # Take rounding errors into account
     n[-1] = 0

@@ -3,5 +3,6 @@
 .pytest_cache/
 .idea/
 *.png
+*.mp4
 
 *.swp

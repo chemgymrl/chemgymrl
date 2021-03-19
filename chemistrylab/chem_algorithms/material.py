@@ -1,40 +1,80 @@
+'''
+Materials File
+
+:title: material.py
+
+:author:
+
+:history: 2021-02-18
+
+This file is intended to define the Material class, where materials and their properties can be
+defined, and numerous, already defined materials available for use. For consistency, the material
+properties must be consistent. The properties and their intended units are included below.
+
+Property : Intended Units -- Object Type -- Brief Description
+    - `name` : N/A -- `str` -- The name of the material, used for identification purposes.
+    - `density` : g/cm**3 -- `float` -- The density of the material at STP.
+    - `polarity` : N/A -- `float` -- The polarity of the material.
+    - `temperature` : K -- `float` -- The initial temperature of the material upon being called.
+    - `pressure` : kPa -- `float` -- The initial pressure of the material upon being called.
+    - `phase` : N/A -- `str` -- The state of the material at the initial temperature.
+    - `charge` : C -- `float` -- The electric charge associated with the material.
+    - `molar_mass` : g/mol -- `float` -- The most common molar mass of the material.
+    - `color` : N/A -- `float` -- A number representing the color of the material using a 0 -> 1 scale.
+    - `solute` : N/A -- `bool` -- A boolean indicating if the material is to be used as a solute.
+    - `solvent` : N/A -- `bool` -- A boolean indicating if the material is to be used as a solvent.
+    - `boiling_point` : K -- `float` -- The boiling point of the material.
+    - `melting_point` : K -- `float` -- The melting point of the material.
+    - `specific_heat` : J/g*K -- `float` -- The specific heat capacity of the material.
+    - `enthalpy_fusion` : J/mol -- `float` -- The material's enthalpy of fusion.
+    - `enthalpy_vapor` : J/mol -- `float` -- The material's enthalpy of vapor.
+    - `index` : N/A -- `int` -- An additional index used for identification purposes.
+
+Moreover, the `get_materials` function gives a list of the already available materials.
+'''
+
 import inspect
 import numpy as np
 import math
 import sys
 
-
 class Material:
     def __init__(self,
-                 name=None,
-                 density=None,
-                 polarity=None,
-                 temperature=None,
-                 pressure=None,
-                 phase=None,
-                 charge=None,
-                 molar_mass=None,
-                 color=None,
-                 solute=False,
-                 solvent=False,
-                 boiling_point=None,
-                 melting_point=None,
-                 index=None,
-                 ):
+                 name="",
+                 density=1.0, # in g/cm**3
+                 polarity=0.0,
+                 temperature=1.0, # in K
+                 pressure=1.0, # in kPa
+                 phase="", # one of "s", "l", or "g" at temperature
+                 charge=0.0,
+                 molar_mass=1.0, # in g/mol
+                 color=0.0, # color scale from 0 to 1
+                 solute=False, # is material a solute
+                 solvent=False, # is material a solvent
+                 boiling_point=1.0, # in K
+                 melting_point=1.0, # in K
+                 specific_heat=1.0, # in J/g*K
+                 enthalpy_fusion=1.0, # in J/mol
+                 enthalpy_vapor=1.0, # in J/mol
+                 index=None
+    ):
         self._name = name
-        self.w2v = None  # not used
-        self._density = density  # g/mL
+        self.w2v = None
+        self._density = density
         self._polarity = polarity
-        self._temperature = temperature  # K
-        self._pressure = pressure  # kPa
+        self._temperature = temperature
+        self._pressure = pressure
         self._phase = phase
         self._charge = charge
-        self._molar_mass = molar_mass  # g/mol
+        self._molar_mass = molar_mass
         self._color = color
         self._solute = solute
         self._solvent = solvent
         self._boiling_point = boiling_point
         self._melting_point = melting_point
+        self._specific_heat = specific_heat
+        self._enthalpy_fusion = enthalpy_fusion
+        self._enthalpy_vapor = enthalpy_vapor
         self._index = index
 
     def _update_properties(self,
@@ -103,19 +143,19 @@ class Material:
     def is_solvent(self):
         return self._solvent
 
-    def get_boiling_point(self, in_kelvin=False):
+    def get_boiling_point(self, in_kelvin=True):
         temp = self._boiling_point
 
-        if in_kelvin:
-            temp = temp + 273.15
+        if not in_kelvin:
+            temp = temp - 273.15
 
         return temp
 
-    def get_melting_point(self, in_kelvin=False):
+    def get_melting_point(self, in_kelvin=True):
         temp = self._melting_point
 
-        if in_kelvin:
-            temp = temp + 273.15
+        if not in_kelvin:
+            temp = temp - 273.15
 
         return temp
 
@@ -146,22 +186,32 @@ class Material:
                      polarity):
         self._polarity = polarity
 
+    def set_specific_heat(self, specific_heat):
+        self._specific_heat = specific_heat
+
+    def set_enthalpy_fusion(self, enthalpy_fusion):
+        self._enthalpy_fusion = enthalpy_fusion
+
+    def set_enthalpy_vapor(self, enthalpy_vapor):
+        self._enthalpy_vapor = enthalpy_vapor
+
     def get_index(self):
         return self._index
 
+## ---------- ## PRE-DEFINED MATERIALS ## ---------- ##
 
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
-                         density=1.225e-3,
-                         temperature=297,
+                         density=1.225e-3, # in g/cm^3
+                         temperature=297, # in K
                          pressure=1,
                          phase='g',
-                         molar_mass=28.963,
-                         color=0.45,
-                         index=0,
+                         molar_mass=28.963, # in g/mol
+                         color=0.65,
+                         specific_heat=1.0035, # in J/g*K
+                         index=0
                          )
-
 
 class H2O(Material):
     def __init__(self):
@@ -174,10 +224,13 @@ class H2O(Material):
                          molar_mass=18.015,
                          color=0.2,
                          charge=0.0,
+                         boiling_point=373.15,
+                         solute=False,
                          solvent=True,
-                         index=1,
+                         specific_heat=4.1813,
+                         enthalpy_vapor=40650.0,
+                         index=1
                          )
-
 
 class H(Material):
     def __init__(self):
@@ -190,9 +243,9 @@ class H(Material):
                          molar_mass=1.008,
                          color=0.1,
                          charge=0.0,
-                         index=2,
+                         specific_heat=None,
+                         index=2
                          )
-
 
 class H2(Material):
     def __init__(self):
@@ -205,9 +258,9 @@ class H2(Material):
                          molar_mass=2.016,
                          color=0.1,
                          charge=0.0,
-                         index=3,
+                         specific_heat=None,
+                         index=3
                          )
-
 
 class O(Material):
     def __init__(self):
@@ -220,9 +273,9 @@ class O(Material):
                          molar_mass=15.999,
                          color=0.15,
                          charge=0.0,
-                         index=4,
+                         specific_heat=None,
+                         index=4
                          )
-
 
 class O2(Material):
     def __init__(self):
@@ -235,9 +288,9 @@ class O2(Material):
                          molar_mass=31.999,
                          color=0.1,
                          charge=0.0,
-                         index=5,
+                         specific_heat=None,
+                         index=5
                          )
-
 
 class O3(Material):
     def __init__(self):
@@ -250,9 +303,9 @@ class O3(Material):
                          molar_mass=47.998,
                          color=0.1,
                          charge=-1.0,
-                         index=6,
+                         specific_heat=None,
+                         index=6
                          )
-
 
 class C6H14(Material):
     def __init__(self):
@@ -266,9 +319,9 @@ class C6H14(Material):
                          color=0.65,
                          charge=0.0,
                          solvent=True,
-                         index=7,
+                         specific_heat=2.26,
+                         index=7
                          )
-
 
 class NaCl(Material):
     def __init__(self):
@@ -281,9 +334,12 @@ class NaCl(Material):
                          molar_mass=58.443,
                          color=0.9,
                          charge=0.0,
-                         index=8,
+                         boiling_point=1738.0,
+                         specific_heat=0.853,
+                         enthalpy_fusion=27950.0,
+                         enthalpy_vapor=229700.0,
+                         index=8
                          )
-
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
@@ -297,9 +353,12 @@ class Na(Material):
                          molar_mass=22.990,
                          color=0.85,
                          charge=0.0,
-                         index=9,
+                         boiling_point=1156.0,
+                         specific_heat=1.23,
+                         enthalpy_fusion=2600.0,
+                         enthalpy_vapor=97700.0,
+                         index=9
                          )
-
 
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
@@ -313,9 +372,11 @@ class Cl(Material):
                          molar_mass=35.453,
                          color=0.8,
                          charge=0.0,
-                         index=10,
+                         specific_heat=0.48,
+                         enthalpy_fusion=3200.0,
+                         enthalpy_vapor=10200.0,
+                         index=10
                          )
-
 
 class Cl2(Material):
     def __init__(self):
@@ -328,9 +389,9 @@ class Cl2(Material):
                          molar_mass=70.906,
                          color=0.8,
                          charge=0.0,
-                         index=11,
+                         specific_heat=1.0,
+                         index=11
                          )
-
 
 class LiF(Material):
     def __init__(self):
@@ -343,9 +404,9 @@ class LiF(Material):
                          molar_mass=25.939,
                          color=0.9,
                          charge=0.0,
-                         index=12,
+                         specific_heat=1.0,
+                         index=12
                          )
-
 
 class Li(Material):
     def __init__(self):
@@ -358,9 +419,9 @@ class Li(Material):
                          molar_mass=6.941,
                          color=0.95,
                          charge=0.0,
-                         index=13,
+                         specific_heat=1.0,
+                         index=13
                          )
-
 
 # Note: F is very unstable when not an aqueous ion
 class F(Material):
@@ -374,9 +435,9 @@ class F(Material):
                          molar_mass=18.998,
                          color=0.8,
                          charge=0.0,
-                         index=14,
+                         specific_heat=None,
+                         index=14
                          )
-
 
 class F2(Material):
     def __init__(self):
@@ -389,7 +450,8 @@ class F2(Material):
                          molar_mass=37.997,
                          color=0.8,
                          charge=0.0,
-                         index=15,
+                         specific_heat=None,
+                         index=15
                          )
 
 ## ---------- ## HYDROCARBONS ## ---------- ##
@@ -404,10 +466,14 @@ class Dodecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.05,
             charge=0.0,
             boiling_point=489.5,
             melting_point=263.6,
+            solute=False,
+            specific_heat=2.3889, # in J/g*K
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=16
         )
 
@@ -421,10 +487,14 @@ class OneChlorohexane(Material):
             pressure=1,
             phase='l',
             molar_mass=120.62,
-            color=0,
+            color=0.1,
             charge=0.0,
             boiling_point=408.2,
             melting_point=179.2,
+            solute=False,
+            specific_heat=1.5408,
+            enthalpy_fusion=15490.0,
+            enthalpy_vapor=42800.0,
             index=17
         )
 
@@ -438,10 +508,14 @@ class TwoChlorohexane(Material):
             pressure=1,
             phase='l',
             molar_mass=120.62,
-            color=0,
+            color=0.15,
             charge=0.0,
             boiling_point=395.2,
             melting_point=308.3,
+            solute=False,
+            specific_heat=1.5408,
+            enthalpy_fusion=11970.0,
+            enthalpy_vapor=43820.0,
             index=18
         )
 
@@ -455,10 +529,14 @@ class ThreeChlorohexane(Material):
             pressure=1,
             phase='l',
             molar_mass=120.62,
-            color=0,
+            color=0.2,
             charge=0.0,
             boiling_point=396.2,
             melting_point=308.3,
+            solute=False,
+            specific_heat=1.5408,
+            enthalpy_fusion=11970.0,
+            enthalpy_vapor=32950.0,
             index=19
         )
 
@@ -472,10 +550,14 @@ class FiveMethylundecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.25,
             charge=0.0,
             boiling_point=481.1,
             melting_point=255.2,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=20
         )
 
@@ -489,10 +571,14 @@ class FourEthyldecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.3,
             charge=0.0,
             boiling_point=480.1,
             melting_point=254.2,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=21
         )
 
@@ -506,10 +592,14 @@ class FiveSixDimethyldecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.35,
             charge=0.0,
             boiling_point=474.2,
             melting_point=222.4,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=22
         )
 
@@ -523,10 +613,14 @@ class FourEthylFiveMethylnonane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.4,
             charge=0.0,
             boiling_point=476.3,
             melting_point=224.5,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=23
         )
 
@@ -540,10 +634,14 @@ class FourFiveDiethyloctane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0,
+            color=0.45,
             charge=0.0,
             boiling_point=470.2,
             melting_point=222.4,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
             index=24
         )
 
@@ -557,19 +655,45 @@ class Ethoxyethane(Material):
             pressure=1,
             phase='l',
             molar_mass=74.123,
-            color=0,
+            color=0.5,
             charge=0.0,
             boiling_point=34.6,
             melting_point=-116.3,
+            solute=False,
+            solvent=True,
+            specific_heat=2.253,
+            enthalpy_fusion=7190.0,
+            enthalpy_vapor=27250.0,
             index=25
         )
 
 def get_materials():
     '''
+    Function to get a tuple containing a list of the names of all the available materials as well
+    as their class object instances.
+
+    Parameters
+    ---------------
+    `boil_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `target_material` : `str` (default=`None`)
+        The name of the required output material designated as reward.
+    `n_steps` : `int` (default=`100`)
+        The number of steps in an episode.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
     '''
 
+    # construct empty lists to contain the names and class instances of the materials.
     names_list = []
     objects_list = []
+
     for name, obj in inspect.getmembers(sys.modules[__name__]):
         if all([
             inspect.isclass(obj),
@@ -580,23 +704,5 @@ def get_materials():
     
     return (names_list, objects_list)
 
+# get the number of materials available in this file
 total_num_material = len(Material.__subclasses__())
-
-#
-#
-# class T1(Material):
-#     def __init__(self):
-#         super().__init__(name='temp1',
-#                          density=0.655,
-#                          polarity=0.9,
-#                          temperature=298,
-#                          )
-#
-#
-# class T2(Material):
-#     def __init__(self):
-#         super().__init__(name='temp2',
-#                          density=0.655,
-#                          polarity=0.1,
-#                          temperature=298,
-#                          )

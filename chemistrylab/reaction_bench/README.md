@@ -1,4 +1,4 @@
-# ODEworld
+# Reaction Bench
 OpenAI Gym framework environment for controlling reaction parameters for reactions modelled by rate law ODEs.
 
 ## To install:
@@ -38,7 +38,8 @@ Reaction 3 | A + B + C -> E, A + D -> F, B + D -> G, C + D -> H, F + G + H -> \|
 Reaction 4 | A + B -> C, A + B -> D, D -> \|E\|: Designed to introduce kinetic vs thermodynamical favoured products.
 Reaction 5 | A + B -> D, C + D -> E, E -> \|F\| + B: Designed to introduce catalyst reactions.
 Reaction 6 | A + B -> 2C, C -> \|D\|, \|D\| -> C, A + \|D\| -> E, B + \|D\| -> F: Designed to introduce loseable product reactions.
+Wurtz Reaction | Designed to peform real reactions and highlight a valuable product to be isolated.
 
 ## To run
 
-See demo.py for an example.
+See demo_chemistrygym.py for an example.

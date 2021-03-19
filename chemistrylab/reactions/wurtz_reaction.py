@@ -12,10 +12,11 @@ Module to model all six Wurtz chlorine hydrocarbon reactions.
 # pylint: disable=invalid-name
 # pylint: disable=unsubscriptable-object
 
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-import sys
 sys.path.append("../../") # allows module to access chemistrylab
 from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 from chemistrylab.reactions.get_reactions import convert_to_class
@@ -28,40 +29,27 @@ from chemistrylab.reactions.get_reactions import convert_to_class
 # 5) 2-chlorohexane + 3-chlorohexane + 2 Na --> 4-ethyl-5-methylnonane + 2 NaCl
 # 6) 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
 
-# reaction rate for each reaction
-# used in the exponential formula k = e^(-E/RT)
-# Reaction 1)
-A1 = 1.0
-E1 = 1.0
+# the gas constant (in kPa * L * mol**-1 * K**-1)
+R = 8.314462619
 
-# Reaction 2)
-A2 = 1.0
-E2 = 1.0
-
-# Reaction 3)
-A3 = 1.0
-E3 = 1.0
-
-# Reaction 4)
-A4 = 1.0
-E4 = 1.0
-
-# Reaction 5)
-A5 = 1.0
-E5 = 1.0
-
-# Reaction 6)
-A6 = 1.0
-E6 = 1.0
-
-# the gas constant (in kPa * m**3 * mol**-1 * K**-1)
-R = 0.008314462619
-
-# names of the reactants and products in all reactions
-REACTANTS = ["1-chlorohexane", "2-chlorohexane", "3-chlorohexane", "Na"]
-PRODUCTS = ["dodecane", "5-methylundecane", "4-ethyldecane", "5,6-dimethyldecane", "4-ethyl-5-methylnonane", "4,5-diethyloctane", "NaCl"]
+# names of the reactants, products, and solutes available to all reactions
+REACTANTS = [
+    "1-chlorohexane",
+    "2-chlorohexane",
+    "3-chlorohexane",
+    "Na"
+]
+PRODUCTS = [
+    "dodecane",
+    "5-methylundecane",
+    "4-ethyldecane",
+    "5,6-dimethyldecane",
+    "4-ethyl-5-methylnonane",
+    "4,5-diethyloctane",
+    "NaCl"
+]
 ALL_MATERIALS = REACTANTS + PRODUCTS
-SOLUTES = ["ethoxyethane"]
+SOLUTES = ["H2O"]
 
 class Reaction():
     '''
@@ -100,6 +88,7 @@ class Reaction():
             if material["Material"] in REACTANTS:
                 index = REACTANTS.index(material["Material"])
                 initial_materials[index] = material["Initial"]
+
         self.initial_in_hand = initial_materials
 
         # get the initial amount of each solute
@@ -245,7 +234,7 @@ class Reaction():
         V : np.float32
             The volume of the system in Litres
         dt : np.float32
-            The time-step demarcating steps
+            The time-step demarcating separate steps
 
         Returns
         ---------------
@@ -257,56 +246,96 @@ class Reaction():
         None
         '''
 
-        # obtain the concentration (all concentrations are in mol/m**3)
+        # get the concentration of each reactant (all concentrations are in mol/L)
         C = self.get_concentration(V)
 
         # define a space to contain the changes in concentration to each chemical
         dC = np.zeros(self.n.shape[0])
 
-        # define the reaction constant for each reaction
+        # reaction rate for each reaction used in the exponential formula k = A * e^(-E/RT);
+        # the units for the pre-exponential constants are (L**2)/(mol**2 * s);
+        # we will scale the pre-exponential constants using each reactant concentration
+        # scaling_factor = abs((C[0] * C[1] * C[2] * C[3]))**(1/2)
+        agg_conc = 1
+        reactant_conc = [C[i] for i in range(len(REACTANTS))]
+        non_zero_conc = [conc for conc in reactant_conc if conc != 0.0]
+        for conc in non_zero_conc:
+            agg_conc *= conc
+        exponent = 2 / len(non_zero_conc) if len(non_zero_conc) != 0 else 1
+        scaling_factor = (abs(agg_conc))**exponent
+
+        # set the pre-exponential constant using the above scaling factor for proper dimensionality
+        A0 = 1.0 / scaling_factor # Reaction 0
+        A1 = 1.0 / scaling_factor # Reaction 1
+        A2 = 1.0 / scaling_factor # Reaction 2
+        A3 = 1.0 / scaling_factor # Reaction 3
+        A4 = 1.0 / scaling_factor # Reaction 4
+        A5 = 1.0 / scaling_factor # Reaction 5
+
+        # set the activation energies for each reaction constant
+        E0 = 1.0
+        E1 = 1.0
+        E2 = 1.0
+        E3 = 1.0
+        E4 = 1.0
+        E5 = 1.0
+
+        # define the reaction constant for each reaction;
+        k0 = A0 * np.exp((-1 * E0)/(R * T))
         k1 = A1 * np.exp((-1 * E1)/(R * T))
         k2 = A2 * np.exp((-1 * E2)/(R * T))
         k3 = A3 * np.exp((-1 * E3)/(R * T))
         k4 = A4 * np.exp((-1 * E4)/(R * T))
         k5 = A5 * np.exp((-1 * E5)/(R * T))
-        k6 = A6 * np.exp((-1 * E6)/(R * T))
 
-        # define the rate of each reaction
-        self.rate[0] = k1 * (C[0] ** 2) * (C[3] ** 2) * dt
-        self.rate[1] = k2 * C[0] * C[1] * (C[3] ** 2) * dt
-        self.rate[2] = k3 * C[0] * C[2] * (C[3] ** 2) * dt
-        self.rate[3] = k4 * (C[1] ** 2) * (C[3] ** 2) * dt
-        self.rate[4] = k5 * C[1] * C[2] * (C[3] ** 2) * dt
-        self.rate[5] = k6 * (C[2] ** 2) * (C[3] ** 2) * dt
+        # define the rate of each reaction;
+        # note the reactants in the concentration array (C) are in
+        # the order of the reactants in the `REACTANTS` variable;
+        # using the stoichiometric ratio in the rate exponentials gives the following rates:
+        self.rate[0] = k0 * (C[0] ** 2) * (C[1] ** 0) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[1] = k1 * (C[0] ** 1) * (C[1] ** 1) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[2] = k2 * (C[0] ** 1) * (C[1] ** 0) * (C[2] ** 1) * (C[3] ** 1)
+        self.rate[3] = k3 * (C[0] ** 0) * (C[1] ** 2) * (C[2] ** 0) * (C[3] ** 1)
+        self.rate[4] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
+        self.rate[5] = k5 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 2) * (C[3] ** 1)
 
-        # calculate and store the changes in concentration of each chemical
-        dC[0] = (-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2]) # change in 1-chlorohexane
-        dC[1] = (-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4]) # change in 2-chlorohexane
-        dC[2] = (-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5]) # change in 3-chlorohexane
-        dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) # change in Na
-        dC[4] = 1.0 * self.rate[0] # change in dodecane
-        dC[5] = 1.0 * self.rate[1] # change in 5-methylundecane
-        dC[6] = 1.0 * self.rate[2] # change in 4-ethyldecane
-        dC[7] = 1.0 * self.rate[3] # change in 5,6-dimethyldecane
-        dC[8] = 1.0 * self.rate[4] # change in 4-ethyl-5-methylnonane
-        dC[9] = 1.0 * self.rate[5] # change in 4,5-diethyloctane
-        dC[10] = 2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) # change in NaCl
+        # calculate and store the changes in concentration of each chemical;
+        # recall: change in concentration = molar concentration * rate * dt
+        # ie. for A + 2B --> C and A + C --> D as parallel reactions
+        # change in A = (-1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
+        # change in B = (-2 * rate of reaction 1 * dt)
+        # change in C = (+1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
+        # change in D = (+1 * rate of reaction 2 * dt)
+        # assuming both reactions have the same time-step, which is true for all reactions in this file
+        dC[0] = ((-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2])) * dt # change in 1-chlorohexane
+        dC[1] = ((-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4])) * dt # change in 2-chlorohexane
+        dC[2] = ((-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5])) * dt # change in 3-chlorohexane
+        dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in Na
+        dC[4] = 1.0 * self.rate[0] * dt # change in dodecane
+        dC[5] = 1.0 * self.rate[1] * dt # change in 5-methylundecane
+        dC[6] = 1.0 * self.rate[2] * dt # change in 4-ethyldecane
+        dC[7] = 1.0 * self.rate[3] * dt # change in 5,6-dimethyldecane
+        dC[8] = 1.0 * self.rate[4] * dt # change in 4-ethyl-5-methylnonane
+        dC[9] = 1.0 * self.rate[5] * dt # change in 4,5-diethyloctane
+        dC[10] = 2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in NaCl
+
+        # ensure the changes in reactant concentration do not exceed the concentrations available
+        dC[0] = np.max([dC[0], -1.0 * C[0]])
+        dC[1] = np.max([dC[1], -1.0 * C[1]])
+        dC[2] = np.max([dC[2], -1.0 * C[2]])
+        dC[3] = np.max([dC[3], -1.0 * C[3]])
 
         # update the concentrations of each chemical
         for i in range(self.n.shape[0]):
             # convert back to moles
-            # Note: concentration is in mol/m**3 and V is in L
-            # moles = moles/m**3 * L * 0.001m**3/L
-            dn = dC[i] * V * 0.001
+            dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
 
-        # calculate the reward (new molar amount of the desired chemical, if present)
-        d_reward = 0
-        if self.desired_material in ALL_MATERIALS:
-            index = ALL_MATERIALS.index(self.desired_material)
-            d_reward = dC[index] * V * 0.001
+            # check the list of molar amounts and set negligible amounts to 0
+            for i, amount in enumerate(self.n):
+                if amount < 1e-8:
+                    self.n[i] = 0
 
-        return d_reward
 
     def get_total_pressure(self, V, T=300):
         '''
@@ -315,7 +344,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system in Litres
+            The volume of the system in L
         T : np.float32 (default=300)
             The temperature of the system in Kelvin
 
@@ -343,7 +372,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system in Litres
+            The volume of the system in L
         T : np.float32 (default=300)
             The temperature of the system in Kelvin
 
@@ -371,12 +400,12 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32 (default=0.1)
-            The volume of the system in Litres
+            The volume of the system in L
 
         Returns
         ---------------
         C : np.array
-            An array of the concentrations (in mol/m**3) of each chemical in the experiment.
+            An array of the concentrations (in mol/L) of each chemical in the experiment.
 
         Raises
         ---------------
@@ -386,7 +415,7 @@ class Reaction():
         # create an array containing the concentrations of each chemical
         C = np.zeros(self.n.shape[0], dtype=np.float32)
         for i in range(self.n.shape[0]):
-            C[i] = self.n[i] / (V * 0.001)
+            C[i] = self.n[i] / V
 
         return C
 
@@ -409,6 +438,9 @@ class Reaction():
         None
         '''
 
+        # convert the volume in litres to the volume in m**3
+        V = V / 1000
+
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
@@ -429,6 +461,8 @@ class Reaction():
                             (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
                         ) ** 2.0
                     )
+                    if decay_rate < 1e-30:
+                        decay_rate = 0
                     absorb[k] += amount * height * decay_rate
 
         # absorption must be between 0 and 1
@@ -443,7 +477,7 @@ class Reaction():
         Parameters
         ---------------
         V : np.float32
-            The volume of the system.
+            The volume of the system in litres.
 
         Returns
         ---------------

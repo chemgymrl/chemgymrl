@@ -1,1 +1,1 @@
-__all__ = ["material", "vessel", "shelf", "util"]
+__all__ = ["logger", "material", "vessel", "shelf", "util"]

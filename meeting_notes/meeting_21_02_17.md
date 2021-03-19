@@ -1,3 +1,4 @@
+
 # Meeting Notes
 
 ## Date: Feb. 17, 2021
@@ -44,4 +45,3 @@ Present: Mark C, Isaac, Mitchell, Amanuel, Chris, Nicholas, Nouha, Mark B (secre
 
 - Nouha
     - clean up code for ppo implementation
-    - run experiments on side to get feedback from sririam

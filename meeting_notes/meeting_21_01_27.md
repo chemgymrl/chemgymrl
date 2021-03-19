@@ -1,3 +1,4 @@
+
 # Meeting Notes
 
 ## Date: January 27, 2021
@@ -19,4 +20,3 @@
 - Amanuel: Continue developing the website and have a beta version ready within a few days.
 - Mark B.: Move to working on the distillation bench lessons and peer review with Nicholas's work on the extract bench lessons.
 - Nicholas: Continue working on the extraction bench lessons and peer review with Mark's work on the distillation bench lessons.
-- Mitchell: Continue working on the infinite values issue.

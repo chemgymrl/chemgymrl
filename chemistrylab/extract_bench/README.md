@@ -9,7 +9,8 @@ extractworld_v1_engine|An generalized engine to handle extractions using chemist
 ## Extractions:
 Version|Description
 ---|---
-water_oil_v1|Use C6H14 to extract Na anc Cl dissolved in H2O in ExV 
+water_oil_v1|Use C6H14 to extract Na and Cl dissolved in H2O in ExV 
+wurtz_v0|Use ethoxyethane to extract dodecane into the ExV
 
 ## Environments:
 Version|Extraction|Engine|Description
