@@ -1,3 +1,4 @@
+
 # Meeting Notes:
 
 ## Date: Feb. 10, 2021
@@ -41,4 +42,3 @@
 - Nouha:
 	- Working on the PPO implementation
 	- Getting results, but trying to get better rewards (playing with the hyper-parameters)
-	- Do a one-on-one with Sriram
