@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Isaac Tamblyn, Mark Crowley, Amanuel Dawit">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Lesson 2 reaction - ChemGymRL Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Lesson 2 reaction";
+    var mkdocs_page_input_path = "lesson_2_reaction.md";
+    var mkdocs_page_url = "/lesson_2_reaction/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> ChemGymRL Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../About/">About</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Contact/">Contact</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Developers/">Developers</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Directory/">Directory</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Glossary/">Glossary</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../License/">License</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Output/">Output</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../QuickStart/">QuickStart</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../RLalgo/">RLalgo</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Troubleshooting/">Troubleshooting</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../UsingCmdLine/">UsingCmdLine</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../VisualizingOutput/">VisualizingOutput</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../WhatIsChemGymRL/">WhatIsChemGymRL</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../custom_extraction_lesson/">Custom extraction lesson</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../custom_reaction_lesson/">Custom reaction lesson</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../input/">Input</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../jenkins/">Jenkins</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_1_distillation/">Lesson 1 distillation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_1_extract/">Lesson 1 extract</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_1_react/">Lesson 1 react</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_2_distillation/">Lesson 2 distillation</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Lesson 2 reaction</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#reaction-bench-lesson-2">Reaction Bench Lesson 2</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#getting-a-high-reward-in-a-reaction-of-form">Getting a high reward in a reaction of form:</a></li>
+        
+            <li><a class="toctree-l3" href="#a-x-a-x-a-a-x-x-and-a-x-b-x-a-b-x-x">A-X + A-X --&gt; A-A + X-X and A-X + B-X --&gt; A-B + X-X</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../vessel_lesson/">Vessel lesson</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">ChemGymRL Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Lesson 2 reaction</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/chemgymrl/chemgymrl/edit/main/docs/lesson_2_reaction.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="reaction-bench-lesson-2">Reaction Bench Lesson 2</h2>
+<h3 id="getting-a-high-reward-in-a-reaction-of-form">Getting a high reward in a reaction of form:</h3>
+<h3 id="a-x-a-x-a-a-x-x-and-a-x-b-x-a-b-x-x">A-X + A-X --&gt; A-A + X-X and A-X + B-X --&gt; A-B + X-X</h3>
+<p>In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be simulating in this lesson is specifically:
+- 2 3-chlorohexane + 2 Na --&gt; 4,5-diethyloctane + 2 NaCl</p>
+<p>In similar fashion to lesson 1, the reactions used in this lesson are found in the reaction file. The reaction above is 1 of the 6 total reactions in the Wurtz reaction.</p>
+<p>The particular reaction we will be simulating is performed in an aqueous state with ethoxyethane as the solvent.</p>
+<p>From lesson 1 we know that our action space is a 6 element vector represented by:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Temperature</th>
+<th>Volume</th>
+<th>1-chlorohexane</th>
+<th>2 chlorohexane</th>
+<th>3-chlorohexane</th>
+<th>Na</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Value range:</td>
+<td>0-1</td>
+<td>0-1</td>
+<td>0-1</td>
+<td>0-1</td>
+<td>0-1</td>
+<td>0-1</td>
+</tr>
+</tbody>
+</table>
+<p>Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease.
+If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase.</p>
+<p>First let's start by importing all the modules we need.</p>
+<pre><code class="python"># import all the required external modules
+import gym
+import numpy as np
+import os
+import pickle
+import sys
+from time import sleep
+from gym import envs
+import matplotlib.pyplot as plt
+import pandas as pd
+%matplotlib inline
+
+# ensure all necessary modules can be found
+sys.path.append(&quot;../&quot;) # to access chemistrylab
+sys.path.append(&quot;../chemistrylab/reactions&quot;) # to access all reactions
+
+# import all local modules
+import chemistrylab
+</code></pre>
+
+<p>This will show all the environments we can currently run. Eventually you can create your own environments with different reactions and target material using the reaction template.</p>
+<pre><code class="python"># show all environments for reaction bench
+all_envs = envs.registry.all()
+env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
+print(env_ids)
+</code></pre>
+
+<pre><code>['WurtzReact-v0', 'WurtzReact_overlap-v0']
+</code></pre>
+<p>This explains the simulated reaction we are trying to simulate and is initializing the reaction environment.</p>
+<pre><code class="python"># trying to get high reward for wurtz reaction of form:
+# A-X + A-X --&gt; A-A + X-X and A-X + B-X --&gt; A-B + X-X
+# Rewards comes from producing A-A or B-B
+# Cannot come from A-B as this doesn't make the desired property
+# Desired material in this case is initialized to be 4,5-diethyloctane
+# initializes environment
+env = gym.make(&quot;WurtzReact-v0&quot;)
+render_mode = &quot;human&quot;
+</code></pre>
+
+<pre><code class="python">done = False
+__ = env.reset()
+
+# shows # of actions available
+print('# of actions available: ',env.action_space.shape[0])
+num_actions_available = env.action_space.shape[0]
+
+total_steps=0
+total_reward=0
+</code></pre>
+
+<pre><code># of actions available:  6
+</code></pre>
+<p>We will store certain values in these arrays so can plot them later on to visually show how each variable changes over time.</p>
+<pre><code class="python">reward_over_time=[]
+steps_over_time=[]
+reactant_1 = []
+reactant_2 = []
+total_reward_over_time = []
+
+action = np.ones(env.action_space.shape)
+</code></pre>
+
+<p>The key to achieving a high reward in this simulation is to only add the reactants that are needed for the reaction to 
+continue. This means that we will only add 3-chlorohexane and Na with our actions. This will allow us to maximize our 
+reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
+do this by running the following commands:</p>
+<pre><code class="python">if total_steps  &lt; 20:
+action[0] = 1
+action[1] = 1
+action[2] = 0.05 # 1-chlorohexane
+action[3] = 0.05 # 2-chlorohexane
+action[4] = 1    # 3-chlorohexane
+action[5] = 1    # Na
+</code></pre>
+
+<p>Notice that we're only adding the reactants we need for the reaction to continue.</p>
+<p><img alt="reaction" src="../../sample_figures/lesson_2r_image1.png" /></p>
+<p>Let's run our program and see what happens!</p>
+<pre><code class="python">while not done:
+    # Actions:
+    #   a[0] changes the temperature between -dT (a[0] = 0.0) and +dT (a[0] = 1.0)
+    #   a[1] changes the Volume between -dV (a[1] = 0.0) and +dV (a[1] = 1.0)
+    #   a[2:] adds between none (a[2:] = 0.0) and all (a[2:] = 1.0) of each reactant
+    if total_steps  &lt; 20:
+        action[0] = 1
+        action[1] = 1
+        action[2] = 0.05 # 1-chlorohexane
+        action[3] = 0.05 # 2-chlorohexane
+        action[4] = 1    # 3-chlorohexane
+        action[5] = 1    # Na
+
+        '''
+        # Adding Reactants not needed:
+        action[0] = 1
+        action[1] = 1
+        action[5] = 1
+        action[4] = 1
+        action[2] = 1
+        action[3] = 1
+        '''
+
+    # perform the action and update the reward
+    state, reward, done, __ = env.step(action)
+    print('-----------------------------------------')
+    print('total_steps: ', total_steps)
+    print('reward: %.2f ' % reward)
+    total_reward += reward
+    print('total reward: %.2f' % total_reward)
+    # print(state)
+
+    # render the plot
+    env.render(mode=render_mode)
+    # sleep(2)
+
+    # increment one step
+    total_steps += 1
+
+    # append arrays for states over time
+    reward_over_time.append(reward)
+    total_reward_over_time.append(total_reward)
+    steps_over_time.append(total_steps)
+    reactant_1.append(env.state[6])
+    reactant_2.append(env.state[7])
+</code></pre>
+
+<pre><code>-----------------------------------------
+total_steps:  0
+reward: 0.28 
+total reward: 0.28
+-----------------------------------------
+total_steps:  1
+reward: 0.28 
+total reward: 0.57
+-----------------------------------------
+total_steps:  2
+reward: 0.28 
+total reward: 0.85
+-----------------------------------------
+total_steps:  3
+reward: 0.28 
+total reward: 1.13
+-----------------------------------------
+total_steps:  4
+reward: 0.28 
+total reward: 1.41
+-----------------------------------------
+total_steps:  5
+reward: 0.28 
+total reward: 1.69
+-----------------------------------------
+total_steps:  6
+reward: 0.28 
+total reward: 1.97
+-----------------------------------------
+total_steps:  7
+reward: 0.28 
+total reward: 2.25
+-----------------------------------------
+total_steps:  8
+reward: 0.28 
+total reward: 2.52
+-----------------------------------------
+total_steps:  9
+reward: 0.28 
+total reward: 2.80
+-----------------------------------------
+total_steps:  10
+reward: 0.28 
+total reward: 3.08
+-----------------------------------------
+total_steps:  11
+reward: 0.28 
+total reward: 3.35
+-----------------------------------------
+total_steps:  12
+reward: 0.27 
+total reward: 3.63
+-----------------------------------------
+total_steps:  13
+reward: 0.26 
+total reward: 3.89
+-----------------------------------------
+total_steps:  14
+reward: 0.26 
+total reward: 4.14
+-----------------------------------------
+total_steps:  15
+reward: 0.25 
+total reward: 4.39
+-----------------------------------------
+total_steps:  16
+reward: 0.24 
+total reward: 4.63
+-----------------------------------------
+total_steps:  17
+reward: 0.24 
+total reward: 4.87
+-----------------------------------------
+total_steps:  18
+reward: 0.23 
+total reward: 5.10
+-----------------------------------------
+total_steps:  19
+reward: 0.23 
+total reward: 5.33
+</code></pre>
+<p>Notice that we get a total reward of 5.33. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!</p>
+<p><img alt="subplot" src="../../sample_figures/lesson_2r_image3.PNG" /></p>
+<p>This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material</p>
+<pre><code class="python"># ask user if they want to see stats of reaction vessel
+show_stats = input(&quot;Show Reaction Vessel Stats ('Y'/'N') &gt;&gt;&gt; &quot;)
+
+if show_stats.lower() in [&quot;y&quot;, &quot;yes&quot;]:
+    # open and check the material dict
+    vessel_path = os.path.join(os.getcwd(), &quot;vessel_experiment_0.pickle&quot;)
+    with open(vessel_path, 'rb') as open_file:
+        v = pickle.load(open_file)
+
+    print(&quot;&quot;)
+    print(&quot;---------- VESSEL ----------&quot;)
+    print(&quot;Label: {}&quot;.format(v.label))
+
+    print(&quot;&quot;)
+    print(&quot;---------- THERMODYNAMIC VARIABLES ----------&quot;)
+    print(&quot;Temperature (in K): {:e}&quot;.format(v.temperature))
+    print(&quot;Volume (in L): {:e}&quot;.format(v.volume))
+    print(&quot;Pressure (in kPa): {:e}&quot;.format(v.pressure))
+
+    print(&quot;&quot;)
+    print(&quot;---------- MATERIAL_DICT ----------&quot;)
+    for material, value_list in v._material_dict.items():
+        print(&quot;{} : {}&quot;.format(material, value_list))
+
+    print(&quot;&quot;)
+    print(&quot;---------- SOLUTE_DICT ----------&quot;)
+    for solute, value_list in v._solute_dict.items():
+        print(&quot;{} : {}&quot;.format(solute, value_list))
+</code></pre>
+
+<pre><code>Show Reaction Vessel Stats ('Y'/'N') &gt;&gt;&gt; y
+
+---------- VESSEL ----------
+Label: new
+
+---------- THERMODYNAMIC VARIABLES ----------
+Temperature (in K): 1.000000e+00
+Volume (in L): 1.197500e-06
+Pressure (in kPa): 8.192200e-07
+
+---------- MATERIAL_DICT ----------
+1-chlorohexane : [&lt;class 'chemistrylab.chem_algorithms.material.OneChlorohexane'&gt;, 0.2768946]
+2-chlorohexane : [&lt;class 'chemistrylab.chem_algorithms.material.TwoChlorohexane'&gt;, 0.0]
+3-chlorohexane : [&lt;class 'chemistrylab.chem_algorithms.material.ThreeChlorohexane'&gt;, 0.0]
+Na : [&lt;class 'chemistrylab.chem_algorithms.material.Na'&gt;, 0.2768946]
+dodecane : [&lt;class 'chemistrylab.chem_algorithms.material.Dodecane'&gt;, 0.36155286]
+5-methylundecane : [&lt;class 'chemistrylab.chem_algorithms.material.FiveMethylundecane'&gt;, 0.0]
+4-ethyldecane : [&lt;class 'chemistrylab.chem_algorithms.material.FourEthyldecane'&gt;, 0.0]
+5,6-dimethyldecane : [&lt;class 'chemistrylab.chem_algorithms.material.FiveSixDimethyldecane'&gt;, 0.0]
+4-ethyl-5-methylnonane : [&lt;class 'chemistrylab.chem_algorithms.material.FourEthylFiveMethylnonane'&gt;, 0.0]
+4,5-diethyloctane : [&lt;class 'chemistrylab.chem_algorithms.material.FourFiveDiethyloctane'&gt;, 0.0]
+NaCl : [&lt;class 'chemistrylab.chem_algorithms.material.NaCl'&gt;, 0.7231057]
+
+---------- SOLUTE_DICT ----------
+ethoxyethane : [&lt;class 'chemistrylab.chem_algorithms.material.Ethoxyethane'&gt;, 1.0]
+</code></pre>
+<p><strong>Why 4,5-diethyloctane is not in the vessel stats????</strong></p>
+<pre><code class="python">
+# graph states over time
+fig, (ax1, ax2, ax3, ax4) = plt.subplots(4)
+ax1.plot(steps_over_time, reactant_1)
+ax1.set_title('Steps vs. Reactant 1 (3-chlorohexane)')
+ax1.set_xlabel('Steps')
+ax1.set_ylabel('3-chlorohexane')
+
+ax2.plot(steps_over_time, reactant_2, 'tab:orange')
+ax2.set_title('Steps vs. Reactant 2 (Na)')
+ax2.set_xlabel('Steps')
+ax2.set_ylabel('Na')
+
+ax3.plot(steps_over_time, reward_over_time, 'tab:green')
+ax3.set_title('Steps vs Reward')
+ax3.set_xlabel('Steps')
+ax3.set_ylabel('Reward')
+
+ax4.plot(steps_over_time, total_reward_over_time, 'tab:red')
+ax4.set_title('Steps vs Total Reward')
+ax4.set_xlabel('Steps')
+ax4.set_ylabel('Total Reward')
+
+fig.tight_layout()
+plt.savefig('Final Subplots Demo Lesson 3.png')
+plt.show()
+</code></pre>
+
+<p>For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again. Note that this is still the same simulation of the reaction stated at the start.
+We are just changing the reactants that we're adding.</p>
+<pre><code class="python"># Adding Reactants not needed:
+action[0] = 1
+action[1] = 1
+action[5] = 1
+action[4] = 1
+action[2] = 1
+action[3] = 1
+</code></pre>
+
+<p>If we run this code we'll notice that our reward is significantly lower. It is now only 0.63 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. </p>
+<p>The next step for this reaction environment is to write an RL implementation that will allow the agent to solve this problem for you essentially maximizing our output of the desired material! </p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../vessel_lesson/" class="btn btn-neutral float-right" title="Vessel lesson">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../lesson_2_distillation/" class="btn btn-neutral" title="Lesson 2 distillation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/chemgymrl/chemgymrl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../lesson_2_distillation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../vessel_lesson/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
