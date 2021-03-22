@@ -66,8 +66,8 @@ class Vessel:
         self.label = label
         self.w2v = None
         self.temperature = temperature
-        self.pressure = self.get_pressure()
         self.volume = volume
+        self.pressure = self.get_pressure()
         self.v_max = v_max
         self.v_min = v_min
         self.Tmax = Tmax
@@ -986,19 +986,22 @@ class Vessel:
         )
 
     # function to set the volume of the container and to specify the units
-    def set_volume(self, volume: float, unit='ml', override=False):
+    def set_volume(self, volume: float, unit='l', override=False):
         if not self._material_dict and not self._solute_dict:
             self.volume = util.convert_volume(volume, unit)
         elif override:
             self.volume = util.convert_volume(volume, unit)
-            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume)
+            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
 
-    def set_v_min(self, volume: float, unit='ml'):
+    def set_v(self, volume: float):
+        self.volume = volume
+
+    def set_v_min(self, volume: float, unit='l'):
         self.v_min = util.convert_volume(volume, unit)
 
-    def set_v_max(self, volume: float, unit='ml'):
+    def set_v_max(self, volume: float, unit='l'):
         self.v_max = util.convert_volume(volume, unit)
 
     # functions to access private properties
@@ -1186,6 +1189,38 @@ class Vessel:
 
         return max_pressure
 
+    def get_pressure(self):
+        '''
+        Method to get the vessel's maximal pressure property
+        '''
+
+        # set up a variable to contain the total pressure
+        total_pressure = 0
+
+        # calculate the total pressure in a vessel using the material dictionary
+        for item in self._material_dict.items():
+            total_pressure += item[1][1] * R * self.temperature / self.volume
+
+        # if the vessel contains no material use 1 atm as a baseline (in kPa)
+        if total_pressure == 0:
+            total_pressure = 101.325
+
+        return total_pressure
+
+    def get_part_pressure(self):
+        '''
+        Method to get the vessel's maximal pressure property
+        '''
+
+        # set up a variable to contain the partial pressures
+        part_pressures = np.zeros(len(self._material_dict))
+
+        # calculate the total pressure in a vessel using the material dictionary
+        for i, item in enumerate(self._material_dict.items()):
+            part_pressures[i] = item[1][1] * R * self.temperature / self.volume
+
+        return part_pressures
+
     def get_defaultdt(self):
         '''
         Method to get the vessel's default time-step property
@@ -1199,21 +1234,6 @@ class Vessel:
         '''
 
         return self.temperature
-
-    def get_pressure(self):
-        '''
-        Method to get the vessel's pressure property
-        '''
-
-        # set up a variable to contain the total pressure
-        total_pressure = 0
-
-        # calculate the total pressure in a vessel using the material dictionary
-        for item in self._material_dict.items():
-            print(item)
-            total_pressure += item[1][1] * R * self.temperature / self.volume
-
-        return total_pressure
 
     def get_volume(self):
         '''
