@@ -39,6 +39,7 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
             solutes=[ # initialize the bench with the following solutes available
                 {"Material": "H2O", "Initial": 0.001}
             ],
+            n_steps=50,
             dt=0.01,
             overlap=False
         )
