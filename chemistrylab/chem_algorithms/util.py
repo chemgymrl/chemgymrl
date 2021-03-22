@@ -11,22 +11,36 @@ MASS_TABLE = {'kg': 1000,
               'g': 1,
               'mg': 1e-3}
 
-VOLUME_TABLE = {'l': 1000,
-                  'dl': 100,
-                  'ml': 1,
-                  'ul': 1/1000,
-                  'nl': 1e-6,
+VOLUME_TABLE = {'l': 1,
+                  'dl': 1/10,
+                  'ml': 1/1000,
+                  'ul': 1e-6,
+                  'nl': 1e-9,
                 }
 
 def convert_material_dict_to_volume(material_dict,
+                                    unit
                                     # the density of solution does not affect the original volume of solvent
                                     ):
+
+    # decide whether to convert density or not depending on volume unit
+    convert_density = False
+    if unit == 'l':
+        convert_density= True
+
     volume_dict = {}
     total_volume = 0
     for M in material_dict:
         if not material_dict[M][0]().is_solute():
             mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
-            volume = mass / material_dict[M][0]().get_density() # in L
+
+            if convert_density:
+                # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
+                volume = (mass / material_dict[M][0]().get_density(convert_density))*1000
+            else:
+                # results in cm^3
+                volume = mass / material_dict[M][0]().get_density(convert_density)
+
             volume_dict[M] = volume
             total_volume += volume
     return volume_dict, total_volume
@@ -66,8 +80,9 @@ def organize_solute_dict(material_dict,
 def check_overflow(material_dict,
                    solute_dict,
                    v_max,
+                   unit
                    ):
-    __, total_volume = convert_material_dict_to_volume(material_dict)  # convert from mole to ml
+    __, total_volume = convert_material_dict_to_volume(material_dict, unit)  # convert from mole to
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow
@@ -175,7 +190,7 @@ def convert_mass_to_mol(mat, mass, unit='g'):
         raise TypeError('the material input must be a material class or a string name for the material')
 
 
-def convert_volume_to_mol(mat, volume, unit='ml'):
+def convert_volume_to_mol(mat, volume, unit='l'):
     if type(mat) == material.Material:
         mass = convert_volume(volume, unit) * mat.density
         return mass / mat.molar_mass

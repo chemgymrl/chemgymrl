@@ -745,7 +745,58 @@ class _Reaction:
         self.cur_in_hand = 1.0 * self.initial_in_hand
 
         # set the n array to contain initial values
-        for i, material_amount in self.initial_in_hand:
+        for i, material_amount in enumerate(self.initial_in_hand):
+            self.n[i] = material_amount
+
+        # reset the vessel parameters to their original values as specified in the reaction file
+        vessels.set_v_min(self.Vmin, unit="l")
+        vessels.set_v_max(self.Vmax, unit="l")
+        vessels.set_volume(self.Vi, unit="l", override=True)
+        vessels.temperature = self.Ti
+        vessels.Tmin = self.Tmin
+        vessels.Tmax = self.Tmax
+        vessels.default_dt = self.dt
+
+        return vessels
+
+    def reset(self, vessels):
+        '''
+        Method to reset the environment and vessel back to its initial state.
+        Empty the initial n array and reset the vessel's thermodynamic properties.
+        Parameters
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel containing initial materials.
+
+        Returns
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel that has been updated to have the proper thermodynamic properties.
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # open the provided vessel to get the material and solute dictionaries
+        material_dict = vessels._material_dict
+        solute_dict = vessels._solute_dict
+
+        # acquire the amounts of reactant materials
+        for i, material_name in enumerate(material_dict.keys()):
+            if material_name in self.reactants:
+                self.initial_in_hand[i] = material_dict[material_name][1]
+
+        # acquire the amounts of solute materials
+        for i, solute_name in enumerate(solute_dict.keys()):
+            if solute_name in self.solutes:
+                self.initial_solutes[i] = solute_dict[solute_name][1]
+
+        # ensure the entire initial materials in hand array is available
+        self.cur_in_hand = 1.0 * self.initial_in_hand
+
+        # set the n array to contain initial values
+        for i, material_amount in enumerate(self.initial_in_hand):
             self.n[i] = material_amount
 
         # reset the vessel parameters to their original values as specified in the reaction file
@@ -1061,7 +1112,7 @@ class _Reaction:
         plt.show()
         plt.close()
 
-    def plotting_step(self, t, vessels: vessel.Vessel):
+    def plotting_step(self, t, tmax, vessels: vessel.Vessel):
         '''
         Set up a method to handle the acquisition of the necessary plotting parameters
         from an input vessel.
@@ -1069,7 +1120,8 @@ class _Reaction:
 
         # acquire the necessary parameters from the vessel
         T = vessels.get_temperature()
-        V = vessels.get_current_volume()
+        V = vessels.get_volume()
+        # V = 0.0025
 
         # create containers to hold the plotting parameters
         plot_data_state = [[], [], [], []]
@@ -1077,7 +1129,7 @@ class _Reaction:
         plot_data_concentration = [[] for _ in range(self.n.shape[0])]
 
         # Record time data
-        plot_data_state[0].append(t)
+        plot_data_state[0].append(t/tmax)
 
         # record temperature data
         Tmin = vessels.get_Tmin()
@@ -1091,6 +1143,7 @@ class _Reaction:
 
         # record pressure data
         P = vessels.get_pressure()
+        # P = 1175.6600956686177
         plot_data_state[3].append(
             P/vessels.get_pmax()
         )
@@ -1102,3 +1155,263 @@ class _Reaction:
             plot_data_concentration[j].append(C[j])
 
         return plot_data_state, plot_data_mol, plot_data_concentration
+
+    def plot_human_render(self, first_render, wave_data_dict, plot_data_state):
+
+        num_list = [plot_data_state[0][0],
+                    plot_data_state[1][0],
+                    plot_data_state[2][0],
+                    plot_data_state[3][0]
+                    ] + self.get_ni_num()
+
+        reactants = []
+        for reactant in self.reactants:
+            name = reactant.replace("[", "").replace("]", "")
+            short_name = name[0:5]
+            reactants.append(short_name)
+
+        label_list = ['t', 'T', 'V', 'P'] + reactants
+
+        spectra_len = wave_data_dict["spectra_len"]
+        absorb = wave_data_dict["absorb"]
+        wave = wave_data_dict["wave"]
+        wave_min = wave_data_dict["wave_min"]
+        wave_max = wave_data_dict["wave_max"]
+
+
+        if first_render:
+            plt.close('all')
+            plt.ion()
+
+            # define a figure and several subplots
+            self._plot_fig, self._plot_axs = plt.subplots(1, 2, figsize=(12, 6))
+
+            # plot spectra
+            self._plot_line1 = self._plot_axs[0].plot(
+                wave,  # wave range from wave_min to wave_max
+                absorb,  # absorb spectra
+            )[0]
+            self._plot_axs[0].set_xlim([wave_min, wave_max])
+            self._plot_axs[0].set_ylim([0, 1.2])
+            self._plot_axs[0].set_xlabel('Wavelength (nm)')
+            self._plot_axs[0].set_ylabel('Absorbance')
+
+            # bar chart displaying time, temperature, pressure,
+            # and amounts of each species left available in hand
+            __ = self._plot_axs[1].bar(
+                range(len(num_list)),
+                num_list,
+                tick_label=label_list,
+            )[0]
+            self._plot_axs[1].set_ylim([0, 1])
+
+
+            # draw the graph and show it
+            self._plot_fig.canvas.draw()
+            plt.show()
+
+        # if the plot is already rendered, simply add the new data to it
+        else:
+            self._plot_line1.set_xdata(wave)
+            self._plot_line1.set_ydata(absorb)
+
+            # bar chart
+            self._plot_axs[1].cla()
+            __ = self._plot_axs[1].bar(
+                range(len(num_list)),
+                num_list,
+                tick_label=label_list,
+            )[0]
+            self._plot_axs[1].set_ylim([0, 1])
+
+            # draw the graph
+            self._plot_fig.canvas.draw()
+            plt.pause(0.000001)
+
+    def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration, n_steps, vessels: vessel.Vessel):
+
+        num_list = [plot_data_state[0][0],
+                    plot_data_state[1][0],
+                    plot_data_state[2][0],
+                    plot_data_state[3][0]
+                    ] + self.get_ni_num()
+
+        reactants = []
+        for reactant in self.reactants:
+            name = reactant.replace("[", "").replace("]", "")
+            short_name = name[0:5]
+            reactants.append(short_name)
+
+        label_list = ['t', 'T', 'V', 'P'] + reactants
+
+        spectra_len = wave_data_dict["spectra_len"]
+        absorb = wave_data_dict["absorb"]
+        wave = wave_data_dict["wave"]
+        wave_min = wave_data_dict["wave_min"]
+        wave_max = wave_data_dict["wave_max"]
+
+        peak = self.get_spectra_peak(vessels.get_volume())
+        dash_spectra = self.get_dash_line_spectra(vessels.get_volume())
+
+        # The first render is required to initialize the figure
+        if first_render:
+            plt.close('all')
+            plt.ion()
+            self._plot_fig, self._plot_axs = plt.subplots(2, 3, figsize=(24, 12))
+
+            # Time vs. Molar_Amount graph ********************** Index: (0, 0)
+            self._plot_lines_amount = []
+            for i in range(self.n.shape[0]):
+                self._plot_lines_amount.append(
+                    self._plot_axs[0, 0].plot(
+                        plot_data_state[0],  # time
+                        plot_data_mol[i],  # mol of species C[i]
+                        label=self.materials[i]  # names of species C[i]
+                    )[0]
+                )
+            self._plot_axs[0, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
+            self._plot_axs[0, 0].set_ylim([0.0, np.max(self.nmax)])
+            self._plot_axs[0, 0].set_xlabel('Time (s)')
+            self._plot_axs[0, 0].set_ylabel('Molar Amount (mol)')
+            self._plot_axs[0, 0].legend()
+
+            # Time vs. Molar_Concentration graph *************** Index: (0, 1)
+            self._plot_lines_concentration = []
+            for i in range(self.n.shape[0]):
+                self._plot_lines_concentration.append(
+                    self._plot_axs[0, 1].plot(
+                        plot_data_state[0],  # time
+                        plot_data_concentration[i],  # concentrations of species C[i]
+                        label=self.materials[i]  # names of species C[i]
+                    )[0]
+                )
+            self._plot_axs[0, 1].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
+            self._plot_axs[0, 1].set_ylim([
+                0.0, np.max(self.nmax) / (vessels.get_min_volume())
+            ])
+            self._plot_axs[0, 1].set_xlabel('Time (s)')
+            self._plot_axs[0, 1].set_ylabel('Molar Concentration (mol/L)')
+            self._plot_axs[0, 1].legend()
+
+            # Time vs. Temperature + Time vs. Volume graph *************** Index: (0, 2)
+            self._plot_line_1 = self._plot_axs[0, 2].plot(
+                plot_data_state[0],  # time
+                plot_data_state[1],  # Temperature
+                label='T'
+            )[0]
+            self._plot_line_2 = self._plot_axs[0, 2].plot(
+                plot_data_state[0],  # time
+                plot_data_state[2],  # Volume
+                label='V'
+            )[0]
+            self._plot_axs[0, 2].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
+            self._plot_axs[0, 2].set_ylim([0, 1])
+            self._plot_axs[0, 2].set_xlabel('Time (s)')
+            self._plot_axs[0, 2].set_ylabel('T and V (map to range [0, 1])')
+            self._plot_axs[0, 2].legend()
+
+            # Time vs. Pressure graph *************** Index: (1, 0)
+            self._plot_line_3 = self._plot_axs[1, 0].plot(
+                plot_data_state[0],  # time
+                plot_data_state[3]  # Pressure
+            )[0]
+            self._plot_axs[1, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
+            self._plot_axs[1, 0].set_ylim([0, vessels.get_pmax()])
+            self._plot_axs[1, 0].set_xlabel('Time (s)')
+            self._plot_axs[1, 0].set_ylabel('Pressure (kPa)')
+
+            # Solid Spectra graph *************** Index: (1, 1)
+            __ = self._plot_axs[1, 1].plot(
+                wave,  # wavelength space (ranging from wave_min to wave_max)
+                absorb  # absorb spectra
+            )[0]
+
+            # dash spectra
+            for spectra in dash_spectra:
+                self._plot_axs[1, 1].plot(wave, spectra, linestyle='dashed')
+
+            # include the labelling when plotting spectral peaks
+            for i in range(self.n.shape[0]):
+                self._plot_axs[1, 1].scatter(peak[i][0], peak[i][1], label=peak[i][2])
+
+            self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
+            self._plot_axs[1, 1].set_ylim([0, 1.2])
+            self._plot_axs[1, 1].set_xlabel('Wavelength (nm)')
+            self._plot_axs[1, 1].set_ylabel('Absorbance')
+            self._plot_axs[1, 1].legend()
+
+            # bar chart plotting the time, tempurature, pressure, and amount of each
+            # species left in hand *************** Index: (1, 2)
+            __ = self._plot_axs[1, 2].bar(
+                range(len(num_list)),
+                num_list,
+                tick_label=label_list
+            )[0]
+            self._plot_axs[1, 2].set_ylim([0, 1])
+
+            # draw and show the full graph
+            self._plot_fig.canvas.draw()
+            plt.show()
+
+        # All other renders serve to update the existing figure with the new current state;
+        # it is assumed that the above actions have already been carried out
+        else:
+            # set data for the Time vs. Molar_Amount graph *************** Index: (0, 0)
+            curent_time = plot_data_state[0][-1]
+            for i in range(self.n.shape[0]):
+                self._plot_lines_amount[i].set_xdata(plot_data_state[0])
+                self._plot_lines_amount[i].set_ydata(plot_data_mol[i])
+
+                # set data for the Time vs. Molar_Concentration graph *************** Index: (0, 1)
+                self._plot_lines_concentration[i].set_xdata(plot_data_state[0])
+                self._plot_lines_concentration[i].set_ydata(plot_data_concentration[i])
+
+            # reset each plot's x-limit because the latest action occurred at a greater time-value
+            self._plot_axs[0, 0].set_xlim([0.0, curent_time])
+            self._plot_axs[0, 1].set_xlim([0.0, curent_time])
+
+            # set data for Time vs. Temp and Time vs. Volume graphs *************** Index: (0, 2)
+            self._plot_line_1.set_xdata(plot_data_state[0])
+            self._plot_line_1.set_ydata(plot_data_state[1])
+            self._plot_line_2.set_xdata(plot_data_state[0])
+            self._plot_line_2.set_ydata(plot_data_state[2])
+            self._plot_axs[0, 2].set_xlim([0.0, curent_time])  # reset xlime since t extend
+
+            # set data for Time vs. Pressure graph *************** Index: (1, 0)
+            self._plot_line_3.set_xdata(plot_data_state[0])
+            self._plot_line_3.set_ydata(plot_data_state[3])
+            self._plot_axs[1, 0].set_xlim([0.0, curent_time])  # reset xlime since t extend
+
+            # reset the Solid Spectra graph
+            self._plot_axs[1, 1].cla()
+            __ = self._plot_axs[1, 1].plot(
+                wave,  # wavelength space (ranging from wave_min to wave_max)
+                absorb,  # absorb spectra
+            )[0]
+
+            # obtain the new dash spectra data
+            for __, item in enumerate(dash_spectra):
+                self._plot_axs[1, 1].plot(wave, item, linestyle='dashed')
+
+            # reset the spectra peak labelling
+            for i in range(self.n.shape[0]):
+                self._plot_axs[1, 1].scatter(peak[i][0], peak[i][1], label=peak[i][2])
+
+            self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
+            self._plot_axs[1, 1].set_ylim([0, 1.2])
+            self._plot_axs[1, 1].set_xlabel('Wavelength (nm)')
+            self._plot_axs[1, 1].set_ylabel('Absorbance')
+            self._plot_axs[1, 1].legend()
+
+            # bar chart
+            self._plot_axs[1, 2].cla()
+            __ = self._plot_axs[1, 2].bar(
+                range(len(num_list)),
+                num_list,
+                tick_label=label_list,
+            )[0]
+            self._plot_axs[1, 2].set_ylim([0, 1])
+
+            # re-draw the graph
+            self._plot_fig.canvas.draw()
+            plt.pause(0.000001)

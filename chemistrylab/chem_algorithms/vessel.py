@@ -986,19 +986,22 @@ class Vessel:
         )
 
     # function to set the volume of the container and to specify the units
-    def set_volume(self, volume: float, unit='ml', override=False):
+    def set_volume(self, volume: float, unit='l', override=False):
         if not self._material_dict and not self._solute_dict:
             self.volume = util.convert_volume(volume, unit)
         elif override:
             self.volume = util.convert_volume(volume, unit)
-            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume)
+            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
 
-    def set_v_min(self, volume: float, unit='ml'):
+    def set_v(self, volume: float):
+        self.volume = volume
+
+    def set_v_min(self, volume: float, unit='l'):
         self.v_min = util.convert_volume(volume, unit)
 
-    def set_v_max(self, volume: float, unit='ml'):
+    def set_v_max(self, volume: float, unit='l'):
         self.v_max = util.convert_volume(volume, unit)
 
     # functions to access private properties
