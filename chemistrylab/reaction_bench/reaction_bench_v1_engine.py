@@ -130,42 +130,12 @@ class ReactionBenchEnv(gym.Env):
         # initialize a step counter
         self.step_num = 1
 
-        # initialize vessels by providing a empty default vessel or loading an existing saved vessel
-        self.n_init = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
-        if self.in_vessel_path is None:
-            # prepare the materials that have been provided
-            material_names = []
-            material_amounts = []
-            for material_params in input_parameters["materials"]:
-                material_names.append(material_params["Material"])
-                material_amounts.append(material_params["Initial"])
-            material_classes = convert_to_class(materials=material_names)
-            material_dict = {}
-            for i, material in enumerate(material_names):
-                material_dict[material] = [material_classes[i], material_amounts[i], 'mol']
-
-            # prepare the solutes that have been provided
-            solute_names = []
-            solute_amounts = []
-            for solute_params in input_parameters["solutes"]:
-                solute_names.append(solute_params["Solute"])
-                solute_amounts.append(solute_params["Initial"])
-            solute_classes = convert_to_class(materials=solute_names)
-            solute_dict = {}
-            for i, solute in enumerate(solute_names):
-                solute_dict[solute] = [solute_classes[i], solute_amounts[i], 'mol']
-
-            # add the materials and solutes to an empty vessel
-            self.vessels = vessel.Vessel(
-                'default',
-                materials=material_dict,
-                solutes=solute_dict,
-                default_dt=self.dt
-            )
-        else:
-            with open(self.in_vessel_path, 'rb') as handle:
-                v = pickle.load(handle)
-                self.vessels = v
+        # prepare the initial vessel
+        self.vessels = self._prepare_vessel(
+            in_vessel_path=self.in_vessel_path,
+            materials=input_parameters["materials"],
+            solutes=input_parameters["solutes"]
+        )
 
         # set up a state variable
         self.state = None
@@ -341,6 +311,67 @@ class ReactionBenchEnv(gym.Env):
 
         return input_parameters
 
+    def _prepare_materials(self, materials=[]):
+        '''
+        Method to prepare a list of materials/solutes into a material or solute dictionary.
+        The provided materials/solutes are expected to be of the following form:
+            materials = [
+                {"Material": INSERT MATERIAL NAME, "Initial": INSERT INITIAL AMOUNT}
+                {"Material": INSERT MATERIAL NAME, "Initial": INSERT INITIAL AMOUNT}
+                .
+                .
+                .
+            ]
+        '''
+
+        # prepare lists to maintain the names and amounts of the materials
+        material_names = []
+        material_amounts = []
+
+        # iterate through the provided list of materials and ibtain the names and amounts
+        for material_params in materials:
+            material_names.append(material_params["Material"])
+            material_amounts.append(material_params["Initial"])
+
+        # acquire the material class representations from the material names
+        material_classes = convert_to_class(materials=material_names)
+
+        # create a dictionary to contain the material and its properties
+        material_dict = {}
+
+        # iterate through each of the material names, classes, and amounts lists;
+        # it is assumed the materials are provided in units of mol
+        for i, material in enumerate(material_names):
+            material_dict[material] = [material_classes[i], material_amounts[i], 'mol']
+
+        return material_dict
+
+    def _prepare_vessel(self, in_vessel_path="", materials=[], solutes=[]):
+        '''
+        Method to prepare the initial vessel.
+        '''
+
+        # initialize vessels by providing a empty default vessel or loading an existing saved vessel
+        if in_vessel_path is None:
+            # prepare the provided materials into a compatible material dictionary
+            material_dict = self._prepare_materials(materials=materials)
+
+            # prepare the solutes that have been provided
+            solute_dict = self._prepare_materials(materials=solutes)
+
+            # add the materials and solutes to an empty vessel
+            vessels = vessel.Vessel(
+                'default',
+                materials=material_dict,
+                solutes=solute_dict,
+                default_dt=self.dt
+            )
+        else:
+            with open(in_vessel_path, 'rb') as handle:
+                vessels = pickle.load(handle)
+
+        return vessels
+
     def _update_state(self):
         '''
         Method to update the state vector with the current time, temperature, volume,
@@ -446,7 +477,7 @@ class ReactionBenchEnv(gym.Env):
         self.plot_data_mol = []
         self.plot_data_concentration = []
 
-        # [0] is time, [1] is Tempurature, [2:] is each species
+        # [0] is time, [1] is Temperature, [2:] is each species
         C = self.reaction.get_concentration(Vi)
         for i in range(self.reaction.nmax.shape[0]):
             self.plot_data_mol.append([self.reaction.n[i]])
