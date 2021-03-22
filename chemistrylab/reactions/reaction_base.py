@@ -65,7 +65,7 @@ class _Reaction:
         # UNPACK THE REACTION PARAMETERS:
         # materials used and the desired material
         self.reactants = reaction_params["REACTANTS"]
-        self.products = reaction_params["PRDOUCTS"]
+        self.products = reaction_params["PRODUCTS"]
         self.solutes = reaction_params["SOLUTES"]
         self.desired = reaction_params["DESIRED"]
 
