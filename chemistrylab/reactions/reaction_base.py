@@ -505,6 +505,7 @@ class _Reaction:
         '''
 
         # open the provided vessel to get the material and solute dictionaries
+        print(vessels)
         material_dict = vessels._material_dict
         solute_dict = vessels._solute_dict
 

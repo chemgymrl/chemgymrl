@@ -321,7 +321,7 @@ class ReactionBenchEnv(gym.Env):
 
         self.vessels = new_vessel
         self.n_init = new_n
-        self.reaction.reset(new_n)
+        self.reaction.reset(self.vessels)
 
     def _prepare_materials(self, materials=[]):
         '''
@@ -484,7 +484,7 @@ class ReactionBenchEnv(gym.Env):
             [0.0], # time
             [(Ti - Tmin) / (Tmax - Tmin)], # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)], # normalized volume
-            [total_pressure / Pmax] # normalized pressure
+            [total_pressure / Pmax], # normalized pressure
             [0.0],  # time
             [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume
