@@ -1,9 +1,9 @@
 '''
-Module to model all six Wurtz chlorine hydrocarbon reactions.
+Module to perform a series of reactions as specified by an accompanying reaction file.
 
-:title: base_reaction.py
+:title: reaction_base.py
 
-:author: Mitchell Shahen
+:author: Mark Baula, Nicholas Paquin, and Mitchell Shahen
 
 :history: 22-06-2020
 '''
@@ -18,11 +18,12 @@ Module to model all six Wurtz chlorine hydrocarbon reactions.
 import importlib.util
 import os
 import sys
+import types
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-sys.path.append("../../") # allows module to access chemistrylab
+sys.path.append("../../") # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.chem_algorithms import vessel
@@ -33,7 +34,7 @@ R = 8.314462619
 class _Reaction:
 
     def __init__(self, reaction_file_identifier="", overlap=False):
-        """
+        '''
         Constructor class module for the Reaction class.
 
         Parameters
@@ -44,6 +45,9 @@ class _Reaction:
             A list of dictionaries containing initial solute names, classes, and amounts.
         `desired` : `str` (default="")
             A string indicating the name of the desired material.
+        `reaction_file_identifier` : `str` (default=`""`)
+            The basename of the reaction file that contains the parameters
+            necessary to perform the desired reaction(s).
         `overlap` : `bool` (default=`False`)
             Indicate if the spectral plot includes overlapping plots.
 
@@ -54,7 +58,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        """
+        '''
 
         # define a name/label for this reaction base class
         self.name = "base_reaction"
@@ -67,10 +71,10 @@ class _Reaction:
 
         # UNPACK THE REACTION PARAMETERS:
         # materials used and the desired material
-        self.reactants = reaction_params["reactants"]
-        self.products = reaction_params["products"]
-        self.solutes = reaction_params["solutes"]
-        self.desired = reaction_params["desired"]
+        self.reactants = reaction_params['REACTANTS']
+        self.products = reaction_params["PRODUCTS"]
+        self.solutes = reaction_params["SOLUTES"]
+        self.desired = reaction_params["DESIRED"]
 
         # initial vessel properties (used in reseting the reaction vessel)
         self.Ti = reaction_params["Ti"]
@@ -109,15 +113,20 @@ class _Reaction:
         self.material_classes = convert_to_class(materials=self.materials)
         self.solute_classes = convert_to_class(materials=self.solutes)
 
+        # create the (empty) n array which will contain the molar amounts of materials in use
+        self.n = np.zeros(len(self.materials))
+
         # define the maximal number of moles available for any chemical
         self.max_mol = 2.0
 
         # define the maximal number of moles of each chemical allowed at one time
         self.nmax = self.max_mol * np.ones(len(self.materials))
 
-        # define parameters for generating spectra
-        # self.params = [spec.S_1]*len(materials)
+        # define variables to contain the initial materials and solutes available "in hand"
+        self.initial_in_hand = np.zeros(len(self.reactants))
+        self.initial_solutes = np.zeros(len(self.solutes))
 
+        # define parameters for generating spectra
         self.params = []
         for material in self.material_classes:
             if overlap:
@@ -130,6 +139,23 @@ class _Reaction:
         '''
         Method to attempt to find the requested reaction file. Currently, the name of the
         reaction file is needed for specifying the requested reaction file.
+
+        Parameters
+        ---------------
+        `reaction_file` : `str` (default=`""`)
+            The basename of the reaction file that contains the parameters
+            necessary to perform the desired reaction(s).
+
+        Returns
+        ---------------
+        `output_reaction_file` : `str`
+            The full filepath to the reaction file that contains the parameters
+            necessary to perform the desired reaction(s).
+
+        Raises
+        ---------------
+        `IOError`:
+            Raised if the requested reaction file is not found in the available reactions directory.
         '''
 
         # acquire the path to the reactions directory containing
@@ -165,39 +191,56 @@ class _Reaction:
     @staticmethod
     def _get_reaction_params(reaction_filepath=""):
         '''
-        Method to acquire the necessary reaction parameters and make them available.
+                Method to acquire the necessary reaction parameters from the specified
+        reaction file and make them available.
+
+        Parameters
+        ---------------
+        `reaction_filepath` : `str` (default=`""`)
+            The full filepath to the reaction file that contains the parameters
+            necessary to perform the desired reaction(s).
+
+        Returns
+        ---------------
+        `output_params` : `dict`
+            A dictionary containing all of the parameters from the specified reaction file.
+
+        Raises
+        ---------------
+        `TypeError`:
+            Raised when the acquired module, by means of `importlib`, is not a `ModuleType` object.hem available.
         '''
 
         # cut the full reaction filepath to just the filename
         reaction_filename = reaction_filepath.split("\\")[-1]
 
-        # cut the reaction filename to its basename (without extension)
-        reaction_basename = reaction_filename.split("\\")[0]
-
         # set up the import functions to access the reaction file module
-        spec = importlib.util.spec_from_file_location(reaction_basename, reaction_filepath)
+        spec = importlib.util.spec_from_file_location(reaction_filename, reaction_filepath)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        # acquire the necessary parameters from the module and add them to a dictionary
-        output_params = {
-            "reactants" : module.REACTANTS,
-            "products" : module.PRODUCTS,
-            "solutes" : module.SOLUTES,
-            "desired" : module.DESIRED,
-            "Ti" : module.Ti,
-            "Vi" : module.Vi,
-            "dt" : module.dt,
-            "Tmin" : module.Tmin,
-            "Tmax" : module.Tmax,
-            "dT" : module.dT,
-            "Vmin" : module.Vmin,
-            "Vmax" : module.Vmax,
-            "dV" : module.dV,
-            "activ_energy_arr" : module.activ_energy_arr,
-            "stoich_coeff_arr" : module.stoich_coeff_arr,
-            "conc_coeff_arr" : module.conc_coeff_arr
-        }
+        # ensure the loaded module is, in fact, a module type object
+        if not isinstance(module, types.ModuleType):
+            raise TypeError(
+                "ERROR: Acquired Module is not a ModuleType! "
+                "Reaction parameters cannot be accessed."
+            )
+
+        # get a list of all dictionary keys in the reaction file
+        all_keys = [item for item in module.__dict__.keys() if not item.startswith("_")]
+
+        # create a dictionary ot contain the reaction file parameters and their key identifiers
+        output_params = {}
+
+        # iterate through the key identifiers and add reaction parameters to the output dictionary
+        for key in all_keys:
+            # acquire the reaction parameter from the module
+            parameter = module.__dict__[key]
+
+            # ensure the parameter is not an imported module (because these are not required)
+            if not isinstance(parameter, types.ModuleType):
+                # add the parameter to the dictionary at the position designated by `key`
+                output_params[key] = parameter
 
         return output_params
 
@@ -211,7 +254,7 @@ class _Reaction:
 
         Returns
         ---------------
-        labels : list
+        `labels` : `list`
             A list of the names of each reactant used in this reaction
 
         Raises
@@ -233,7 +276,7 @@ class _Reaction:
 
         Returns
         ---------------
-        num_list : list
+         `num_list` : `list`
             A list of the chemicals that are currently available (in hand)
 
         Raises
@@ -254,12 +297,12 @@ class _Reaction:
 
         Parameters
         ---------------
-        V : np.float32 (default=0.1)
+        `V` : `float` (default=0.1)
             The volume of the system in L
 
         Returns
         ---------------
-        C : np.array
+        `C` : `np.array`
             An array of the concentrations (in mol/L) of each chemical in the experiment.
 
         Raises
@@ -273,66 +316,6 @@ class _Reaction:
             C[i] = self.n[i] / V
 
         return C
-
-    def reset(self, vessels):
-        '''
-        Method to reset the environment back to its initial state.
-        Empty the initial n array and open the vessel to determine
-        the amounts of material initially available.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # ensure the n array (which contains the amount of materials in use) is completely empty
-        self.n = np.zeros(len(self.materials))
-
-        initial_in_hand = np.zeros(len(self.reactants))
-        initial_solutes = np.zeros(len(self.solutes))
-
-        # open the provided vessel to get the material and solute dictionaries
-        material_dict = vessels._material_dict
-        solute_dict = vessels._solute_dict
-
-        # acquire the amounts of reactant materials
-        for i, material_name in enumerate(material_dict.keys()):
-            if material_name in self.reactants:
-                initial_in_hand[i] = material_dict[material_name][1]
-
-        # acquire the amounts of solute materials
-        for i, solute_name in enumerate(solute_dict.keys()):
-            if solute_name in self.solutes:
-                initial_solutes[i] = solute_dict[solute_name][1]
-
-        # set the initial materials in hand array
-        self.initial_in_hand = initial_in_hand
-
-        # set the initial solutes in hand array
-        self.initial_solutes = initial_solutes
-
-        # ensure the entire initial materials in hand array is available
-        self.cur_in_hand = 1.0 * initial_in_hand
-
-        # reset the vessel parameters to their original values as specified in the reaction file
-        vessels.set_v_min(self.Vmin, unit="l")
-        vessels.set_v_max(self.Vmax, unit="l")
-        vessels.set_volume(self.Vi, unit="l", override=True)
-        # vessels.set_v(self.Vi)
-        vessels.temperature = self.Ti
-        vessels.Tmin = self.Tmin
-        vessels.Tmax = self.Tmax
-        vessels.default_dt = self.dt
-
-        return vessels
 
     def get_reaction_constants(self, temp, conc_arr):
         '''
@@ -362,6 +345,22 @@ class _Reaction:
             If both are zero, no reaction using A and B are available, so n = 1 by default.
             Note that n is determined by the stiochiometric coefficients of the rate as well.
             Therefore, we will have different scaling factors for different reactions.
+
+        Parameters
+        ---------------
+        `temperature` : `float`
+            The temperature of the vessel when the reaction(s) are taking place.
+        `conc_arr` : `np.array`
+            The array containing concentrations of each material set to take place in reaction(s).
+
+        Returns
+        ---------------
+        `k_arr` : `np.array`
+            An array containing reaction rate constants for each reaction set to occur.
+
+        Raises
+        ---------------
+        None
         '''
 
         # acquire the activation energies and stoichiometric coefficients for each reaction
@@ -434,6 +433,22 @@ class _Reaction:
         Method to calculate the reaction rates for every reaction that is to be performed.
         The rates are calculated using the concentrations of reactants made available, their
         stoichiometric coefficients, and the rate constants for each reaction.
+
+         Parameters
+        ---------------
+        `k_arr` : `np.array`
+            An array containing reaction rate constants for each reaction set to occur.
+        `conc_arr` : `bool`
+            The array containing concentrations of each material set to take place in reaction(s).
+
+        Returns
+        ---------------
+        `rates_arr` : `np.array`
+            An array containing the rate at which each reaction is to take place.
+
+        Raises
+        ---------------
+        None
         '''
 
         # acquire the array of stiochiometric coefficients for each reaction
@@ -477,6 +492,23 @@ class _Reaction:
         '''
         Method to calculate the change_concentration array containing the changes in reactant and
         product concentrations as a result of performing a reaction.
+
+         Parameters
+        ---------------
+        `rates_arr` : `np.array`
+            An array containing the rate at which each reaction is to take place.
+        `conc_arr` : `bool`
+            The array containing concentrations of each material set to take place in reaction(s).
+
+        Returns
+        ---------------
+        `change_conc_arr` : `np.array`
+            An array containing the changes in concentration of each material that has taken
+            place in the occurring reaction(s).
+
+        Raises
+        ---------------
+        None
         '''
 
         # acquire the concentration coefficients array conatining the coefficients indicating the
@@ -525,6 +557,23 @@ class _Reaction:
         '''
         Method to deconstruct the action and obtain the proper thermodynamic variables and reactant
         amounts that can be used in further methods.
+
+        Parameters
+        ---------------
+        `action` : `list`
+            A list of values specifying actions that are to be carried out.
+            Each action varies from 0 to 1.
+        Returns
+        ---------------
+        `temp_change` : `float`
+            The change in temperature set to occur as given by the inputted action.
+        `volume_change` : `float`
+            The change in volume set to occur as given by the inputted action.
+        `delta_n_array` : `np.array`
+            An array containing the changes in molar amount of each reactant as given by the action.
+        Raises
+        ---------------
+        None
         '''
 
         # the first action parameter is the requested change in temperature;
@@ -565,10 +614,66 @@ class _Reaction:
 
         return temp_change, volume_change, delta_n_array
 
-    def update_vessel(self, vessels: vessel.Vessel, temperature, volume, pressure):
+    def vessel_deconstruct(self, vessels):
+        '''
+        Method to deconstruct and acquire key properties of the inputted vessel.
+        Additionally, the n array is given the appropriate values.
+        Notable properties include the temperature and volume.
+
+        Parameters
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel containing materials that are to be used in a series of reactions.
+
+        Returns
+        ---------------
+        `temperature` : `float`
+            The temperature of the inputted vessel.
+        `volume` : `float`
+            The volume of the inputted vessel.
+
+        Raises
+            ---------------
+        None
+        '''
+
+        # obtain the material dictionary
+        material_dict = vessels._material_dict
+
+        # unpack the material dictionary and add all the material amounts to the n array
+        for i, material_name in enumerate(material_dict.keys()):
+            if material_name in self.materials:
+                material_amount = material_dict[material_name][1]
+                self.n[i] = material_amount
+
+        # acquire the vessel's temperature property
+        temperature = vessels.get_temperature()
+
+        # acquire the vessel's volume property
+        volume = vessels.get_volume()
+
+        return temperature, volume
+
+    def update_vessel(self, temperature, volume):
         '''
         Method to update the provided vessel object with materials from the reaction base
         and new thermodynamic variables.
+
+        Parameters
+        ---------------
+        `temperature` : `float`
+            The final temperature of the vessel after all reactions have been completed.
+        `volume` : `float`
+            The final temperature of the vessel after all reactions have been completed.
+
+        Returns
+        ---------------
+        `new_vessel` : `float`
+            The new vessel containing the final materials and thermodynamic variables.
+
+        Raises
+        ---------------
+        None
         '''
 
         # tabulate all the materials used and their new values
@@ -597,15 +702,66 @@ class _Reaction:
             v_min=self.Vmin,
             Tmax=self.Tmax,
             Tmin=self.Tmin,
-            default_dt=vessels.default_dt
+            default_dt=self.dt
         )
         new_vessel.temperature = temperature
+        new_vessel.volume = volume
         new_vessel._material_dict = new_material_dict
         new_vessel._solute_dict = new_solute_dict
-        new_vessel.volume = volume
-        new_vessel.pressure = pressure
+        new_vessel.pressure = new_vessel.get_pressure()
 
         return new_vessel
+
+    def reset(self, vessels):
+        '''
+        Method to reset the environment and vessel back to its initial state.
+        Empty the initial n array and reset the vessel's thermodynamic properties.
+        Parameters
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel containing initial materials.
+
+        Returns
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel that has been updated to have the proper thermodynamic properties.
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # open the provided vessel to get the material and solute dictionaries
+        material_dict = vessels._material_dict
+        solute_dict = vessels._solute_dict
+
+        # acquire the amounts of reactant materials
+        for i, material_name in enumerate(material_dict.keys()):
+            if material_name in self.reactants:
+                self.initial_in_hand[i] = material_dict[material_name][1]
+
+        # acquire the amounts of solute materials
+        for i, solute_name in enumerate(solute_dict.keys()):
+            if solute_name in self.solutes:
+                self.initial_solutes[i] = solute_dict[solute_name][1]
+
+        # ensure the entire initial materials in hand array is available
+        self.cur_in_hand = 1.0 * self.initial_in_hand
+
+        # set the n array to contain initial values
+        for i, material_amount in enumerate(self.initial_in_hand):
+            self.n[i] = material_amount
+
+        # reset the vessel parameters to their original values as specified in the reaction file
+        vessels.set_v_min(self.Vmin, unit="l")
+        vessels.set_v_max(self.Vmax, unit="l")
+        vessels.set_volume(self.Vi, unit="l", override=True)
+        vessels.temperature = self.Ti
+        vessels.Tmin = self.Tmin
+        vessels.Tmax = self.Tmax
+        vessels.default_dt = self.dt
+
+        return vessels
 
     def update(self, temp, volume, dt):
         '''
@@ -614,17 +770,16 @@ class _Reaction:
 
         Parameters
         ---------------
-        T : np.float32
+        `temp` : `float`
             The temperature of the system in Kelvin
-        V : np.float32
+        `volume` : `float`
             The volume of the system in Litres
-        dt : np.float32
+        `dt` : `float`
             The time-step demarcating separate steps
 
         Returns
         ---------------
-        reward : np.float32
-            The amount of the desired product created during the time-step
+        None
 
         Raises
         ---------------
@@ -663,20 +818,16 @@ class _Reaction:
         `action` : `np.array`
             An array containing elements describing the changes to be made, during the current
             step, to each modifiable thermodynamic variable and reactant used in the reaction.
+         `vessels` : `vessel.Vessel`
+            A vessel containing initial materials to be used in a series of reactions.
+        `n_steps` : `int`
+            The number of increments into which the action is split.
 
         Returns
         ---------------
-        `state` : `np.array`
-            An array containing updated values of all the thermodynamic variables,
-            reactants, and spectra generated by the most recent step.
-        `reward` : `float`
-            The amount of the desired product that has been created in the most recent step.
-        `done` : `boolean`
-            Indicates if, upon completing the most recent step, all the required steps
-            have been completed.
-        `parameters` : `dict`
-            Any additional parameters used/generated in the most recent step that need
-            to be specified.
+        `vessels` : `vessel.Vessel`
+            A vessel that has been updated to have the proper materials and
+            thermodynamic properties.
 
         Raises
         ---------------
@@ -686,26 +837,30 @@ class _Reaction:
         # deconstruct the action
         temperature_change, volume_change, delta_n_array = self.action_deconstruct(action=action)
 
-        # acquire the necessary thermodynamic parameters from the vessel
-        T = vessels.get_temperature()
-        V = vessels.get_volume()
-        # V = vessels.get_volume() * 0.001
+        # deconstruct the vessel: acquire the vessel temperature and volume and create the n array
+        temperature, volume = self.vessel_deconstruct(vessels=vessels)
 
         # perform the complete action over a series of increments
         for __ in range(n_steps):
-            # split the overall temperature change into increments
-            T += temperature_change / n_steps
-            T = np.min([
-                np.max([T, vessels.get_Tmin()]),
-                vessels.get_Tmax()
-            ])
+            # split the overall temperature change into increments,
+            # ensure it does not exceed the maximal and minimal temperature values
+            temperature += temperature_change / n_steps
+            temperature = np.min(
+                [
+                    np.max([temperature, vessels.get_Tmin()]),
+                    vessels.get_Tmax()
+                ]
+            )
 
-            # split the overall volume change into increments
-            V += volume_change / n_steps
-            V = np.min([
-                np.max([V, vessels.get_min_volume()]),
-                vessels.get_max_volume()
-            ])
+            # split the overall volume change into increments,
+            # ensure it does not exceed the maximal and minimal volume values
+            volume += volume_change / n_steps
+            volume = np.min(
+                [
+                    np.max([volume, vessels.get_min_volume()]),
+                    vessels.get_max_volume()
+                ]
+            )
 
             # split the overall molar changes into increments
             for j, delta_n in enumerate(delta_n_array):
@@ -722,13 +877,13 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
-                T,
-                V,
+                temperature,
+                volume,
                 vessels.get_defaultdt()
             )
 
-        # update the vessels variable
-        vessels = self.update_vessel(vessels, T, V, vessels.get_pressure())
+        # create a new reaction vessel containing the final materials
+        vessels = self.update_vessel(temperature, volume)
 
         return vessels
 
