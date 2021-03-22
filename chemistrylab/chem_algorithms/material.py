@@ -84,8 +84,12 @@ class Material:
     def get_name(self):
         return self._name
 
-    def get_density(self):
-        return self._density
+    def get_density(self, convert_to_g_cubic_meter):
+        # need to convert to g/m^3 in order to get volume in litres
+        if convert_to_g_cubic_meter:
+            return self._density * 1000000
+        else:
+            return self._density
 
     def get_polarity(self):
         return self._polarity

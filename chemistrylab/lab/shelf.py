@@ -52,5 +52,3 @@ class Shelf:
     def reset(self):
         while len(self.vessels) > 0:
             self.delete_vessel(0)
-
-
