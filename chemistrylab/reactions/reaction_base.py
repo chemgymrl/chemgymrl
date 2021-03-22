@@ -745,7 +745,8 @@ class _Reaction:
         self.cur_in_hand = 1.0 * self.initial_in_hand
 
         # set the n array to contain initial values
-        self.n = self.initial_in_hand
+        for i, material_amount in self.initial_in_hand:
+            self.n[i] = material_amount
 
         # reset the vessel parameters to their original values as specified in the reaction file
         vessels.set_v_min(self.Vmin, unit="l")
