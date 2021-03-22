@@ -1,19 +1,27 @@
 import sys
+from abc import ABC
+
 import numpy as np
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.lab.lab import Lab
+from chemistrylab.lab.agent import RandomAgent
 import datetime as dt
+import gym
 
 
 class Manager:
     def __init__(self, mode='human'):
         self.mode = mode
+        self.agents = {'random': RandomAgent}
         self.agent = None
         self.lab = Lab()
 
     def run(self):
         if self.mode == 'human':
             self._human_run()
+        elif self.mode in self.agents:
+            self.agent = self.agents[self.mode]()
+            self._agent_run()
 
     def _human_run(self):
         done = False
@@ -49,7 +57,6 @@ class Manager:
             else:
                 done = True
 
-
     def _human_bench(self, bench):
         if bench == 'distillation':
             envs = self.lab.distillations
@@ -74,17 +81,20 @@ class Manager:
         for i, agent in enumerate(agents):
             print(f'{i}: {agent}')
         agent_ind = int(input('Please specify what agent you wish to use: '))
-        agent = agents[agent_ind]
         start = dt.datetime.now()
-        self.load_bench(bench, env, vessel, agent)
+        self.load_bench(bench, env, vessel, agent_ind)
         finish = dt.datetime.now()
         print(finish - start)
 
     def _agent_run(self):
-        self.load_agent()
-
-    def load_agent(self):
-        pass
+        done = False
+        self.lab.reset()
+        total_reward = 0
+        while not done:
+            action = self.agent.run_step(self.lab, self.lab.shelf)
+            print(action)
+            reward, done = self.lab.step(action)
+            total_reward += reward
 
     def load_bench(self, bench, env_index, vessel_index, agent):
         self.lab.run_bench(bench,  env_index, vessel_index, agent)

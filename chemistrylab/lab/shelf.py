@@ -49,4 +49,6 @@ class Shelf:
         self.create_new_vessel()
         self.vessels[-1].load_vessel(path)
 
-
+    def reset(self):
+        while len(self.vessels) > 0:
+            self.delete_vessel(0)

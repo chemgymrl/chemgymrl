@@ -311,6 +311,18 @@ class ReactionBenchEnv(gym.Env):
 
         return input_parameters
 
+    def update_vessel(self, new_vessel: vessel.Vessel):
+        new_n = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+        mat_dict = util.convert_material_dict_units(new_vessel.get_material_dict())
+        for i, mat in enumerate(self.reaction.materials):
+            if mat in mat_dict:
+                amount = mat_dict[mat][1]
+                new_n[i] = amount
+
+        self.vessels = new_vessel
+        self.n_init = new_n
+        self.reaction.reset(new_n)
+
     def _prepare_materials(self, materials=[]):
         '''
         Method to prepare a list of materials/solutes into a material or solute dictionary.
