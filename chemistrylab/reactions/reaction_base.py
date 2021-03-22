@@ -707,57 +707,6 @@ class _Reaction:
 
         return new_vessel
 
-    def reset(self, vessels):
-        '''
-        Method to reset the environment and vessel back to its initial state.
-        Empty the initial n array and reset the vessel's thermodynamic properties.
-
-        Parameters
-        ---------------
-        `vessels` : `vessel.Vessel`
-            A vessel containing initial materials.
-
-        Returns
-        ---------------
-        `vessels` : `vessel.Vessel`
-            A vessel that has been updated to have the proper thermodynamic properties.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # open the provided vessel to get the material and solute dictionaries
-        material_dict = vessels._material_dict
-        solute_dict = vessels._solute_dict
-
-        # acquire the amounts of reactant materials
-        for i, material_name in enumerate(material_dict.keys()):
-            if material_name in self.reactants:
-                self.initial_in_hand[i] = material_dict[material_name][1]
-
-        # acquire the amounts of solute materials
-        for i, solute_name in enumerate(solute_dict.keys()):
-            if solute_name in self.solutes:
-                self.initial_solutes[i] = solute_dict[solute_name][1]
-
-        # ensure the entire initial materials in hand array is available
-        self.cur_in_hand = 1.0 * self.initial_in_hand
-
-        # set the n array to contain initial values
-        for i, material_amount in enumerate(self.initial_in_hand):
-            self.n[i] = material_amount
-
-        # reset the vessel parameters to their original values as specified in the reaction file
-        vessels.set_v_min(self.Vmin, unit="l")
-        vessels.set_v_max(self.Vmax, unit="l")
-        vessels.set_volume(self.Vi, unit="l", override=True)
-        vessels.temperature = self.Ti
-        vessels.Tmin = self.Tmin
-        vessels.Tmax = self.Tmax
-        vessels.default_dt = self.dt
-
-        return vessels
 
     def reset(self, vessels):
         '''
