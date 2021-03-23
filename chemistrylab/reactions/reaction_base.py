@@ -506,8 +506,10 @@ class _Reaction:
         '''
 
         # open the provided vessel to get the material and solute dictionaries
-        material_dict = vessels._material_dict
-        solute_dict = vessels._solute_dict
+        material_dict = vessels.get_material_dict()
+        solute_dict = vessels.get_solute_dict()
+        print(material_dict)
+        print(solute_dict)
 
         # acquire the amounts of reactant materials
         for i, material_name in enumerate(material_dict.keys()):
@@ -518,6 +520,18 @@ class _Reaction:
         for i, solute_name in enumerate(solute_dict.keys()):
             if solute_name in self.solutes:
                 self.initial_solutes[i] = solute_dict[solute_name][1]
+
+        vessels = vessel.Vessel(
+            'react_vessel',
+            materials=material_dict,
+            solutes=solute_dict,
+            temperature=self.Ti,
+            v_max=self.Vmax,
+            v_min=self.Vmin,
+            Tmax=self.Tmax,
+            Tmin=self.Tmin,
+            default_dt=self.dt
+        )
 
         # ensure the entire initial materials in hand array is available
         self.cur_in_hand = 1.0 * self.initial_in_hand

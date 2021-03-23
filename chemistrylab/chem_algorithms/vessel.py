@@ -63,6 +63,9 @@ class Vessel:
         self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
         self._solute_dict = solutes  # solute.name: [solvent(), amount]; amount is in mole
 
+        # self._initial_material_dict = copy.deepcopy(materials)
+        # self._initial_solute_dict = copy.deepcopy(solutes)
+
         # initialize parameters
         self.label = label
         self.w2v = None

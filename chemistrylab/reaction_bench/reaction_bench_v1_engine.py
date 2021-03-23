@@ -131,6 +131,8 @@ class ReactionBenchEnv(gym.Env):
         self.step_num = 1
 
         # prepare the initial vessel
+        self.initial_materials = input_parameters["materials"]
+        self.initial_solutes = input_parameters["solutes"]
         self.vessels = self._prepare_vessel(
             in_vessel_path=self.in_vessel_path,
             materials=input_parameters["materials"],
@@ -320,8 +322,7 @@ class ReactionBenchEnv(gym.Env):
                 new_n[i] = amount
 
         self.vessels = new_vessel
-        self.n_init = new_n
-        self.reaction.reset(self.vessels)
+        self.vessels = self.reaction.reset(self.vessels)
 
     def _prepare_materials(self, materials=[]):
         '''
@@ -478,6 +479,8 @@ class ReactionBenchEnv(gym.Env):
         self.t = 0.0
 
         # reinitialize the reaction class
+        self.vessels = self._prepare_vessel(in_vessel_path=None, materials=self.initial_materials, solutes=self.initial_solutes)
+
         self.vessels = self.reaction.reset(vessels=self.vessels)
 
         Ti = self.vessels.get_temperature()
