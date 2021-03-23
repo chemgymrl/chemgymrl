@@ -8,6 +8,11 @@ from chemistrylab.lab.agent import RandomAgent
 import datetime as dt
 import gym
 
+"""
+The manager class works as an interface for the agent to work with the lab environment and helps to automate the use of 
+the entire lab
+"""
+
 
 class Manager:
     def __init__(self, mode='human'):

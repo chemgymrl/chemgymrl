@@ -1,5 +1,17 @@
 import numpy as np
 
+"""
+This class is used to solve the chemical reaction
+
+rate_coef: is a num_reagents x num_reactions array of exponential coefficients that we use to calculate
+the rate of each reaction
+
+exp_coef: is a num_reactions length vector which represents the exponential coefficients we use to calculate
+the rate constants
+
+reaction_coef: in a num_reactions x num_materials numpy array
+
+"""
 
 class De:
     def __init__(self, rate_coef: np.array, exp_coef:np.array, reaction_coef: np.array, num_reagents: int):
@@ -10,6 +22,11 @@ class De:
         self.temp = 0
 
     def __call__(self, t, conc):
+        """
+        a function that calculates the change in concentration given a current concentration
+        remember to set the temperature before you call this function
+        This function is mainly used with the scipy ODE solvers
+        """
         conc_change = self.run(conc, self.temp)
         return conc_change
 
@@ -45,6 +62,9 @@ class De:
         return dC
 
     def conc_limit(self, conc_change, conc):
+        """
+        This function makes sure that the change in concentration doesn't exceed the concentration of the reagents
+        """
         for i in range(self.num_reagents):
             conc_change[i] = np.max([conc_change[i], -1*conc[i]])
         return conc_change

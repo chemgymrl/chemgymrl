@@ -12,17 +12,28 @@ from gym import envs
 
 
 class Lab(gym.Env, ABC):
+    """
+    The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals
+    """
     def __init__(self, render_mode=None, max_num_vessels=100):
         all_envs = envs.registry.all()
+        # the following parameters list out all available reactions, extractions and distillations that the agent can use
         self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
         self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
         self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
+        # the following is a dictionary of all available agents that can operate each bench
         self.react_agents = {'random': RandomAgent()}
         self.extract_agents = {'random': RandomAgent()}
         self.distill_agents = {'random': RandomAgent()}
         self.render_mode = render_mode
         self.max_number_vessels = max_num_vessels
+        # the shelf holds all available vessels that can be used by the agent
         self.shelf = Shelf(max_num_vessels=max_num_vessels)
+        # the action space is a vector:
+        # the 0th index represents what bench is selected (reaction, extraxction, distillation, done)
+        # the 1st index represents what environment the agent selects
+        # the 2nd index represents what vessel from the shelf the agent uses
+        # the 3rd index represents which agent will be used to perform the experiment
         self.action_space = gym.spaces.MultiDiscrete([4,
                                                       max([len(self.reactions),
                                                            len(self.extractions),
@@ -35,18 +46,27 @@ class Lab(gym.Env, ABC):
         self.observation_space = None
 
     def load_reaction_bench(self, index):
+        # this function returns the reaction environment that the agent has selected
         print(self.reactions[index])
         return gym.make(self.reactions[index])
 
     def load_extraction_bench(self, index):
+        # this function returns the extraction environment that the agent has selected
         print(self.extractions[index])
         return gym.make(self.extractions[index])
 
     def load_distillation_bench(self, index):
+        # this function returns the distillation environment that the agent has selected
         print(self.distillations[index])
         return gym.make(self.distillations[index])
 
     def run_bench(self, bench, env_index, vessel_index, agent_index=0):
+        """
+        bench: the bench that is to be run in the lab
+        env_index: which environment(experiment) from the specified bench will be used
+        vessel_index: the vessel that will be used in the specified bench
+        agent_index: the agent that will be used to perform the experiment
+        """
         env = None
         agent = None
         total_reward = 0
