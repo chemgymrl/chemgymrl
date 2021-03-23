@@ -27,6 +27,7 @@ import pickle
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import material, util
 from chemistrylab.extract_algorithms import separate
+from chemistrylab.reactions.get_reactions import convert_to_class
 
 # the gas constant (in kPa * L * mol**-1 * K**-1)
 R = 8.314462619
@@ -449,14 +450,14 @@ class Vessel:
 
                 for Solvent in self._solute_dict[Solute]:
                     # calculate the change of amount in each solvent and update the solute dict
-                    d_mole = self._solute_dict[Solute][Solvent][0] * d_percentage
-                    self._solute_dict[Solute][Solvent][0] -= d_mole
+                    d_mole = self._solute_dict[Solute][Solvent][1] * d_percentage
+                    self._solute_dict[Solute][Solvent][1] -= d_mole
 
                     # check if the solvent is in target material and update the vessel accordingly
                     if Solvent in target_solute_dict[Solute]:
-                        target_solute_dict[Solute][Solvent][0] += d_mole
+                        target_solute_dict[Solute][Solvent][1] += d_mole
                     else:
-                        target_solute_dict[Solute][Solvent] = [d_mole, 'mol']
+                        target_solute_dict[Solute][Solvent] = [convert_to_class([Solvent])[0], d_mole, 'mol']
 
         # if this vessel has less liquid than calculated amount then everything gets poured out
         else:
@@ -486,13 +487,13 @@ class Vessel:
 
                 for solvent in self._solute_dict[solute]:
                     # calculate the change of amount in each solvent
-                    d_mole = self._solute_dict[solute][solvent][0]
+                    d_mole = self._solute_dict[solute][solvent][1]
 
                     # check if that solvent is in target material
                     if solvent in target_solute_dict[solute]:
-                        target_solute_dict[solute][solvent][0] += d_mole
+                        target_solute_dict[solute][solvent][1] += d_mole
                     else:
-                        target_solute_dict[solute][solvent] = [d_mole, 'mol']
+                        target_solute_dict[solute][solvent] = [convert_to_class([solvent])[0], d_mole, 'mol']
 
                 # remove the solute from the solute dictionary
                 self._solute_dict.pop(solute)  # pop the solute
@@ -640,10 +641,10 @@ class Vessel:
                     for Solute in self._solute_dict:
                         if M in self._solute_dict[Solute]:
                             # calculate the amount of moles
-                            d_mole = self._solute_dict[Solute][M][0] * d_percentage
+                            d_mole = self._solute_dict[Solute][M][1] * d_percentage
 
                             # update the material dictionaries
-                            self._solute_dict[Solute][M][0] -= d_mole
+                            self._solute_dict[Solute][M][1] -= d_mole
                             d_solute[Solute] += d_mole
 
                             # if all solutes are used up, eliminate the solute dictionary
@@ -652,9 +653,9 @@ class Vessel:
 
                             # update the target solute dictionary
                             if M in target_solute_dict[Solute]:
-                                target_solute_dict[Solute][M][0] += d_mole
+                                target_solute_dict[Solute][M][1] += d_mole
                             else:
-                                target_solute_dict[Solute][M] = [d_mole, 'mol']
+                                target_solute_dict[Solute][M] = [convert_to_class([M])[0], d_mole, 'mol']
 
                 # if all materials are drained out
                 else:
@@ -674,7 +675,7 @@ class Vessel:
                     for Solute in copy.deepcopy(self._solute_dict):
                         if M in self._solute_dict[Solute]:
                             # calculate the amount to drain
-                            d_mole = self._solute_dict[Solute][M]
+                            d_mole = self._solute_dict[Solute][M][1]
 
                             # store the change of solute in d_solute
                             d_solute[Solute] += d_mole
@@ -685,9 +686,9 @@ class Vessel:
 
                             # update the target solute dictionary
                             if M in target_solute_dict[Solute]:
-                                target_solute_dict[Solute][M][0] += d_mole
+                                target_solute_dict[Solute][M][1] += d_mole
                             else:
-                                target_solute_dict[Solute][M] = [d_mole, 'mol']
+                                target_solute_dict[Solute][M] = [convert_to_class([M])[0], d_mole, 'mol']
 
                             # pop this solvent from the solute
                             self._solute_dict[Solute].pop(M)
@@ -701,7 +702,7 @@ class Vessel:
                 empty_flag = False
             else:
                 for Solvent in self._solute_dict[Solute]:
-                    if abs(self._solute_dict[Solute][Solvent][0] - 0.0) > 1e-6:
+                    if abs(self._solute_dict[Solute][Solvent][1] - 0.0) > 1e-6:
                         empty_flag = False
 
             if empty_flag:
@@ -893,7 +894,7 @@ class Vessel:
                     if self._solute_dict:
                         # fill in solute_amount
                         for Solute in self._solute_dict:
-                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][0])
+                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][1])
                             solute_counter += 1
                     else:
                         solute_amount[0].append(0.0)
@@ -932,7 +933,7 @@ class Vessel:
                     solute_counter = 0  # count position for solute in new_solute_amount
                     for Solute in self._solute_dict:
                         solute_amount = new_solute_amount[solute_counter][solvent_counter]
-                        self._solute_dict[Solute][M][0] = solute_amount
+                        self._solute_dict[Solute][M][1] = solute_amount
                         solute_counter += 1
                     solvent_counter += 1
 

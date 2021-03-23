@@ -358,6 +358,16 @@ class ReactionBenchEnv(gym.Env):
 
         return material_dict
 
+    def _prepare_solutes(self, material_dict=None, solutes=None):
+        solute_dict = {}
+        for name, material in material_dict.items():
+            if name not in solute_dict and material[0]()._solute:
+                solute_dict[name] = {}
+                for solvent in solutes:
+                    solvent_class = convert_to_class([solvent['Material']])
+                    solute_dict[name][solvent['Material']] = [solvent_class, solvent["Initial"], 'mol']
+        return solute_dict
+
     def _prepare_vessel(self, in_vessel_path="", materials=[], solutes=[]):
         '''
         Method to prepare the initial vessel.
@@ -369,7 +379,7 @@ class ReactionBenchEnv(gym.Env):
             material_dict = self._prepare_materials(materials=materials)
 
             # prepare the solutes that have been provided
-            solute_dict = self._prepare_materials(materials=solutes)
+            solute_dict = self._prepare_solutes(material_dict=material_dict, solutes=solutes)
 
             # add the materials and solutes to an empty vessel
             vessels = vessel.Vessel(

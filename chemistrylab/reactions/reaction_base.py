@@ -127,10 +127,10 @@ class _Reaction:
         self.solvers = {'RK45'}
         if solver in self.solvers:
             self.solver = solver
-            self._solver = solve_ivp
         else:
             self.solver = 'newton'
-            self._solver = None
+
+        self._solver = solve_ivp
 
         # define parameters for generating spectra
         self.params = []
@@ -458,14 +458,15 @@ class _Reaction:
 
         # tabulate all the solutes and their values
         new_solute_dict = {}
-        for i in range(self.initial_solutes.shape[0]):
-            solute_name = self.solutes[i]
-            solute_class = self.solute_classes[i]
-            amount = self.initial_solutes[i]
+        for mat, mat_class in zip(self.materials, self.material_classes):
+            if mat not in self.solutes and mat_class()._solute:
+                for i in range(self.initial_solutes.shape[0]):
+                    solute_name = self.solutes[i]
+                    solute_class = self.solute_classes[i]
+                    amount = self.initial_solutes[i]
 
-            # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = [solute_class, amount]
-
+                    # create the new solute dictionary to be appended to a new vessel object
+                    new_solute_dict[mat] = {solute_name: [solute_class, amount, 'mol']}
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
             'react_vessel',
@@ -505,7 +506,6 @@ class _Reaction:
         '''
 
         # open the provided vessel to get the material and solute dictionaries
-        print(vessels)
         material_dict = vessels._material_dict
         solute_dict = vessels._solute_dict
 
