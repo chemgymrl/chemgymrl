@@ -21,12 +21,13 @@ class Lab(gym.Env, ABC):
         self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
         self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
         self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
-        # the following is a dictionary of all available agents that can operate each bench
+        # the following is a dictionary of all available agents that can operate each bench feel free to add your own
+        # custom agents
         self.react_agents = {'random': RandomAgent()}
         self.extract_agents = {'random': RandomAgent()}
         self.distill_agents = {'random': RandomAgent()}
         self.render_mode = render_mode
-        self.max_number_vessels = max_num_vessels
+        self.max_num_vessels = max_num_vessels
         # the shelf holds all available vessels that can be used by the agent
         self.shelf = Shelf(max_num_vessels=max_num_vessels)
         # the action space is a vector:
@@ -38,12 +39,34 @@ class Lab(gym.Env, ABC):
                                                       max([len(self.reactions),
                                                            len(self.extractions),
                                                            len(self.distillations)]),
-                                                      max_num_vessels,
+                                                      self.max_num_vessels,
                                                       max([len(self.react_agents),
                                                            len(self.extract_agents),
                                                            len(self.distill_agents)])])
         # have to get back to this part
         self.observation_space = None
+
+    def register_agent(self, bench, name, agent):
+        """
+        a function that allows the user to add their own custom agents to a bench
+        """
+        if bench == "reaction":
+            self.react_agents[name] = agent
+        elif bench == "extraction":
+            self.extract_agents[name] = agent
+        elif bench == "distillation":
+            self.distill_agents[name] = agent
+        else:
+            raise ValueError('bench must be "reaction", "extraction" or "distillation"')
+
+        self.action_space = gym.spaces.MultiDiscrete([4,
+                                                      max([len(self.reactions),
+                                                           len(self.extractions),
+                                                           len(self.distillations)]),
+                                                      self.max_num_vessels,
+                                                      max([len(self.react_agents),
+                                                           len(self.extract_agents),
+                                                           len(self.distill_agents)])])
 
     def load_reaction_bench(self, index):
         # this function returns the reaction environment that the agent has selected
@@ -60,12 +83,13 @@ class Lab(gym.Env, ABC):
         print(self.distillations[index])
         return gym.make(self.distillations[index])
 
-    def run_bench(self, bench, env_index, vessel_index, agent_index=0):
+    def run_bench(self, bench, env_index, vessel_index, agent_index=0, custom_agent=None):
         """
         bench: the bench that is to be run in the lab
         env_index: which environment(experiment) from the specified bench will be used
         vessel_index: the vessel that will be used in the specified bench
         agent_index: the agent that will be used to perform the experiment
+        custom_agent: allows for the user to specify a custom agent
         """
         env = None
         agent = None
@@ -120,6 +144,8 @@ class Lab(gym.Env, ABC):
             raise KeyError(f'{bench} is not a recognized bench')
         done = total_reward < 0
         if not done:
+            if custom_agent:
+                agent = custom_agent
             state = env.reset()
             while not done:
                 # env.render(mode=self.render_mode)

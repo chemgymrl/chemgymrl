@@ -15,11 +15,31 @@ the entire lab
 
 
 class Manager:
-    def __init__(self, mode='human'):
+    def __init__(self, mode='custom', agent=None):
+        """
+        'mode': str: ['human', 'random', 'custom']: describes the mode that the manager will be run in, human opens up a
+         cli that can be used to run or by adding an agent to the agents
+         'agent': Agent: specifies a custom user made agent for the manager to use in solving the lab environment
+        """
+
         self.mode = mode
         self.agents = {'random': RandomAgent}
-        self.agent = None
+        self.agent = agent
         self.lab = Lab()
+
+    def register_agent(self, name, agent):
+        """
+        allows the user to add an agent to the manager environment which they can then use to perform actions in the lab
+        environment
+        """
+        self.agents[name] = agent
+
+    def register_bench_agent(self, bench, name, agent):
+        """
+        allows the user to add agents to the lab environment which can then be used in order to perform actions in a
+        bench
+        """
+        self.lab.register_agent(bench, name, agent)
 
     def run(self):
         if self.mode == 'human':
@@ -27,6 +47,10 @@ class Manager:
         elif self.mode in self.agents:
             self.agent = self.agents[self.mode]()
             self._agent_run()
+        elif self.agent:
+            self._agent_run()
+        else:
+            raise ValueError("agent specified does not exist")
 
     def _human_run(self):
         done = False
