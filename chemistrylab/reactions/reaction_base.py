@@ -124,7 +124,8 @@ class _Reaction:
         self.initial_in_hand = np.zeros(len(self.reactants))
         self.initial_solutes = np.zeros(len(self.solutes))
 
-        self.solvers = {'RK45'}
+        self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
+
         if solver in self.solvers:
             self.solver = solver
         else:
@@ -508,8 +509,6 @@ class _Reaction:
         # open the provided vessel to get the material and solute dictionaries
         material_dict = vessels.get_material_dict()
         solute_dict = vessels.get_solute_dict()
-        print(material_dict)
-        print(solute_dict)
 
         # acquire the amounts of reactant materials
         for i, material_name in enumerate(material_dict.keys()):
