@@ -1,7 +1,7 @@
 '''
 Module to perform a series of reactions as specified by an accompanying reaction file.
 
-:title: reaction_base.py
+:title: reaction_base_test.py
 
 :author: Mark Baula, Nicholas Paquin, and Mitchell Shahen
 
@@ -649,6 +649,54 @@ class _Reaction:
 
         return temperature, volume
 
+    def perform_compatibility_check(self, action, vessels, n_steps, step_num):
+
+        # ensure action is an np.ndarray
+        if not isinstance(action, np.ndarray):
+            raise TypeError('Invalid action array. Unable to proceed')
+
+        # ensure the vessel class is a class type object
+        if not isinstance(vessels, vessel.Vessel):
+            raise TypeError('Invalid vessel class. Unable to proceed')
+
+        # ensure that n_steps is an integer
+        if not isinstance(n_steps, int):
+            raise TypeError("Invalid 'n_steps' type. Unable to proceed")
+
+        # ensure that materials from vessels compatible with reaction
+        materials_dict_vessel = vessels.get_material_dict()
+        materials_array = []
+        for reactant in materials_dict_vessel:
+            materials_array.append(reactant)
+        if step_num == 1:
+            # in the first iteration materials_array will only be filled with reactants (no products)
+            assert self.reactants == materials_array
+        else:
+            # after the first iteration materials_array should be filled with products as well
+            assert self.materials == materials_array
+
+        # ensure that solutes from vessels compatible with reaction
+        solute_dict_vessel = vessels.get_solute_dict()
+        solute_array = []
+        for solute in solute_dict_vessel:
+            solute_array.append(solute)
+        assert self.solutes==solute_array
+
+        # ensure that Tmin are the same
+        assert self.Tmin==vessels.Tmin
+
+        # ensure that Tmax are the same
+        assert self.Tmax==vessels.Tmax
+
+        #ensure that Vmin are the same
+        assert self.Vmin==vessels.v_min
+
+        # ensure that Tmax are the same
+        assert self.Vmax == vessels.v_max
+
+        # ensure that dt are the same
+        assert self.dt == vessels.default_dt
+
     def update_vessel(self, temperature, volume):
         '''
         Method to update the provided vessel object with materials from the reaction base
@@ -805,7 +853,7 @@ class _Reaction:
             if amount < self.threshold:
                 self.n[i] = 0
 
-    def perform_action(self, action, vessels: vessel.Vessel, n_steps):
+    def perform_action(self, action, vessels: vessel.Vessel, n_steps, step_num):
         '''
         Update the environment with processes defined in `action`.
 
@@ -829,6 +877,13 @@ class _Reaction:
         ---------------
         None
         '''
+
+        self.perform_compatibility_check(
+            action=action,
+            vessels=vessels,
+            n_steps=n_steps,
+            step_num=step_num
+        )
 
         # deconstruct the action
         temperature_change, volume_change, delta_n_array = self.action_deconstruct(action=action)
