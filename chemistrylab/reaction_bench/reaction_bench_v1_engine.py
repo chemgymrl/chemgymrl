@@ -472,7 +472,7 @@ class ReactionBenchEnv(gym.Env):
             [0.0], # time
             [(Ti - Tmin) / (Tmax - Tmin)], # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)], # normalized volume
-            [total_pressure / Pmax] # normalized pressure
+            [total_pressure / Pmax], # normalized pressure
             [0.0],  # time
             [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume
