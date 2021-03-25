@@ -9,6 +9,7 @@ import gym
 import chemistrylab
 import numpy as np
 from gym import envs
+from chemistrylab.analysis_bench.analysis_bench import AnalysisBench
 
 
 class Lab(gym.Env, ABC):
@@ -21,6 +22,7 @@ class Lab(gym.Env, ABC):
         self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
         self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
         self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
+        self.analysis = AnalysisBench()
         # the following is a dictionary of all available agents that can operate each bench feel free to add your own
         # custom agents
         self.react_agents = {'random': RandomAgent()}
@@ -139,7 +141,12 @@ class Lab(gym.Env, ABC):
                 agent_name = list(self.distill_agents.keys())[agent_index]
                 agent = self.distill_agents[agent_name]
         elif bench == 'analysis':
-            return 0
+            spectra = np.array([])
+            if vessel_index > self.shelf.open_slot:
+                total_reward -= 10
+            else:
+                spectra = self.analysis.analyze(self.shelf.get_vessel(vessel_index))
+            return total_reward, spectra
         else:
             raise KeyError(f'{bench} is not a recognized bench')
         done = total_reward < 0
@@ -154,7 +161,7 @@ class Lab(gym.Env, ABC):
                 total_reward += reward
             rtn_vessel = env.vessels
             self.shelf.return_vessel_to_shelf(vessel=rtn_vessel)
-        return total_reward
+        return total_reward, np.array([])
 
     def step(self, action: list):
         done = False
@@ -176,12 +183,13 @@ class Lab(gym.Env, ABC):
         else:
             raise EnvironmentError(f'{action[0]} is not a valid environment')
         reward = 0
+        spectra = np.array([])
         if not done:
             env_index = action[1]
             vessel_index = action[2]
             agent_index = action[3]
-            reward = self.run_bench(bench, env_index, vessel_index, agent_index)
-        return reward, done
+            reward, spectra = self.run_bench(bench, env_index, vessel_index, agent_index)
+        return reward, spectra, done
 
     def reset(self):
         self.shelf.reset()

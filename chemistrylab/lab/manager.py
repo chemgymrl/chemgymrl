@@ -58,6 +58,7 @@ class Manager:
                     'load distillation bench',
                     'load reaction bench',
                     'load extraction bench',
+                    'load analysis bench',
                     'list vessels',
                     'create new vessel',
                     'save vessel',
@@ -78,10 +79,12 @@ class Manager:
             elif action == 3:
                 self._human_bench('extraction')
             elif action == 4:
-                self.list_vessels()
+                self._human_bench('analysis')
             elif action == 5:
-                self.create_new_vessel()
+                self.list_vessels()
             elif action == 6:
+                self.create_new_vessel()
+            elif action == 7:
                 self.save_vessel()
             else:
                 done = True
@@ -96,6 +99,9 @@ class Manager:
         elif bench == 'extraction':
             envs = self.lab.extractions
             agents = list(self.lab.extract_agents.keys())
+        elif bench == 'analysis':
+            envs = ['analysis']
+            agents = ['none']
         else:
             raise KeyError('bench not supported')
         print('index: env')
@@ -119,10 +125,11 @@ class Manager:
         done = False
         self.lab.reset()
         total_reward = 0
+        spectra = np.array([])
         while not done:
-            action = self.agent.run_step(self.lab, self.lab.shelf)
+            action = self.agent.run_step(self.lab, spectra)
             print(action)
-            reward, done = self.lab.step(action)
+            reward, spectra, done = self.lab.step(action)
             total_reward += reward
 
     def load_bench(self, bench, env_index, vessel_index, agent):
@@ -148,5 +155,5 @@ class Manager:
 
 
 if __name__ == "__main__":
-    manager = Manager()
+    manager = Manager(mode='human')
     manager.run()

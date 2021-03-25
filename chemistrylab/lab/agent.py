@@ -9,7 +9,7 @@ class Agent:
     def __init__(self):
         self.name = 'agent'
 
-    def run_step(self, env, state):
+    def run_step(self, env, spectra):
         """
         this is the function where the operation of your model or heuristic agent is defined
         """
@@ -21,5 +21,5 @@ class RandomAgent(Agent):
         super(RandomAgent, self).__init__()
         self.name = 'random'
 
-    def run_step(self, env, state):
+    def run_step(self, env, spectra):
         return env.action_space.sample()

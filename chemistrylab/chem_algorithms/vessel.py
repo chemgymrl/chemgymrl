@@ -1008,6 +1008,33 @@ class Vessel:
     def set_v_max(self, volume: float, unit='l'):
         self.v_max = util.convert_volume(volume, unit)
 
+    def get_concentration(self):
+        '''
+        Method to convert molar volume to concentration.
+
+        Parameters
+        ---------------
+        `V` : `float` (default=0.1)
+            The volume of the system in L
+
+        Returns
+        ---------------
+        `C` : `np.array`
+            An array of the concentrations (in mol/L) of each chemical in the experiment.
+
+        Raises
+        ---------------
+        None
+        '''
+        v = self.get_volume()
+        n = np.array([item[1] for __, item in self._material_dict.items()])
+        # create an array containing the concentrations of each chemical
+        C = np.zeros(n.shape[0], dtype=np.float32)
+        for i in range(n.shape[0]):
+            C[i] = n[i] / v
+
+        return C
+
     # functions to access private properties
     def get_material_amount(
             self,
