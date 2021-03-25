@@ -125,11 +125,11 @@ class Manager:
         done = False
         self.lab.reset()
         total_reward = 0
-        spectra = np.array([])
+        analysis = np.array([])
         while not done:
-            action = self.agent.run_step(self.lab, spectra)
+            action = self.agent.run_step(self.lab, analysis)
             print(action)
-            reward, spectra, done = self.lab.step(action)
+            reward, analysis, done = self.lab.step(action)
             total_reward += reward
 
     def load_bench(self, bench, env_index, vessel_index, agent):

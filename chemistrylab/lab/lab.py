@@ -22,7 +22,8 @@ class Lab(gym.Env, ABC):
         self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
         self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
         self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
-        self.analysis = AnalysisBench()
+        self.analysis = list(AnalysisBench().techniques.keys())
+        self.analysis_bench = AnalysisBench()
         # the following is a dictionary of all available agents that can operate each bench feel free to add your own
         # custom agents
         self.react_agents = {'random': RandomAgent()}
@@ -40,7 +41,8 @@ class Lab(gym.Env, ABC):
         self.action_space = gym.spaces.MultiDiscrete([4,
                                                       max([len(self.reactions),
                                                            len(self.extractions),
-                                                           len(self.distillations)]),
+                                                           len(self.distillations),
+                                                           len(self.analysis)]),
                                                       self.max_num_vessels,
                                                       max([len(self.react_agents),
                                                            len(self.extract_agents),
@@ -141,12 +143,12 @@ class Lab(gym.Env, ABC):
                 agent_name = list(self.distill_agents.keys())[agent_index]
                 agent = self.distill_agents[agent_name]
         elif bench == 'analysis':
-            spectra = np.array([])
-            if vessel_index > self.shelf.open_slot:
+            analysis = np.array([])
+            if vessel_index > self.shelf.open_slot or env_index >= len(self.analysis):
                 total_reward -= 10
             else:
-                spectra = self.analysis.analyze(self.shelf.get_vessel(vessel_index))
-            return total_reward, spectra
+                analysis = self.analysis_bench.analyze(self.shelf.get_vessel(vessel_index), self.analysis[env_index])
+            return total_reward, analysis
         else:
             raise KeyError(f'{bench} is not a recognized bench')
         done = total_reward < 0
@@ -183,13 +185,13 @@ class Lab(gym.Env, ABC):
         else:
             raise EnvironmentError(f'{action[0]} is not a valid environment')
         reward = 0
-        spectra = np.array([])
+        analysis = np.array([])
         if not done:
             env_index = action[1]
             vessel_index = action[2]
             agent_index = action[3]
-            reward, spectra = self.run_bench(bench, env_index, vessel_index, agent_index)
-        return reward, spectra, done
+            reward, analysis = self.run_bench(bench, env_index, vessel_index, agent_index)
+        return reward, analysis, done
 
     def reset(self):
         self.shelf.reset()

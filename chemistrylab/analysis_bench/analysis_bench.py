@@ -2,18 +2,13 @@ import numpy as np
 
 class AnalysisBench:
     def __init__(self):
-        pass
+        self.techniques = {'spectra': self.get_spectra}
 
-    def analyze(self, vessel, overlap=False):
-        if not overlap:
-            params = [item[0]().get_spectra_no_overlap() for __, item in vessel.get_material_dict().items()]
-        else:
-            params = [item[0]().get_spectra_overlap() for __, item in vessel.get_material_dict().items()]
-        spectra = self.get_spectra(vessel.get_volume(), vessel.get_concentration(), params)
-        print(spectra)
-        return spectra
+    def analyze(self, vessel, analysis, overlap=False):
+        analysis = self.techniques[analysis](vessel, overlap)
+        return analysis
 
-    def get_spectra(self, V, C, params):
+    def get_spectra(self, vessel, overlap):
         '''
         Class method to generate total spectral data using a guassian decay.
 
@@ -31,10 +26,12 @@ class AnalysisBench:
         ---------------
         None
         '''
+        if not overlap:
+            params = [item[0]().get_spectra_no_overlap() for __, item in vessel.get_material_dict().items()]
+        else:
+            params = [item[0]().get_spectra_overlap() for __, item in vessel.get_material_dict().items()]
 
-        # convert the volume in litres to the volume in m**3
-        V = V / 1000
-
+        C = vessel.get_concentration()
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
