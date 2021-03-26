@@ -1,4 +1,6 @@
-# Distillation Bench: Lesson 2
+[chemgymrl.com](https://chemgymrl.com/)
+
+## Distillation Bench: Lesson 2
 
 This experiment consists of 3 main parts. We will:
 - Increase to the maximum temperature with a multiplier of 6
