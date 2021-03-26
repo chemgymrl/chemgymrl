@@ -216,5 +216,76 @@ class ReactionBaseTestCase(unittest.TestCase):
         np.testing.assert_almost_equal(plot_data_state, env.state[:4].tolist(), decimal=5)
         np.testing.assert_almost_equal(plot_data_mol, state_mols[4:].tolist(), decimal=5)
 
-        #test
+    def test_temperature_increase(self):
 
+        # testing perform action for temperature increase
+        env = gym.make(ENV_NAME)
+        env.reset()
+
+        # setting action to increase temperature
+        action = np.zeros(env.action_space.shape[0])
+        action[0] = 1
+        env.step(action)
+
+        desired_temp = env.reaction.Ti + env.reaction.dT
+        actual_temp = env.vessels.get_temperature()
+        self.assertAlmostEqual(desired_temp, actual_temp, places=6)
+
+    def test_volume_increase(self):
+
+        # testing perform action for volume increase
+        env = gym.make(ENV_NAME)
+        env.reset()
+
+        # setting action to increase volume
+        action = np.zeros(env.action_space.shape[0])
+        action[1] = 1
+        env.step(action)
+
+        desired_volume = env.reaction.Vi + env.reaction.dV
+        actual_volume = env.vessels.get_volume()
+        self.assertAlmostEqual(desired_volume, actual_volume, places=6)
+
+    def test_temperature_decrease(self):
+
+        # testing perform action for temperature decrease
+        env = gym.make(ENV_NAME)
+        env.reset()
+
+        # setting action to decrease temperature
+        action = np.zeros(env.action_space.shape[0])
+        action[0] = 0
+        env.step(action)
+
+        desired_temp = max((env.reaction.Ti - env.reaction.dT), env.vessels.Tmin)
+        actual_temp = env.vessels.get_temperature()
+        self.assertAlmostEqual(desired_temp, actual_temp, places=6)
+
+    def test_volume_decrease(self):
+
+        # testing perform action for volume decrease
+        env = gym.make(ENV_NAME)
+        env.reset()
+
+        # setting action to decrease volume
+        action = np.zeros(env.action_space.shape[0])
+        action[1] = 0
+        env.step(action)
+
+        desired_volume = max((env.reaction.Vi - env.reaction.dV), env.vessels.v_min)
+        actual_volume = env.vessels.get_volume()
+        self.assertAlmostEqual(desired_volume, actual_volume, places=6)
+
+    def test_add_nacl(self):
+
+        # test adding NaCl
+        env = gym.make(ENV_NAME)
+        env.reset()
+        action = np.zeros(env.action_space.shape[0])
+
+        # checking to see if NaCl is in current material_dict before reaction goes through
+        self.assertNotIn('NaCl', env.vessels.get_material_dict())
+
+        # stepping through the action and checking to see if NaCl is in material_dict as it should be
+        env.step(action)
+        self.assertIn('NaCl', env.vessels.get_material_dict())
