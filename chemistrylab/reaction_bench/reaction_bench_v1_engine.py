@@ -472,7 +472,7 @@ class ReactionBenchEnv(gym.Env):
             [0.0], # time
             [(Ti - Tmin) / (Tmax - Tmin)], # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)], # normalized volume
-            [total_pressure / Pmax] # normalized pressure
+            [total_pressure / Pmax], # normalized pressure
             [0.0],  # time
             [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume
@@ -525,7 +525,7 @@ class ReactionBenchEnv(gym.Env):
         reward = 0.0
 
         # pass the action and vessel to the reaction base class's perform action function
-        self.vessels = self.reaction.perform_action(action, self.vessels, self.n_steps)
+        self.vessels = self.reaction.perform_action(action, self.vessels, self.n_steps, self.step_num)
 
         # Increase time by time step
         self.t += self.n_steps * self.dt

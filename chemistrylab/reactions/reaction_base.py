@@ -1147,7 +1147,6 @@ class _Reaction:
 
         # record pressure data
         P = vessels.get_pressure()
-        # P = 1175.6600956686177
         plot_data_state[3].append(
             P/vessels.get_pmax()
         )
