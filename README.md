@@ -1,4 +1,9 @@
 # chemistrygym
+
+[![Build Status](https://travis-ci.com/chemgymrl/chemgymrl.svg?branch=master)](https://travis-ci.com/chemgymrl/chemgymrl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://chemgymrl.readthedocs.io/en/latest/)
+
+
 A  chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the OpenAI Gym environment framework for use with reinforcement learning applications.
 
 ## Data Structure
