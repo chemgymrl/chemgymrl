@@ -124,67 +124,6 @@ class ReactionBaseTestCase(unittest.TestCase):
 
         self.assertEqual(C.tolist(), C_reaction.tolist())
 
-    def test_get_spectra_absorb_shape(self):
-
-        # testing get_spectra() method by checking if absorb has the correct shape
-        env = gym.make(ENV_NAME)
-
-        # checking against correct observation shape (achieved with correct absorb.shape[0]
-        obs_low = np.zeros(208, dtype=np.float32)
-        obs_high = np.ones(208, dtype=np.float32)
-
-        # gets observation shape via absorb and get_spectra() method
-        absorb = env.reaction.get_spectra(env.vessels.get_volume())
-        obs_low_reaction = np.zeros(env.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0],
-                                    dtype=np.float32)
-        obs_high_reaction = np.ones(env.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0],
-                                    dtype=np.float32)
-
-        # tests to see if the observation shape is correct
-        self.assertEqual(obs_low.tolist(), obs_low_reaction.tolist())
-        self.assertEqual(obs_high.tolist(), obs_high_reaction.tolist())
-
-
-    def test_get_spectra_absorb_values(self):
-        
-        # testing get_spectra() method by checkng if absorb has the correct values
-        env = gym.make(ENV_NAME)
-        Volume = 0.1
-
-        # convert the volume in litres to the volume in m**3
-        Volume = Volume / 1000
-
-        # set the wavelength space
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
-
-        # define an array to contain absorption data
-        absorb = np.zeros(x.shape[0], dtype=np.float32)
-
-        # obtain the concentration array
-        C = env.reaction.get_concentration(Volume)
-
-        # iterate through the spectral parameters in self.params and the wavelength space
-        for i, item in enumerate(env.reaction.params):
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                                (x[k] - env.reaction.params[i][j, 1]) / env.reaction.params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    if decay_rate < 1e-30:
-                        decay_rate = 0
-                    absorb[k] += amount * height * decay_rate
-
-        # absorption must be between 0 and 1
-        absorb = np.clip(absorb, 0.0, 1.0)
-
-        absorb_reaction = env.reaction.get_spectra(V=0.1)
-
-        self.assertEqual(absorb.tolist(), absorb_reaction.tolist())
-
     def test_plotting_step(self):
 
         # testing test_plotting_step() method to see if they return correct plotting data arrays
@@ -289,3 +228,6 @@ class ReactionBaseTestCase(unittest.TestCase):
         # stepping through the action and checking to see if NaCl is in material_dict as it should be
         env.step(action)
         self.assertIn('NaCl', env.vessels.get_material_dict())
+
+if __name__ == '__main__':
+    unittest.main()
