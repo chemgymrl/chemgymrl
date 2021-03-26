@@ -19,7 +19,7 @@ VOLUME_TABLE = {'l': 1,
                 }
 
 def convert_material_dict_to_volume(material_dict,
-                                    unit
+                                    unit='l'
                                     # the density of solution does not affect the original volume of solvent
                                     ):
 
@@ -31,6 +31,7 @@ def convert_material_dict_to_volume(material_dict,
     volume_dict = {}
     total_volume = 0
     for M in material_dict:
+
         if not material_dict[M][0]().is_solute():
             mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
 
@@ -43,6 +44,7 @@ def convert_material_dict_to_volume(material_dict,
 
             volume_dict[M] = volume
             total_volume += volume
+
     return volume_dict, total_volume
 
 
@@ -80,7 +82,7 @@ def organize_solute_dict(material_dict,
 def check_overflow(material_dict,
                    solute_dict,
                    v_max,
-                   unit
+                   unit='l'
                    ):
     __, total_volume = convert_material_dict_to_volume(material_dict, unit)  # convert from mole to
     overflow = total_volume - v_max  # calculate overflow

@@ -27,8 +27,16 @@ class Shelf:
         self.open_slot += 1
 
     def get_vessel(self, index):
-        self.open_slot -= 1
-        return self.vessels.pop(index)
+        if self.open_slot == 0:
+            self.create_new_vessel()
+            self.open_slot -= 1
+            return self.vessels.pop(0)
+        elif index > self.open_slot:
+            self.open_slot -= 1
+            return self.vessels.pop(-1)
+        else:
+            self.open_slot -= 1
+            return self.vessels.pop(index)
 
     def delete_vessel(self, index):
         self.open_slot -= 1

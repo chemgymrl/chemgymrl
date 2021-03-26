@@ -165,7 +165,7 @@ class Lab(gym.Env, ABC):
             self.shelf.return_vessel_to_shelf(vessel=rtn_vessel)
         return total_reward, np.array([])
 
-    def step(self, action: list):
+    def step(self, action: [list, np.array]):
         done = False
         if action[0] == 0:
             # reaction bench
