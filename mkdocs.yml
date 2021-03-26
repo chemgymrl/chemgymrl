@@ -21,6 +21,8 @@ nav:
     - Reaction Bench: reaction.md
     - Extraction Bench: extraction.md
     - Distillation Bench: distillation.md
+    - Characterization Bench: characterization.md
+    - Lab Manager: lab_manager.md
     - Developers: Developers.md
     - Glossary: Glossary.md
     - Troubleshooting: Troubleshooting.md
