@@ -18,6 +18,9 @@ nav:
 - User Manual:  
     - Input: input.md
     - Output: Output.md
+    - Reaction Bench: reaction.md
+    - Extraction Bench: extraction.md
+    - Distillation Bench: distillation.md
     - Developers: Developers.md
     - Glossary: Glossary.md
     - Troubleshooting: Troubleshooting.md
