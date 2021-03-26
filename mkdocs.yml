@@ -13,7 +13,6 @@ nav:
 - Getting Started: 
     - What is ChemGymRL?: WhatIsChemGymRL.md
     - Installation: Installation.md
-    - Using Jenkins: jenkins.md
     - Quick Start: QuickStart.md
 - User Manual:  
     - Input: input.md
