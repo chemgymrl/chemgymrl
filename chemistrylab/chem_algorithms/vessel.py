@@ -871,7 +871,7 @@ class Vessel:
         # collect data (according to separate.mix()):
 
         # convert the material dictionary volumes
-        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict, unit='l')
+        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict)
 
         layers_variance = self._layers_variance
 
@@ -971,8 +971,7 @@ class Vessel:
         layers_color = []
         layers_variance = self._layers_variance
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
-            self._material_dict,
-            unit='l'
+            self._material_dict
         )
 
         for M in self._layers_position_dict:
