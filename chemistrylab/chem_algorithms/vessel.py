@@ -412,7 +412,7 @@ class Vessel:
         if len(parameter) == 3:
             unit = parameter[2]
         else:
-            unit = 'ml'
+            unit = 'l'
         d_volume = util.convert_volume(d_volume, unit)
         # collect data from the target vessel
         target_material_dict = target_vessel.get_material_dict()
