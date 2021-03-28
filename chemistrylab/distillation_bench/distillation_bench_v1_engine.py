@@ -290,7 +290,10 @@ class DistillationBenchEnv(gym.Env):
             # set up each set of material properties as separate packages (as lists)
             # each list has three elements: [material_name, material_class, material_amount]
             material_packages = []
-            for material_name, [material_class, material_amount] in vessel._material_dict.items():
+            for j in range(len( list(vessel._material_dict))):
+                material_name = list(vessel._material_dict.items())[j][0]
+                material_class = list(vessel._material_dict.items())[j][1][0]
+                material_amount = list(vessel._material_dict.items())[j][1][1]
                 material_package = [material_name, material_class, material_amount]
                 material_packages.append(material_package)
             for material_package in material_packages:
