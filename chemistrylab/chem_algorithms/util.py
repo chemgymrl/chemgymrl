@@ -19,7 +19,7 @@ VOLUME_TABLE = {'l': 1,
                 }
 
 def convert_material_dict_to_volume(material_dict,
-                                    unit
+                                    unit='l'
                                     # the density of solution does not affect the original volume of solvent
                                     ):
 
@@ -80,7 +80,7 @@ def organize_solute_dict(material_dict,
 def check_overflow(material_dict,
                    solute_dict,
                    v_max,
-                   unit
+                   unit='l'
                    ):
     __, total_volume = convert_material_dict_to_volume(material_dict, unit)  # convert from mole to
     overflow = total_volume - v_max  # calculate overflow
