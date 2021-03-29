@@ -6,7 +6,7 @@ from chemistrylab.chem_algorithms.vessel import Vessel
 
 
 class Shelf:
-    def __init__(self, max_num_vessels, vessel_paths=None):
+    def __init__(self, max_num_vessels, vessel_paths: [np.array, list] = None):
         self.open_slot = 0
         self.max_num_vessels = max_num_vessels
         self.vessels = []
@@ -14,6 +14,8 @@ class Shelf:
             for i, path in enumerate(vessel_paths):
                 # function to load vessels from the path
                 self.vessels[i] = Vessel(label=i)
+                self.vessels[i].load_vessel(path)
+            self.open_slot = len(vessel_paths)
 
     def create_new_vessel(self):
         index = self.open_slot
@@ -22,6 +24,7 @@ class Shelf:
         self.open_slot += 1
 
     def _add_vessel_to_shelf(self, vessel):
+        assert self.open_slot < self.max_num_vessels
         vessel.label = self.open_slot
         self.vessels.append(vessel)
         self.open_slot += 1
