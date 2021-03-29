@@ -388,7 +388,7 @@ class Vessel:
 
     def _pour_by_volume(
             self,
-            parameter,  # [target_vessel, d_volume, unit] unit is optional, if not included we assume the use of ml
+            parameter,  # [target_vessel, d_volume, unit] unit is optional, if not included we assume the use of l
             dt
     ):
         '''
