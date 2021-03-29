@@ -250,6 +250,9 @@ class Vessel:
         heat_available = parameter[0]
         out_beaker = parameter[1]
 
+        self.total_temp_change = 0
+        self.current_temp = self.temperature
+
         print("Implement Heat Change of {} joules".format(heat_available))
 
         while heat_available > 0:
@@ -302,8 +305,13 @@ class Vessel:
                 # if enough heat is available, modify the vessel temp and boil off the material
                 if heat_to_add < heat_available:
                     print("Raising Boil Vessel Temperature by {} Kelvin".format(temp_change_needed))
+
                     # change the vessel temperature to the smallest boiling point
                     self.temperature = smallest_bp
+
+                    # updates total temp change and current temp
+                    self.total_temp_change += self.temperature - self.current_temp
+                    self.current_temp = self.temperature
 
                     # modify the amount of heat available
                     heat_available -= heat_to_add
@@ -350,10 +358,17 @@ class Vessel:
                     # calculate the change in vessel temperature if all heat is used
                     vessel_temp_change = heat_available / total_entropy
 
+                    # setting temp_change_needed equal to temp change in vessel
+                    temp_change_needed = vessel_temp_change
+
                     print("Raising Boil Vessel Temperature by {}".format(vessel_temp_change))
 
                     # modify the boil vessel's temperature accordingly
                     self.temperature += vessel_temp_change
+
+                    # updates total temp change and current temp
+                    self.total_temp_change += self.temperature - self.current_temp
+                    self.current_temp = self.temperature
 
                     # reduce the available heat energy to 0
                     heat_available = 0
@@ -368,6 +383,10 @@ class Vessel:
 
                 # modify the boil vessel's temperature accordingly
                 self.temperature += vessel_temp_change
+
+                # updates total temp change and current temp
+                self.total_temp_change += self.temperature - self.current_temp
+                self.current_temp = self.temperature
 
                 # reduce the available heat energy to 0
                 heat_available = 0
