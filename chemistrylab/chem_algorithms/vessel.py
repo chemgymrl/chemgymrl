@@ -225,7 +225,7 @@ class Vessel:
 
     def _update_temperature(
             self,
-            parameters,  # [target_temperature]
+            parameter,  # [target_temperature]
             dt
     ):
         '''
@@ -235,12 +235,12 @@ class Vessel:
         feedback = []
 
         # update vessel's temperature property
-        self.temperature += parameters[0]
+        self.temperature += parameter[0]
 
         # loop over all the materials in the vessel
         for material_obj in self._material_dict.values():
             feedback = material_obj[0].update_temperature(
-                target_temperature=parameters[0],
+                target_temperature=parameter[0],
                 dt=dt
             )
             self._feedback_queue.extend(feedback)

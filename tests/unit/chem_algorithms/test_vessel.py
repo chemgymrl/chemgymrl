@@ -9,25 +9,26 @@ from chemistrylab.chem_algorithms.vessel import Vessel
 class TestVessel(TestCase):
     def test__update_temperature(self):
         vessel = Vessel("test")
+        initial_temp = vessel.get_temperature()
         event = ['temperature change', 400]
         vessel.push_event_to_queue(feedback=[event], dt=0)
-        self.assertEqual(vessel.get_temperature(), 400)
+        self.assertEqual(vessel.get_temperature(), initial_temp + 400)
 
     def test__pour_by_volume(self):
         vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
         initial_volume = vessel.get_current_volume()
-        event = ['pour by volume', 0.1]
+        event = ['pour by volume', Vessel('test_2'), 0.1]
         vessel.push_event_to_queue(feedback=[event], dt=0)
         final_volume = vessel.get_current_volume()
-        self.assertEqual(initial_volume - 0.1, final_volume)
+        self.assertLess(final_volume[1], initial_volume[1])
 
     def test__drain_by_pixel(self):
-        vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
+        vessel = Vessel("test", materials={"H2O": [material.H2O, 1000, 'mol']})
         initial_volume = vessel.get_current_volume()
-        event = ['drain by pixel', 10]
-        vessel.push_event_to_queue(feedback=[event], dt=0)
+        event = ['drain by pixel', Vessel('test_2'), 100]
+        vessel.push_event_to_queue(feedback=[event], dt=100)
         final_volume = vessel.get_current_volume()
-        self.assertLess(final_volume, initial_volume)
+        self.assertLess(final_volume[1], initial_volume[1])
 
     def test__fully_mix(self):
         vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
