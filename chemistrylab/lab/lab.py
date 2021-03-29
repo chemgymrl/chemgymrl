@@ -166,6 +166,12 @@ class Lab(gym.Env, ABC):
         return total_reward, np.array([])
 
     def step(self, action: [list, np.array]):
+        """
+        This function takes in an agents command and deconstructs the command and runs the appropriate environment with
+        the specified bench, environment, vessel, and agent
+        'action': [list, np.array]: this parameter specifies the action the agent takes
+        action: [bench_id, environment_id, vessel_id, agent_id]
+        """
         done = False
         if action[0] == 0:
             # reaction bench
@@ -194,6 +200,9 @@ class Lab(gym.Env, ABC):
         return reward, analysis, done
 
     def reset(self):
+        """
+        this function resets the shelf and gets rid of all the currently stored vessels
+        """
         self.shelf.reset()
         return self.shelf.vessels
 

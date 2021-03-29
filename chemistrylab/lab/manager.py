@@ -42,17 +42,26 @@ class Manager:
         self.lab.register_agent(bench, name, agent)
 
     def run(self):
+        """
+        this function runs the lab environment based on the agent specified by the user, based on the run mode it loads
+        the correct agent
+        """
         if self.mode == 'human':
             self._human_run()
         elif self.mode in self.agents:
             self.agent = self.agents[self.mode]()
             self._agent_run()
         elif self.agent:
+            self.agent = self.agent()
             self._agent_run()
         else:
             raise ValueError("agent specified does not exist")
 
     def _human_run(self):
+        """
+        Function for running the environment using a human agent
+        the human agent picks an action from the list and is then prompted with options
+        """
         done = False
         commands = ['load vessel from pickle',
                     'load distillation bench',
@@ -90,6 +99,9 @@ class Manager:
                 done = True
 
     def _human_bench(self, bench):
+        """
+        a method that loads a bench and provides cli instructions for a human agent
+        """
         if bench == 'distillation':
             envs = self.lab.distillations
             agents = list(self.lab.distill_agents.keys())
@@ -122,32 +134,42 @@ class Manager:
         print(finish - start)
 
     def _agent_run(self):
+        """
+        a wrapper for the agent to run with the lab environment autonomously
+        """
         done = False
         self.lab.reset()
         total_reward = 0
+        # if at any stage during the running of the environment, if the user selects an analysis technique the data will
+        # be stored here
         analysis = np.array([])
         while not done:
+            # agent selects actions based on the state of the environemnt and the chosen analysis of a vessel
             action = self.agent.run_step(self.lab, analysis)
-            print(action)
             reward, analysis, done = self.lab.step(action)
             total_reward += reward
 
     def load_bench(self, bench, env_index, vessel_index, agent):
+        # loads a lab bench based on the bench, environment, vessel and agent specifications
         self.lab.run_bench(bench,  env_index, vessel_index, agent)
 
     def list_vessels(self):
+        # for a human user this function lists all available vessels
         for i, vessel in enumerate(self.lab.shelf.vessels):
             print(f'{i}: {vessel.label}')
             print(vessel.get_material_dict())
             print(vessel.get_solute_dict())
 
     def load_vessel(self, path):
+        # for a human user, the user may specify a path to a vessel pickle file and load it using this function
         self.lab.shelf.load_vessel(path)
 
     def create_new_vessel(self):
+        # creates a new empty vessel which is stored in the shelf
         self.lab.shelf.create_new_vessel()
 
     def save_vessel(self):
+        # for a human user to save a vessel to a pickle file
         self.list_vessels()
         vessel = int(input('What vessel do you wish to save: '))
         path = input('please specify the relative path for the vessel: ')
