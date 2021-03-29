@@ -7,12 +7,10 @@ from chemistrylab.chem_algorithms.vessel import Vessel
 
 
 class TestVessel(TestCase):
-    def test__update_materials(self):
-        vessel = Vessel("test")
-        vessel.push_event_to_queue()
-
     def test__update_temperature(self):
-        self.fail()
+        vessel = Vessel("test")
+        event = []
+        vessel.push_event_to_queue()
 
     def test__change_heat(self):
         self.fail()
