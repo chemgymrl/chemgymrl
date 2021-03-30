@@ -9,9 +9,9 @@ setup(name='chemistrygym',
           'matplotlib',
           'cmocean',
           'pyyaml',
-          'pickle'
+          'scipy',
       ],
       description='Implementation of extraction simulations in the OpenAI Gym environment framework.',
       author='CLEAN and UW ECE ML',
-      url='https://github.com/CLEANit/chemistrygym',
+      url='https://github.com/chemgymrl/chemgymrl',
       version='0.0')
