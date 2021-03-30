@@ -438,7 +438,8 @@ class Vessel:
         target_solute_dict = target_vessel.get_solute_dict()
         __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
 
-        reward = -1
+        # set default reward equal to zero
+        reward = 0
 
         # if this vessel is empty or the d_volume is equal to zero, do nothing
         if any([
@@ -604,7 +605,8 @@ class Vessel:
             )
         )
 
-        reward = -1
+        # set default reward equal to zero
+        reward = 0
 
         # if this vessel is empty or the d_volume is equal to zero, do nothing
         if any([
@@ -882,7 +884,8 @@ class Vessel:
         Method to mix a vessel.
         '''
 
-        reward = -1
+        # set default reward equal to zero
+        reward = 0
 
         # get mixing parameter from parameter if mixing, or get dt as mixing parameter for settling
         mixing_parameter = parameter[0] if parameter[0] else dt
