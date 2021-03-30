@@ -3,7 +3,7 @@ from abc import ABC
 
 sys.path.append("../../") # to access `chemistrylab`
 sys.path.append('../../chemistrylab/reactions')
-from chemistrylab.lab.agent import RandomAgent
+from chemistrylab.lab.agent import RandomAgent, Agent
 from chemistrylab.lab.shelf import Shelf
 import gym
 import chemistrylab
@@ -16,7 +16,14 @@ class Lab(gym.Env, ABC):
     """
     The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals
     """
-    def __init__(self, render_mode=None, max_num_vessels=100):
+    def __init__(self, render_mode: str = None, max_num_vessels: int = 100):
+        """
+
+        Parameters
+        ----------
+        render_mode: a string for the render mode of the environment if the user wishes to see outputs from the benches
+        max_num_vessels: the maximum number of vessels that the shelf can store
+        """
         all_envs = envs.registry.all()
         # the following parameters list out all available reactions, extractions and distillations that the agent can use
         self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
@@ -50,9 +57,19 @@ class Lab(gym.Env, ABC):
         # have to get back to this part
         self.observation_space = None
 
-    def register_agent(self, bench, name, agent):
+    def register_agent(self, bench: str, name: str, agent: Agent):
         """
-        a function that allows the user to add their own custom agents to a bench
+        a function that registers an agent for a specified bench
+
+        Parameters
+        ----------
+        bench: the bench for which the agent will be registered
+        name: the name of the agent to be registered
+        agent: the agent itself derived from the agent class
+
+        Returns
+        -------
+        None
         """
         if bench == "reaction":
             self.react_agents[name] = agent
@@ -72,35 +89,73 @@ class Lab(gym.Env, ABC):
                                                            len(self.extract_agents),
                                                            len(self.distill_agents)])])
 
-    def load_reaction_bench(self, index):
-        # this function returns the reaction environment that the agent has selected
+    def load_reaction_bench(self, index: int):
+        """
+        this function returns the reaction environment that the agent has selected
+
+        Parameters
+        ----------
+        index: the index of the agent to be run
+
+        Returns
+        -------
+        the gym environment that has been loaded
+        """
         print(self.reactions[index])
         return gym.make(self.reactions[index])
 
     def load_extraction_bench(self, index):
-        # this function returns the extraction environment that the agent has selected
+        """
+        this function returns the extraction environment that the agent has selected
+
+        Parameters
+        ----------
+        index: the index of the agent to be run
+
+        Returns
+        -------
+        the gym environment that has been loaded
+        """
         print(self.extractions[index])
         return gym.make(self.extractions[index])
 
     def load_distillation_bench(self, index):
-        # this function returns the distillation environment that the agent has selected
+        """
+        this function returns the distillation environment that the agent has selected
+
+        Parameters
+        ----------
+        index: the index of the agent to be run
+
+        Returns
+        -------
+        the gym environment that has been loaded
+        """
         print(self.distillations[index])
         return gym.make(self.distillations[index])
 
     def run_bench(self, bench, env_index, vessel_index, agent_index=0, custom_agent=None):
         """
-        bench: the bench that is to be run in the lab
-        env_index: which environment(experiment) from the specified bench will be used
-        vessel_index: the vessel that will be used in the specified bench
-        agent_index: the agent that will be used to perform the experiment
-        custom_agent: allows for the user to specify a custom agent
+        this function works as a wrapper for the lab environment and allows for an agent to specify what
+        environment they wish to run and with what vessel and agent
+
+        Parameters
+        ----------
+        bench
+        env_index
+        vessel_index
+        agent_index
+        custom_agent
+
+        Returns
+        -------
+
         """
         env = None
         agent = None
         total_reward = 0
 
         if bench == 'reaction':
-            # we need to finish updates to reaction class inorder to get the ability to add a new vessel
             if env_index >= len(self.reactions):
                 total_reward -= 10
             else:
@@ -169,9 +224,16 @@ class Lab(gym.Env, ABC):
         """
         This function takes in an agents command and deconstructs the command and runs the appropriate environment with
         the specified bench, environment, vessel, and agent
-        'action': [list, np.array]: this parameter specifies the action the agent takes
+        Parameters
+        ----------
+        action: [list, np.array]: this parameter specifies the action the agent takes
         action: [bench_id, environment_id, vessel_id, agent_id]
+
+        Returns
+        -------
+        None
         """
+
         done = False
         if action[0] == 0:
             # reaction bench
@@ -202,6 +264,9 @@ class Lab(gym.Env, ABC):
     def reset(self):
         """
         this function resets the shelf and gets rid of all the currently stored vessels
+        Returns
+        -------
+        None
         """
         self.shelf.reset()
         return self.shelf.vessels

@@ -4,7 +4,7 @@ from abc import ABC
 import numpy as np
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.lab.lab import Lab
-from chemistrylab.lab.agent import RandomAgent
+from chemistrylab.lab.agent import RandomAgent, Agent
 import datetime as dt
 import gym
 
@@ -17,9 +17,12 @@ the entire lab
 class Manager:
     def __init__(self, mode='custom', agent=None):
         """
-        'mode': str: ['human', 'random', 'custom']: describes the mode that the manager will be run in, human opens up a
-         cli that can be used to run or by adding an agent to the agents
-         'agent': Agent: specifies a custom user made agent for the manager to use in solving the lab environment
+
+        Parameters
+        ----------
+        mode: str: ['human', 'random', 'custom']: describes the mode that the manager will be run in, human opens up a
+        cli that can be used to run or by adding an agent to the agents
+        agent: Agent: specifies a custom user made agent for the manager to use in solving the lab environment
         """
 
         self.mode = mode
@@ -27,17 +30,34 @@ class Manager:
         self.agent = agent
         self.lab = Lab()
 
-    def register_agent(self, name, agent):
+    def register_agent(self, name: str, agent: Agent):
         """
         allows the user to add an agent to the manager environment which they can then use to perform actions in the lab
         environment
+        Parameters
+        ----------
+        name: str: the name of the agent that will be stored
+        agent: Agent: the agent that will run the environment
+
+        Returns
+        -------
+        None
         """
         self.agents[name] = agent
 
-    def register_bench_agent(self, bench, name, agent):
+    def register_bench_agent(self, bench: str, name: str, agent: Agent):
         """
         allows the user to add agents to the lab environment which can then be used in order to perform actions in a
         bench
+        Parameters
+        ----------
+        bench: str: reaction, extraction, distillation specifies which bench the agent will be registered for
+        name: str: the name of the agent
+        agent: Agent: the agent itself of the type Agent
+
+        Returns
+        -------
+        None
         """
         self.lab.register_agent(bench, name, agent)
 
@@ -45,6 +65,9 @@ class Manager:
         """
         this function runs the lab environment based on the agent specified by the user, based on the run mode it loads
         the correct agent
+        Returns
+        -------
+        None
         """
         if self.mode == 'human':
             self._human_run()
@@ -61,6 +84,9 @@ class Manager:
         """
         Function for running the environment using a human agent
         the human agent picks an action from the list and is then prompted with options
+        Returns
+        -------
+        None
         """
         done = False
         commands = ['load vessel from pickle',
@@ -98,9 +124,17 @@ class Manager:
             else:
                 done = True
 
-    def _human_bench(self, bench):
+    def _human_bench(self, bench: str):
         """
         a method that loads a bench and provides cli instructions for a human agent
+        Parameters
+        ----------
+        bench: str: either reaction, extraction, distillation or analysis then bench which the human
+        agent wishes to load.
+
+        Returns
+        -------
+        None
         """
         if bench == 'distillation':
             envs = self.lab.distillations
@@ -136,6 +170,9 @@ class Manager:
     def _agent_run(self):
         """
         a wrapper for the agent to run with the lab environment autonomously
+        Returns
+        -------
+
         """
         done = False
         self.lab.reset()
@@ -149,27 +186,65 @@ class Manager:
             reward, analysis, done = self.lab.step(action)
             total_reward += reward
 
-    def load_bench(self, bench, env_index, vessel_index, agent):
-        # loads a lab bench based on the bench, environment, vessel and agent specifications
+    def load_bench(self, bench: str, env_index: int, vessel_index: int, agent: int):
+        """
+        loads and runs a lab bench based on the bench, environment, vessel and agent specified
+        Parameters
+        ----------
+        bench: str: either reaction, extraction, distillation or analysis
+        env_index: which environment within each bench the agent wishes to use
+        vessel_index: which vessel will provide the necessary materials
+        agent: what agent within each bench that will perform the experiment
+
+        Returns
+        -------
+        None
+        """
         self.lab.run_bench(bench,  env_index, vessel_index, agent)
 
     def list_vessels(self):
-        # for a human user this function lists all available vessels
+        """
+        for a human user this function lists all available vessels
+        Returns
+        -------
+        None
+        """
         for i, vessel in enumerate(self.lab.shelf.vessels):
             print(f'{i}: {vessel.label}')
             print(vessel.get_material_dict())
             print(vessel.get_solute_dict())
 
-    def load_vessel(self, path):
-        # for a human user, the user may specify a path to a vessel pickle file and load it using this function
+    def load_vessel(self, path: str):
+        """
+        for a human user, the user may specify a path to a vessel pickle file and load it using this function
+        Parameters
+        ----------
+        path: str: the path to a vessel pickle that will be loaded into the shelf
+
+        Returns
+        -------
+        None
+        """
         self.lab.shelf.load_vessel(path)
 
     def create_new_vessel(self):
-        # creates a new empty vessel which is stored in the shelf
+        """
+        creates a new empty vessel which is stored in the shelf
+
+        Returns
+        -------
+
+        """
         self.lab.shelf.create_new_vessel()
 
     def save_vessel(self):
-        # for a human user to save a vessel to a pickle file
+        """
+        for a human user to save a vessel to a pickle file
+        Returns
+        -------
+
+        """
+
         self.list_vessels()
         vessel = int(input('What vessel do you wish to save: '))
         path = input('please specify the relative path for the vessel: ')
