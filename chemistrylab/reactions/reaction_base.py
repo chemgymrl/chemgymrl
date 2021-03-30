@@ -650,6 +650,35 @@ class _Reaction:
         return temperature, volume
 
     def perform_compatibility_check(self, action, vessels, n_steps, step_num):
+        '''
+        Method to ensure vessel and action being supplied from reaction bench is compatible
+        with perform_action method.
+
+        Parameters
+        ---------------
+        `action` : `np.array`
+            An array containing elements describing the changes to be made, during the current
+            step, to each modifiable thermodynamic variable and reactant used in the reaction.
+        `vessels` : `vessel.Vessel`
+            A vessel containing materials that are to be used in a series of reactions.
+         `n_steps` : `int`
+            The number of increments into which the action is split.
+        `step_num` : `int`
+            The number of steps completed by the agent
+
+        Returns
+        ---------------
+
+        Raises
+        ---------------
+        `TypeError`:
+            Raised when the acquired action from reaction bench is not of type np.ndarray.
+        `TypeError`:
+            Raised when the acquired vessel is not a `Vessel` type object.
+        `TypeError`:
+            Raised when n_steps is not an integer.
+        None
+        '''
 
         # ensure action is an np.ndarray
         if not isinstance(action, np.ndarray):
@@ -1061,65 +1090,33 @@ class _Reaction:
 
         return dash_spectra
 
-    def plot_graph(self, temp=300, volume=1, pressure=101.325, dt=0.01, n_steps=500, save_name=None):
-        '''
-        Method to plot the concentration, pressure, temperature, time, and spectral data.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # get the concentration array
-        conc = self.get_concentration(volume)
-
-        # set the default reaction constants
-        k = self.get_reaction_constants(temp, conc)
-
-        # set arrays to keep track of the time and concentration
-        t = np.zeros(n_steps, dtype=np.float32)
-        conc = np.zeros((n_steps, 4), dtype=np.float32)
-
-        # set initial concentration values
-        conc[0] = conc[0] * self.initial_in_hand
-
-        for i in range(1, n_steps):
-            conc = self.get_concentration(volume)
-            rates = self.get_rates(k, conc)
-            conc_change = self.get_conc_change(rates, conc, dt)
-
-            # update plotting info
-            conc[i] = conc[i-1] + conc_change
-            t[i] = t[i-1] + dt
-
-        plt.figure()
-
-        for i in range(conc.shape[1]):
-            plt.plot(t, conc[:, i], label=self.materials[i])
-
-        # set plotting parameters
-        plt.xlim([t[0], t[-1]])
-        plt.ylim([0.0, 2.0])
-        plt.xlabel('Time (s)')
-        plt.ylabel('Concentration (M)')
-        plt.legend()
-        if save_name:
-            plt.savefig(save_name)
-        plt.show()
-        plt.close()
-
     def plotting_step(self, t, tmax, vessels: vessel.Vessel):
         '''
         Set up a method to handle the acquisition of the necessary plotting parameters
         from an input vessel.
+
+        Parameters
+        ---------------
+        `t` : `float`
+            Current amount of time
+        `tmax` : `float`
+            Maximum time allowed
+        `vessels` : `vessel.Vessel`
+            A vessel containing methods to acquire the necessary parameters
+
+        Returns
+        ---------------
+        `plot_data_state` : `list`
+            A list containing the states to be plotted such as time,
+            temperature, volume, pressure, and reactant amounts
+        `plot_data_mol` : `list`
+            A list containing the molar amounts of reactants and products
+        `plot_data_concentration` : `list`
+            A list containing the concentration of reactants and products
+
+        Raises
+        ---------------
+        None
         '''
 
         # acquire the necessary parameters from the vessel
@@ -1160,6 +1157,29 @@ class _Reaction:
         return plot_data_state, plot_data_mol, plot_data_concentration
 
     def plot_human_render(self, first_render, wave_data_dict, plot_data_state):
+        '''
+        Method to plot thermodynamic variables and spectral data.
+        Plots a minimal amount of data for a 'surface-level'
+        understanding of the information portrayed.
+
+        Parameters
+        ---------------
+        `first_render` : `boolean`
+            Indicates whether a plot has been already rendered
+        `wave_data_dict` : `dict`
+            A dictionary containing all the wave data
+        `plot_data_state` : `list`
+            A list containing the states we are going to plot such as time,
+            temperature, volume, pressure, and reactant amounts
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
 
         num_list = [plot_data_state[0][0],
                     plot_data_state[1][0],
@@ -1232,6 +1252,37 @@ class _Reaction:
             plt.pause(0.000001)
 
     def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration, n_steps, vessels: vessel.Vessel):
+        '''
+        Method to plot thermodynamic variables and spectral data.
+        Plots a significant amount of data for a more in-depth
+        understanding of the information portrayed.
+
+        Parameters
+        ---------------
+        `first_render` : `boolean`
+            Indicates whether a plot has been already rendered
+        `wave_data_dict` : `dict`
+            A dictionary containing all the wave data
+        `plot_data_state` : `list`
+            A list containing the states to be plotted such as time,
+            temperature, volume, pressure, and reactant amounts
+        `plot_data_mol` : `list`
+            A list containing the molar amounts of reactants and products
+        `plot_data_concentration` : `list`
+            A list containing the concentration of reactants and products
+        `n_steps` : `int`
+            The number of increments into which the action is split.
+        `vessels` : `vessel.Vessel`
+            A vessel containing methods to obtain thermodynamic data
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
 
         num_list = [plot_data_state[0][0],
                     plot_data_state[1][0],

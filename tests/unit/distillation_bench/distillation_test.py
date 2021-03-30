@@ -224,6 +224,8 @@ class DistillationTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
+        done = False
+
         action = np.array([5,0])
         __, __ , done, __ = env.step(action)
 
