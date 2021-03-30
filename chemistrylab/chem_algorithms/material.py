@@ -210,6 +210,8 @@ class H2O(Material):
                          solvent=True,
                          specific_heat=4.1813,
                          enthalpy_vapor=40650.0,
+                         spectra_overlap=spec.S_7,
+                         spectra_no_overlap=spec.S_3,
                          index=1
                          )
 
@@ -474,6 +476,8 @@ class CuSO4(Material):
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,
                          enthalpy_vapor=229700.0,
+                         spectra_overlap=spec.S_6,
+                         spectra_no_overlap=spec.S_1,
                          index=8
                          )
 
@@ -494,6 +498,8 @@ class CuSO4Pentahydrate(Material):
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,
                          enthalpy_vapor=229700.0,
+                         spectra_overlap=spec.S_3_3,
+                         spectra_no_overlap=spec.S_5,
                          index=8
                          )
 
