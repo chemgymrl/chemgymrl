@@ -4,8 +4,8 @@ import os
 sys.path.append('../../../')
 sys.path.append('../../../chemistrylab/reactions')
 import gym
-from chemistrylab.reactions.available_reactions.chloro_wurtz import *
-from chemistrylab.reactions.get_reactions import convert_to_class
+import chemistrylab
+from collections import Counter
 import numpy as np
 
 ENV_NAME = 'Distillation-v0'
@@ -91,15 +91,6 @@ class DistillationTestCase(unittest.TestCase):
         # beaker 1 should have the same material dict as boiling vessel before the pour
         self.assertEqual(bv_material_list_before, b1_material_list)
 
-    # Reminder to create an issue for:
-    # THE FOLLOWING SET OF ACTIONS BREAK DISTILLATION
-    # Pour BV into B1
-    # Pour B1 into B2
-    # Pour B2 into BV
-    # then try to heat it up, too many values to unpack (solvable by only checking the first 2 indices)
-
-    # Documentation of plotting methods/others added in reaction base
-
     def test_pour_b1_b2(self):
         env = gym.make(ENV_NAME)
         env.reset()
@@ -137,40 +128,41 @@ class DistillationTestCase(unittest.TestCase):
         env.reset()
 
         # boil off some materials into b1
-        action = np.array([0, 500])
+        action = np.array([0, 1500])
         env.step(action)
 
         # gets material dict of b1 before the pour
-        # this will be added to bv_material_dict_before, in order to get the material_dict of bv after the pour
         b1_material_dict_before = env.vessels[1].get_material_dict()
 
         # gets material dict of bv before the pour
         bv_material_dict_before = env.boil_vessel.get_material_dict()
 
-        print(b1_material_dict_before)
-        print(bv_material_dict_before)
-
-        # perform action
-        # check that b1 is empty
-        # add b1_material_dict_before to bv_material_dict before
-        # check equal to current bv_material_dict
-
         # pour from b1 to bv
         action = np.array([3,10])
         env.step(action)
 
-        # add b1_material_dict_before to bv_material_dict_before in order to get bv_material_dict after pour
+        # merges material dict of b1 and bv before the pour
+        # creates a problem for materials that were completely boiled off, which is taken care of in the for loop below
         bv_material_dict_after = {**b1_material_dict_before, **bv_material_dict_before}
+
+        for key, value in bv_material_dict_after.items():
+            # this checks to see if both materials were in beaker 1 and boiling vessel before the pour
+            # if they were both in the respective vessels, add the to the bv the amount that was in beaker 1
+            # unless it is the same amount in which case it is already completed when we merge the dictionaries
+            if key in b1_material_dict_before and bv_material_dict_before and (b1_material_dict_before[key][1]!=bv_material_dict_after[key][1]):
+                bv_material_dict_after[key][1] += b1_material_dict_before[key][1]
 
         # convert bv_dicts into lists
         bv_material_list_after = []
         for key in bv_material_dict_after:
             bv_material_list_after.append(bv_material_dict_after[key][:2])
-        bv_material_list_after = sorted(bv_material_list_after, key=lambda l:l[1])
 
         bv_material_list_env = []
         for key in env.boil_vessel._material_dict:
             bv_material_list_env.append(env.boil_vessel._material_dict[key][:2])
+
+        # sort lists such that they're in the same order as each other
+        bv_material_list_after = sorted(bv_material_list_after, key=lambda l: l[1])
         bv_material_list_env = sorted(bv_material_list_env, key=lambda l:l[1])
 
         # env.vessels[1]._material_dict should be empty
@@ -178,4 +170,62 @@ class DistillationTestCase(unittest.TestCase):
 
         # bv_material_dict_after should now have same material dict as boiling vessel
         self.assertEqual(bv_material_list_after, bv_material_list_env)
+
+    def test_pour_b2_bv(self):
+        env = gym.make(ENV_NAME)
+        env.reset()
+
+        # boil off some materials into b1
+        action = np.array([0, 777])
+        env.step(action)
+
+        # pour materials from b1 into b2
+        action = np.array([2,10])
+        env.step(action)
+
+        # gets material dict of b2 before the pour into bv
+        b2_material_dict_before = env.vessels[2].get_material_dict()
+
+        # gets material dict of bv before the pour
+        bv_material_dict_before = env.boil_vessel.get_material_dict()
+
+        # pour from b2 to bv
+        action = np.array([4, 10])
+        env.step(action)
+
+        # merges material dict of b2 and bv before the pour
+        bv_material_dict_after = {**b2_material_dict_before, **bv_material_dict_before}
+
+        for key, value in bv_material_dict_after.items():
+            if key in b2_material_dict_before and bv_material_dict_before and (
+                    b2_material_dict_before[key][1] != bv_material_dict_after[key][1]):
+                bv_material_dict_after[key][1] += b2_material_dict_before[key][1]
+
+        # convert bv_dicts into lists
+        bv_material_list_after = []
+        for key in bv_material_dict_after:
+            bv_material_list_after.append(bv_material_dict_after[key][:2])
+
+        bv_material_list_env = []
+        for key in env.boil_vessel._material_dict:
+            bv_material_list_env.append(env.boil_vessel._material_dict[key][:2])
+
+        # sort lists such that they're in the same order as each other
+        bv_material_list_after = sorted(bv_material_list_after, key=lambda l: l[1])
+        bv_material_list_env = sorted(bv_material_list_env, key=lambda l: l[1])
+
+        # env.vessels[2]._material_dict should be empty
+        self.assertFalse(env.vessels[2]._material_dict)
+
+        # bv_material_dict_after should now have same material dict as boiling vessel
+        self.assertEqual(bv_material_list_after, bv_material_list_env)
+
+    def test_done(self):
+        env = gym.make(ENV_NAME)
+        env.reset()
+
+        action = np.array([5,0])
+        __, __ , done, __ = env.step(action)
+
+        self.assertTrue(done)
 
