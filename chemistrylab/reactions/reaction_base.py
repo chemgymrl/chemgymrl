@@ -699,7 +699,7 @@ class _Reaction:
             materials_array.append(reactant)
         if step_num == 1:
             # in the first iteration materials_array will only be filled with reactants (no products)
-            assert self.reactants == materials_array
+            assert self.reactants.sort() == materials_array.sort()
         else:
             # after the first iteration materials_array should be filled with products as well
             assert self.materials == materials_array
