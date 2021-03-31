@@ -258,8 +258,11 @@ class Vessel:
         while heat_available > 0:
             # get the necessary vessel properties
             material_names = list(self._material_dict.keys())
-            material_amounts = [amount for __, amount in self._material_dict.values()]
-            material_objs = [material_obj for material_obj, __ in self._material_dict.values()]
+            material_list = []
+            for i in range(len(self._material_dict.values())):
+                material_list.append(list(self._material_dict.values())[i][:2])
+            material_amounts = [amount for __, amount in material_list]
+            material_objs = [material_obj for material_obj, __ in material_list]
             material_bps = [material_obj()._boiling_point for material_obj in material_objs]
             material_sp_heats = [material_obj()._specific_heat for material_obj in material_objs]
 
