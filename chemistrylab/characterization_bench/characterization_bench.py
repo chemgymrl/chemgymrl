@@ -1,6 +1,6 @@
 import numpy as np
 
-class AnalysisBench:
+class CharachterizationBench:
     def __init__(self):
         self.techniques = {'spectra': self.get_spectra}
 

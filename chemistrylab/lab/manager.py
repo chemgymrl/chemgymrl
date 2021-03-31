@@ -93,7 +93,7 @@ class Manager:
                     'load distillation bench',
                     'load reaction bench',
                     'load extraction bench',
-                    'load analysis bench',
+                    'load characterization bench',
                     'list vessels',
                     'create new vessel',
                     'save vessel',
@@ -114,7 +114,7 @@ class Manager:
             elif action == 3:
                 self._human_bench('extraction')
             elif action == 4:
-                self._human_bench('analysis')
+                self._human_bench('characterization')
             elif action == 5:
                 self.list_vessels()
             elif action == 6:
@@ -129,7 +129,7 @@ class Manager:
         a method that loads a bench and provides cli instructions for a human agent
         Parameters
         ----------
-        bench: str: either reaction, extraction, distillation or analysis then bench which the human
+        bench: str: either reaction, extraction, distillation or characterization then bench which the human
         agent wishes to load.
 
         Returns
@@ -145,8 +145,8 @@ class Manager:
         elif bench == 'extraction':
             envs = self.lab.extractions
             agents = list(self.lab.extract_agents.keys())
-        elif bench == 'analysis':
-            envs = ['analysis']
+        elif bench == 'characterization':
+            envs = ['characterization']
             agents = ['none']
         else:
             raise KeyError('bench not supported')
@@ -177,11 +177,11 @@ class Manager:
         done = False
         self.lab.reset()
         total_reward = 0
-        # if at any stage during the running of the environment, if the user selects an analysis technique the data will
+        # if at any stage during the running of the environment, if the user selects an characterization technique the data will
         # be stored here
         analysis = np.array([])
         while not done:
-            # agent selects actions based on the state of the environemnt and the chosen analysis of a vessel
+            # agent selects actions based on the state of the environemnt and the chosen characterization of a vessel
             action = self.agent.run_step(self.lab, analysis)
             reward, analysis, done = self.lab.step(action)
             total_reward += reward
@@ -191,7 +191,7 @@ class Manager:
         loads and runs a lab bench based on the bench, environment, vessel and agent specified
         Parameters
         ----------
-        bench: str: either reaction, extraction, distillation or analysis
+        bench: str: either reaction, extraction, distillation or characterization
         env_index: which environment within each bench the agent wishes to use
         vessel_index: which vessel will provide the necessary materials
         agent: what agent within each bench that will perform the experiment
