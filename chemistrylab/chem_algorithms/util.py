@@ -246,7 +246,7 @@ def convert_solute_dict_units(solute_dict):
         new_solute_dict[solute] = {}
         for solvent, item in solvents.items():
             unit = 'mol'
-            if len(item) == 2:
+            if len(item) == 3:
                 unit = item[2]
             new_solute_dict[solute][solvent] = [item[0], convert_unit_to_mol(solvent, item[1], unit)]
     return new_solute_dict
