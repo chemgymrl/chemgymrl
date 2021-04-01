@@ -110,20 +110,6 @@ class ReactionBaseTestCase(unittest.TestCase):
         self.assertEqual(env.vessels.Tmax, Tmax)
         self.assertEqual(env.vessels.default_dt, dt)
 
-    def test_get_concentration(self):
-
-        # testing get_concentration method
-        env = gym.make(ENV_NAME)
-
-        Volume = 0.2
-        C = np.zeros(env.reaction.n.shape[0], dtype=np.float32)
-        for i in range(env.reaction.n.shape[0]):
-            C[i] = env.reaction.n[i]/Volume
-
-        C_reaction = env.reaction.get_concentration(Volume)
-
-        self.assertEqual(C.tolist(), C_reaction.tolist())
-
     def test_plotting_step(self):
 
         # testing test_plotting_step() method to see if they return correct plotting data arrays
