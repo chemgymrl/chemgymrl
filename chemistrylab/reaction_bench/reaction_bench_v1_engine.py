@@ -1,4 +1,4 @@
-'''
+"""
 Reaction Bench Engine Class
 
 :title: reaction_bench_v0_engine
@@ -6,7 +6,9 @@ Reaction Bench Engine Class
 :author: Chris Beeler and Mitchell Shahen
 
 :history: 21-05-2020
-'''
+
+Class to initialize reaction vessels, prepare the reaction base environment, and designate actions to occur.
+"""
 
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=import-error
@@ -25,11 +27,9 @@ Reaction Bench Engine Class
 import numpy as np
 import gym
 import gym.spaces
-import matplotlib.pyplot as plt
 import pickle
 import os
 import sys
-import datetime as dt
 
 sys.path.append("../../")  # to access chemistrylab
 sys.path.append("../reactions/")  # to access all reactions
@@ -44,9 +44,9 @@ wave_min = 200
 
 
 class ReactionBenchEnv(gym.Env):
-    '''
+    """
     Class to define elements of an engine to represent a reaction.
-    '''
+    """
 
     def __init__(
             self,
@@ -60,7 +60,7 @@ class ReactionBenchEnv(gym.Env):
             dt=0.01,
             overlap=False
     ):
-        '''
+        """
         Constructor class method to pass thermodynamic variables to class methods.
 
         Parameters
@@ -90,7 +90,7 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
         # assign an identifier to this bench
         self.name = "react_bench"
@@ -117,7 +117,7 @@ class ReactionBenchEnv(gym.Env):
         self.n_steps = input_parameters["n_steps"]  # Time steps per action
         self.dt = input_parameters["dt"]  # Time step of reaction (s)
 
-        # initialize the reaction
+        # initialize the reaction by specifying the reaction file to locate and acquire
         self.reaction = input_parameters["reaction"](
             reaction_file_identifier=input_parameters["reaction_file_identifier"],
             overlap=input_parameters["overlap"]
@@ -131,6 +131,8 @@ class ReactionBenchEnv(gym.Env):
         self.step_num = 1
 
         # prepare the initial vessel
+        self.initial_materials = input_parameters["materials"]
+        self.initial_solutes = input_parameters["solutes"]
         self.vessels = self._prepare_vessel(
             in_vessel_path=self.in_vessel_path,
             materials=input_parameters["materials"],
@@ -162,7 +164,7 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = self.reaction.get_spectra(self.vessels.get_volume())
+        absorb = self.reaction.get_spectra(self.vessels.get_concentration())
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -178,7 +180,16 @@ class ReactionBenchEnv(gym.Env):
         )
         self.observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
 
-        # Reset the environment upon calling the class
+        # set up plotting variables
+        self._first_render = True
+        self.plot_data_state = []
+        self.plot_data_mol = []
+        self.plot_data_concentration = []
+
+        # set up the done parameter
+        self.done = False
+
+        # Finally, reset the environment
         self.reset()
 
     @staticmethod
@@ -193,7 +204,7 @@ class ReactionBenchEnv(gym.Env):
             dt=0.0,
             overlap=False
     ):
-        '''
+        """
         Method to validate the parameters inputted to the reaction class.
 
         Parameters
@@ -225,9 +236,9 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         `TypeError`:
             Raised when the `reaction` parameter is invalid.
-        '''
+        """
 
-        ## ----- ## CHECK PARAMETER TYPES ## ----- ##
+        # ----- ## CHECK PARAMETER TYPES ## ----- #
 
         # ensure the reaction class is a class type object
         if not isinstance(reaction, type):
@@ -298,23 +309,60 @@ class ReactionBenchEnv(gym.Env):
 
         # collect all the input parameters in a labelled dictionary
         input_parameters = {
-            "reaction" : reaction,
-            "reaction_file_identifier" : reaction_file_identifier,
-            "in_vessel_path" : in_vessel_path,
-            "out_vessel_path" : out_vessel_path,
-            "materials" : materials,
-            "solutes" : solutes,
-            "n_steps" : n_steps,
-            "dt" : dt,
-            "overlap" : overlap
+            "reaction": reaction,
+            "reaction_file_identifier": reaction_file_identifier,
+            "in_vessel_path": in_vessel_path,
+            "out_vessel_path": out_vessel_path,
+            "materials": materials,
+            "solutes": solutes,
+            "n_steps": n_steps,
+            "dt": dt,
+            "overlap": overlap
         }
 
         return input_parameters
 
-    def _prepare_materials(self, materials=[]):
-        '''
-        Method to prepare a list of materials/solutes into a material or solute dictionary.
-        The provided materials/solutes are expected to be of the following form:
+    def update_vessel(self, new_vessel: vessel.Vessel):
+        """
+        Method to initialize a vessel and reset the environment to properly populate the vessel.
+
+        Parameters
+        ---------------
+        `new_vessel` : `vessel.Vessel`
+            The vessel that has been requested to be updated.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
+
+        # set up a new, empty n array intended to contain the vessel materials
+        new_n = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+
+        # acquire the appropriate material dictionary from the inputted vessel
+        mat_dict = util.convert_material_dict_units(new_vessel.get_material_dict())
+
+        # iterate through the material dictionary populating the n array
+        for i, mat in enumerate(self.reaction.materials):
+            if mat in mat_dict:
+                amount = mat_dict[mat][1]
+                new_n[i] = amount
+
+        # set the inputted vessel as the vessels variable
+        self.vessels = new_vessel
+
+        # modify the vessel appropriately and reset the reaction environment
+        self.vessels = self.reaction.reset(self.vessels)
+
+    @staticmethod
+    def _prepare_materials(materials=[]):
+        """
+        Method to prepare a list of materials into a material dictionary.
+        The provided materials are expected to be of the following form:
             materials = [
                 {"Material": INSERT MATERIAL NAME, "Initial": INSERT INITIAL AMOUNT}
                 {"Material": INSERT MATERIAL NAME, "Initial": INSERT INITIAL AMOUNT}
@@ -322,13 +370,27 @@ class ReactionBenchEnv(gym.Env):
                 .
                 .
             ]
-        '''
+
+        Parameters
+        ---------------
+        `materials` : `list` (default=`None`)
+            A list of dictionaries including initial material names and amounts.
+
+        Returns
+        ---------------
+        `material_dict` : `dict`
+            A dictionary containing all the inputted materials, class representations, and their molar amounts.
+
+        Raises
+        ---------------
+        None
+        """
 
         # prepare lists to maintain the names and amounts of the materials
         material_names = []
         material_amounts = []
 
-        # iterate through the provided list of materials and ibtain the names and amounts
+        # iterate through the provided list of materials and obtain the names and amounts
         for material_params in materials:
             material_names.append(material_params["Material"])
             material_amounts.append(material_params["Initial"])
@@ -346,10 +408,66 @@ class ReactionBenchEnv(gym.Env):
 
         return material_dict
 
-    def _prepare_vessel(self, in_vessel_path="", materials=[], solutes=[]):
-        '''
+    @staticmethod
+    def _prepare_solutes(material_dict=None, solutes=None):
+        """
+        Method to prepare a list of materials into a material dictionary.
+        The provided materials are expected to be of the following form:
+            materials = [
+                {"Material": INSERT MATERIAL NAME, "Initial": INSERT INITIAL AMOUNT}
+                {"Material": INSERT MATERIAL NAME, "Initial": INSERT INITIAL AMOUNT}
+                .
+                .
+                .
+            ]
+
+        Parameters
+        ---------------
+        `solutes` : `list` (default=`None`)
+            A list of dictionaries including initial solute names and amounts.
+
+        Returns
+        ---------------
+        `solute_dict` : `dict`
+            A dictionary containing all the inputted solutes, class representations, and their molar amounts.
+
+        Raises
+        ---------------
+        None
+        """
+
+        solute_dict = {}
+        for name, material in material_dict.items():
+            if name not in solute_dict and material[0]()._solute:
+                solute_dict[name] = {}
+                for solvent in solutes:
+                    solvent_class = convert_to_class([solvent['Material']])
+                    solute_dict[name][solvent['Material']] = [solvent_class, solvent["Initial"], 'mol']
+
+        return solute_dict
+
+    def _prepare_vessel(self, in_vessel_path=None, materials=[], solutes=[]):
+        """
         Method to prepare the initial vessel.
-        '''
+
+        Parameters
+        ---------------
+        `in_vessel_path` : `str` (default=`None`)
+            A string indicating the path to a vessel intended to be loaded into the reaction bench environment.
+        `materials` : `list` (default=`None`)
+            A list of dictionaries including initial material names and amounts.
+        `solutes` : `list` (default=`None`)
+            A list of dictionaries including initial solute names and amounts.
+
+        Returns
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel object containing materials and solutes to be used in the reaction bench.
+
+        Raises
+        ---------------
+        None
+        """
 
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         if in_vessel_path is None:
@@ -357,7 +475,7 @@ class ReactionBenchEnv(gym.Env):
             material_dict = self._prepare_materials(materials=materials)
 
             # prepare the solutes that have been provided
-            solute_dict = self._prepare_materials(materials=solutes)
+            solute_dict = self._prepare_solutes(material_dict=material_dict, solutes=solutes)
 
             # add the materials and solutes to an empty vessel
             vessels = vessel.Vessel(
@@ -373,7 +491,7 @@ class ReactionBenchEnv(gym.Env):
         return vessels
 
     def _update_state(self):
-        '''
+        """
         Method to update the state vector with the current time, temperature, volume,
         pressure, the amounts of each reactant, and spectral parameters.
 
@@ -388,12 +506,14 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
+        # get the vessel's thermodynamic properties
         T = self.vessels.get_temperature()
         V = self.vessels.get_volume()
 
-        absorb = self.reaction.get_spectra(V)
+        # acquire the absorption spectra for the materials in the vessel
+        absorb = self.reaction.get_spectra(self.vessels.get_concentration())
 
         # create an array to contain all state variables
         state = np.zeros(
@@ -404,6 +524,7 @@ class ReactionBenchEnv(gym.Env):
         )
 
         # populate the state array with updated state variables
+
         # state[0] = time
         state[0] = self.t / self.tmax
 
@@ -431,7 +552,7 @@ class ReactionBenchEnv(gym.Env):
         self.state = state
 
     def reset(self):
-        '''
+        """
         Class method to reinitialize the environment by setting
         all thermodynamic variables to their initial values.
 
@@ -447,7 +568,7 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
         self._first_render = True
         self.done = False
@@ -456,6 +577,9 @@ class ReactionBenchEnv(gym.Env):
         self.t = 0.0
 
         # reinitialize the reaction class
+        self.vessels = self._prepare_vessel(in_vessel_path=None, materials=self.initial_materials,
+                                            solutes=self.initial_solutes)
+
         self.vessels = self.reaction.reset(vessels=self.vessels)
 
         Ti = self.vessels.get_temperature()
@@ -469,10 +593,10 @@ class ReactionBenchEnv(gym.Env):
 
         # populate the state with the above variables
         self.plot_data_state = [
-            [0.0], # time
-            [(Ti - Tmin) / (Tmax - Tmin)], # normalized temperature
-            [(Vi - Vmin) / (Vmax - Vmin)], # normalized volume
-            [total_pressure / Pmax], # normalized pressure
+            [0.0],  # time
+            [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
+            [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume
+            [total_pressure / Pmax],  # normalized pressure
             [0.0],  # time
             [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume
@@ -482,7 +606,7 @@ class ReactionBenchEnv(gym.Env):
         self.plot_data_concentration = []
 
         # [0] is time, [1] is Temperature, [2:] is each species
-        C = self.reaction.get_concentration(Vi)
+        C = self.vessels.get_concentration()
         for i in range(self.reaction.nmax.shape[0]):
             self.plot_data_mol.append([self.reaction.n[i]])
             self.plot_data_concentration.append([C[i]])
@@ -493,7 +617,7 @@ class ReactionBenchEnv(gym.Env):
         return self.state
 
     def step(self, action):
-        '''
+        """
         Update the environment with processes defined in `action`.
 
         Parameters
@@ -519,7 +643,7 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
         # the reward for this step is set to 0 initially
         reward = 0.0
@@ -532,7 +656,7 @@ class ReactionBenchEnv(gym.Env):
 
         # call some function to get plotting data
         self.plot_data_state, self.plot_data_mol, self.plot_data_concentration = self.reaction.plotting_step(
-            self.t,self.tmax, self.vessels
+            self.t, self.tmax, self.vessels
         )
 
         self._update_state()
@@ -556,7 +680,7 @@ class ReactionBenchEnv(gym.Env):
         return self.state, reward, self.done, {}
 
     def render(self, model='human'):
-        '''
+        """
         Method to specify the type of plot rendering.
 
         Parameters
@@ -571,7 +695,7 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
         if model == 'human':
             self.human_render()
@@ -581,7 +705,7 @@ class ReactionBenchEnv(gym.Env):
             print("Incorrect Render Model: {}".format(model))
 
     def human_render(self, model='plot'):
-        '''
+        """
         Method to plot thermodynamic variables and spectral data.
         Plots a minimal amount of data for a 'surface-level'
         understanding of the information portrayed.
@@ -598,7 +722,7 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
         # Wavelength array and array length for plotting
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
@@ -627,9 +751,8 @@ class ReactionBenchEnv(gym.Env):
         if self._first_render:
             self._first_render = False
 
-
     def full_render(self, model='plot'):
-        '''
+        """
         Method to plot thermodynamic variables and spectral data.
         Plots a significant amount of data for a more in-depth
         understanding of the information portrayed.
@@ -646,7 +769,7 @@ class ReactionBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        '''
+        """
 
         # define the length of the spectral data array and the array itself
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
@@ -670,12 +793,19 @@ class ReactionBenchEnv(gym.Env):
                           }
 
         # call render function in reaction base
-        self.reaction.plot_full_render(self._first_render, wave_data_dict, self.plot_data_state, self.plot_data_mol,
-                                       self.plot_data_concentration, self.n_steps, self.vessels)
+        self.reaction.plot_full_render(
+            self._first_render,
+            wave_data_dict,
+            self.plot_data_state,
+            self.plot_data_mol,
+            self.plot_data_concentration,
+            self.n_steps,
+            self.vessels
+        )
 
         # get the spectral data peak and dashed spectral lines
-        peak = self.reaction.get_spectra_peak(self.vessels.get_volume())
-        dash_spectra = self.reaction.get_dash_line_spectra(self.vessels.get_volume())
+        peak = self.reaction.get_spectra_peak(self.vessels.get_concentration())
+        dash_spectra = self.reaction.get_dash_line_spectra(self.vessels.get_concentration())
 
         # The first render is required to initialize the figure
         if self._first_render:

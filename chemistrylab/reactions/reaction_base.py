@@ -1,12 +1,12 @@
-'''
+"""
 Module to perform a series of reactions as specified by an accompanying reaction file.
 
-:title: reaction_base_test.py
+:title: reaction_base.py
 
 :author: Mark Baula, Nicholas Paquin, and Mitchell Shahen
 
 :history: 22-06-2020
-'''
+"""
 
 # pylint: disable=import-error
 # pylint: disable=invalid-name
@@ -23,17 +23,20 @@ import types
 import numpy as np
 import matplotlib.pyplot as plt
 
-sys.path.append("../../") # allows the module to access chemistrylab
+sys.path.append("../../")  # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.chem_algorithms import vessel
+from chemistrylab.lab.de import De
+from scipy.integrate import solve_ivp
 
 R = 8.314462619
 
+
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", overlap=False):
-        '''
+    def __init__(self, reaction_file_identifier="", overlap=False, solver='newton'):
+        """
         Constructor class module for the Reaction class.
 
         Parameters
@@ -51,7 +54,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # define a name/label for this reaction base class
         self.name = "base_reaction"
@@ -89,6 +92,8 @@ class _Reaction:
         self.stoich_coeff_arr = reaction_params["stoich_coeff_arr"]
         self.conc_coeff_arr = reaction_params["conc_coeff_arr"]
 
+        self.de = De(self.stoich_coeff_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
+
         # specify the full list of materials
         self.materials = self.reactants + self.products
 
@@ -119,6 +124,17 @@ class _Reaction:
         self.initial_in_hand = np.zeros(len(self.reactants))
         self.initial_solutes = np.zeros(len(self.solutes))
 
+        # include the available solvers
+        self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
+
+        # select the intended solver or use the default
+        if solver in self.solvers:
+            self.solver = solver
+        else:
+            self.solver = 'newton'
+
+        self._solver = solve_ivp
+
         # define parameters for generating spectra
         self.params = []
         for material in self.material_classes:
@@ -129,7 +145,7 @@ class _Reaction:
 
     @staticmethod
     def _find_reaction_file(reaction_file=""):
-        '''
+        """
         Method to attempt to find the requested reaction file. Currently, the name of the
         reaction file is needed for specifying the requested reaction file.
 
@@ -149,7 +165,7 @@ class _Reaction:
         ---------------
         `IOError`:
             Raised if the requested reaction file is not found in the available reactions directory.
-        '''
+        """
 
         # acquire the path to the reactions directory containing
         # this file and the available reactions directory
@@ -174,7 +190,7 @@ class _Reaction:
         if reaction_file in reaction_files_no_ext:
             output_reaction_file = os.path.join(
                 r_files_dir,
-                reaction_file + ".py" # re-add the extension
+                reaction_file + ".py"  # re-add the extension
             )
         else:
             raise IOError("ERROR: Requested Reaction File Not Found in Directory!")
@@ -183,7 +199,7 @@ class _Reaction:
 
     @staticmethod
     def _get_reaction_params(reaction_filepath=""):
-        '''
+        """
         Method to acquire the necessary reaction parameters from the specified
         reaction file and make them available.
 
@@ -202,7 +218,7 @@ class _Reaction:
         ---------------
         `TypeError`:
             Raised when the acquired module, by means of `importlib`, is not a `ModuleType` object.
-        '''
+        """
 
         # cut the full reaction filepath to just the filename
         reaction_filename = reaction_filepath.split("\\")[-1]
@@ -238,7 +254,7 @@ class _Reaction:
         return output_params
 
     def get_ni_label(self):
-        '''
+        """
         Method to obtain the names of all the reactants used in the experiment.
 
         Parameters
@@ -253,14 +269,14 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         labels = ['[{}]'.format(reactant) for reactant in self.reactants]
 
         return labels
 
     def get_ni_num(self):
-        '''
+        """
         Method to determine which chemicals are available for use.
 
         Parameters
@@ -275,7 +291,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # populate a list with the available chemicals
         num_list = []
@@ -284,270 +300,8 @@ class _Reaction:
 
         return num_list
 
-    def get_concentration(self, V=0.1):
-        '''
-        Method to convert molar volume to concentration.
-
-        Parameters
-        ---------------
-        `V` : `float` (default=0.1)
-            The volume of the system in L
-
-        Returns
-        ---------------
-        `C` : `np.array`
-            An array of the concentrations (in mol/L) of each chemical in the experiment.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # create an array containing the concentrations of each chemical
-        C = np.zeros(self.n.shape[0], dtype=np.float32)
-        for i in range(self.n.shape[0]):
-            C[i] = self.n[i] / V
-
-        return C
-
-    def get_reaction_constants(self, temp, conc_arr):
-        '''
-        Method for calculating the reaction rate constants. The reaction rate for each reaction
-        uses a reaction rate constant specific to that reaction because each reaction has a unique
-        activation energy, E. The rate constant is given by k = A * e^((-1.0 * E) / (R * T)).
-
-        The pre-exponential factor, A, ensures that the rate constant is of the proper units.
-        The reaction rate must be of units: mol / (L * s), but uses various concentrations of
-        reactant materials during it's calculation. Therefore, the rate constant must counter
-        or normalize these concentrations to ensure the proper rate units.
-
-        Therefore, A = 1 / S, for a scaling factor, S, which is calculated using the concentrations
-        of all the reactants which are used in calculating any reaction rate (normalization).
-
-        For example:
-            Consider A + 2B --> C.
-            We calculate the rate of this reaction as: r = k * (A ** 1) * (B ** 2).
-            Therefore, the rate will have units of: [r] = [k] * mol**3 / L**3.
-            Therefore, the units of k must be: [k] = L**2 / (mol**2 * s)
-            Using aggregate concentrations of A and B, we define: k = A * e^((-1.0 * E) / (R * T)).
-            The pre-exponential factor, A, defines the units of the rate constant.
-            Therefore, the pre-exponential factor must be: A = 1 / ([A] * [B])**n
-            For some value, n, that gets the proper rate constant units.
-            If the concentrations of A and B are both non-zero, n = 1 gives the required units.
-            If one of the concentrations of A or B are non-zero, n = 2 gives the required units.
-            If both are zero, no reaction using A and B are available, so n = 1 by default.
-            Note that n is determined by the stiochiometric coefficients of the rate as well.
-            Therefore, we will have different scaling factors for different reactions.
-
-        Parameters
-        ---------------
-        `temperature` : `float`
-            The temperature of the vessel when the reaction(s) are taking place.
-        `conc_arr` : `np.array`
-            The array containing concentrations of each material set to take place in reaction(s).
-
-        Returns
-        ---------------
-        `k_arr` : `np.array`
-            An array containing reaction rate constants for each reaction set to occur.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # acquire the activation energies and stoichiometric coefficients for each reaction
-        activ_energy_arr = self.activ_energy_arr
-        stoich_coeff_arr = self.stoich_coeff_arr
-
-        # obtain the number of reactions set to occur
-        n_reactions = activ_energy_arr.shape[0]
-
-        # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = [conc_arr[i] for i, __ in enumerate(self.reactants)]
-
-        # we define a variable to contain the aggregate concentration value
-        agg_conc = 1
-
-        # only non-zero reactant concentrations will be of use, so these are isolated
-        non_zero_conc = [conc for conc in reactant_conc if conc != 0.0]
-
-        # we use the non-zero concentrations to define the aggregate concentration
-        for conc in non_zero_conc:
-            agg_conc *= conc
-
-        # define arrays to hold the scaling factor for each reaction
-        scaling_arr = np.zeros(n_reactions)
-
-        # iterate through each row in the activation energy and stoichiometric coefficient arrays
-        # to get the parameters required and calculate the scaling factor for each reaction
-        for i, row in enumerate(stoich_coeff_arr):
-            # get the dimensionality of the rate by summing the stoichiometric coefficients
-            rate_exponential = sum(row)
-
-            # get the dimensionality of the rate constant required to balance the rate exponential
-            rate_constant_dim = rate_exponential - 1
-
-            # get the dimensionality of the aggregate concentration
-            agg_conc_dim = len(non_zero_conc)
-
-            # calculate the exponential needed to be applied to the aggregate concentration
-            # to properly define the rate constant's pre-exponential factor
-            exponent = (rate_constant_dim) / agg_conc_dim if agg_conc_dim != 0 else 1
-
-            # apply the exponent to the aggregate rate constant to get the scaling factor
-            scaling_factor = (abs(agg_conc)) ** exponent
-
-            # add the scaling factor to the array of scaling factors
-            scaling_arr[i] = scaling_factor
-
-        # set up an array to contain the rate constants for each reaction
-        k_arr = np.zeros(n_reactions)
-
-        # iterate through the activate energy and scaling factor arrays to
-        # calculate the rate constants for each reaction
-        for i, scaling_factor in enumerate(scaling_arr):
-            # get the activation energy
-            activ_energy = activ_energy_arr[i][0]
-
-            # calculate the pre-exponential factor
-            A = 1.0 / scaling_factor
-
-            # calculate the rate constant
-            k = A * np.exp((-1.0 * activ_energy) / (R * temp))
-
-            # add the rate constant to the array of rate constants
-            k_arr[i] = k
-
-        return k_arr
-
-    def get_rates(self, k_arr, conc_arr):
-        '''
-        Method to calculate the reaction rates for every reaction that is to be performed.
-        The rates are calculated using the concentrations of reactants made available, their
-        stoichiometric coefficients, and the rate constants for each reaction.
-
-        Parameters
-        ---------------
-        `k_arr` : `np.array`
-            An array containing reaction rate constants for each reaction set to occur.
-        `conc_arr` : `bool`
-            The array containing concentrations of each material set to take place in reaction(s).
-
-        Returns
-        ---------------
-        `rates_arr` : `np.array`
-            An array containing the rate at which each reaction is to take place.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # acquire the array of stiochiometric coefficients for each reaction
-        stoich_coeff_arr = self.stoich_coeff_arr
-
-        # obtain the number of reactions set to occur (number of rows in the stoich_coeff_arr)
-        n_reactions = stoich_coeff_arr.shape[0]
-
-        # define an array to contain the rates for each reaction
-        rates_arr = np.zeros(n_reactions)
-
-        # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = [conc_arr[i] for i, __ in enumerate(self.reactants)]
-
-        # iterate through each row stoichiometric coefficients array, calculating each reaction rate
-        for i, row in enumerate(stoich_coeff_arr):
-            # get the rate constant
-            k = k_arr[i]
-
-            # set up a variable to contain the product of the concentrations
-            conc_product = 1.0
-
-            # iterate through the items in the current row to calculate the product of the
-            # concentrations exponentiated using their stoichiometric coefficients
-            for j, stoich_coeff in enumerate(row):
-                # get the reactant concentration
-                conc = reactant_conc[j]
-
-                # calculate the exponentiated concentration and include it in the product
-                conc_product *= conc ** stoich_coeff
-
-            # multiply the concentration product and the rate constant to get the reaction rate
-            rate = k * conc_product
-
-            # add the reaction rate to the array of reaction rates
-            rates_arr[i] = rate
-
-        return rates_arr
-
-    def get_conc_change(self, rates_arr, conc_arr, dt):
-        '''
-        Method to calculate the change_concentration array containing the changes in reactant and
-        product concentrations as a result of performing a reaction.
-
-        Parameters
-        ---------------
-        `rates_arr` : `np.array`
-            An array containing the rate at which each reaction is to take place.
-        `conc_arr` : `bool`
-            The array containing concentrations of each material set to take place in reaction(s).
-
-        Returns
-        ---------------
-        `change_conc_arr` : `np.array`
-            An array containing the changes in concentration of each material that has taken
-            place in the occurring reaction(s).
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # acquire the concentration coefficients array conatining the coefficients indicating the
-        # relative proportions of materials being used up or created in each reaction
-        conc_coeff_arr = self.conc_coeff_arr
-
-        # get the number of materials involved in the reactions (same as len(self.materials))
-        n_materials = conc_coeff_arr.shape[0]
-
-        # set up an array to contain the changes in concentration
-        change_conc_arr = np.zeros(n_materials)
-
-        # iterate through the concentration coefficient array,
-        # calculating the changes of each material
-        for i, row in enumerate(conc_coeff_arr):
-            # create a variable to contain the cumulative change of a material
-            cumulative_change = 0
-
-            # iterate through each coefficient in the row calculating
-            # the change in concentration from each reaction
-            for j, coefficient in enumerate(row):
-                # calculate the concentration change
-                conc_change = coefficient * rates_arr[j] * dt
-
-                # add the concentration change to the cumulative change
-                cumulative_change += conc_change
-
-            # store the overall concentration change in the change concentration array
-            change_conc_arr[i] = cumulative_change
-
-        # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = [conc_arr[i] for i, __ in enumerate(self.reactants)]
-
-        # look through the changes to the reactant concentrations and make sure they
-        # do not exceed the concentrations of reactants available
-        for i, available_conc in enumerate(reactant_conc):
-            # get the intended concentration change
-            conc_change = change_conc_arr[i]
-
-            # change the intended concentration to the available concentration, if necessary
-            change_conc_arr[i] = np.max([conc_change, -1.0 * available_conc])
-
-        return change_conc_arr
-
     def action_deconstruct(self, action):
-        '''
+        """
         Method to deconstruct the action and obtain the proper thermodynamic variables and reactant
         amounts that can be used in further methods.
 
@@ -569,7 +323,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # the first action parameter is the requested change in temperature;
         # action[0] = 0.0 indicates a temperature change of -dT
@@ -610,7 +364,7 @@ class _Reaction:
         return temp_change, volume_change, delta_n_array
 
     def vessel_deconstruct(self, vessels):
-        '''
+        """
         Method to deconstruct and acquire key properties of the inputted vessel.
         Additionally, the n array is given the appropriate values.
         Notable properties include the temperature and volume.
@@ -630,7 +384,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # obtain the material dictionary
         material_dict = vessels._material_dict
@@ -727,7 +481,7 @@ class _Reaction:
         assert self.dt == vessels.default_dt
 
     def update_vessel(self, temperature, volume):
-        '''
+        """
         Method to update the provided vessel object with materials from the reaction base
         and new thermodynamic variables.
 
@@ -746,7 +500,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # tabulate all the materials used and their new values
         new_material_dict = {}
@@ -758,13 +512,15 @@ class _Reaction:
 
         # tabulate all the solutes and their values
         new_solute_dict = {}
-        for i in range(self.initial_solutes.shape[0]):
-            solute_name = self.solutes[i]
-            solute_class = self.solute_classes[i]
-            amount = self.initial_solutes[i]
+        for mat, mat_class in zip(self.materials, self.material_classes):
+            if mat not in self.solutes and mat_class()._solute:
+                for i in range(self.initial_solutes.shape[0]):
+                    solute_name = self.solutes[i]
+                    solute_class = self.solute_classes[i]
+                    amount = self.initial_solutes[i]
 
-            # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = [solute_class, amount]
+                    # create the new solute dictionary to be appended to a new vessel object
+                    new_solute_dict[mat] = {solute_name: [solute_class, amount, 'mol']}
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
@@ -784,9 +540,8 @@ class _Reaction:
 
         return new_vessel
 
-
     def reset(self, vessels):
-        '''
+        """
         Method to reset the environment and vessel back to its initial state.
         Empty the initial n array and reset the vessel's thermodynamic properties.
         Parameters
@@ -802,11 +557,11 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # open the provided vessel to get the material and solute dictionaries
-        material_dict = vessels._material_dict
-        solute_dict = vessels._solute_dict
+        material_dict = vessels.get_material_dict()
+        solute_dict = vessels.get_solute_dict()
 
         # acquire the amounts of reactant materials
         for i, material_name in enumerate(material_dict.keys()):
@@ -817,6 +572,18 @@ class _Reaction:
         for i, solute_name in enumerate(solute_dict.keys()):
             if solute_name in self.solutes:
                 self.initial_solutes[i] = solute_dict[solute_name][1]
+
+        vessels = vessel.Vessel(
+            'react_vessel',
+            materials=material_dict,
+            solutes=solute_dict,
+            temperature=self.Ti,
+            v_max=self.Vmax,
+            v_min=self.Vmin,
+            Tmax=self.Tmax,
+            Tmin=self.Tmin,
+            default_dt=self.dt
+        )
 
         # ensure the entire initial materials in hand array is available
         self.cur_in_hand = 1.0 * self.initial_in_hand
@@ -836,46 +603,49 @@ class _Reaction:
 
         return vessels
 
-    def update(self, temp, volume, dt):
-        '''
+    def update(self, conc, temp, volume, dt, n_steps):
+        """
         Method to update the environment.
         This involves using reactants, generating products, and obtaining rewards.
 
         Parameters
         ---------------
-        `temp` : `float`
+        conc : np.array
+            An array containing the concentrations of each material in the vessel.
+        temp : np.float32
             The temperature of the system in Kelvin
-        `volume` : `float`
+        volume : np.float32
             The volume of the system in Litres
-        `dt` : `float`
+        dt : np.float32
             The time-step demarcating separate steps
+        n_steps : np.int64
+            The number of steps into which the action has been divided.
 
         Returns
         ---------------
-        None
+        reward : np.float32
+            The amount of the desired product created during the time-step
 
         Raises
         ---------------
         None
-        '''
+        """
 
-        # get an array of the concentrations of each material in the n array
-        conc_arr = self.get_concentration(volume)
+        # set the intended vessel temperature in the differential equation module
+        self.de.temp = temp
 
-        # calculate the reaction rate constants using the
-        # vessel temperature and concentration array
-        k_arr = self.get_reaction_constants(temp, conc_arr)
-
-        # calculate the reaction rates using the reaction rate constants and concentration array
-        rates_arr = self.get_rates(k_arr, conc_arr)
-
-        # calculate the changes in concentration for each material in an array
-        conc_change = self.get_conc_change(rates_arr, conc_arr, dt)
-
-        # iterate through each material in the n array and update it's amount
-        for i in range(self.n.shape[0]):
-            dn = conc_change[i] * volume # convert back to moles
-            self.n[i] += dn # update the molar amount array
+        # implement the differential equation solver
+        if self.solver != 'newton':
+            new_conc = self._solver(self.de, (0, dt * n_steps), conc, method=self.solver).y[:, -1]
+            for i in range(self.n.shape[0]):
+                # convert back to moles and update the molar amount array
+                self.n[i] = new_conc[i] * volume
+        else:
+            conc_change = self.de.run(conc, temp) * dt
+            for i in range(self.n.shape[0]):
+                # convert back to moles and update the molar amount array
+                dn = conc_change[i] * volume
+                self.n[i] += dn
 
         # check the list of molar amounts and set negligible amounts to 0
         for i, amount in enumerate(self.n):
@@ -883,7 +653,7 @@ class _Reaction:
                 self.n[i] = 0
 
     def perform_action(self, action, vessels: vessel.Vessel, n_steps, step_num):
-        '''
+        """
         Update the environment with processes defined in `action`.
 
         Parameters
@@ -905,7 +675,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         self.perform_compatibility_check(
             action=action,
@@ -921,6 +691,8 @@ class _Reaction:
         temperature, volume = self.vessel_deconstruct(vessels=vessels)
 
         # perform the complete action over a series of increments
+        if self.solver != 'newton':
+            n_steps = 1
         for __ in range(n_steps):
             # split the overall temperature change into increments,
             # ensure it does not exceed the maximal and minimal temperature values
@@ -957,9 +729,11 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
+                vessels.get_concentration(),
                 temperature,
                 volume,
-                vessels.get_defaultdt()
+                vessels.get_defaultdt(),
+                n_steps
             )
 
         # create a new reaction vessel containing the final materials
@@ -967,14 +741,14 @@ class _Reaction:
 
         return vessels
 
-    def get_spectra(self, V):
-        '''
+    def get_spectra(self, C):
+        """
         Class method to generate total spectral data using a guassian decay.
 
         Parameters
         ---------------
-        V : np.float32
-            The volume of the system in Litres
+        C : np.array
+            An array containing the concentrations of materials in the vessel.
 
         Returns
         ---------------
@@ -984,19 +758,13 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
-
-        # convert the volume in litres to the volume in m**3
-        V = V / 1000
+        """
 
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
         # define an array to contain absorption data
         absorb = np.zeros(x.shape[0], dtype=np.float32)
-
-        # obtain the concentration array
-        C = self.get_concentration(V)
 
         # iterate through the spectral parameters in self.params and the wavelength space
         for i, item in enumerate(self.params):
@@ -1006,7 +774,7 @@ class _Reaction:
                     height = item[j, 0]
                     decay_rate = np.exp(
                         -0.5 * (
-                            (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
+                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
                         ) ** 2.0
                     )
                     if decay_rate < 1e-30:
@@ -1018,14 +786,14 @@ class _Reaction:
 
         return absorb
 
-    def get_spectra_peak(self, V):
-        '''
+    def get_spectra_peak(self, C):
+        """
         Method to populate a list with the spectral peak of each chemical.
 
         Parameters
         ---------------
-        V : np.float32
-            The volume of the system in litres.
+        C : np.array
+            An array containing the concentrations of all the materials in the vessel.
 
         Returns
         ---------------
@@ -1035,10 +803,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
-
-        # get the concentration of each chemical
-        C = self.get_concentration(V)
+        """
 
         # create a list of the spectral peak of each chemical
         spectra_peak = []
@@ -1048,16 +813,17 @@ class _Reaction:
                 C[i] * self.params[i][:, 0],
                 material
             ])
+
         return spectra_peak
 
-    def get_dash_line_spectra(self, V):
-        '''
+    def get_dash_line_spectra(self, C):
+        """
         Module to generate each individual spectral dataset using gaussian decay.
 
         Parameters
         ---------------
-        V : np.float32
-            The volume of the system in Litres
+        C : np.array
+            An array containing the concentrations of materials in the vessel.
 
         Returns
         ---------------
@@ -1067,10 +833,9 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         dash_spectra = []
-        C = self.get_concentration(V)
 
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
@@ -1082,7 +847,7 @@ class _Reaction:
                     height = item[j, 0]
                     decay_rate = np.exp(
                         -0.5 * (
-                            (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
+                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
                         ) ** 2.0
                     )
                     each_absorb += amount * height * decay_rate
@@ -1130,26 +895,26 @@ class _Reaction:
         plot_data_concentration = [[] for _ in range(self.n.shape[0])]
 
         # Record time data
-        plot_data_state[0].append(t/tmax)
+        plot_data_state[0].append(t / tmax)
 
         # record temperature data
         Tmin = vessels.get_Tmin()
         Tmax = vessels.get_Tmax()
-        plot_data_state[1].append((T - Tmin)/(Tmax - Tmin))
+        plot_data_state[1].append((T - Tmin) / (Tmax - Tmin))
 
         # record volume data
         Vmin = vessels.get_min_volume()
         Vmax = vessels.get_max_volume()
-        plot_data_state[2].append((V - Vmin)/(Vmax - Vmin))
+        plot_data_state[2].append((V - Vmin) / (Vmax - Vmin))
 
         # record pressure data
         P = vessels.get_pressure()
         plot_data_state[3].append(
-            P/vessels.get_pmax()
+            P / vessels.get_pmax()
         )
 
         # calculate and record the molar concentrations of the reactants and products
-        C = self.get_concentration(V)
+        C = vessels.get_concentration()
         for j in range(self.n.shape[0]):
             plot_data_mol[j].append(self.n[j])
             plot_data_concentration[j].append(C[j])
@@ -1201,7 +966,6 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-
         if first_render:
             plt.close('all')
             plt.ion()
@@ -1228,7 +992,6 @@ class _Reaction:
             )[0]
             self._plot_axs[1].set_ylim([0, 1])
 
-
             # draw the graph and show it
             self._plot_fig.canvas.draw()
             plt.show()
@@ -1251,7 +1014,8 @@ class _Reaction:
             self._plot_fig.canvas.draw()
             plt.pause(0.000001)
 
-    def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration, n_steps, vessels: vessel.Vessel):
+    def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration,
+                         n_steps, vessels: vessel.Vessel):
         '''
         Method to plot thermodynamic variables and spectral data.
         Plots a significant amount of data for a more in-depth
@@ -1304,8 +1068,8 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = self.get_spectra_peak(vessels.get_volume())
-        dash_spectra = self.get_dash_line_spectra(vessels.get_volume())
+        peak = self.get_spectra_peak(vessels.get_concentration())
+        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration())
 
         # The first render is required to initialize the figure
         if first_render:

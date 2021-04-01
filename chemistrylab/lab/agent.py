@@ -4,12 +4,15 @@ sys.path.append("../../") # to access `chemistrylab`
 sys.path.append('../../chemistrylab/reactions')
 import gym
 
-
+# this is a class that is meant to interact with any of the lab benches or with the lab environment itself
 class Agent:
     def __init__(self):
         self.name = 'agent'
 
-    def run(self, env, state):
+    def run_step(self, env, spectra):
+        """
+        this is the function where the operation of your model or heuristic agent is defined
+        """
         return np.array([])
 
 
@@ -18,5 +21,5 @@ class RandomAgent(Agent):
         super(RandomAgent, self).__init__()
         self.name = 'random'
 
-    def run_step(self, env, state):
+    def run_step(self, env, spectra):
         return env.action_space.sample()

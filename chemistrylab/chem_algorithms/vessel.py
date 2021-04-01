@@ -1,9 +1,9 @@
-'''
+"""
 Module to define the vessel object and it's associated functionality.
 :title: vessel.py
-:author: Chris Beeler and Mitchell Shahen
+:author: Chris Beeler, Nicholas Paquin, and Mitchell Shahen
 :history: 2020-07-22
-'''
+"""
 
 # pylint: disable=invalid-name
 # pylint: disable=protected-access
@@ -27,36 +27,79 @@ import pickle
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import material, util
 from chemistrylab.extract_algorithms import separate
+from chemistrylab.reactions.get_reactions import convert_to_class
 
 # the gas constant (in kPa * L * mol**-1 * K**-1)
 R = 8.314462619
 
+
 class Vessel:
-    '''
+    """
     Class defining the Vessel object.
-    '''
+    """
 
     def __init__(
             self,
-            label, # Name of the vessel
-            temperature=297, # K
-            volume=1.0, # L
+            label,  # Name of the vessel
+            temperature=297.0,  # K
+            volume=1.0,  # L
             unit='l',
-            materials={}, # moles of materials
-            solutes={}, # moles of solutes
-            v_max=1.0, # L
-            v_min=0.001, # L
-            Tmax=500.0, # Kelvin
-            Tmin=250.0, # Kelvin
-            default_dt=0.05, # Default time for each step
-            n_pixels=100, # Number of pixel to represent layers
-            open_vessel=True, # True means no lid
-            settling_switch=True, # switch used for defaults
-            layer_switch=True, # switch used for defaults
+            materials={},  # moles of materials
+            solutes={},  # moles of solutes
+            v_max=1.0,  # L
+            v_min=0.001,  # L
+            Tmax=500.0,  # Kelvin
+            Tmin=250.0,  # Kelvin
+            default_dt=0.05,  # Default time for each step
+            n_pixels=100,  # Number of pixel to represent layers
+            open_vessel=True,  # True means no lid
+            settling_switch=True,  # switch used for defaults
+            layer_switch=True,  # switch used for defaults
     ):
-        '''
+        """
         Constructor class for the Vessel object.
-        '''
+
+        Parameters
+        ---------------
+        `temperature` : `np.float32`
+            The intended temperature of the vessel in Kelvin.
+        `volume` : `np.float32`
+            The intended vessel volume in units as specified by the `unit` parameter.
+        `unit` : `str`
+            The intended units of the vessel's volume parameter.
+        `materials` : `dict`
+            A dictionary containing the vessel's materials, material class representations, and material amounts.
+        `solutes` : `dict`
+            A dictionary containing the vessel's materials, material class representations, and material amounts.
+        `v_max` : `np.float32`
+            The maximal volume of the vessel in units as specified by the `unit` parameter.
+            Exceeding this value will cause an overflow.
+        `v_min` : `np.float32`
+            The minimal volume of the vessel in units as specified by the `unit` parameter.
+        `Tmax` : `np.float32`
+            The maximal temperature of the vessel in Kelvin.
+            Exceeding this value will result in the vessel shattering.
+        `Tmin` : `np.float32`
+            The minimal temperature of the vessel in Kelvin.
+        `default_dt` : `np.float32`
+            The default time-step of actions occurring in or to the vessel.
+        `n_pixels` : `np.int64`
+            The number of pixels used to represent layers during extractions.
+        `open_vessel` : `bool`
+            Whether or not the vessel is open (has no lid).
+        `settling_switch` : `bool`
+            A switch used for defaults.
+        `layer_switch` : `bool`
+            A switch used for defaults.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         # define the Material Dict and Solute Dict first
         self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
@@ -66,7 +109,8 @@ class Vessel:
         self.label = label
         self.w2v = None
         self.temperature = temperature
-        self.volume = volume
+        self.unit = unit
+        self.volume = util.convert_volume(volume, unit=self.unit)
         self.pressure = self.get_pressure()
         self.v_max = v_max
         self.v_min = v_min
@@ -113,16 +157,34 @@ class Vessel:
 
     def push_event_to_queue(
             self,
-            events=None, # a list of event tuples(['event', parameters])
-            feedback=None, # a list of event tuples(['event', parameters])
-            dt=None, # time for each step
-            check_switches_flag=True # whether check switches or not
+            events=None,  # a list of event tuples(['event', parameters])
+            feedback=None,  # a list of event tuples(['event', parameters])
+            dt=None,  # time for each step
+            check_switches_flag=True  # whether check switches or not
     ):
-        '''
+        """
         Method to assign events to occur by placing them in a queue.
-        '''
 
-        reward = 0
+        Parameters
+        ---------------
+        `events` : `np.float32`
+            A list of tuples specifying events to be performed as well as parameters necessary to perform these events.
+        `feedback` : `np.float32`
+            A list of tuples specifying feedback from events as well as feedback parameters.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+        `check_switches_flag` : `bool`
+            A switch used for defaults.
+
+        Returns
+        ---------------
+        `reward` : `np.float64`
+            The reward from updating the material dictionary.
+
+        Raises
+        ---------------
+        None
+        """
 
         # ensure the time-step is specified
         if dt is None:
@@ -146,9 +208,25 @@ class Vessel:
             dt,
             check_switches_flag
     ):
-        '''
+        """
         Method to perform a vessel action.
-        '''
+
+        Parameters
+        ---------------
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+        `check_switches_flag` : `bool`
+            A switch used for defaults.
+
+        Returns
+        ---------------
+        `reward` : `np.float64`
+            The reward from each action in the event queue.
+
+        Raises
+        ---------------
+        None
+        """
 
         reward = 0
 
@@ -199,10 +277,28 @@ class Vessel:
             dt,
             check_switches_flag
     ):
-        '''
+        """
         A function to merge events and add default events
         The merge need to be added
-        '''
+
+        Parameters
+        ---------------
+        `event_queue` : `list`
+            A list containing the events that have been queued.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+        `check_switches_flag` : `bool`
+            A switch used for defaults.
+
+        Returns
+        ---------------
+        `merged` : `list`
+            The events queue list updated with additional events depending on the switches.
+
+        Raises
+        ---------------
+        None
+        """
 
         # add default events at the end of merged queue
         merged = copy.deepcopy(event_queue)
@@ -217,34 +313,65 @@ class Vessel:
 
         return merged
 
-    ## ---------- START EVENT FUNCTIONS ---------- ##
+    # ---------- START EVENT FUNCTIONS ---------- #
 
     def _update_temperature(
             self,
-            parameters,  # [target_temperature]
+            parameter,  # [target_temperature]
             dt
     ):
-        '''
+        """
         Method to update the temperature of the vessel.
-        '''
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing a single element, the target temperature.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         feedback = []
 
         # update vessel's temperature property
-        self.temperature += parameters[0]
+        self.temperature += parameter[0]
 
         # loop over all the materials in the vessel
         for material_obj in self._material_dict.values():
             feedback = material_obj[0].update_temperature(
-                target_temperature=parameters[0],
+                target_temperature=parameter[0],
                 dt=dt
             )
             self._feedback_queue.extend(feedback)
 
     def _change_heat(self, parameter, dt):
-        '''
+        """
         Method to modify the temperature and contents of a vessel by adding or removing heat.
-        '''
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing two parameters, the amount of heat available and the intended output beaker.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        `0` : `np.int64`
+            A default reward of 0.
+
+        Raises
+        ---------------
+        None
+        """
 
         # extract the inputted parameters
         heat_available = parameter[0]
@@ -291,12 +418,12 @@ class Vessel:
                 # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
                 temp_change_needed = smallest_bp - self.temperature
 
-                # calculate the total entropy of all the materials in J/K
-                total_entropy = 0
-                for i, material_amount in enumerate(material_amounts):
-                    specific_heat = material_sp_heats[i] # in J/g*K
-                    molar_amount = material_amount # in mol
-                    molar_mass = material_objs[i]()._molar_mass # in g/mol
+            # calculate the total entropy of all the materials in J/K
+            total_entropy = 0
+            for i, material_amount in enumerate(material_amounts):
+                specific_heat = material_sp_heats[i]  # in J/g*K
+                molar_amount = material_amount  # in mol
+                molar_mass = material_objs[i]()._molar_mass  # in g/mol
 
                     # calculate the entropy
                     material_entropy = specific_heat * molar_amount * molar_mass
@@ -397,9 +524,21 @@ class Vessel:
         return 0
 
     def open_lid(self):
-        '''
+        """
         Method to open the vessel.
-        '''
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         if self.open_vessel:
             pass
@@ -409,9 +548,21 @@ class Vessel:
             # followed by several updates
 
     def close_lid(self):
-        '''
+        """
         Method to close the vessel.
-        '''
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         if not self.open_vessel:
             pass
@@ -421,12 +572,28 @@ class Vessel:
 
     def _pour_by_volume(
             self,
-            parameter,  # [target_vessel, d_volume, unit] unit is optional, if not included we assume the use of ml
+            parameter,  # [target_vessel, d_volume, unit] unit is optional, if not included we assume the use of l
             dt
     ):
-        '''
+        """
         Method to pour the contents of the vessel into another vessel.
-        '''
+
+        Parameters
+        ---------------
+        `parameter` : `list`
+            A list containing 3 elements: the target vessel, the volume of material being moved, and the volume unit.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        `reward` : `np.float32`
+            The reward associated with the event.
+
+        Raises
+        ---------------
+        None
+        """
 
         # extract the relevant parameters
         target_vessel = parameter[0]
@@ -439,15 +606,15 @@ class Vessel:
         # collect data from the target vessel
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
+        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit="l")
 
         # set default reward equal to zero
         reward = 0
 
         # if this vessel is empty or the d_volume is equal to zero, do nothing
         if any([
-                math.isclose(self_total_volume, 0.0, rel_tol=1e-6),
-                math.isclose(d_volume, 0.0, rel_tol=1e-6)
+            math.isclose(self_total_volume, 0.0, rel_tol=1e-6),
+            math.isclose(d_volume, 0.0, rel_tol=1e-6)
         ]):
             __ = target_vessel.push_event_to_queue(
                 events=None,
@@ -487,14 +654,14 @@ class Vessel:
 
                 for Solvent in self._solute_dict[Solute]:
                     # calculate the change of amount in each solvent and update the solute dict
-                    d_mole = self._solute_dict[Solute][Solvent][0] * d_percentage
-                    self._solute_dict[Solute][Solvent][0] -= d_mole
+                    d_mole = self._solute_dict[Solute][Solvent][1] * d_percentage
+                    self._solute_dict[Solute][Solvent][1] -= d_mole
 
                     # check if the solvent is in target material and update the vessel accordingly
                     if Solvent in target_solute_dict[Solute]:
-                        target_solute_dict[Solute][Solvent][0] += d_mole
+                        target_solute_dict[Solute][Solvent][1] += d_mole
                     else:
-                        target_solute_dict[Solute][Solvent] = [d_mole, 'mol']
+                        target_solute_dict[Solute][Solvent] = [convert_to_class([Solvent])[0], d_mole, 'mol']
 
         # if this vessel has less liquid than calculated amount then everything gets poured out
         else:
@@ -524,13 +691,13 @@ class Vessel:
 
                 for solvent in self._solute_dict[solute]:
                     # calculate the change of amount in each solvent
-                    d_mole = self._solute_dict[solute][solvent][0]
+                    d_mole = self._solute_dict[solute][solvent][1]
 
                     # check if that solvent is in target material
                     if solvent in target_solute_dict[solute]:
-                        target_solute_dict[solute][solvent][0] += d_mole
+                        target_solute_dict[solute][solvent][1] += d_mole
                     else:
-                        target_solute_dict[solute][solvent] = [d_mole, 'mol']
+                        target_solute_dict[solute][solvent] = [convert_to_class([solvent])[0], d_mole, 'mol']
 
                 # remove the solute from the solute dictionary
                 self._solute_dict.pop(solute)  # pop the solute
@@ -540,7 +707,8 @@ class Vessel:
         target_material_dict, target_solute_dict, temp_reward = util.check_overflow(
             material_dict=target_material_dict,
             solute_dict=target_solute_dict,
-            v_max=v_max
+            v_max=v_max,
+            unit=self.unit
         )
 
         # update the reward
@@ -569,9 +737,25 @@ class Vessel:
             parameter,  # [target_vessel, n_pixel]
             dt
     ):
-        '''
+        """
         Method to drain a vessel gradually by pixel count.
-        '''
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing two elements: the target vessel and the number of pixels to transfer.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        `reward` : `list`
+            The reward associated with this event.
+
+        Raises
+        ---------------
+        None
+        """
 
         # extract the necessary parameters
         target_vessel = parameter[0]
@@ -580,7 +764,7 @@ class Vessel:
         # collect data
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict)
+        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
 
         # print the old and new dictionaries to the terminal
         print(
@@ -613,8 +797,8 @@ class Vessel:
 
         # if this vessel is empty or the d_volume is equal to zero, do nothing
         if any([
-                math.isclose(self_total_volume, 0.0, rel_tol=1e-6),
-                math.isclose(n_pixel, 0.0, rel_tol=1e-6)
+            math.isclose(self_total_volume, 0.0, rel_tol=1e-6),
+            math.isclose(n_pixel, 0.0, rel_tol=1e-6)
         ]):
             __ = target_vessel.push_event_to_queue(
                 events=None,
@@ -679,10 +863,10 @@ class Vessel:
                     for Solute in self._solute_dict:
                         if M in self._solute_dict[Solute]:
                             # calculate the amount of moles
-                            d_mole = self._solute_dict[Solute][M][0] * d_percentage
+                            d_mole = self._solute_dict[Solute][M][1] * d_percentage
 
                             # update the material dictionaries
-                            self._solute_dict[Solute][M][0] -= d_mole
+                            self._solute_dict[Solute][M][1] -= d_mole
                             d_solute[Solute] += d_mole
 
                             # if all solutes are used up, eliminate the solute dictionary
@@ -691,9 +875,9 @@ class Vessel:
 
                             # update the target solute dictionary
                             if M in target_solute_dict[Solute]:
-                                target_solute_dict[Solute][M][0] += d_mole
+                                target_solute_dict[Solute][M][1] += d_mole
                             else:
-                                target_solute_dict[Solute][M] = [d_mole, 'mol']
+                                target_solute_dict[Solute][M] = [convert_to_class([M])[0], d_mole, 'mol']
 
                 # if all materials are drained out
                 else:
@@ -713,7 +897,7 @@ class Vessel:
                     for Solute in copy.deepcopy(self._solute_dict):
                         if M in self._solute_dict[Solute]:
                             # calculate the amount to drain
-                            d_mole = self._solute_dict[Solute][M]
+                            d_mole = self._solute_dict[Solute][M][1]
 
                             # store the change of solute in d_solute
                             d_solute[Solute] += d_mole
@@ -724,9 +908,9 @@ class Vessel:
 
                             # update the target solute dictionary
                             if M in target_solute_dict[Solute]:
-                                target_solute_dict[Solute][M][0] += d_mole
+                                target_solute_dict[Solute][M][1] += d_mole
                             else:
-                                target_solute_dict[Solute][M] = [d_mole, 'mol']
+                                target_solute_dict[Solute][M] = [convert_to_class([M])[0], d_mole, 'mol']
 
                             # pop this solvent from the solute
                             self._solute_dict[Solute].pop(M)
@@ -740,7 +924,7 @@ class Vessel:
                 empty_flag = False
             else:
                 for Solvent in self._solute_dict[Solute]:
-                    if abs(self._solute_dict[Solute][Solvent][0] - 0.0) > 1e-6:
+                    if abs(self._solute_dict[Solute][Solvent][1] - 0.0) > 1e-6:
                         empty_flag = False
 
             if empty_flag:
@@ -774,7 +958,8 @@ class Vessel:
         target_material_dict, target_solute_dict, temp_reward = util.check_overflow(
             material_dict=target_material_dict,
             solute_dict=target_solute_dict,
-            v_max=v_max
+            v_max=v_max,
+            unit=self.unit
         )
 
         reward += temp_reward
@@ -827,9 +1012,25 @@ class Vessel:
             parameter,
             dt
     ):
-        '''
-        Method to completely mix a beaker
-        '''
+        """
+        Method to completely mix a beaker.
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing parameters used to properly perform the fully mix event.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        `merged` : `list`
+            The events queue list updated with additional events depending on the switches.
+
+        Raises
+        ---------------
+        None
+        """
 
         # create new layer_position_dict
         new_layers_position_dict = {}
@@ -854,9 +1055,24 @@ class Vessel:
             parameter,  # [new_material_dict]
             dt
     ):
-        '''
+        """
         Method to update the material dictionary.
-        '''
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing a single element, the intended new material dictionary.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         new_material_dict = parameter[0]
 
@@ -867,8 +1083,24 @@ class Vessel:
             parameter,  # [new_solute_dict]
             dt
     ):
-        '''
-        '''
+        """
+        Method to update the solute dictionary.
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing a single element, the intended new solute dictionary.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         new_solute_dict = parameter[0]
 
@@ -880,12 +1112,28 @@ class Vessel:
 
     def _mix(
             self,
-            parameter, # [mixing_parameter]
+            parameter,  # [mixing_parameter]
             dt
     ):
-        '''
+        """
         Method to mix a vessel.
-        '''
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing a single element, mixing parameters.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        `reward` : `np.float32`
+            The reward associated with this event.
+
+        Raises
+        ---------------
+        None
+        """
 
         # set default reward equal to zero
         reward = 0
@@ -895,8 +1143,8 @@ class Vessel:
 
         # collect data (according to separate.mix()):
 
-        # convert the material dictionary volumes
-        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict)
+        # convert the material dictionary to volumes in mL
+        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
 
         layers_variance = self._layers_variance
 
@@ -933,7 +1181,7 @@ class Vessel:
                     if self._solute_dict:
                         # fill in solute_amount
                         for Solute in self._solute_dict:
-                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][0])
+                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][1])
                             solute_counter += 1
                     else:
                         solute_amount[0].append(0.0)
@@ -972,7 +1220,7 @@ class Vessel:
                     solute_counter = 0  # count position for solute in new_solute_amount
                     for Solute in self._solute_dict:
                         solute_amount = new_solute_amount[solute_counter][solvent_counter]
-                        self._solute_dict[Solute][M][0] = solute_amount
+                        self._solute_dict[Solute][M][1] = solute_amount
                         solute_counter += 1
                     solvent_counter += 1
 
@@ -986,9 +1234,24 @@ class Vessel:
             parameter,
             dt
     ):
-        '''
+        """
         Modify self._layers.
-        '''
+
+        Parameters
+        ---------------
+        `parameters` : `list`
+            A list containing parameters to properly perform this events.
+        `dt` : `np.float32`
+            The time-step of actions occurring in or to the vessel.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         # collect data (according to separate.map())
         layers_amount = []
@@ -996,7 +1259,8 @@ class Vessel:
         layers_color = []
         layers_variance = self._layers_variance
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
-            self._material_dict
+            self._material_dict,
+            unit=self.unit
         )
 
         for M in self._layers_position_dict:
@@ -1031,32 +1295,132 @@ class Vessel:
 
     # function to set the volume of the container and to specify the units
     def set_volume(self, volume: float, unit='l', override=False):
+        """
+        Method to set the volume of the vessel and specify the units of the volume of the vessel.
+
+        Parameters
+        ---------------
+        `volume` : `np.float32`
+            The intended new volume of the vessel.
+        `unit` : `str`
+            The units of the volume of the vessel.
+        `override` : `bool`
+            Whether or not the material and solute dictionaries are NOT overwritten in the event of an overflow.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
+
         if not self._material_dict and not self._solute_dict:
             self.volume = util.convert_volume(volume, unit)
         elif override:
             self.volume = util.convert_volume(volume, unit)
-            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self.volume, unit)
+            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict,
+                                                                            self.volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
 
-    def set_v(self, volume: float):
-        self.volume = volume
-
     def set_v_min(self, volume: float, unit='l'):
+        """
+        Method to set the minimal volume of the vessel and specify the units of the volume of the vessel.
+
+        Parameters
+        ---------------
+        `volume` : `np.float32`
+            The intended new volume of the vessel.
+        `unit` : `str`
+            The units of the volume of the vessel.
+        `override` : `bool`
+            Whether or not the material and solute dictionaries are NOT overwritten in the event of an overflow.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
+
         self.v_min = util.convert_volume(volume, unit)
 
     def set_v_max(self, volume: float, unit='l'):
+        """
+        Method to set the maximal volume of the vessel and specify the units of the volume of the vessel.
+
+        Parameters
+        ---------------
+        `volume` : `np.float32`
+            The intended new volume of the vessel.
+        `unit` : `str`
+            The units of the volume of the vessel.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
+
         self.v_max = util.convert_volume(volume, unit)
+
+    def get_concentration(self):
+        """
+        Method to convert molar volume to concentration.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `C` : `np.array`
+            An array of the concentrations (in mol/L) of each chemical in the experiment.
+
+        Raises
+        ---------------
+        None
+        """
+
+        V = self.get_volume()
+        n = np.array([item[1] for __, item in self._material_dict.items()])
+
+        # create an array containing the concentrations of each chemical
+        C = np.zeros(n.shape[0], dtype=np.float32)
+        for i in range(n.shape[0]):
+            C[i] = n[i] / V
+
+        return C
 
     # functions to access private properties
     def get_material_amount(
             self,
             material_name=None
     ):
-        '''
-        :param material_name: a string or a list of strings
-        :return:
-        '''
+        """
+        Method to get the material amount of a material in the material dictionary.
+
+        Parameters
+        ---------------
+        `material_name` : `str`
+            The name of the material in the material dictionary.
+
+        Returns
+        ---------------
+        `amount` : `np.float32`
+            The amount of the requested material.
+
+        Raises
+        ---------------
+        None
+        """
 
         if isinstance(material_name, list):
             amount = []
@@ -1077,12 +1441,27 @@ class Vessel:
             self,
             material_name=None
     ):
-        '''
+        """
         Method to obtain the volume of a material in the vessel.
-        '''
+
+        Parameters
+        ---------------
+        `material_name` : `str`
+            The name of the material in the material dictionary.
+
+        Returns
+        ---------------
+        `amount` : `np.float32`
+            The volumetric amount of the material.
+
+        Raises
+        ---------------
+        None
+        """
 
         self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
-            self._material_dict
+            self._material_dict,
+            unit=self.unit
         )
 
         if isinstance(material_name, list):
@@ -1100,7 +1479,8 @@ class Vessel:
             except KeyError:
                 if material_name == 'Air':
                     amount = self.v_max - self_total_volume
-                amount = 0.0
+                else:
+                    amount = 0.0
 
         return amount
 
@@ -1108,10 +1488,23 @@ class Vessel:
             self,
             material_name=None
     ):
-        '''
-        :param material_name: a string or a list of strings
-        :return:
-        '''
+        """
+        Method to get the position of the material in a layer.
+
+        Parameters
+        ---------------
+        `material_name` : `str`
+            The name of the material in the material dictionary.
+
+        Returns
+        ---------------
+        `position` : `np.int64`
+            The position of the material in the layer dictionary.
+
+        Raises
+        ---------------
+        None
+        """
 
         if isinstance(material_name, list):
             position = []
@@ -1137,37 +1530,103 @@ class Vessel:
         return position
 
     def get_material_variance(self):
-        '''
-        Method to get the material variance property
-        '''
+        """
+        Method to get the material variance property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `layers_variance` : `np.float32`
+            The variance of the layers dictionary.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self._layers_variance
 
     def get_layers(self):
-        '''
-        Method to get the vessel layers property
-        '''
+        """
+        Method to get the vessel layers property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `amount` : `np.array`
+            The array containing layers.
+
+        Raises
+        ---------------
+        None
+        """
 
         return np.copy(self._layers)
 
     def get_material_color(self, material_name):
-        '''
-        Method to get the material color property
-        '''
+        """
+        Method to get the material color property.
+
+        Parameters
+        ---------------
+        `material_name` : `np.float32`
+            The name of the material in the material dictionary.
+
+        Returns
+        ---------------
+        `material_color` : `np.float32`
+            A number representing the color of the specified material.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self._material_dict[material_name][0]().get_color()
 
     def get_material_dict(self):
-        '''
-        Method to get the material dictionary property
-        '''
+        """
+        Method to get the material dictionary property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `material_dict` : `dict`
+            The vessel's material dictionary.
+
+        Raises
+        ---------------
+        None
+        """
 
         return copy.deepcopy(self._material_dict)
 
     def get_solute_dict(self):
-        '''
-        Method to get the solute dictionary property
-        '''
+        """
+        Method to get the solute dictionary property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `solute_dict` : `dict`
+            The vessel's solute dictionary.
+
+        Raises
+        ---------------
+        None
+        """
 
         return copy.deepcopy(self._solute_dict)
 
@@ -1175,51 +1634,134 @@ class Vessel:
             self,
             dict_or_list='dict'
     ):
-        '''
-        Method to get the material position and variance property
-        '''
+        """
+        Method to get the material position and variance property.
+
+        Parameters
+        ---------------
+        `dict_or_list` : `str`
+            Indicating if the output position list should be a list or dict.
+
+        Returns
+        ---------------
+        `position_list` : `list` or `dict`
+            An object containing the layer positions as a list or a dict.
+        `layers_variance` : `np.float64`
+            The variance of the layers dictionary.
+
+        Raises
+        ---------------
+        None
+        """
+
+        position_list = []
 
         if dict_or_list == 'dict':
             position_list = copy.deepcopy(self._layers_position_dict)
         elif dict_or_list == 'list':
-            position_list = []
             for L in self._layers_position_dict:
                 position_list.append(self._layers_position_dict[L])
 
         return position_list, self._layers_variance
 
     def get_max_volume(self):
-        '''
-        Method to get the vessel's maximal volume property
-        '''
+        """
+        Method to get the vessel's maximal volume property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `v_max` : `np.float32`
+            The maximal volume of the vessel.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.v_max
 
     def get_min_volume(self):
-        '''
-        Method to get the vessel's minimal volume property
-        '''
+        """
+        Method to get the vessel's minimal volume property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `v_min` : `np.float32`
+            The minimum volume of the vessel.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.v_min
 
     def get_Tmin(self):
-        '''
-        Method to get the vessel's minimal temperature property
-        '''
+        """
+        Method to get the vessel's minimal temperature property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `Tmin` : `np.float32`
+            The minimum temperature of the vessel.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.Tmin
 
     def get_Tmax(self):
-        '''
-        Method to get the vessel's maximal temperature property
-        '''
+        """
+        Method to get the vessel's maximal temperature property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `Tmax` : `np.float32`
+            The maximal temperature of the vessel.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.Tmax
 
     def get_pmax(self):
-        '''
-        Method to get the vessel's maximal pressure property
-        '''
+        """
+        Method to get the vessel's maximal pressure property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `max_pressure` : `np.float32`
+            The maximal pressure of the vessel based on the vessel's material dictionary,
+            maximal temperature, and minimal volume.
+
+        Raises
+        ---------------
+        None
+        """
 
         # set up a variable to contain the total pressure
         max_pressure = 0
@@ -1234,9 +1776,23 @@ class Vessel:
         return max_pressure
 
     def get_pressure(self):
-        '''
-        Method to get the vessel's maximal pressure property
-        '''
+        """
+        Method to get the vessel's maximal pressure property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `total_pressure` : `np.float32`
+            The total pressure of the vessel from aggregate pressures based on the vessel's material dictionary,
+            maximal temperature, and minimal volume.
+
+        Raises
+        ---------------
+        None
+        """
 
         # set up a variable to contain the total pressure
         total_pressure = 0
@@ -1252,9 +1808,22 @@ class Vessel:
         return total_pressure
 
     def get_part_pressure(self):
-        '''
-        Method to get the vessel's maximal pressure property
-        '''
+        """
+        Method to get the vessel's maximal pressure property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `part_pressures` : `list`
+            A list of the partial pressures of each of the materials in the vessel.
+
+        Raises
+        ---------------
+        None
+        """
 
         # set up a variable to contain the partial pressures
         part_pressures = np.zeros(len(self._material_dict))
@@ -1266,45 +1835,104 @@ class Vessel:
         return part_pressures
 
     def get_defaultdt(self):
-        '''
-        Method to get the vessel's default time-step property
-        '''
+        """
+        Method to get the vessel's default time-step property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `default_dt` : `np.float32`
+            The default time-step of the vessel.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.default_dt
 
     def get_temperature(self):
-        '''
-        Method to get the vessel's temperature property
-        '''
+        """
+        Method to get the vessel's temperature property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `temperature` : `np.float32`
+            The vessel temperature.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.temperature
 
     def get_volume(self):
-        '''
-        Method to get the vessel's volume property
-        '''
+        """
+        Method to get the vessel's volume property.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `volume` : `np.float32`
+            The vessel volume.
+
+        Raises
+        ---------------
+        None
+        """
 
         return self.volume
 
     def get_current_volume(self):
-        return util.convert_material_dict_to_volume(self._material_dict)
+        """
+        Method to get the vessel's current volume property.
 
-    ## ---------- SAVING/LOADING FUNCTIONS ---------- ##
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `volume` : `np.float32`
+            The volume of the materials in the material dictionary in the vessel's volume.
+
+        Raises
+        ---------------
+        None
+        """
+
+        return util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+
+    # ---------- SAVING/LOADING FUNCTIONS ---------- #
 
     def save_vessel(self, vessel_rootname: str):
-        '''
+        """
         Method to save a vessel as a pickle file.
+
         Parameters
         ---------------
         `vessel_rootname` : `str` (default="")
             The intended file root of the vessel (no extension; not the absolute path).
+
         Returns
         ---------------
         None
+
         Raises
         ---------------
         None
-        '''
+        """
 
         # use the vessel path that was given upon initialization or during parameter verification
         output_directory = os.path.dirname(os.path.realpath('reaction_bench_v0_engine.py'))
@@ -1320,6 +1948,22 @@ class Vessel:
             pickle.dump(self, vessel_file)
 
     def load_vessel(self, vessel_path: str):
+        """
+        Method to load a vessel from a pickle file.
+
+        Parameters
+        ---------------
+        `vessel_path` : `str` (default="")
+            The filepath to the pickle file containing the vessel (no extension; not the absolute path).
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         with open(vessel_path, 'rb') as handle:
             v = pickle.load(handle)

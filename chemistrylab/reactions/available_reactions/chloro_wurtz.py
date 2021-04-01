@@ -1,7 +1,7 @@
-'''
+"""
 File to specify the parameters required to instruct reaction_base.py to perform the
 chloro-wurtz reactions
-'''
+"""
 
 import numpy as np
 
@@ -47,12 +47,12 @@ dV = 0.0005
     # the stoichiometric coefficients (6x4 array)
 activ_energy_arr = np.array(
     [
-        [1.0], # activation energy for reaction 0
-        [1.0], # activation energy for reaction 1
-        [1.0], # activation energy for reaction 2
-        [1.0], # activation energy for reaction 3
-        [1.0], # activation energy for reaction 4
-        [1.0]  # activation energy for reaction 5
+        1.0, # activation energy for reaction 0
+        1.0, # activation energy for reaction 1
+        1.0, # activation energy for reaction 2
+        1.0, # activation energy for reaction 3
+        1.0, # activation energy for reaction 4
+        1.0  # activation energy for reaction 5
     ]
 )
 
