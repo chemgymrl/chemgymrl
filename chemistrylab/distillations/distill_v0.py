@@ -155,6 +155,9 @@ class Distillation:
         # delete the solute dictionary from the boil vessel
         boil_vessel._solute_dict = {}
 
+        # set the unit of the boil vessel
+        boil_vessel.unit = 'l'
+
         # add the inputted boil vessel to the list of all vessels
         vessels = [boil_vessel]
 

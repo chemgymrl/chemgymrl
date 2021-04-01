@@ -102,8 +102,8 @@ class Vessel:
         """
 
         # define the Material Dict and Solute Dict first
-        self._material_dict = util.convert_material_dict_units(materials)
-        self._solute_dict = util.convert_solute_dict_units(solutes)
+        self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
 
         # initialize parameters
         self.label = label
@@ -419,16 +419,16 @@ class Vessel:
                 # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
                 temp_change_needed = smallest_bp - self.temperature
 
-            # calculate the total entropy of all the materials in J/K
-            total_entropy = 0
-            for i, material_amount in enumerate(material_amounts):
-                specific_heat = material_sp_heats[i]  # in J/g*K
-                molar_amount = material_amount  # in mol
-                molar_mass = material_objs[i]()._molar_mass  # in g/mol
+                # calculate the total entropy of all the materials in J/K
+                total_entropy = 0
+                for i, material_amount in enumerate(material_amounts):
+                    specific_heat = material_sp_heats[i]  # in J/g*K
+                    molar_amount = material_amount  # in mol
+                    molar_mass = material_objs[i]()._molar_mass  # in g/mol
 
-                # calculate the entropy
-                material_entropy = specific_heat * molar_amount * molar_mass
-                total_entropy += material_entropy
+                    # calculate the entropy
+                    material_entropy = specific_heat * molar_amount * molar_mass
+                    total_entropy += material_entropy
 
                 # calculate the energy needed to get to the smallest boiling point
                 heat_to_add = temp_change_needed * total_entropy
@@ -505,8 +505,6 @@ class Vessel:
                     heat_available = 0
 
             else:
-                # SHOULD WE IMPLEMENT A MAX BOIL VESSEL TEMP ???
-
                 # calculate the change in vessel temperature
                 vessel_temp_change = heat_available
 
