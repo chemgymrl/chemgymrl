@@ -9,7 +9,7 @@ import gym
 import chemistrylab
 import numpy as np
 from gym import envs
-from chemistrylab.characterization_bench.characterization_bench import CharachterizationBench
+from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 
 
 class Lab(gym.Env, ABC):
@@ -29,8 +29,8 @@ class Lab(gym.Env, ABC):
         self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
         self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
         self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
-        self.characterization = list(CharachterizationBench().techniques.keys())
-        self.characterization_bench = CharachterizationBench()
+        self.characterization = list(CharacterizationBench().techniques.keys())
+        self.characterization_bench = CharacterizationBench()
         # the following is a dictionary of all available agents that can operate each bench feel free to add your own
         # custom agents
         self.react_agents = {'random': RandomAgent()}
