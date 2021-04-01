@@ -39,40 +39,11 @@ register(
 ############################ ReactBench ####################################
 
 register(
-    id='WurtzReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0',
-    max_episode_steps=20
-)
-
-register(
     id='WurtzReact-v1',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_0',
     max_episode_steps=20
 )
 
-register(
-    id='WurtzReact_overlap-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0_Overlap',
-    max_episode_steps=20
-)
-
-register(
-    id='DecompReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
-    max_episode_steps=20
-)
-
-register(
-    id='EquilReactLesson-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_2',
-    max_episode_steps=20
-)
-
-register(
-    id='SolutionReactLesson-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_3',
-    max_episode_steps=20
-)
 
 ############################ DistillationBench ####################################
 

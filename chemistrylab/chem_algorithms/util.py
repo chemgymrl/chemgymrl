@@ -177,14 +177,14 @@ def convert_volume(volume, unit):
 def convert_mass_to_mol(mat, mass, unit='g'):
 
     if type(mat) == material.Material:
-        return mat.molar_mass * MASS_TABLE[unit] * mass
+        return mat().get_molar_mass() * MASS_TABLE[unit] * mass
     elif type(mat) == str:
         found = False
-        materials = material.get_materials()
+        materials = material().get_materials()
         for i, name in enumerate(materials[0]):
             if name == mat:
                 found = True
-                return materials[1][i].molar_mass * MASS_TABLE[unit] * mass
+                return materials[1][i]().get_molar_mass() * MASS_TABLE[unit] * mass
         if not found:
             raise ValueError('Material name not found')
 
@@ -194,16 +194,16 @@ def convert_mass_to_mol(mat, mass, unit='g'):
 
 def convert_volume_to_mol(mat, volume, unit='l'):
     if type(mat) == material.Material:
-        mass = convert_volume(volume, unit) * mat.density
-        return mass / mat.molar_mass
+        mass = convert_volume(volume, unit) * mat().get_density()
+        return mass / mat.get_molar_mass()
     elif type(mat) == str:
         found = False
         materials = material.get_materials()
         for i, name in enumerate(materials[0]):
             if name == mat:
                 found = True
-                mass = convert_volume(volume, unit) * materials[1][i].density
-                return mass / materials[1][i].molar_mass
+                mass = convert_volume(volume, unit) * materials[1][i]().get_density()
+                return mass / materials[1][i]().get_molar_mass()
 
         if not found:
             raise ValueError('Material name not found')

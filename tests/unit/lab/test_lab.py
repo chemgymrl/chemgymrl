@@ -14,7 +14,7 @@ class TestLab(TestCase):
 
     def test_load_reaction_bench(self):
         lab = Lab()
-        env = lab.load_reaction_bench(1)
+        env = lab.load_reaction_bench(0)
         self.assertEqual(env.__class__.__bases__[0].__name__, 'Wrapper')
 
     def test_load_extraction_bench(self):
@@ -29,7 +29,7 @@ class TestLab(TestCase):
 
     def test_step(self):
         lab = Lab()
-        react_action = np.array([0, 1, 0, 0])
+        react_action = np.array([0, 0, 0, 0])
         extract_action = np.array([1, 0, 0, 0])
         distill_action = np.array([2, 0, 2, 0])
         analysis_action = np.array([3, 0, 2, 0])
