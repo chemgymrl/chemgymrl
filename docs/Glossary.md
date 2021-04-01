@@ -8,7 +8,11 @@ Serves as a reference for some of the key terms used in this documentation.
 
 #### Action
 
+What the agent does in an environment to obtain a reward.
+
 #### Agent
+
+Who takes decisions in an environment based on rewards and punishments.
 
 ## B 
 
@@ -18,13 +22,21 @@ Serves as a reference for some of the key terms used in this documentation.
 
 #### Command Line
 
+A place where a user can enter commands into the computer from a terminal.
+
 ## D
 
 #### Distillation
 
+Distillation is a process where components of a mixture are seperated using their boiling points.
+
 ## E
 
+#### Environment
+
 #### Extraction
+
+Extraction is a process done to separate components of a mixture using different densities.
 
 ## F
 
@@ -42,9 +54,13 @@ Serves as a reference for some of the key terms used in this documentation.
 
 #### Lab Manager
 
+Lab managers direct and inspect results from sub agents that carry out tasks for individual benches, and also takes materials from bench to bench using a vessel.
+
 ## M 
  
 #### Material
+
+A material is a substance or mixture of substances that constitutes an object. 
 
 ## N
 
@@ -60,13 +76,21 @@ Serves as a reference for some of the key terms used in this documentation.
 
 #### Reinforcement Learning
 
+A type of Machine Learning that uses an agent to perform actions in an environment in order to receive optimal outcomes and maximize rewards.
+
 #### Reward
+
+Method used to train ML models to make optimal decisions.
 
 ## S
 
 #### Solute
 
+The component that is not present in excess in the solution.
+
 #### Solvent
+
+The liquid in which a solute is dissolved to form a solution.
 
 ## T
 
@@ -75,6 +99,8 @@ Serves as a reference for some of the key terms used in this documentation.
 ## V
 
 #### Vessel
+
+A container used to hold mixtures or materials in ChemGymRL experiments.
 
 ## W
 
