@@ -102,8 +102,8 @@ class Vessel:
         """
 
         # define the Material Dict and Solute Dict first
-        self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
-        self._solute_dict = solutes  # solute.name: [solvent(), amount]; amount is in mole
+        self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
 
         # initialize parameters
         self.label = label
@@ -401,7 +401,8 @@ class Vessel:
                         "to exceed the boiling point of at least one material."
                     )
             except:
-                input("No material remaining in the boil vessel. Only the vessel and air will be heated. Press Enter to exit.")
+                print("No material remaining in the boil vessel. Only the vessel and air will be heated.")
+                return -1
 
             if material_amounts:
                 # determine the material with the smallest boiling point and its value
@@ -418,16 +419,16 @@ class Vessel:
                 # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
                 temp_change_needed = smallest_bp - self.temperature
 
-            # calculate the total entropy of all the materials in J/K
-            total_entropy = 0
-            for i, material_amount in enumerate(material_amounts):
-                specific_heat = material_sp_heats[i]  # in J/g*K
-                molar_amount = material_amount  # in mol
-                molar_mass = material_objs[i]()._molar_mass  # in g/mol
+                # calculate the total entropy of all the materials in J/K
+                total_entropy = 0
+                for i, material_amount in enumerate(material_amounts):
+                    specific_heat = material_sp_heats[i]  # in J/g*K
+                    molar_amount = material_amount  # in mol
+                    molar_mass = material_objs[i]()._molar_mass  # in g/mol
 
-                # calculate the entropy
-                material_entropy = specific_heat * molar_amount * molar_mass
-                total_entropy += material_entropy
+                    # calculate the entropy
+                    material_entropy = specific_heat * molar_amount * molar_mass
+                    total_entropy += material_entropy
 
                 # calculate the energy needed to get to the smallest boiling point
                 heat_to_add = temp_change_needed * total_entropy
@@ -504,8 +505,6 @@ class Vessel:
                     heat_available = 0
 
             else:
-                # SHOULD WE IMPLEMENT A MAX BOIL VESSEL TEMP ???
-
                 # calculate the change in vessel temperature
                 vessel_temp_change = heat_available
 
@@ -1074,7 +1073,7 @@ class Vessel:
         None
         """
 
-        new_material_dict = parameter[0]
+        new_material_dict = util.convert_material_dict_units(parameter[0])
 
         self._material_dict = util.organize_material_dict(new_material_dict)
 
@@ -1102,7 +1101,7 @@ class Vessel:
         None
         """
 
-        new_solute_dict = parameter[0]
+        new_solute_dict = util.convert_solute_dict_units(parameter[0])
 
         # organize the target_solute_dict so it includes all solute and solvent
         self._solute_dict = util.organize_solute_dict(
@@ -1370,6 +1369,26 @@ class Vessel:
         """
 
         self.v_max = util.convert_volume(volume, unit)
+
+    def get_unit(self):
+        """
+        Method to get the unit
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `unit` : `str`
+            The unit being used in the vessel
+
+        Raises
+        ---------------
+        None
+        """
+
+        return self.unit
 
     def get_concentration(self):
         """
