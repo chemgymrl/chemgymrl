@@ -596,7 +596,10 @@ class DistillationReward:
             )
 
         # divide the sum reward by the number of vessels containing some of the desired material
-        final_reward = total_reward / len(self.desired_vessels)
+        if len(self.desired_vessels) == 0:
+            final_reward = 0
+        else:
+            final_reward = total_reward / len(self.desired_vessels)
 
         return final_reward
 
