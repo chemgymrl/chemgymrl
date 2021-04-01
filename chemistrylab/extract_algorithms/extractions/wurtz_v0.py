@@ -1,14 +1,9 @@
 '''
 Module to describe the extraction of a desired material generated in a Wurtz reaction.
-
 :title: wurtz_v0.py
-
 :author: Mitchell Shahen
-
 :history: 2020-06-27
-
 Available Actions for this Extraction Experiment are included below.
-
 0: Valve (Speed multiplier, relative to max_valve_speed)
 1: Mix ExV (mixing coefficient, *-1 when passed into mix function)
 2: Pour B1 into ExV (Volume multiplier, relative to max_vessel_volume)
@@ -43,7 +38,6 @@ from chemistrylab.reactions.get_reactions import convert_to_class
 class Extraction:
     '''
     Class object for a Wurtz extraction experiment.
-
     Parameters
     ---------------
     `extraction_vessel` : `vessel` (default=`None`)
@@ -66,11 +60,9 @@ class Extraction:
         The maximal amount of material flowing through the valve in a given time-step.
     `n_actions` : `int` (default=`8`)
         The number of actions included in this extraction experiment.
-
     Returns
     ---------------
     None
-
     Raises
     ---------------
     None
@@ -111,16 +103,13 @@ class Extraction:
     def get_action_space(self):
         '''
         Method to describe the actions index and multipliers available.
-
         Parameters
         ---------------
         None
-
         Returns
         ---------------
         `action_space` : `MultiDiscrete`
             A MultiDiscrete object indicating the options for selecting actions and multipliers.
-
         Raises
         ---------------
         None
@@ -133,12 +122,10 @@ class Extraction:
     def reset(self, extraction_vessel):
         '''
         Method to reset the environment.
-
         Parameters
         ---------------
         `extraction_vessel` : `vessel` (default=`None`)
             A vessel object containing state variables, materials, solutes, and spectral data.
-
         Returns
         ---------------
         `vessels` : `list`
@@ -147,7 +134,6 @@ class Extraction:
             A list of the external vessels, beakers, to be used in the extraction.
         `state` : `np.array`
             An array containing state variables, material concentrations, and spectral data.
-
         Raises
         ---------------
         None
@@ -155,8 +141,6 @@ class Extraction:
 
         # delete the extraction vessel's solute_dict and copy it into a list of vessels
         solute_dict = extraction_vessel._solute_dict
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(solute_dict)
         material_dict = extraction_vessel.get_material_dict()
         extraction_vessel._solute_dict = {}
         vessels = [copy.deepcopy(extraction_vessel)]
@@ -174,31 +158,48 @@ class Extraction:
         # generate a list of external vessels to contain solutes
         external_vessels = []
 
-        # to ensure we have 2 external vessels, create and add solute vessels
-        # only until the external vessels list contains two vessels
-        while len(external_vessels) < 2:
-            # set the iteraction number
-            iteration = len(external_vessels)
+        # generate a vessel to contain the main solute
+        solute_vessel = vessel.Vessel(
+            label='solute_vessel0',
+            v_max=self.solute_volume,
+            n_pixels=self.n_vessel_pixels,
+            settling_switch=False,
+            layer_switch=False,
+        )
 
+        # create the material dictionary for the solute vessel
+        solute_material_dict = {}
+        solute_class = convert_to_class(materials=[self.solute])[0]
+        solute_material_dict[self.solute] = [solute_class, self.solute_volume]
+
+        # check for overflow
+        solute_material_dict, _, _ = util.check_overflow(
+            material_dict=solute_material_dict,
+            solute_dict={},
+            v_max=solute_vessel.get_max_volume()
+        )
+
+        # instruct the vessel to update its material dictionary
+        event = ['update material dict', solute_material_dict]
+        solute_vessel.push_event_to_queue(feedback=[event], dt=0)
+
+        # add the main solute vessel to the list of external vessels
+        external_vessels.append(solute_vessel)
+
+        # generate vessels for each solute in the extraction vessel
+        for solute_name in solute_dict:
             # generate an empty vessel to be filled with a single solute
             solute_vessel = vessel.Vessel(
-                label='solute_vessel{}'.format(iteration),
+                label='solute_vessel{}'.format(len(external_vessels)),
                 v_max=extraction_vessel.v_max,
                 n_pixels=self.n_vessel_pixels,
                 settling_switch=False,
                 layer_switch=False
             )
+            solute_material_dict = {}
+            solute_material_dict[solute_name] = material_dict[solute_name]
 
-            # get a list of all the solutes in the solute dictionary
-            solute_names_list = list(solute_dict.keys())
-
-            # obtain the first name to add this solute to the current solute vessel
-            solute_name = solute_names_list[iteration]
-
-            # define the current solute vessel's material dictionary
-            solute_material_dict = {solute_name: material_dict[solute_name]}
-
-            # check for overflow in the solute vessel's material dictionary
+            # check for overflow
             solute_material_dict, _, _ = util.check_overflow(
                 material_dict=solute_material_dict,
                 solute_dict={},
@@ -224,7 +225,6 @@ class Extraction:
         '''
         Method to perform the action designated by `action` and update
         the state, vessels, external vessels, and generate reward.
-
         Parameters
         ---------------
         `vessels` : `list`
@@ -234,7 +234,6 @@ class Extraction:
         `action` : `list`
             A list of two numbers indicating the index of an action to
             perform and a multiplier used when performin the action.
-
         Returns
         ---------------
         `vessels` : `list`
@@ -245,7 +244,6 @@ class Extraction:
             The amount of the target material that has been generated by the most recent action.
         `done` : `bool`
             A boolean indicating if all of the required actions have now been completed.
-
         Raises
         ---------------
         None
