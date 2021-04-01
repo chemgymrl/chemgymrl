@@ -22,6 +22,8 @@ state = env.reset()
 total_reward = 0
 round = 0
 
+#test
+
 while not done:
     # print(state)
     env.render(mode=render_mode)

@@ -43,3 +43,57 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
             dt=0.01,
             overlap=False
         )
+
+class ReactionBenchEnv_1(ReactionBenchEnv):
+    '''
+    Class object to define an environment available in the reaction bench.
+    '''
+
+    def __init__(self):
+        '''
+        Constructor class for the ReactionBenchEnv_1 environment.
+        '''
+
+        super(ReactionBenchEnv_1, self).__init__(
+            reaction=_Reaction,
+            reaction_file_identifier="decomp",
+            in_vessel_path=None, # do not include an input vessel
+            out_vessel_path=os.getcwd(), # include an output vessel directory
+            materials=[ # initialize the bench with the following materials
+                {"Material": "NaCl", "Initial": 0.001},
+            ],
+            solutes=[ # initialize the bench with the following solutes available
+                {"Material": "H2O", "Initial": 0.001}
+            ],
+            n_steps=50,
+            dt=0.01,
+            overlap=False
+        )
+
+class ReactionBenchEnv_2(ReactionBenchEnv):
+    '''
+    Class object to define an environment available in the reaction bench.
+    '''
+
+    def __init__(self):
+        '''
+        Constructor class for the ReactionBenchEnv_1 environment.
+        '''
+
+        super(ReactionBenchEnv_2, self).__init__(
+            reaction=_Reaction,
+            reaction_file_identifier="equilibrium",
+            in_vessel_path=None, # do not include an input vessel
+            out_vessel_path=os.getcwd(), # include an output vessel directory
+            materials=[ # initialize the bench with the following materials
+                {"Material": "CuSO4", "Initial": 0.001},
+                {"Material": "CuS04*5H2O", "Initial": 0.001},
+                {"Material": "H2O", "Initial": 0.005}
+            ],
+            solutes=[ # initialize the bench with the following solutes available
+                {"Material": "H2O", "Initial": 0.001}
+            ],
+            n_steps=50,
+            dt=0.01,
+            overlap=False
+        )
