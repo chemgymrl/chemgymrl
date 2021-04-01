@@ -102,8 +102,8 @@ class Vessel:
         """
 
         # define the Material Dict and Solute Dict first
-        self._material_dict = materials  # material.name: [material(), amount]; amount is in mole
-        self._solute_dict = solutes  # solute.name: [solvent(), amount]; amount is in mole
+        self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
 
         # initialize parameters
         self.label = label
@@ -1074,7 +1074,7 @@ class Vessel:
         None
         """
 
-        new_material_dict = parameter[0]
+        new_material_dict = util.convert_material_dict_units(parameter[0])
 
         self._material_dict = util.organize_material_dict(new_material_dict)
 
@@ -1102,7 +1102,7 @@ class Vessel:
         None
         """
 
-        new_solute_dict = parameter[0]
+        new_solute_dict = util.convert_solute_dict_units(parameter[0])
 
         # organize the target_solute_dict so it includes all solute and solvent
         self._solute_dict = util.organize_solute_dict(
