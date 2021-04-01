@@ -155,6 +155,8 @@ class Extraction:
 
         # delete the extraction vessel's solute_dict and copy it into a list of vessels
         solute_dict = extraction_vessel._solute_dict
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(solute_dict)
         material_dict = extraction_vessel.get_material_dict()
         extraction_vessel._solute_dict = {}
         vessels = [copy.deepcopy(extraction_vessel)]
