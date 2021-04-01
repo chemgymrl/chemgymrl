@@ -172,48 +172,31 @@ class Extraction:
         # generate a list of external vessels to contain solutes
         external_vessels = []
 
-        # generate a vessel to contain the main solute
-        solute_vessel = vessel.Vessel(
-            label='solute_vessel0',
-            v_max=self.solute_volume,
-            n_pixels=self.n_vessel_pixels,
-            settling_switch=False,
-            layer_switch=False,
-        )
+        # to ensure we have 2 external vessels, create and add solute vessels
+        # only until the external vessels list contains two vessels
+        while len(external_vessels) < 2:
+            # set the iteraction number
+            iteration = len(external_vessels)
 
-        # create the material dictionary for the solute vessel
-        solute_material_dict = {}
-        solute_class = convert_to_class(materials=[self.solute])[0]
-        solute_material_dict[self.solute] = [solute_class, self.solute_volume]
-
-        # check for overflow
-        solute_material_dict, _, _ = util.check_overflow(
-            material_dict=solute_material_dict,
-            solute_dict={},
-            v_max=solute_vessel.get_max_volume()
-        )
-
-        # instruct the vessel to update its material dictionary
-        event = ['update material dict', solute_material_dict]
-        solute_vessel.push_event_to_queue(feedback=[event], dt=0)
-
-        # add the main solute vessel to the list of external vessels
-        external_vessels.append(solute_vessel)
-
-        # generate vessels for each solute in the extraction vessel
-        for solute_name in solute_dict:
             # generate an empty vessel to be filled with a single solute
             solute_vessel = vessel.Vessel(
-                label='solute_vessel{}'.format(len(external_vessels)),
+                label='solute_vessel{}'.format(iteration),
                 v_max=extraction_vessel.v_max,
                 n_pixels=self.n_vessel_pixels,
                 settling_switch=False,
                 layer_switch=False
             )
-            solute_material_dict = {}
-            solute_material_dict[solute_name] = material_dict[solute_name]
 
-            # check for overflow
+            # get a list of all the solutes in the solute dictionary
+            solute_names_list = list(solute_dict.keys())
+
+            # obtain the first name to add this solute to the current solute vessel
+            solute_name = solute_names_list[iteration]
+
+            # define the current solute vessel's material dictionary
+            solute_material_dict = {solute_name: material_dict[solute_name]}
+
+            # check for overflow in the solute vessel's material dictionary
             solute_material_dict, _, _ = util.check_overflow(
                 material_dict=solute_material_dict,
                 solute_dict={},
