@@ -324,6 +324,7 @@ class NaCl(Material):
                          molar_mass=58.443,
                          color=0.9,
                          charge=0.0,
+                         solute=True,
                          boiling_point=1738.0,
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,

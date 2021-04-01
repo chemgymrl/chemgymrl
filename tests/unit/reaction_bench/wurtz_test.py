@@ -6,7 +6,7 @@ import gym
 import chemistrylab
 import numpy as np
 
-ENV_NAME = 'WurtzReact-v0'
+ENV_NAME = 'WurtzReact-v1'
 
 class DecompositionTestCase(unittest.TestCase):
     def test_init(self):
@@ -19,9 +19,9 @@ class DecompositionTestCase(unittest.TestCase):
         env.reset()
         action = np.zeros(env.action_space.shape)
         action[0] = 1
-        action[1] = 1/2
+        action[1] = 1 / 2
         env.step(action)
-        desired_temp = env.Ti + env.dT
+        desired_temp = min(env.reaction.Ti + env.reaction.dT, env.reaction.Tmax)
         actual_temp = env.vessels.get_temperature()
         self.assertEqual(desired_temp, actual_temp)
 
@@ -29,10 +29,10 @@ class DecompositionTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
-        action[0] = 1/2
+        action[0] = 1 / 2
         action[1] = 1
         env.step(action)
-        desired_volume = env.Vi + env.dV
+        desired_volume = env.reaction.Vi + env.reaction.dV
         actual_volume = env.vessels.get_volume()
         self.assertAlmostEqual(desired_volume, actual_volume, places=6)
 
@@ -43,7 +43,7 @@ class DecompositionTestCase(unittest.TestCase):
         action[0] = 0
         action[1] = 1 / 2
         env.step(action)
-        desired_temp = env.Ti - env.dT
+        desired_temp = max(env.reaction.Ti - env.reaction.dT, env.reaction.Tmin)
         actual_temp = env.vessels.get_temperature()
         self.assertEqual(desired_temp, actual_temp)
 
@@ -54,7 +54,7 @@ class DecompositionTestCase(unittest.TestCase):
         action[0] = 1 / 2
         action[1] = 0
         env.step(action)
-        desired_volume = env.Vi - env.dV
+        desired_volume = max(env.reaction.Vi - env.reaction.dV, env.reaction.Vmin)
         actual_volume = env.vessels.get_volume()
         self.assertAlmostEqual(desired_volume, actual_volume, places=6)
 
