@@ -425,9 +425,9 @@ class Vessel:
                 molar_amount = material_amount  # in mol
                 molar_mass = material_objs[i]()._molar_mass  # in g/mol
 
-                    # calculate the entropy
-                    material_entropy = specific_heat * molar_amount * molar_mass
-                    total_entropy += material_entropy
+                # calculate the entropy
+                material_entropy = specific_heat * molar_amount * molar_mass
+                total_entropy += material_entropy
 
                 # calculate the energy needed to get to the smallest boiling point
                 heat_to_add = temp_change_needed * total_entropy
