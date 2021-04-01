@@ -277,17 +277,11 @@ class Extraction:
                 __ = vessel_obj.push_event_to_queue(dt=self.dt)
         else:
             # obtain the necessary vessels
-            try:
-                extract_vessel = vessels[0]
-                beaker_1 = vessels[1]
-                beaker_2 = vessels[2]
-                solute_vessel1 = ext_vessel[0]
-                solute_vessel2 = ext_vessel[1]
-            except Extraction as e:
-                print(e)
-                print(vessels)
-                print(ext_vessel)
-                raise ValueError
+            extract_vessel = vessels[0]
+            beaker_1 = vessels[1]
+            beaker_2 = vessels[2]
+            solute_vessel1 = ext_vessel[0]
+            solute_vessel2 = ext_vessel[1]
 
             # Open Valve (Speed multiplier)
             if do_action == 0:
