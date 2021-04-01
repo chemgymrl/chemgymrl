@@ -460,7 +460,7 @@ class _Reaction:
 
         # ensure that solutes from vessels compatible with reaction
         solute_dict_vessel = vessels.get_solute_dict()
-        print(solute_dict_vessel)
+        # print(solute_dict_vessel)
         solute_list = []
         for solute_dict in solute_dict_vessel.values():
             for key in solute_dict.keys():
