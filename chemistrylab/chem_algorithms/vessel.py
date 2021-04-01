@@ -401,7 +401,8 @@ class Vessel:
                         "to exceed the boiling point of at least one material."
                     )
             except:
-                input("No material remaining in the boil vessel. Only the vessel and air will be heated. Press Enter to exit.")
+                print("No material remaining in the boil vessel. Only the vessel and air will be heated.")
+                return -1
 
             if material_amounts:
                 # determine the material with the smallest boiling point and its value
