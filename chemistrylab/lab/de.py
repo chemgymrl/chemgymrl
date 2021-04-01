@@ -1,24 +1,61 @@
+"""
+This class is used to solve the chemical reaction(s).
+
+:title: de.py
+
+:author: Mark Baula, Nicholas Paquin, and Mitchell Shahen
+
+:history: 26-03-2021
+
+Used throughout this class are the following arrays:
+    - rate_coef: is a num_reagents x num_reactions array of exponential coefficients that we use to calculate
+    the rate of each reaction
+
+    - exp_coef: is a num_reactions length vector which represents the exponential coefficients we use to calculate
+    the rate constants
+
+    - reaction_coef: in a num_reactions x num_materials numpy array
+"""
+
 import numpy as np
 
-"""
-This class is used to solve the chemical reaction
+# specify the R constant
+R = 8.314462619
 
-rate_coef: is a num_reagents x num_reactions array of exponential coefficients that we use to calculate
-the rate of each reaction
-
-exp_coef: is a num_reactions length vector which represents the exponential coefficients we use to calculate
-the rate constants
-
-reaction_coef: in a num_reactions x num_materials numpy array
-
-"""
 
 class De:
-    def __init__(self, stoich_coeff_arr: np.array, activ_energy_arr: np.array, conc_coeff_arr: np.array, num_reagents: int):
+    def __init__(self, stoich_coeff_arr: np.array, activ_energy_arr: np.array, conc_coeff_arr: np.array,
+                 num_reagents: int):
+        """
+        Constructor class for differential equation solver
+
+        Parameters
+        ---------------
+        `stoich_coeff_arr` : `np.array`
+            An array of stoichiometric coefficients for each reaction that is to occur.
+        `activ_energy_arr` : `np.array`
+            An array including the activation energies of each reaction that is to occur.
+        `conc_coeff_arr` : `np.array`
+            An array including the coefficients of concentrations used to determine the rate of each reaction.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
+
+        # acquire the necessary arrays
         self.stoich_coeff_arr = stoich_coeff_arr
         self.activ_energy_arr = activ_energy_arr
         self.conc_coeff_arr = conc_coeff_arr
+
+        # specify the number of reagents being considered
         self.num_reagents = num_reagents
+
+        # set the vessel temperature parameter
         self.temp = 0
 
     def __call__(self, t, conc):
@@ -26,62 +63,106 @@ class De:
         a function that calculates the change in concentration given a current concentration
         remember to set the temperature before you call this function
         This function is mainly used with the scipy ODE solvers
+
+        Parameters
+        ---------------
+        `conc` : `np.array`
+            An array containing the initial concentrations of each material involved in the intended reactions.
+        `t` : `np.float32`
+            A necessary time-stamp.
+
+        Returns
+        ---------------
+        `conc_change` : `np.array`
+            An array of changes in concentration to each of the materials in the inputted conc array.
+
+        Raises
+        ---------------
+        None
         """
+
+        # acquire the change of concentrations array by executing the `run` function
         conc_change = self.run(conc, self.temp)
+
         return conc_change
 
     def run(self, conc, temp):
+        """
+        Method to run all the functions necessary to produce an array containing intended changes in concentration.
+
+        Parameters
+        ---------------
+        `conc` : `np.array`
+            An array containing the initial concentrations of each material involved in the intended reactions.
+        `temp` : `np.array`
+            The temperature of the vessel.
+
+        Returns
+        ---------------
+        `conc_change` : `np.array`
+            An array of changes in concentration to each of the materials in the inputted conc array.
+
+        Raises
+        ---------------
+        None
+        """
+
+        # calculate all the reaction rate constants
         k = self.get_reaction_constants(temp, conc)
+
+        # calculate the rates of each reaction
         rates = self.get_rates(k, conc)
+
+        # calculate the changes in concentration
         conc_change = self.get_conc_change(rates)
+
+        # ensure the concentration changes do not exceed limitations
         conc_change = self.conc_limit(conc_change, conc)
+
         return conc_change
 
-    def get_rates(self, k, conc):
-        rate = conc[:self.num_reagents] ** self.stoich_coeff_arr
-        rate = k * np.array([np.product(x) for x in rate])
-        return rate
-
     def get_reaction_constants(self, temp, conc):
-        R = 8.314462619
-        '''
-                Method for calculating the reaction rate constants. The reaction rate for each reaction
-                uses a reaction rate constant specific to that reaction because each reaction has a unique
-                activation energy, E. The rate constant is given by k = A * e^((-1.0 * E) / (R * T)).
-                The pre-exponential factor, A, ensures that the rate constant is of the proper units.
-                The reaction rate must be of units: mol / (L * s), but uses various concentrations of
-                reactant materials during it's calculation. Therefore, the rate constant must counter
-                or normalize these concentrations to ensure the proper rate units.
-                Therefore, A = 1 / S, for a scaling factor, S, which is calculated using the concentrations
-                of all the reactants which are used in calculating any reaction rate (normalization).
-                For example:
-                    Consider A + 2B --> C.
-                    We calculate the rate of this reaction as: r = k * (A ** 1) * (B ** 2).
-                    Therefore, the rate will have units of: [r] = [k] * mol**3 / L**3.
-                    Therefore, the units of k must be: [k] = L**2 / (mol**2 * s)
-                    Using aggregate concentrations of A and B, we define: k = A * e^((-1.0 * E) / (R * T)).
-                    The pre-exponential factor, A, defines the units of the rate constant.
-                    Therefore, the pre-exponential factor must be: A = 1 / ([A] * [B])**n
-                    For some value, n, that gets the proper rate constant units.
-                    If the concentrations of A and B are both non-zero, n = 1 gives the required units.
-                    If one of the concentrations of A or B are non-zero, n = 2 gives the required units.
-                    If both are zero, no reaction using A and B are available, so n = 1 by default.
-                    Note that n is determined by the stiochiometric coefficients of the rate as well.
-                    Therefore, we will have different scaling factors for different reactions.
-                Parameters
-                ---------------
-                `temperature` : `float`
-                    The temperature of the vessel when the reaction(s) are taking place.
-                `conc_arr` : `np.array`
-                    The array containing concentrations of each material set to take place in reaction(s).
-                Returns
-                ---------------
-                `k_arr` : `np.array`
-                    An array containing reaction rate constants for each reaction set to occur.
-                Raises
-                ---------------
-                None
-                '''
+        """
+        Method for calculating the reaction rate constants. The reaction rate for each reaction
+        uses a reaction rate constant specific to that reaction because each reaction has a unique
+        activation energy, E. The rate constant is given by k = A * e^((-1.0 * E) / (R * T)).
+        The pre-exponential factor, A, ensures that the rate constant is of the proper units.
+        The reaction rate must be of units: mol / (L * s), but uses various concentrations of
+        reactant materials during it's calculation. Therefore, the rate constant must counter
+        or normalize these concentrations to ensure the proper rate units.
+        Therefore, A = 1 / S, for a scaling factor, S, which is calculated using the concentrations
+        of all the reactants which are used in calculating any reaction rate (normalization).
+        For example:
+            Consider A + 2B --> C.
+            We calculate the rate of this reaction as: r = k * (A ** 1) * (B ** 2).
+            Therefore, the rate will have units of: [r] = [k] * mol**3 / L**3.
+            Therefore, the units of k must be: [k] = L**2 / (mol**2 * s)
+            Using aggregate concentrations of A and B, we define: k = A * e^((-1.0 * E) / (R * T)).
+            The pre-exponential factor, A, defines the units of the rate constant.
+            Therefore, the pre-exponential factor must be: A = 1 / ([A] * [B])**n
+            For some value, n, that gets the proper rate constant units.
+            If the concentrations of A and B are both non-zero, n = 1 gives the required units.
+            If one of the concentrations of A or B are non-zero, n = 2 gives the required units.
+            If both are zero, no reaction using A and B are available, so n = 1 by default.
+            Note that n is determined by the stiochiometric coefficients of the rate as well.
+            Therefore, we will have different scaling factors for different reactions.
+
+        Parameters
+        ---------------
+        `temperature` : `np.float32`
+            The temperature of the vessel when the reaction(s) are taking place.
+        `conc_arr` : `np.array`
+            The array containing concentrations of each material set to take place in reaction(s).
+
+        Returns
+        ---------------
+        `k` : `np.array`
+            An array containing reaction rate constants for each reaction set to occur.
+
+        Raises
+        ---------------
+        None
+        """
 
         # acquire the activation energies and stoichiometric coefficients for each reaction
         activ_energy_arr = self.activ_energy_arr
@@ -92,9 +173,6 @@ class De:
 
         # acquire the concentrations of the reactants from the full concentration array
         reactant_conc = conc
-
-        # we define a variable to contain the aggregate concentration value
-        agg_conc = 1
 
         # only non-zero reactant concentrations will be of use, so these are isolated
         non_zero_conc = np.array([conc for conc in reactant_conc if conc != 0.0])
@@ -127,22 +205,88 @@ class De:
             # add the scaling factor to the array of scaling factors
             scaling_arr[i] = scaling_factor
 
-        # iterate through the activate energy and scaling factor arrays to
-        # calculate the rate constants for each reaction
-        A = 1/scaling_arr
-        k = A * np.exp((-1.0 * activ_energy_arr) / (R * temp))
+        # use the activation energy and scaling factor arrays to calculate the rate constants for each reaction
+        scaling_coefficients = 1 / scaling_arr
+        k = scaling_coefficients * np.exp((-1.0 * activ_energy_arr) / (R * temp))
 
         return k
 
+    def get_rates(self, k, conc):
+        """
+        Method to calculate the rates of each reaction set to occur.
+
+        Parameters
+        ---------------
+        `k` : `np.array`
+            An array of reaction rate constants for each of the intended reactions.
+        `conc` : `np.array`
+            An array containing the initial concentrations of each material involved in the intended reactions.
+
+        Returns
+        ---------------
+        `rates` : `np.array`
+            An array of each reaction set to occur.
+
+        Raises
+        ---------------
+        None
+        """
+
+        # get the reaction rates by raising the concentrations of reactants to their stiochiometric coefficients
+        rates = conc[:self.num_reagents] ** self.stoich_coeff_arr
+
+        # multiply the rates by the intended rate constant to properly scale them
+        rates = k * np.array([np.product(x) for x in rates])
+
+        return rates
+
     def get_conc_change(self, rates):
-        dC = np.array([np.sum(x) for x in self.conc_coeff_arr * rates])
-        return dC
+        """
+        Method to calculate the changes in concentration of each material.
+
+        Parameters
+        ---------------
+        `rates` : `np.array`
+            An array containing the rates of each reaction.
+
+        Returns
+        ---------------
+        `conc_change` : `np.array`
+            An array containing the changes in concentration to each of the materials in the inputted conc array.
+
+        Raises
+        ---------------
+        None
+        """
+
+        # use the concentration coefficients and the rates of each reaction to calculate the changes in concentration
+        conc_change = np.array([np.sum(x) for x in self.conc_coeff_arr * rates])
+
+        return conc_change
 
     def conc_limit(self, conc_change, conc):
         """
-        This function makes sure that the change in concentration doesn't exceed the concentration of the reagents
-        """
-        for i in range(self.num_reagents):
-            conc_change[i] = np.max([conc_change[i], -1*conc[i]])
-        return conc_change
+        This function makes sure that the change in concentration doesn't exceed the concentration of the reagents.
 
+        Parameters
+        ---------------
+        `conc_change` : `np.array`
+            An array containing the changes in concentration to each of the materials in the inputted conc array.
+        `conc` : `np.array`
+            An array containing the initial concentrations of each material involved in the intended reactions.
+
+        Returns
+        ---------------
+        `conc_change` : `np.array`
+            A validated array containing the changes in concentration to each of the materials.
+
+        Raises
+        ---------------
+        None
+        """
+
+        # ensure that all the intended concentration changes do not exceed the initial available concentrations
+        for i in range(self.num_reagents):
+            conc_change[i] = np.max([conc_change[i], -1 * conc[i]])
+
+        return conc_change

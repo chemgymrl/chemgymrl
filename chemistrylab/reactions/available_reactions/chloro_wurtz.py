@@ -1,7 +1,7 @@
-'''
+"""
 File to specify the parameters required to instruct reaction_base.py to perform the
 chloro-wurtz reactions
-'''
+"""
 
 import numpy as np
 
