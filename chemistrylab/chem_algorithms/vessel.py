@@ -396,13 +396,18 @@ class Vessel:
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
-                    raise IOError(
-                        "An error has caused the temperature of the vessel "
-                        "to exceed the boiling point of at least one material."
+                    input(
+                        "An error has caused the temperature of the vessel to exceed the "
+                        "boiling point of at least one material. Press Enter to exit."
                     )
-            except:
-                print("No material remaining in the boil vessel. Only the vessel and air will be heated.")
-                return -1
+                    exit()
+            except ValueError:
+                print(
+                    "No material remaining in the boil vessel. "
+                    "Only the vessel and air will be heated. "
+                    "Press Enter to exit."
+                )
+                reward = -1
 
             if material_amounts:
                 # determine the material with the smallest boiling point and its value
