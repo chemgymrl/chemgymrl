@@ -131,6 +131,8 @@ class ReactionBenchEnv(gym.Env):
         self.step_num = 1
 
         # prepare the initial vessel
+        self.initial_materials = input_parameters["materials"]
+        self.initial_solutes = input_parameters["solutes"]
         self.vessels = self._prepare_vessel(
             in_vessel_path=self.in_vessel_path,
             materials=input_parameters["materials"],
@@ -311,6 +313,17 @@ class ReactionBenchEnv(gym.Env):
 
         return input_parameters
 
+    def update_vessel(self, new_vessel: vessel.Vessel):
+        new_n = np.zeros(self.reaction.nmax.shape[0], dtype=np.float32)
+        mat_dict = util.convert_material_dict_units(new_vessel.get_material_dict())
+        for i, mat in enumerate(self.reaction.materials):
+            if mat in mat_dict:
+                amount = mat_dict[mat][1]
+                new_n[i] = amount
+
+        self.vessels = new_vessel
+        self.vessels = self.reaction.reset(self.vessels)
+
     def _prepare_materials(self, materials=[]):
         '''
         Method to prepare a list of materials/solutes into a material or solute dictionary.
@@ -346,6 +359,16 @@ class ReactionBenchEnv(gym.Env):
 
         return material_dict
 
+    def _prepare_solutes(self, material_dict=None, solutes=None):
+        solute_dict = {}
+        for name, material in material_dict.items():
+            if name not in solute_dict and material[0]()._solute:
+                solute_dict[name] = {}
+                for solvent in solutes:
+                    solvent_class = convert_to_class([solvent['Material']])
+                    solute_dict[name][solvent['Material']] = [solvent_class, solvent["Initial"], 'mol']
+        return solute_dict
+
     def _prepare_vessel(self, in_vessel_path="", materials=[], solutes=[]):
         '''
         Method to prepare the initial vessel.
@@ -357,7 +380,7 @@ class ReactionBenchEnv(gym.Env):
             material_dict = self._prepare_materials(materials=materials)
 
             # prepare the solutes that have been provided
-            solute_dict = self._prepare_materials(materials=solutes)
+            solute_dict = self._prepare_solutes(material_dict=material_dict, solutes=solutes)
 
             # add the materials and solutes to an empty vessel
             vessels = vessel.Vessel(
@@ -456,6 +479,8 @@ class ReactionBenchEnv(gym.Env):
         self.t = 0.0
 
         # reinitialize the reaction class
+        self.vessels = self._prepare_vessel(in_vessel_path=None, materials=self.initial_materials, solutes=self.initial_solutes)
+
         self.vessels = self.reaction.reset(vessels=self.vessels)
 
         Ti = self.vessels.get_temperature()
@@ -472,7 +497,7 @@ class ReactionBenchEnv(gym.Env):
             [0.0], # time
             [(Ti - Tmin) / (Tmax - Tmin)], # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)], # normalized volume
-            [total_pressure / Pmax] # normalized pressure
+            [total_pressure / Pmax], # normalized pressure
             [0.0],  # time
             [(Ti - Tmin) / (Tmax - Tmin)],  # normalized temperature
             [(Vi - Vmin) / (Vmax - Vmin)],  # normalized volume

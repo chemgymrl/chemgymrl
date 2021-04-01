@@ -27,12 +27,15 @@ sys.path.append("../../") # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.chem_algorithms import vessel
+from chemistrylab.lab.de import De
+import scipy
+from scipy.integrate import solve_ivp
 
 R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", overlap=False):
+    def __init__(self, reaction_file_identifier="", overlap=False, solver='newton'):
         '''
         Constructor class module for the Reaction class.
 
@@ -89,6 +92,8 @@ class _Reaction:
         self.stoich_coeff_arr = reaction_params["stoich_coeff_arr"]
         self.conc_coeff_arr = reaction_params["conc_coeff_arr"]
 
+        self.de = De(self.stoich_coeff_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
+
         # specify the full list of materials
         self.materials = self.reactants + self.products
 
@@ -118,6 +123,15 @@ class _Reaction:
         # define variables to contain the initial materials and solutes available "in hand"
         self.initial_in_hand = np.zeros(len(self.reactants))
         self.initial_solutes = np.zeros(len(self.solutes))
+
+        self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
+
+        if solver in self.solvers:
+            self.solver = solver
+        else:
+            self.solver = 'newton'
+
+        self._solver = solve_ivp
 
         # define parameters for generating spectra
         self.params = []
@@ -310,242 +324,6 @@ class _Reaction:
 
         return C
 
-    def get_reaction_constants(self, temp, conc_arr):
-        '''
-        Method for calculating the reaction rate constants. The reaction rate for each reaction
-        uses a reaction rate constant specific to that reaction because each reaction has a unique
-        activation energy, E. The rate constant is given by k = A * e^((-1.0 * E) / (R * T)).
-
-        The pre-exponential factor, A, ensures that the rate constant is of the proper units.
-        The reaction rate must be of units: mol / (L * s), but uses various concentrations of
-        reactant materials during it's calculation. Therefore, the rate constant must counter
-        or normalize these concentrations to ensure the proper rate units.
-
-        Therefore, A = 1 / S, for a scaling factor, S, which is calculated using the concentrations
-        of all the reactants which are used in calculating any reaction rate (normalization).
-
-        For example:
-            Consider A + 2B --> C.
-            We calculate the rate of this reaction as: r = k * (A ** 1) * (B ** 2).
-            Therefore, the rate will have units of: [r] = [k] * mol**3 / L**3.
-            Therefore, the units of k must be: [k] = L**2 / (mol**2 * s)
-            Using aggregate concentrations of A and B, we define: k = A * e^((-1.0 * E) / (R * T)).
-            The pre-exponential factor, A, defines the units of the rate constant.
-            Therefore, the pre-exponential factor must be: A = 1 / ([A] * [B])**n
-            For some value, n, that gets the proper rate constant units.
-            If the concentrations of A and B are both non-zero, n = 1 gives the required units.
-            If one of the concentrations of A or B are non-zero, n = 2 gives the required units.
-            If both are zero, no reaction using A and B are available, so n = 1 by default.
-            Note that n is determined by the stiochiometric coefficients of the rate as well.
-            Therefore, we will have different scaling factors for different reactions.
-
-        Parameters
-        ---------------
-        `temperature` : `float`
-            The temperature of the vessel when the reaction(s) are taking place.
-        `conc_arr` : `np.array`
-            The array containing concentrations of each material set to take place in reaction(s).
-
-        Returns
-        ---------------
-        `k_arr` : `np.array`
-            An array containing reaction rate constants for each reaction set to occur.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # acquire the activation energies and stoichiometric coefficients for each reaction
-        activ_energy_arr = self.activ_energy_arr
-        stoich_coeff_arr = self.stoich_coeff_arr
-
-        # obtain the number of reactions set to occur
-        n_reactions = activ_energy_arr.shape[0]
-
-        # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = [conc_arr[i] for i, __ in enumerate(self.reactants)]
-
-        # we define a variable to contain the aggregate concentration value
-        agg_conc = 1
-
-        # only non-zero reactant concentrations will be of use, so these are isolated
-        non_zero_conc = [conc for conc in reactant_conc if conc != 0.0]
-
-        # we use the non-zero concentrations to define the aggregate concentration
-        for conc in non_zero_conc:
-            agg_conc *= conc
-
-        # define arrays to hold the scaling factor for each reaction
-        scaling_arr = np.zeros(n_reactions)
-
-        # iterate through each row in the activation energy and stoichiometric coefficient arrays
-        # to get the parameters required and calculate the scaling factor for each reaction
-        for i, row in enumerate(stoich_coeff_arr):
-            # get the dimensionality of the rate by summing the stoichiometric coefficients
-            rate_exponential = sum(row)
-
-            # get the dimensionality of the rate constant required to balance the rate exponential
-            rate_constant_dim = rate_exponential - 1
-
-            # get the dimensionality of the aggregate concentration
-            agg_conc_dim = len(non_zero_conc)
-
-            # calculate the exponential needed to be applied to the aggregate concentration
-            # to properly define the rate constant's pre-exponential factor
-            exponent = (rate_constant_dim) / agg_conc_dim if agg_conc_dim != 0 else 1
-
-            # apply the exponent to the aggregate rate constant to get the scaling factor
-            scaling_factor = (abs(agg_conc)) ** exponent
-
-            # add the scaling factor to the array of scaling factors
-            scaling_arr[i] = scaling_factor
-
-        # set up an array to contain the rate constants for each reaction
-        k_arr = np.zeros(n_reactions)
-
-        # iterate through the activate energy and scaling factor arrays to
-        # calculate the rate constants for each reaction
-        for i, scaling_factor in enumerate(scaling_arr):
-            # get the activation energy
-            activ_energy = activ_energy_arr[i][0]
-
-            # calculate the pre-exponential factor
-            A = 1.0 / scaling_factor
-
-            # calculate the rate constant
-            k = A * np.exp((-1.0 * activ_energy) / (R * temp))
-
-            # add the rate constant to the array of rate constants
-            k_arr[i] = k
-
-        return k_arr
-
-    def get_rates(self, k_arr, conc_arr):
-        '''
-        Method to calculate the reaction rates for every reaction that is to be performed.
-        The rates are calculated using the concentrations of reactants made available, their
-        stoichiometric coefficients, and the rate constants for each reaction.
-
-        Parameters
-        ---------------
-        `k_arr` : `np.array`
-            An array containing reaction rate constants for each reaction set to occur.
-        `conc_arr` : `bool`
-            The array containing concentrations of each material set to take place in reaction(s).
-
-        Returns
-        ---------------
-        `rates_arr` : `np.array`
-            An array containing the rate at which each reaction is to take place.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # acquire the array of stiochiometric coefficients for each reaction
-        stoich_coeff_arr = self.stoich_coeff_arr
-
-        # obtain the number of reactions set to occur (number of rows in the stoich_coeff_arr)
-        n_reactions = stoich_coeff_arr.shape[0]
-
-        # define an array to contain the rates for each reaction
-        rates_arr = np.zeros(n_reactions)
-
-        # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = [conc_arr[i] for i, __ in enumerate(self.reactants)]
-
-        # iterate through each row stoichiometric coefficients array, calculating each reaction rate
-        for i, row in enumerate(stoich_coeff_arr):
-            # get the rate constant
-            k = k_arr[i]
-
-            # set up a variable to contain the product of the concentrations
-            conc_product = 1.0
-
-            # iterate through the items in the current row to calculate the product of the
-            # concentrations exponentiated using their stoichiometric coefficients
-            for j, stoich_coeff in enumerate(row):
-                # get the reactant concentration
-                conc = reactant_conc[j]
-
-                # calculate the exponentiated concentration and include it in the product
-                conc_product *= conc ** stoich_coeff
-
-            # multiply the concentration product and the rate constant to get the reaction rate
-            rate = k * conc_product
-
-            # add the reaction rate to the array of reaction rates
-            rates_arr[i] = rate
-
-        return rates_arr
-
-    def get_conc_change(self, rates_arr, conc_arr, dt):
-        '''
-        Method to calculate the change_concentration array containing the changes in reactant and
-        product concentrations as a result of performing a reaction.
-
-        Parameters
-        ---------------
-        `rates_arr` : `np.array`
-            An array containing the rate at which each reaction is to take place.
-        `conc_arr` : `bool`
-            The array containing concentrations of each material set to take place in reaction(s).
-
-        Returns
-        ---------------
-        `change_conc_arr` : `np.array`
-            An array containing the changes in concentration of each material that has taken
-            place in the occurring reaction(s).
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # acquire the concentration coefficients array conatining the coefficients indicating the
-        # relative proportions of materials being used up or created in each reaction
-        conc_coeff_arr = self.conc_coeff_arr
-
-        # get the number of materials involved in the reactions (same as len(self.materials))
-        n_materials = conc_coeff_arr.shape[0]
-
-        # set up an array to contain the changes in concentration
-        change_conc_arr = np.zeros(n_materials)
-
-        # iterate through the concentration coefficient array,
-        # calculating the changes of each material
-        for i, row in enumerate(conc_coeff_arr):
-            # create a variable to contain the cumulative change of a material
-            cumulative_change = 0
-
-            # iterate through each coefficient in the row calculating
-            # the change in concentration from each reaction
-            for j, coefficient in enumerate(row):
-                # calculate the concentration change
-                conc_change = coefficient * rates_arr[j] * dt
-
-                # add the concentration change to the cumulative change
-                cumulative_change += conc_change
-
-            # store the overall concentration change in the change concentration array
-            change_conc_arr[i] = cumulative_change
-
-        # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = [conc_arr[i] for i, __ in enumerate(self.reactants)]
-
-        # look through the changes to the reactant concentrations and make sure they
-        # do not exceed the concentrations of reactants available
-        for i, available_conc in enumerate(reactant_conc):
-            # get the intended concentration change
-            conc_change = change_conc_arr[i]
-
-            # change the intended concentration to the available concentration, if necessary
-            change_conc_arr[i] = np.max([conc_change, -1.0 * available_conc])
-
-        return change_conc_arr
-
     def action_deconstruct(self, action):
         '''
         Method to deconstruct the action and obtain the proper thermodynamic variables and reactant
@@ -681,14 +459,15 @@ class _Reaction:
 
         # tabulate all the solutes and their values
         new_solute_dict = {}
-        for i in range(self.initial_solutes.shape[0]):
-            solute_name = self.solutes[i]
-            solute_class = self.solute_classes[i]
-            amount = self.initial_solutes[i]
+        for mat, mat_class in zip(self.materials, self.material_classes):
+            if mat not in self.solutes and mat_class()._solute:
+                for i in range(self.initial_solutes.shape[0]):
+                    solute_name = self.solutes[i]
+                    solute_class = self.solute_classes[i]
+                    amount = self.initial_solutes[i]
 
-            # create the new solute dictionary to be appended to a new vessel object
-            new_solute_dict[solute_name] = [solute_class, amount]
-
+                    # create the new solute dictionary to be appended to a new vessel object
+                    new_solute_dict[mat] = {solute_name: [solute_class, amount, 'mol']}
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
             'react_vessel',
@@ -728,8 +507,8 @@ class _Reaction:
         '''
 
         # open the provided vessel to get the material and solute dictionaries
-        material_dict = vessels._material_dict
-        solute_dict = vessels._solute_dict
+        material_dict = vessels.get_material_dict()
+        solute_dict = vessels.get_solute_dict()
 
         # acquire the amounts of reactant materials
         for i, material_name in enumerate(material_dict.keys()):
@@ -740,6 +519,18 @@ class _Reaction:
         for i, solute_name in enumerate(solute_dict.keys()):
             if solute_name in self.solutes:
                 self.initial_solutes[i] = solute_dict[solute_name][1]
+
+        vessels = vessel.Vessel(
+            'react_vessel',
+            materials=material_dict,
+            solutes=solute_dict,
+            temperature=self.Ti,
+            v_max=self.Vmax,
+            v_min=self.Vmin,
+            Tmax=self.Tmax,
+            Tmin=self.Tmin,
+            default_dt=self.dt
+        )
 
         # ensure the entire initial materials in hand array is available
         self.cur_in_hand = 1.0 * self.initial_in_hand
@@ -759,47 +550,40 @@ class _Reaction:
 
         return vessels
 
-    def update(self, temp, volume, dt):
+    def update(self, temp, volume, dt, n_steps):
         '''
         Method to update the environment.
         This involves using reactants, generating products, and obtaining rewards.
-
         Parameters
         ---------------
-        `temp` : `float`
+        T : np.float32
             The temperature of the system in Kelvin
-        `volume` : `float`
+        V : np.float32
             The volume of the system in Litres
-        `dt` : `float`
+        dt : np.float32
             The time-step demarcating separate steps
-
         Returns
         ---------------
-        None
-
+        reward : np.float32
+            The amount of the desired product created during the time-step
         Raises
         ---------------
         None
         '''
+        conc = self.get_concentration(volume)
+        self.de.temp = temp
 
-        # get an array of the concentrations of each material in the n array
-        conc_arr = self.get_concentration(volume)
-
-        # calculate the reaction rate constants using the
-        # vessel temperature and concentration array
-        k_arr = self.get_reaction_constants(temp, conc_arr)
-
-        # calculate the reaction rates using the reaction rate constants and concentration array
-        rates_arr = self.get_rates(k_arr, conc_arr)
-
-        # calculate the changes in concentration for each material in an array
-        conc_change = self.get_conc_change(rates_arr, conc_arr, dt)
-
-        # iterate through each material in the n array and update it's amount
-        for i in range(self.n.shape[0]):
-            dn = conc_change[i] * volume # convert back to moles
-            self.n[i] += dn # update the molar amount array
-
+        if self.solver != 'newton':
+            new_conc = self._solver(self.de, (0, dt * n_steps), conc, method=self.solver).y[:, -1]
+            for i in range(self.n.shape[0]):
+                # convert back to moles
+                self.n[i] = new_conc[i] * volume  # update the molar amount array
+        else:
+            conc_change = self.de.run(conc, temp) * dt
+            for i in range(self.n.shape[0]):
+                # convert back to moles
+                dn = conc_change[i] * volume
+                self.n[i] += dn  # update the molar amount array
         # check the list of molar amounts and set negligible amounts to 0
         for i, amount in enumerate(self.n):
             if amount < self.threshold:
@@ -837,6 +621,8 @@ class _Reaction:
         temperature, volume = self.vessel_deconstruct(vessels=vessels)
 
         # perform the complete action over a series of increments
+        if self.solver != 'newton':
+            n_steps = 1
         for __ in range(n_steps):
             # split the overall temperature change into increments,
             # ensure it does not exceed the maximal and minimal temperature values
@@ -875,7 +661,8 @@ class _Reaction:
             self.update(
                 temperature,
                 volume,
-                vessels.get_defaultdt()
+                vessels.get_defaultdt(),
+                n_steps
             )
 
         # create a new reaction vessel containing the final materials
@@ -1023,12 +810,6 @@ class _Reaction:
         None
         '''
 
-        # get the concentration array
-        conc = self.get_concentration(volume)
-
-        # set the default reaction constants
-        k = self.get_reaction_constants(temp, conc)
-
         # set arrays to keep track of the time and concentration
         t = np.zeros(n_steps, dtype=np.float32)
         conc = np.zeros((n_steps, 4), dtype=np.float32)
@@ -1037,9 +818,7 @@ class _Reaction:
         conc[0] = conc[0] * self.initial_in_hand
 
         for i in range(1, n_steps):
-            conc = self.get_concentration(volume)
-            rates = self.get_rates(k, conc)
-            conc_change = self.get_conc_change(rates, conc, dt)
+            conc_change = self.de.run(conc[i-1], temp)
 
             # update plotting info
             conc[i] = conc[i-1] + conc_change

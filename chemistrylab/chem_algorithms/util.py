@@ -19,7 +19,7 @@ VOLUME_TABLE = {'l': 1,
                 }
 
 def convert_material_dict_to_volume(material_dict,
-                                    unit
+                                    unit='l'
                                     # the density of solution does not affect the original volume of solvent
                                     ):
 
@@ -31,6 +31,7 @@ def convert_material_dict_to_volume(material_dict,
     volume_dict = {}
     total_volume = 0
     for M in material_dict:
+
         if not material_dict[M][0]().is_solute():
             mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
 
@@ -43,6 +44,7 @@ def convert_material_dict_to_volume(material_dict,
 
             volume_dict[M] = volume
             total_volume += volume
+
     return volume_dict, total_volume
 
 
@@ -69,7 +71,7 @@ def organize_solute_dict(material_dict,
         if material_dict[M][0]().is_solvent():  # if the material is solvent add to each solute with 0.0 amount
             for Solute in solute_dict:
                 if M not in solute_dict[Solute]:
-                    solute_dict[Solute][M] = [0.0, 'mol']
+                    solute_dict[Solute][M] = [material_dict[M][0], 0.0, 'mol']
     new_solute_dict = copy.deepcopy(solute_dict)
     for Solute in solute_dict:  # remove solute if it's not in material dict (avoid Solute: [Solvent, 0.0] )
         if Solute not in material_dict:
@@ -80,7 +82,7 @@ def organize_solute_dict(material_dict,
 def check_overflow(material_dict,
                    solute_dict,
                    v_max,
-                   unit
+                   unit='l'
                    ):
     __, total_volume = convert_material_dict_to_volume(material_dict, unit)  # convert from mole to
     overflow = total_volume - v_max  # calculate overflow
@@ -94,7 +96,7 @@ def check_overflow(material_dict,
         if solute_dict:  # if not empty
             for Solute in solute_dict:
                 for Solvent in solute_dict[Solute]:
-                    solute_dict[Solute][Solvent][0] *= d_percentage  # update the solute_dict based on percentage
+                    solute_dict[Solute][Solvent][1] *= d_percentage  # update the solute_dict based on percentage
 
     return material_dict, solute_dict, reward
 
@@ -151,7 +153,7 @@ def generate_state(vessel_list,
             solute_index = solute_class.get_index()
             for solvent in solute_dict[solute]:
                 solvent_index = all_materials[1][all_materials[0].index(solvent)]().get_index()
-                solute_dict_matrix[solute_index, solvent_index] = solute_dict[solute][solvent][0]
+                solute_dict_matrix[solute_index, solvent_index] = solute_dict[solute][solvent][1]
 
         current_vessel_state = [material_dict_matrix, solute_dict_matrix, layer_vector]
         state.append(current_vessel_state)
@@ -245,6 +247,6 @@ def convert_solute_dict_units(solute_dict):
         for solvent, item in solvents.items():
             unit = 'mol'
             if len(item) == 2:
-                unit = item[1]
-            new_solute_dict[solute][solvent] = [convert_unit_to_mol(solvent, item[0], unit)]
+                unit = item[2]
+            new_solute_dict[solute][solvent] = [item[0], convert_unit_to_mol(solvent, item[1], unit)]
     return new_solute_dict
