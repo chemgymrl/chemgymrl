@@ -1370,33 +1370,14 @@ class Vessel:
 
         self.v_max = util.convert_volume(volume, unit)
 
-    def get_unit(self):
-        """
-        Method to get the unit
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        `unit` : `str`
-            The unit being used in the vessel
-
-        Raises
-        ---------------
-        None
-        """
-
-        return self.unit
-
-    def get_concentration(self):
+    def get_concentration(self, materials=[]):
         """
         Method to convert molar volume to concentration.
 
         Parameters
         ---------------
-        None
+        `materials` : `list`
+            List of materials to check against the material dictionary.
 
         Returns
         ---------------
@@ -1408,13 +1389,37 @@ class Vessel:
         None
         """
 
+        # if not initially provided, fill the materials list with the materials in the vessel
+        if not materials:
+            materials = list(self._material_dict.keys())
+
+        # get the vessel volume
         V = self.get_volume()
-        n = np.array([item[1] for __, item in self._material_dict.items()])
+
+        # set up lists to contain the vessel's materials and the material amounts
+        materials_in_vessel = []
+        n_list = []
+
+        # iteracte through the material dictionary to update the above lists
+        for key, item in self._material_dict.items():
+            materials_in_vessel.append(key)
+            n_list.append(item[1])
+
+        # convert the list of amounts to an array
+        n = np.array(n_list)
 
         # create an array containing the concentrations of each chemical
-        C = np.zeros(n.shape[0], dtype=np.float32)
-        for i in range(n.shape[0]):
-            C[i] = n[i] / V
+        C = np.zeros(len(materials), dtype=np.float32)
+
+        # iterate through the materials required in the concentration array
+        for i, req_material in enumerate(materials):
+            # if the requested material is not in the vessel, assign a concentration of 0
+            if req_material not in materials_in_vessel:
+                C[i] = 0
+            else:
+                # if the requested material is found, acquire the material's concentration in the vessel
+                material_index = materials_in_vessel.index(req_material)
+                C[i] = n[material_index] / V
 
         return C
 
