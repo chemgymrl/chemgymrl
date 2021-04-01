@@ -1,4 +1,4 @@
-'''
+"""
 Module to perform a series of reactions as specified by an accompanying reaction file.
 
 :title: reaction_base.py
@@ -6,7 +6,7 @@ Module to perform a series of reactions as specified by an accompanying reaction
 :author: Mark Baula, Nicholas Paquin, and Mitchell Shahen
 
 :history: 22-06-2020
-'''
+"""
 
 # pylint: disable=import-error
 # pylint: disable=invalid-name
@@ -23,20 +23,20 @@ import types
 import numpy as np
 import matplotlib.pyplot as plt
 
-sys.path.append("../../") # allows the module to access chemistrylab
+sys.path.append("../../")  # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.lab.de import De
-import scipy
 from scipy.integrate import solve_ivp
 
 R = 8.314462619
 
+
 class _Reaction:
 
     def __init__(self, reaction_file_identifier="", overlap=False, solver='newton'):
-        '''
+        """
         Constructor class module for the Reaction class.
 
         Parameters
@@ -54,7 +54,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # define a name/label for this reaction base class
         self.name = "base_reaction"
@@ -124,8 +124,10 @@ class _Reaction:
         self.initial_in_hand = np.zeros(len(self.reactants))
         self.initial_solutes = np.zeros(len(self.solutes))
 
+        # include the available solvers
         self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
 
+        # select the intended solver or use the default
         if solver in self.solvers:
             self.solver = solver
         else:
@@ -143,7 +145,7 @@ class _Reaction:
 
     @staticmethod
     def _find_reaction_file(reaction_file=""):
-        '''
+        """
         Method to attempt to find the requested reaction file. Currently, the name of the
         reaction file is needed for specifying the requested reaction file.
 
@@ -163,7 +165,7 @@ class _Reaction:
         ---------------
         `IOError`:
             Raised if the requested reaction file is not found in the available reactions directory.
-        '''
+        """
 
         # acquire the path to the reactions directory containing
         # this file and the available reactions directory
@@ -188,7 +190,7 @@ class _Reaction:
         if reaction_file in reaction_files_no_ext:
             output_reaction_file = os.path.join(
                 r_files_dir,
-                reaction_file + ".py" # re-add the extension
+                reaction_file + ".py"  # re-add the extension
             )
         else:
             raise IOError("ERROR: Requested Reaction File Not Found in Directory!")
@@ -197,7 +199,7 @@ class _Reaction:
 
     @staticmethod
     def _get_reaction_params(reaction_filepath=""):
-        '''
+        """
         Method to acquire the necessary reaction parameters from the specified
         reaction file and make them available.
 
@@ -216,7 +218,7 @@ class _Reaction:
         ---------------
         `TypeError`:
             Raised when the acquired module, by means of `importlib`, is not a `ModuleType` object.
-        '''
+        """
 
         # cut the full reaction filepath to just the filename
         reaction_filename = reaction_filepath.split("\\")[-1]
@@ -252,7 +254,7 @@ class _Reaction:
         return output_params
 
     def get_ni_label(self):
-        '''
+        """
         Method to obtain the names of all the reactants used in the experiment.
 
         Parameters
@@ -267,14 +269,14 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         labels = ['[{}]'.format(reactant) for reactant in self.reactants]
 
         return labels
 
     def get_ni_num(self):
-        '''
+        """
         Method to determine which chemicals are available for use.
 
         Parameters
@@ -289,7 +291,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # populate a list with the available chemicals
         num_list = []
@@ -298,34 +300,8 @@ class _Reaction:
 
         return num_list
 
-    def get_concentration(self, V=0.1):
-        '''
-        Method to convert molar volume to concentration.
-
-        Parameters
-        ---------------
-        `V` : `float` (default=0.1)
-            The volume of the system in L
-
-        Returns
-        ---------------
-        `C` : `np.array`
-            An array of the concentrations (in mol/L) of each chemical in the experiment.
-
-        Raises
-        ---------------
-        None
-        '''
-
-        # create an array containing the concentrations of each chemical
-        C = np.zeros(self.n.shape[0], dtype=np.float32)
-        for i in range(self.n.shape[0]):
-            C[i] = self.n[i] / V
-
-        return C
-
     def action_deconstruct(self, action):
-        '''
+        """
         Method to deconstruct the action and obtain the proper thermodynamic variables and reactant
         amounts that can be used in further methods.
 
@@ -347,7 +323,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # the first action parameter is the requested change in temperature;
         # action[0] = 0.0 indicates a temperature change of -dT
@@ -388,7 +364,7 @@ class _Reaction:
         return temp_change, volume_change, delta_n_array
 
     def vessel_deconstruct(self, vessels):
-        '''
+        """
         Method to deconstruct and acquire key properties of the inputted vessel.
         Additionally, the n array is given the appropriate values.
         Notable properties include the temperature and volume.
@@ -408,7 +384,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # obtain the material dictionary
         material_dict = vessels._material_dict
@@ -428,7 +404,7 @@ class _Reaction:
         return temperature, volume
 
     def update_vessel(self, temperature, volume):
-        '''
+        """
         Method to update the provided vessel object with materials from the reaction base
         and new thermodynamic variables.
 
@@ -447,7 +423,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # tabulate all the materials used and their new values
         new_material_dict = {}
@@ -468,6 +444,7 @@ class _Reaction:
 
                     # create the new solute dictionary to be appended to a new vessel object
                     new_solute_dict[mat] = {solute_name: [solute_class, amount, 'mol']}
+
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
             'react_vessel',
@@ -486,9 +463,8 @@ class _Reaction:
 
         return new_vessel
 
-
     def reset(self, vessels):
-        '''
+        """
         Method to reset the environment and vessel back to its initial state.
         Empty the initial n array and reset the vessel's thermodynamic properties.
         Parameters
@@ -504,7 +480,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # open the provided vessel to get the material and solute dictionaries
         material_dict = vessels.get_material_dict()
@@ -550,47 +526,57 @@ class _Reaction:
 
         return vessels
 
-    def update(self, temp, volume, dt, n_steps):
-        '''
+    def update(self, conc, temp, volume, dt, n_steps):
+        """
         Method to update the environment.
         This involves using reactants, generating products, and obtaining rewards.
+
         Parameters
         ---------------
-        T : np.float32
+        conc : np.array
+            An array containing the concentrations of each material in the vessel.
+        temp : np.float32
             The temperature of the system in Kelvin
-        V : np.float32
+        volume : np.float32
             The volume of the system in Litres
         dt : np.float32
             The time-step demarcating separate steps
+        n_steps : np.int64
+            The number of steps into which the action has been divided.
+
         Returns
         ---------------
         reward : np.float32
             The amount of the desired product created during the time-step
+
         Raises
         ---------------
         None
-        '''
-        conc = self.get_concentration(volume)
+        """
+
+        # set the intended vessel temperature in the differential equation module
         self.de.temp = temp
 
+        # implement the differential equation solver
         if self.solver != 'newton':
             new_conc = self._solver(self.de, (0, dt * n_steps), conc, method=self.solver).y[:, -1]
             for i in range(self.n.shape[0]):
-                # convert back to moles
-                self.n[i] = new_conc[i] * volume  # update the molar amount array
+                # convert back to moles and update the molar amount array
+                self.n[i] = new_conc[i] * volume
         else:
             conc_change = self.de.run(conc, temp) * dt
             for i in range(self.n.shape[0]):
-                # convert back to moles
+                # convert back to moles and update the molar amount array
                 dn = conc_change[i] * volume
-                self.n[i] += dn  # update the molar amount array
+                self.n[i] += dn
+
         # check the list of molar amounts and set negligible amounts to 0
         for i, amount in enumerate(self.n):
             if amount < self.threshold:
                 self.n[i] = 0
 
     def perform_action(self, action, vessels: vessel.Vessel, n_steps):
-        '''
+        """
         Update the environment with processes defined in `action`.
 
         Parameters
@@ -612,9 +598,9 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
-        # deconstruct the action
+        # deconstruct the action to get changes in temperature, volume, and molar amount
         temperature_change, volume_change, delta_n_array = self.action_deconstruct(action=action)
 
         # deconstruct the vessel: acquire the vessel temperature and volume and create the n array
@@ -659,6 +645,7 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
+                vessels.get_concentration(),
                 temperature,
                 volume,
                 vessels.get_defaultdt(),
@@ -670,14 +657,14 @@ class _Reaction:
 
         return vessels
 
-    def get_spectra(self, V):
-        '''
+    def get_spectra(self, C):
+        """
         Class method to generate total spectral data using a guassian decay.
 
         Parameters
         ---------------
-        V : np.float32
-            The volume of the system in Litres
+        C : np.array
+            An array containing the concentrations of materials in the vessel.
 
         Returns
         ---------------
@@ -687,19 +674,13 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
-
-        # convert the volume in litres to the volume in m**3
-        V = V / 1000
+        """
 
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
         # define an array to contain absorption data
         absorb = np.zeros(x.shape[0], dtype=np.float32)
-
-        # obtain the concentration array
-        C = self.get_concentration(V)
 
         # iterate through the spectral parameters in self.params and the wavelength space
         for i, item in enumerate(self.params):
@@ -709,7 +690,7 @@ class _Reaction:
                     height = item[j, 0]
                     decay_rate = np.exp(
                         -0.5 * (
-                            (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
+                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
                         ) ** 2.0
                     )
                     if decay_rate < 1e-30:
@@ -721,14 +702,14 @@ class _Reaction:
 
         return absorb
 
-    def get_spectra_peak(self, V):
-        '''
+    def get_spectra_peak(self, C):
+        """
         Method to populate a list with the spectral peak of each chemical.
 
         Parameters
         ---------------
-        V : np.float32
-            The volume of the system in litres.
+        C : np.array
+            An array containing the concentrations of all the materials in the vessel.
 
         Returns
         ---------------
@@ -738,10 +719,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
-
-        # get the concentration of each chemical
-        C = self.get_concentration(V)
+        """
 
         # create a list of the spectral peak of each chemical
         spectra_peak = []
@@ -751,16 +729,17 @@ class _Reaction:
                 C[i] * self.params[i][:, 0],
                 material
             ])
+
         return spectra_peak
 
-    def get_dash_line_spectra(self, V):
-        '''
+    def get_dash_line_spectra(self, C):
+        """
         Module to generate each individual spectral dataset using gaussian decay.
 
         Parameters
         ---------------
-        V : np.float32
-            The volume of the system in Litres
+        C : np.array
+            An array containing the concentrations of materials in the vessel.
 
         Returns
         ---------------
@@ -770,10 +749,9 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         dash_spectra = []
-        C = self.get_concentration(V)
 
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
@@ -785,7 +763,7 @@ class _Reaction:
                     height = item[j, 0]
                     decay_rate = np.exp(
                         -0.5 * (
-                            (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
+                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
                         ) ** 2.0
                     )
                     each_absorb += amount * height * decay_rate
@@ -793,13 +771,18 @@ class _Reaction:
 
         return dash_spectra
 
-    def plot_graph(self, temp=300, volume=1, pressure=101.325, dt=0.01, n_steps=500, save_name=None):
-        '''
+    def plot_graph(self, temp=300.0, dt=0.01, n_steps=500, save_name=None):
+        """
         Method to plot the concentration, pressure, temperature, time, and spectral data.
 
         Parameters
         ---------------
-        None
+        `temp` : `np.float32`
+            The temperature of the vessel when the reaction(s) are taking place.
+        `dt` : `np.float32`
+            The default time-step.
+        `n_steps` : `np.int64`
+            The number of steps to divide the overall plot updating into.
 
         Returns
         ---------------
@@ -808,7 +791,7 @@ class _Reaction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # set arrays to keep track of the time and concentration
         t = np.zeros(n_steps, dtype=np.float32)
@@ -818,11 +801,11 @@ class _Reaction:
         conc[0] = conc[0] * self.initial_in_hand
 
         for i in range(1, n_steps):
-            conc_change = self.de.run(conc[i-1], temp)
+            conc_change = self.de.run(conc[i - 1], temp)
 
             # update plotting info
-            conc[i] = conc[i-1] + conc_change
-            t[i] = t[i-1] + dt
+            conc[i] = conc[i - 1] + conc_change
+            t[i] = t[i - 1] + dt
 
         plt.figure()
 
@@ -841,10 +824,10 @@ class _Reaction:
         plt.close()
 
     def plotting_step(self, t, tmax, vessels: vessel.Vessel):
-        '''
+        """
         Set up a method to handle the acquisition of the necessary plotting parameters
         from an input vessel.
-        '''
+        """
 
         # acquire the necessary parameters from the vessel
         T = vessels.get_temperature()
@@ -857,27 +840,27 @@ class _Reaction:
         plot_data_concentration = [[] for _ in range(self.n.shape[0])]
 
         # Record time data
-        plot_data_state[0].append(t/tmax)
+        plot_data_state[0].append(t / tmax)
 
         # record temperature data
         Tmin = vessels.get_Tmin()
         Tmax = vessels.get_Tmax()
-        plot_data_state[1].append((T - Tmin)/(Tmax - Tmin))
+        plot_data_state[1].append((T - Tmin) / (Tmax - Tmin))
 
         # record volume data
         Vmin = vessels.get_min_volume()
         Vmax = vessels.get_max_volume()
-        plot_data_state[2].append((V - Vmin)/(Vmax - Vmin))
+        plot_data_state[2].append((V - Vmin) / (Vmax - Vmin))
 
         # record pressure data
         P = vessels.get_pressure()
         # P = 1175.6600956686177
         plot_data_state[3].append(
-            P/vessels.get_pmax()
+            P / vessels.get_pmax()
         )
 
         # calculate and record the molar concentrations of the reactants and products
-        C = self.get_concentration(V)
+        C = vessels.get_concentration()
         for j in range(self.n.shape[0]):
             plot_data_mol[j].append(self.n[j])
             plot_data_concentration[j].append(C[j])
@@ -906,7 +889,6 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-
         if first_render:
             plt.close('all')
             plt.ion()
@@ -933,7 +915,6 @@ class _Reaction:
             )[0]
             self._plot_axs[1].set_ylim([0, 1])
 
-
             # draw the graph and show it
             self._plot_fig.canvas.draw()
             plt.show()
@@ -956,7 +937,8 @@ class _Reaction:
             self._plot_fig.canvas.draw()
             plt.pause(0.000001)
 
-    def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration, n_steps, vessels: vessel.Vessel):
+    def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration,
+                         n_steps, vessels: vessel.Vessel):
 
         num_list = [plot_data_state[0][0],
                     plot_data_state[1][0],
@@ -978,8 +960,8 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = self.get_spectra_peak(vessels.get_volume())
-        dash_spectra = self.get_dash_line_spectra(vessels.get_volume())
+        peak = self.get_spectra_peak(vessels.get_concentration())
+        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration())
 
         # The first render is required to initialize the figure
         if first_render:
