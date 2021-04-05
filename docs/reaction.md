@@ -40,9 +40,9 @@ being performed by the agent. There are two main plot modes:
 ![human render output](../tutorial_figures/human_render_reaction.png)
 
 - Full Render
-  -  Plots thermodynamic variables and spectral data. The full render plots a significant amount of data for a more 
+    -  Plots thermodynamic variables and spectral data. The full render plots a significant amount of data for a more 
     in-depth understanding of the information portrayed.
-  - In addition to the data human render plots, full render also plots the molar amount, molar concentration, and 
+    - In addition to the data human render plots, full render also plots the molar amount, molar concentration, and 
     absorbance of both reactants and products. It also plots the temperature and pressure mapped to range between 0 and 
     1, as well as the pressure in units kPa.            
 
