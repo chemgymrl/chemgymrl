@@ -12,7 +12,7 @@ An agent tasked to operate on this bench must control the heat energy added to t
 
 The input to the extraction bench is initialized in the `distillation_bench_v1.py` file.
 
-![distillation bench input](../tutorial_figures/distillation_bench_input.png)
+![distillation bench input](../tutorial_figures/distillation_bench_input.PNG)
 
 Here we pass the boiling vessel, which is typically the pickle file produced by the extraction bench. Like in the other 
 engines we also pass the target material. Additionally, we pass in a dQ value which is the maximal change in heat 
