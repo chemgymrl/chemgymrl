@@ -51,6 +51,3 @@ being performed by the agent. There are two main plot modes:
 In addition to these plots, the reaction engine will also provide a vessel of the completed reaction which contains 
 information on the updated thermodynamic variables, material dictionary, and solute dictionary after the reaction. This 
 vessel is contained within a pickle file with the default name `reaction_vessel.pickle`.
-
-Lastly like in most openAI gym environments, once the step function is called the environment will return the state, 
-reward, done indicator, and any additional parameters. 
