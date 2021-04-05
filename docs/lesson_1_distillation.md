@@ -234,7 +234,7 @@ We can again pour the contents of the condensation vessel to the storage vessel
 
 Notice now that all the materials are in the condensation vessel.
 
-![pour boiling vessel](../tutorial_figures/pour-bv.PNG)
+![pour boiling vessel](../tutorial_figures/pour-bv.png)
 
 #### Step 5: Ending the experiment
 
