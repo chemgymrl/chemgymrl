@@ -18,7 +18,13 @@ Who takes decisions in an environment based on rewards and punishments.
 
 #### Bench
 
+
+
 ## C
+
+#### Characterization
+
+
 
 #### Command Line
 
@@ -53,6 +59,8 @@ A material is a substance or mixture of substances that constitutes an object.
 ## O
 
 #### Observation
+
+
 
 ## R
 
