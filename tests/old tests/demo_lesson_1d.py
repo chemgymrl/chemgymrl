@@ -23,8 +23,8 @@ print(env_ids)
 
 # allows user to pick which environment they want to use
 # initializes environment
-select_env = int(input(f"Enter a number to choose which environment you want to run (0 - {len(env_ids) - 1}): \n"))
-env = gym.make(env_ids[select_env])
+# select_env = int(input(f"Enter a number to choose which environment you want to run (0 - {len(env_ids) - 1}): \n"))
+env = gym.make('Distillation-v0')
 render_mode = "human"
 
 done = False
@@ -39,11 +39,9 @@ print('\n')
 #   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
 #   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
 #   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   3: Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)
-#   4: Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)
-#   5: Done (Value doesn't matter)
+#   3: Done (Value doesn't matter)
 
-action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
+action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Done']
 assert env.action_space.shape[0] == 2
 print(env.action_space)
 
@@ -77,26 +75,9 @@ while not done:
     print('Temperature of boiling vessel: %.1f ' % env.boil_vessel.temperature, ' K \n')
     # print(state)
 
-
-    # render the plot
+     # render the plot
     env.render(mode=render_mode)
     # sleep(1)
 
-    #temp.append(env.state[1])
-    steps_over_time.append(total_steps)
-
     #increment one step
     total_steps += 1
-
-'''
-temp = pd.Series(temp)
-steps_over_time = pd.Series(steps_over_time)
-
-plt.plot(steps_over_time,temp)
-plt.ylabel('temperature')
-plt.xlabel('steps')
-plt.savefig('steps vs temperature')
-plt.tight_layout()
-plt.savefig('Distilattion Lesson 1 Graph')
-plt.show()
-'''

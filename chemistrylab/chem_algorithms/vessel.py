@@ -405,9 +405,8 @@ class Vessel:
                 print(
                     "No material remaining in the boil vessel. "
                     "Only the vessel and air will be heated. "
-                    "Press Enter to exit."
                 )
-                reward = -1
+                return -1
 
             if material_amounts:
                 # determine the material with the smallest boiling point and its value

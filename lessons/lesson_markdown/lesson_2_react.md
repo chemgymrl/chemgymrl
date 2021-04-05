@@ -1,3 +1,26 @@
+## Reaction Bench Lesson 2
+
+### Getting a high reward in a reaction of form: 
+
+- A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
+
+In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be taking an in depth look at in this lesson is specifically:
+- 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
+
+We will try to get the desired material: 4,5-diethyloctane
+
+In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions file. This particular lesson will use the reaction file 'chloro_wurtz_v1.py' and is registered under the id 'WurtzReact-v2'
+
+From lesson 1 we know that our action space is a 6 element vector represented by:
+
+|              | Temperature | Volume | 1-chlorohexane | 2 chlorohexane | 3-chlorohexane | Na  | 
+|--------------|-------------|--------|----------------|----------------|----------------|-----|
+| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1|
+
+First let's start by importing all the modules we need.
+
+
+```python
 # import all the required external modules
 import gym
 import numpy as np
@@ -8,19 +31,30 @@ from time import sleep
 from gym import envs
 import matplotlib.pyplot as plt
 import pandas as pd
+%matplotlib inline
 
 # ensure all necessary modules can be found
-sys.path.append("../../../tests/") # to access chemistrylab
+sys.path.append("../") # to access chemistrylab
 sys.path.append("../chemistrylab/reactions") # to access all reactions
 
 # import all local modules
 import chemistrylab
+```
 
+This will show all the environments we can currently run. Eventually you can create your own environments with different reactions and target material using the reaction template.
+
+
+```python
 # show all environments for reaction bench
 all_envs = envs.registry.all()
 env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
+```
 
+This explains the simulated reaction we are trying to simulate and is initializing the reaction environment.
+
+
+```python
 # trying to get high reward for wurtz reaction of form:
 # A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
 # Rewards comes from producing A-A or B-B
@@ -29,7 +63,10 @@ print(env_ids)
 # initializes environment
 env = gym.make("WurtzReact-v2")
 render_mode = "human"
+```
 
+
+```python
 done = False
 __ = env.reset()
 
@@ -39,7 +76,12 @@ num_actions_available = env.action_space.shape[0]
 
 total_steps=0
 total_reward=0
+```
 
+We will store certain values in these arrays so can plot them later on to visually show how each variable changes over time.
+
+
+```python
 reward_over_time=[]
 steps_over_time=[]
 reactant_1 = []
@@ -47,7 +89,23 @@ reactant_2 = []
 total_reward_over_time = []
 
 action = np.ones(env.action_space.shape)
+```
 
+The key to achieving a high reward in this simulation is to only add the reactants that are needed for the reaction to 
+continue. This means that we will only add 3-chlorohexane and Na with our actions. This will allow us to maximize our 
+reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
+do this by running the following commands:
+
+![actions](../tutorial_figures/actions_reaction.png)
+
+Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane
+
+![reaction](../tutorial_figures/reaction.png)
+
+Let's run our program and see what happens!
+
+
+```python
 while not done:
     # Actions:
     #   a[0] changes the temperature between -dT (a[0] = 0.0) and +dT (a[0] = 1.0)
@@ -56,8 +114,8 @@ while not done:
     if total_steps  < 20:
         action[0] = 1
         action[1] = 1
-        action[2] = 1    # 1-chlorohexane
-        action[3] = 1    # 2-chlorohexane
+        action[2] = 0    # 1-chlorohexane
+        action[3] = 0    # 2-chlorohexane
         action[4] = 1    # 3-chlorohexane
         action[5] = 1    # Na
 
@@ -93,13 +151,22 @@ while not done:
     steps_over_time.append(total_steps)
     reactant_1.append(env.state[6])
     reactant_2.append(env.state[7])
+```
 
+Notice that we get a total reward of 2.45. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
+
+![subplot](../tutorial_figures/subplots.PNG)
+
+This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
+
+
+```python
 # ask user if they want to see stats of reaction vessel
 show_stats = input("Show Reaction Vessel Stats ('Y'/'N') >>> ")
 
 if show_stats.lower() in ["y", "yes"]:
     # open and check the material dict
-    vessel_path = os.path.join(os.getcwd(), "reaction_vessel.pickle")
+    vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
     with open(vessel_path, 'rb') as open_file:
         v = pickle.load(open_file)
 
@@ -122,15 +189,12 @@ if show_stats.lower() in ["y", "yes"]:
     print("---------- SOLUTE_DICT ----------")
     for solute, value_list in v._solute_dict.items():
         print("{} : {}".format(solute, value_list))
+```
 
-reward_over_time = pd.Series(reward_over_time)
-steps_over_time = pd.Series(steps_over_time)
+This part of the code plots certain states over time.
 
-reward_over_time = pd.Series(reward_over_time)
-total_reward_over_time = pd.Series(total_reward_over_time)
-steps_over_time = pd.Series(steps_over_time)
-reactant_1 = pd.Series(reactant_1)
-reactant_2 = pd.Series(reactant_2)
+
+```python
 
 # graph states over time
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(4)
@@ -157,3 +221,12 @@ ax4.set_ylabel('Total Reward')
 fig.tight_layout()
 plt.savefig('Final Subplots Demo Lesson 3.png')
 plt.show()
+```
+
+For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again.
+
+![code](../tutorial_figures/actions_for_bad_reward.PNG)
+
+If we run this code we'll notice that our reward is significantly lower. It is now only 1.06 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
+
+The next step for this reaction environment is to write an RL implementation that will allow the agent to solve this problem for you essentially maximizing our output of the desired material! 

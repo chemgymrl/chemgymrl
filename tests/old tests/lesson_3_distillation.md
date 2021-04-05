@@ -8,7 +8,7 @@ Essentially what we're trying to do is isolate our targeted material into the co
 
 In this tutorial we will be trying to get a high reward by targeting our desired material *dodecane*. We will heat up the boiling vessel to a temperature right before dodecane's boiling point (489.5 Kelvin) which will allow us to boil off every other material in the boiling vessel into beaker 1. 
 
-![boiling](../sample_figures/lesson_3d_image0.PNG)
+![boiling](../tutorial_figures/lesson_3d_image0.PNG)
 
 Then we will dump all the contents currently in beaker 1, which is not dodecane into beaker 2. Finally we will heat up boiling vessel even more to exceed dodecane's boiling temperature thus boiling it into beaker 1. This will allow us to have a beaker that is mostly dodecane thus getting us a high reward.
 
