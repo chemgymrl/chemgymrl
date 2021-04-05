@@ -47,3 +47,10 @@ being performed by the agent. There are two main plot modes:
     1, as well as the pressure in units kPa.            
 
 ![full render output](../tutorial_figures/full_render_reaction.png)
+
+In addition to these plots, the reaction engine will also provide a vessel of the completed reaction which contains 
+information on the updated thermodynamic variables, material dictionary, and solute dictionary after the reaction. This 
+vessel is contained within a pickle file with the default name `reaction_vessel.pickle`.
+
+Lastly like in most openAI gym environments, once the step function is called the environment will return the state, 
+reward, done indicator, and any additional parameters. 
