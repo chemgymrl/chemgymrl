@@ -180,7 +180,7 @@ We will now lower the temperature the absolute minimum it can be and see what ha
 
 Running this results in the following graph:
 
-![graph](../tutorial_figures/decrease_temp.png)
+![graph](../tutorial_figures/decrease_temp.PNG)
 
 As you will notice, nothing really changes. Of course this isn't much of a surprise since by lowering the temperature  none of the materials in the boiling vessel will boil into the condensation vessel (in this case; if you have materials  with lower boiling points this will change). You'll notice that the minimum temperature the boiling vessel will reach is  297 Kelvin.
 
