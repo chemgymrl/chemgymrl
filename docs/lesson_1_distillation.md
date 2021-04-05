@@ -18,7 +18,7 @@ In the distillation environment there are 3 main containers or vessels.
 
 The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials  that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.
 
-![vessels](/tutorial_figures/vessels_image.png)
+![vessels](../tutorial_figures/vessels_image.png)
 
 The point of the process is to extract a target material from the boiling vessel, which contains numerous materials, and we do this by utilizing the different material's boiling points. Typically the process begins by raising the temperature of the BV which allows certain materials in that vessel to boil off into the condensation vessel or B1. 
 
