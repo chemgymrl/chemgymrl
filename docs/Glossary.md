@@ -8,7 +8,7 @@ Serves as a reference for some of the key terms used in this documentation.
 
 #### Action
 
-What the agent does in an environment to obtain a reward.
+What the agent does in an environment in order to obtain a reward.
 
 #### Agent
 
@@ -36,19 +36,7 @@ Distillation is a process where components of a mixture are seperated using thei
 
 #### Extraction
 
-Extraction is a process done to separate components of a mixture using different densities.
-
-## F
-
-## G
-
-## H
-
-## I
-
-## J
-
-## K
+Extraction is a separation process consisting in the separation of a substance from a matrix using different densities.
 
 ## L
 
@@ -62,15 +50,9 @@ Lab managers direct and inspect results from sub agents that carry out tasks for
 
 A material is a substance or mixture of substances that constitutes an object. 
 
-## N
-
 ## O
 
 #### Observation
-
-## P
-
-## Q
 
 ## R
 
@@ -92,20 +74,8 @@ The component that is not present in excess in the solution.
 
 The liquid in which a solute is dissolved to form a solution.
 
-## T
-
-## U 
-
 ## V
 
 #### Vessel
 
 A container used to hold mixtures or materials in ChemGymRL experiments.
-
-## W
-
-## X
-
-## Y
-
-## Z
