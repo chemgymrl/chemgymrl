@@ -9,7 +9,6 @@ setup(name='chemistrygym',
           'matplotlib',
           'cmocean',
           'pyyaml',
-          'pickle'
       ],
       description='Implementation of extraction simulations in the OpenAI Gym environment framework.',
       author='CLEAN and UW ECE ML',
