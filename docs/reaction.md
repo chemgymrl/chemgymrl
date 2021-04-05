@@ -14,7 +14,7 @@ When the agent performs enough positive actions and is satisfied with the amount
 
 The input to the reaction bench is initialized in the `reaction_bench_v1.py` file. 
 
-![reaction bench input](tutorial_figures/reaction_bench_input.png)
+![reaction bench input](../tutorial_figures/reaction_bench_input.png)
 
 In here we pass parameters such as the materials and solutes needed for the experiment, the path to an input vessel 
 (if we're including one), the output vessel path, the number of time steps to be taken during each action, the amount
@@ -37,7 +37,7 @@ being performed by the agent. There are two main plot modes:
     'surface-level' understanding of the information portrayed.
     - Plots absorbance, time, temperature, volume, pressure, and the amount of reactants remaining.
   
-![human render output](tutorial_figures/human_render_reaction.png)
+![human render output](../tutorial_figures/human_render_reaction.png)
 
 - Full Render
   -  Plots thermodynamic variables and spectral data. The full render plots a significant amount of data for a more 
@@ -46,4 +46,4 @@ being performed by the agent. There are two main plot modes:
     absorbance of both reactants and products. It also plots the temperature and pressure mapped to range between 0 and 
     1, as well as the pressure in units kPa.            
 
-![full render output](tutorial_figures/full_render_reaction.png)
+![full render output](../tutorial_figures/full_render_reaction.png)
