@@ -65,10 +65,10 @@ class DecompositionTestCase(unittest.TestCase):
         action[0] = 1 / 2
         action[1] = 1 / 2
         env.step(action)
-        self.assertIn('Na', env.vessel.get_material_dict())
-        self.assertIn('1-chlorohexane', env.vessel.get_material_dict())
-        self.assertIn('2-chlorohexane', env.vessel.get_material_dict())
-        self.assertIn('3-chlorohexane', env.vessel.get_material_dict())
+        self.assertIn('Na', env.vessels.get_material_dict())
+        self.assertIn('1-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
 
 
 if __name__ == '__main__':

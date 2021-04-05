@@ -133,6 +133,11 @@ class Vessel:
 
         # layers gaussian representation
         self._layers_position_dict = {self.Air.get_name(): 0.0}  # material.name: position
+        for M in self._material_dict:
+            # do not fill in solute (solute does not form layer)
+            if not self._material_dict[M][0]().is_solute():
+                self._layers_position_dict[M] = 0.0
+
         self._layers_variance = 2.0
 
         # calculate the maximal pressure based on what material is in the vessel
@@ -1052,6 +1057,7 @@ class Vessel:
 
         # update self._layers_position_dict
         self._layers_position_dict = new_layers_position_dict
+        return 0
 
     def _update_material_dict(
             self,
@@ -1080,6 +1086,11 @@ class Vessel:
         new_material_dict = util.convert_material_dict_units(parameter[0])
 
         self._material_dict = util.organize_material_dict(new_material_dict)
+        self._layers_position_dict = {self.Air.get_name(): 0.0}  # material.name: position
+        for M in self._material_dict:
+            # do not fill in solute (solute does not form layer)
+            if not self._material_dict[M][0]().is_solute():
+                self._layers_position_dict[M] = 0.0
 
     def _update_solute_dict(
             self,
@@ -1137,7 +1148,9 @@ class Vessel:
         ---------------
         None
         """
-
+        print("-------------dubug_mix------------")
+        print(self.label)
+        print(self._layers_position_dict)
         # set default reward equal to zero
         reward = 0
 
@@ -1230,6 +1243,8 @@ class Vessel:
         # deal with Air
         self._layers_position_dict['Air'] = new_layers_position[layers_counter]
 
+        print(self._layers_position_dict)
+
         return reward
 
     def _update_layers(
@@ -1275,8 +1290,8 @@ class Vessel:
                 # if not a solute
                 if not self._material_dict[M][0]().is_solute():
                     layers_amount.append(self_volume_dict[M])
-                layers_position.append((self._layers_position_dict[M]))
-                layers_color.append(self._material_dict[M][0]().get_color())
+                    layers_position.append((self._layers_position_dict[M]))
+                    layers_color.append(self._material_dict[M][0]().get_color())
 
         # calculate air
         air_volume = self.v_max - self_total_volume
@@ -1286,7 +1301,13 @@ class Vessel:
         layers_position.append(self._layers_position_dict['Air'])
         layers_color.append(self.Air.get_color())
 
-        '''
+        print("===================================")
+        print(self.label)
+        print(layers_color)
+        print(layers_amount)
+        print(layers_position)
+        print("===================================")
+
         self._layers = separate.map_to_state(
             A=np.array(layers_amount),
             B=np.array(layers_position),
@@ -1294,7 +1315,6 @@ class Vessel:
             colors=layers_color,
             x=separate.x
         )
-        '''
 
     # function to set the volume of the container and to specify the units
     def set_volume(self, volume: float, unit='l', override=False):

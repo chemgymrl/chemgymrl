@@ -42,8 +42,8 @@ class ReactionBaseTestCase(unittest.TestCase):
 
         # testing _find_reaction_file() method
         env = gym.make(ENV_NAME)
-        path = "../../../chemistrylab/reactions/available_reactions"
-        os.chdir(path)
+        path = "../../chemistrylab/reactions/available_reactions"
+        # os.chdir(path)
         file_path = path + '/chloro_wurtz.py'
         reaction_base_file_path = env.reaction._find_reaction_file(reaction_file="chloro_wurtz")
 
@@ -54,7 +54,7 @@ class ReactionBaseTestCase(unittest.TestCase):
 
         # testing _get_reaction_params() method
         env = gym.make(ENV_NAME)
-        file_path = "../../../chemistrylab/reactions/available_reactions/chloro_wurtz.py"
+        file_path = "../../chemistrylab/reactions/available_reactions/chloro_wurtz.py"
 
         # unpacking all variables contained in chloro_wurtz reacton file
         reactants = REACTANTS

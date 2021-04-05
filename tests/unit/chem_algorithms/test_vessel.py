@@ -23,10 +23,7 @@ class TestVessel(TestCase):
         self.assertLess(final_volume[1], initial_volume[1])
 
     def test__drain_by_pixel(self):
-        vessel = Vessel("test", materials={'Na': [material.Na, 100, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
-        solute_dict = {'Na': {'H2O': [material.H2O, 100, 'mol']}}
-        event = ['update solute dict', solute_dict]
-        vessel.push_event_to_queue(feedback=[event], dt=0)
+        vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
         initial_volume = vessel.get_current_volume()
         vessel2 = Vessel('test_2')
         event = ['drain by pixel', vessel2, 100]
