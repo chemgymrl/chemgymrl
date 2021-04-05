@@ -69,8 +69,8 @@ register(
 )
 
 register(
-    id='SolutionReactLesson-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_3',
+    id='WurtzReact-v2',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',
     max_episode_steps=20
 )
 

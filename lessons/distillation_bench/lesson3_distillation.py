@@ -62,10 +62,8 @@ while not done:
     elif total_steps == 2:
         action = np.array([2,10])
     elif total_steps == 3:
-        action = np.array([2,10])
-    elif total_steps == 4:
         action = np.array([0,75])
-    elif total_steps == 5:
+    elif total_steps == 4:
         action = np.array([3,0])
 
     # perform the action and update the reward
@@ -79,6 +77,8 @@ while not done:
     # print(state)
 
     # render the plot
+    if total_steps == 4:
+        input('h')
     env.render(mode=render_mode)
     # sleep(1)
 

@@ -46,15 +46,15 @@ while not done:
 
     # ACTION 1
     # increase temperature all the way up
-    action = np.array([0,100])
+    # action = np.array([0,125])
 
     # ACTION 2
     # results in temperature being too high and all material is boiled off in the vessel
-    # action = np.array([0,700])
+    # action = np.array([0,500])
 
     # ACTION 3
     # decrease temperature all the way down
-    # action = np.array([0,1])
+    action = np.array([0,0])
 
     # perform the action and update the reward
     state, reward, done, __ = env.step(action)
@@ -68,6 +68,9 @@ while not done:
     # print(state)
 
     # render the plot
+    if total_steps == 19:
+        input("enter")
+
     env.render(mode=render_mode)
     # sleep(1)
 
