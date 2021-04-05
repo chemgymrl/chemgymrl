@@ -129,14 +129,6 @@ while not done:
     env.render(mode=render_mode)
     # sleep(1)
 
-    multiplier = 2 * (6 / 10 - 0.5)
-    print(multiplier * 1)
-    print(env.boil_vessel.temperature)
-
-    print('hello: ', env.distillation.dQ)
-    print('hi: ', env.distillation.n_increments)
-
-
     #increment one step
     total_steps += 1
 ```
