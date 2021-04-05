@@ -30,4 +30,4 @@ The output plot shows the contents of each container and the level of separation
 the right shows the layers of materials forming in the container.
 
 Like reaction bench the extraction bench also outputs a pickle file once the extraction process is completed. The
-default name for this file is `extract_vessel_{i}` where i ranges from 0 to the number of validated vessels .
+default name for this file is `extract_vessel_{i}` where i ranges from 0 to the total number of validated vessels.
