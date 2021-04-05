@@ -73,7 +73,7 @@ class OilWaterTestCase(unittest.TestCase):
         print(v1_initial_layers)
         print(env.vessels[1].get_material_dict())
 
-        material_dict = {'H2O': [H2O, 100, 'mol'], 'C6H14': [C6H14, 30, 'mol']}
+        material_dict = {'H2O': [H2O, 1, 'mol'], 'C6H14': [C6H14, 1, 'mol']}
 
         event_1 = ['update material dict', material_dict]
         event_2 = ['update_layer']
@@ -93,7 +93,6 @@ class OilWaterTestCase(unittest.TestCase):
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
-        self.assertLess(reward, 0)
         equal = 0 in (v1_initial_layers == vessels[1].get_layers())
         self.assertTrue(equal)
 
@@ -101,7 +100,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
-        material_dict = {'H2O': [H2O, 30], 'C6H14': [C6H14, 30]}
+        material_dict = {'H2O': [H2O, 1], 'C6H14': [C6H14, 1]}
 
         event_1 = ['update material dict', material_dict]
         event_2 = ['update_layer']
@@ -115,7 +114,6 @@ class OilWaterTestCase(unittest.TestCase):
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
-        self.assertLess(reward, 0)
         equal = 0 in (v2_initial_layers == vessels[2].get_layers())
         self.assertTrue(equal)
 
