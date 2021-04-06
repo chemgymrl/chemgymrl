@@ -153,6 +153,7 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self._plot_fig = None
         self._plot_axs = None
+        self.reset()
 
     @staticmethod
     def _validate_parameters(
@@ -291,6 +292,7 @@ class ExtractBenchEnv(gym.Env):
 
     def update_vessel(self, vessel):
         self.extraction_vessel = vessel
+        self.vessels[0] = self.extraction_vessel
         self.extraction = extraction_dict[self.extraction_name].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,

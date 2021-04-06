@@ -14,5 +14,9 @@ class TestManager(TestCase):
         self.assertIn("test", manager.agents)
 
     def test_run(self):
-        manager = Manager(mode='random')
-        manager.run()
+        for i in range(100):
+            print("----------------")
+            print(i)
+            print("----------------")
+            manager = Manager(mode='random')
+            manager.run()

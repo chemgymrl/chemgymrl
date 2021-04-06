@@ -15,8 +15,6 @@ render_mode = "human"
 
 action_set = ['Temperature', 'Volume', "1-chlorohexane", "2-chlorohexane", "3-chlorohexane", "Na"]
 
-assert len(action_set) == env.action_space.shape[0]
-
 done = False
 state = env.reset()
 total_reward = 0
@@ -37,7 +35,7 @@ while not done:
         else:
             action[0] = 1
             action[1] = 1
-    elif select_env == 0:
+    else:
         if round == 0:
             action = np.ones(env.action_space.shape[0])
             action[0] = 1

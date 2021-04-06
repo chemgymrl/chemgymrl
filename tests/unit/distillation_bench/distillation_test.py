@@ -24,7 +24,7 @@ class DistillationTestCase(unittest.TestCase):
         boil_vessel = env.boil_vessel
         target_material= env.target_material
         dQ=env.dQ
-        n_actions=6
+        n_actions=4
 
         self.assertEqual(boil_vessel, env.distillation.boil_vessel)
         self.assertEqual(target_material, env.distillation.target_material)
@@ -33,7 +33,7 @@ class DistillationTestCase(unittest.TestCase):
 
     def test_get_action_space(self):
         env = gym.make(ENV_NAME)
-        action_space = gym.spaces.MultiDiscrete([6,10])
+        action_space = gym.spaces.MultiDiscrete([4,10])
         self.assertEqual(action_space, env.distillation.get_action_space())
 
     def test_reset(self):
@@ -123,110 +123,13 @@ class DistillationTestCase(unittest.TestCase):
         # beaker 2 should have the same material dict as beaker 1 before the pour
         self.assertEqual(b1_material_list_before, b2_material_list)
 
-    def test_pour_b1_bv(self):
-        env = gym.make(ENV_NAME)
-        env.reset()
-
-        # boil off some materials into b1
-        action = np.array([0, 1500])
-        env.step(action)
-
-        # gets material dict of b1 before the pour
-        b1_material_dict_before = env.vessels[1].get_material_dict()
-
-        # gets material dict of bv before the pour
-        bv_material_dict_before = env.boil_vessel.get_material_dict()
-
-        # pour from b1 to bv
-        action = np.array([3,10])
-        env.step(action)
-
-        # merges material dict of b1 and bv before the pour
-        # creates a problem for materials that were completely boiled off, which is taken care of in the for loop below
-        bv_material_dict_after = {**b1_material_dict_before, **bv_material_dict_before}
-
-        for key, value in bv_material_dict_after.items():
-            # this checks to see if both materials were in beaker 1 and boiling vessel before the pour
-            # if they were both in the respective vessels, add the to the bv the amount that was in beaker 1
-            # unless it is the same amount in which case it is already completed when we merge the dictionaries
-            if key in b1_material_dict_before and bv_material_dict_before and (b1_material_dict_before[key][1]!=bv_material_dict_after[key][1]):
-                bv_material_dict_after[key][1] += b1_material_dict_before[key][1]
-
-        # convert bv_dicts into lists
-        bv_material_list_after = []
-        for key in bv_material_dict_after:
-            bv_material_list_after.append(bv_material_dict_after[key][:2])
-
-        bv_material_list_env = []
-        for key in env.boil_vessel._material_dict:
-            bv_material_list_env.append(env.boil_vessel._material_dict[key][:2])
-
-        # sort lists such that they're in the same order as each other
-        bv_material_list_after = sorted(bv_material_list_after, key=lambda l: l[1])
-        bv_material_list_env = sorted(bv_material_list_env, key=lambda l:l[1])
-
-        # env.vessels[1]._material_dict should be empty
-        self.assertFalse(env.vessels[1]._material_dict)
-
-        # bv_material_dict_after should now have same material dict as boiling vessel
-        self.assertEqual(bv_material_list_after, bv_material_list_env)
-
-    def test_pour_b2_bv(self):
-        env = gym.make(ENV_NAME)
-        env.reset()
-
-        # boil off some materials into b1
-        action = np.array([0, 777])
-        env.step(action)
-
-        # pour materials from b1 into b2
-        action = np.array([2,10])
-        env.step(action)
-
-        # gets material dict of b2 before the pour into bv
-        b2_material_dict_before = env.vessels[2].get_material_dict()
-
-        # gets material dict of bv before the pour
-        bv_material_dict_before = env.boil_vessel.get_material_dict()
-
-        # pour from b2 to bv
-        action = np.array([4, 10])
-        env.step(action)
-
-        # merges material dict of b2 and bv before the pour
-        bv_material_dict_after = {**b2_material_dict_before, **bv_material_dict_before}
-
-        for key, value in bv_material_dict_after.items():
-            if key in b2_material_dict_before and bv_material_dict_before and (
-                    b2_material_dict_before[key][1] != bv_material_dict_after[key][1]):
-                bv_material_dict_after[key][1] += b2_material_dict_before[key][1]
-
-        # convert bv_dicts into lists
-        bv_material_list_after = []
-        for key in bv_material_dict_after:
-            bv_material_list_after.append(bv_material_dict_after[key][:2])
-
-        bv_material_list_env = []
-        for key in env.boil_vessel._material_dict:
-            bv_material_list_env.append(env.boil_vessel._material_dict[key][:2])
-
-        # sort lists such that they're in the same order as each other
-        bv_material_list_after = sorted(bv_material_list_after, key=lambda l: l[1])
-        bv_material_list_env = sorted(bv_material_list_env, key=lambda l: l[1])
-
-        # env.vessels[2]._material_dict should be empty
-        self.assertFalse(env.vessels[2]._material_dict)
-
-        # bv_material_dict_after should now have same material dict as boiling vessel
-        self.assertEqual(bv_material_list_after, bv_material_list_env)
-
     def test_done(self):
         env = gym.make(ENV_NAME)
         env.reset()
 
         done = False
 
-        action = np.array([5,0])
+        action = np.array([3,0])
         __, __ , done, __ = env.step(action)
 
         self.assertTrue(done)

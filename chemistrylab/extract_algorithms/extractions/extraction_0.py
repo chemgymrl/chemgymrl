@@ -20,7 +20,7 @@ class Extraction:
         n_empty_vessels=2,  # number of empty vessels
         extractor_volume=1000000000,  # the amount of oil available (unlimited)
         dt=0.05,  # time for each step (time for separation)
-        max_vessel_volume=1000.0,  # max volume of empty vessels / g
+        max_vessel_volume=1.0,  # max volume of empty vessels / g
         n_vessel_pixels=100,  # number of pixels for each vessel
         max_valve_speed=10,  # maximum draining speed (pixels/step)
         n_actions=10,
@@ -219,9 +219,11 @@ class Extraction:
                 vessels[2].push_event_to_queue(dt=self.dt)
             else:
                 # add 50ml*multiplier
-                d_volume = 50 * multiplier
+                d_volume = 0.05 * multiplier
                 event = ['pour by volume', vessels[0], d_volume]
                 reward = ext_vessel.push_event_to_queue(events=[event], dt=self.dt)
+                event_2 = ['fully mix']
+                vessels[0].push_event_to_queue(events=None, feedback=[event_2], dt=0)
                 vessels[1].push_event_to_queue(dt=self.dt)
                 vessels[2].push_event_to_queue(dt=self.dt)
         elif 8 == int(action[0]):  # wait

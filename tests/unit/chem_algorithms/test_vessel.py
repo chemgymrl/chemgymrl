@@ -10,9 +10,9 @@ class TestVessel(TestCase):
     def test__update_temperature(self):
         vessel = Vessel("test")
         initial_temp = vessel.get_temperature()
-        event = ['temperature change', 400]
+        event = ['temperature change', 400, True]
         vessel.push_event_to_queue(feedback=[event], dt=0)
-        self.assertEqual(vessel.get_temperature(), initial_temp + 400)
+        self.assertEqual(vessel.get_temperature(), 400)
 
     def test__pour_by_volume(self):
         vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
@@ -23,10 +23,11 @@ class TestVessel(TestCase):
         self.assertLess(final_volume[1], initial_volume[1])
 
     def test__drain_by_pixel(self):
-        vessel = Vessel("test", materials={"H2O": [material.H2O, 1000, 'mol']})
+        vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
         initial_volume = vessel.get_current_volume()
-        event = ['drain by pixel', Vessel('test_2'), 100]
-        vessel.push_event_to_queue(feedback=[event], dt=100)
+        vessel2 = Vessel('test_2')
+        event = ['drain by pixel', vessel2, 100]
+        vessel.push_event_to_queue(events=[event], dt=10000)
         final_volume = vessel.get_current_volume()
         self.assertLess(final_volume[1], initial_volume[1])
 
@@ -43,7 +44,7 @@ class TestVessel(TestCase):
         self.assertIn('H2O', vessel.get_material_dict())
 
     def test__update_solute_dict(self):
-        vessel = Vessel("test", materials={'Na': [material.Na, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
+        vessel = Vessel("test", materials={'Na': [material.Na, 100, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
         solute_dict = {'Na': {'H2O': [material.H2O, 100, 'mol']}}
         event = ['update solute dict', solute_dict]
         vessel.push_event_to_queue(feedback=[event], dt=0)

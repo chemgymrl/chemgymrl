@@ -164,7 +164,7 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = self.reaction.get_spectra(self.vessels.get_concentration())
+        absorb = self.reaction.get_spectra(self.vessels.get_concentration(materials=self.reaction.materials))
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -513,7 +513,7 @@ class ReactionBenchEnv(gym.Env):
         V = self.vessels.get_volume()
 
         # acquire the absorption spectra for the materials in the vessel
-        absorb = self.reaction.get_spectra(self.vessels.get_concentration())
+        absorb = self.reaction.get_spectra(self.vessels.get_concentration(materials=self.reaction.materials))
 
         # create an array to contain all state variables
         state = np.zeros(
@@ -606,7 +606,7 @@ class ReactionBenchEnv(gym.Env):
         self.plot_data_concentration = []
 
         # [0] is time, [1] is Temperature, [2:] is each species
-        C = self.vessels.get_concentration()
+        C = self.vessels.get_concentration(materials=self.reaction.materials)
         for i in range(self.reaction.nmax.shape[0]):
             self.plot_data_mol.append([self.reaction.n[i]])
             self.plot_data_concentration.append([C[i]])
@@ -804,8 +804,12 @@ class ReactionBenchEnv(gym.Env):
         )
 
         # get the spectral data peak and dashed spectral lines
-        peak = self.reaction.get_spectra_peak(self.vessels.get_concentration())
-        dash_spectra = self.reaction.get_dash_line_spectra(self.vessels.get_concentration())
+        peak = self.reaction.get_spectra_peak(
+            self.vessels.get_concentration(materials=self.reaction.materials)
+        )
+        dash_spectra = self.reaction.get_dash_line_spectra(
+            self.vessels.get_concentration(materials=self.reaction.materials)
+        )
 
         # The first render is required to initialize the figure
         if self._first_render:
