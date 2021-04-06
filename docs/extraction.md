@@ -12,7 +12,7 @@ The agent operating on this bench will experiment using solutes in different sce
 
 The input to the extraction bench is initialized in the `extraction_bench_v1.py` file.
 
-![extraction bench input](../extraction bench/tutorial_figures/extraction_bench_input.png)
+![extraction bench input](../extractionbench/tutorial_figures/extraction_bench_input.png)
 
 Here we pass the extraction we want to perform, in the figure above, we would perform the wurtz extraction. The input 
 vessel is also passed here. It contains the material and solute dictionary of a vessel that's typically outputted by the
@@ -24,7 +24,7 @@ of the output vessel.
 The extraction bench plots data about the extraction being performed by the agent. Unlike reaction bench, in extraction 
 there is only the human render mode.
 
-![extraction output](../extraction bench/tutorial_figures/human_render_extraction.png)
+![extraction output](../extractionbench/tutorial_figures/human_render_extraction.png)
 
 The output plot shows the contents of each container and the level of separation between the materials. The graphs to 
 the right shows the layers of materials forming in the container.
