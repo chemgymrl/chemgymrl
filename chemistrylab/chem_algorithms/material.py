@@ -756,11 +756,12 @@ class EthylAcetate(Material):
             pressure=1,
             phase='l',
             molar_mass=88.106,
-            color=0.05,
+            color=0.4,
             charge=0.0,
             boiling_point=350,
             melting_point=189.6,
             solvent=True,
+            solute=False,
             specific_heat=1.904,  # in J/g*K
             enthalpy_fusion=10480,
             enthalpy_vapor=31940,

@@ -240,7 +240,7 @@ class Vessel:
             # get the next event in event_queue
             event = self._event_queue.pop(0)
 
-            print('-------{}: {} (event)-------'.format(self.label, event[0]))
+            # print('-------{}: {} (event)-------'.format(self.label, event[0]))
 
             # use the name of the event to get the function form event_dict
             action = self._event_dict[event[0]]
@@ -261,12 +261,12 @@ class Vessel:
             # get the next event in event_queue
             feedback_event = merged.pop(0)
 
-            print(
-                '-------{}: {} (feedback_event)-------'.format(
-                    self.label,
-                    feedback_event[0]
-                )
-            )
+            # print(
+            #     '-------{}: {} (feedback_event)-------'.format(
+            #         self.label,
+            #         feedback_event[0]
+            #     )
+            # )
 
             # use the name of the event to get the function form event_dict
             action = self._event_dict[feedback_event[0]]
@@ -775,30 +775,30 @@ class Vessel:
         __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
 
         # print the old and new dictionaries to the terminal
-        print(
-            '-------{}: {} (old_material_dict)-------'.format(
-                self.label,
-                self._material_dict
-            )
-        )
-        print(
-            '-------{}: {} (old_solute_dict)-------'.format(
-                self.label,
-                self._solute_dict
-            )
-        )
-        print(
-            '-------{}: {} (old_material_dict)-------'.format(
-                target_vessel.label,
-                target_material_dict
-            )
-        )
-        print(
-            '-------{}: {} (old_solute_dict)-------'.format(
-                target_vessel.label,
-                target_solute_dict
-            )
-        )
+        # print(
+        #     '-------{}: {} (old_material_dict)-------'.format(
+        #         self.label,
+        #         self._material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (old_solute_dict)-------'.format(
+        #         self.label,
+        #         self._solute_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (old_material_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (old_solute_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_solute_dict
+        #     )
+        # )
 
         # set default reward equal to zero
         reward = 0
@@ -972,30 +972,30 @@ class Vessel:
 
         reward += temp_reward
 
-        print(
-            '-------{}: {} (new_material_dict)-------'.format(
-                self.label,
-                self._material_dict
-            )
-        )
-        print(
-            '-------{}: {} (new_solute_dict)-------'.format(
-                self.label,
-                self._solute_dict
-            )
-        )
-        print(
-            '-------{}: {} (new_material_dict)-------'.format(
-                target_vessel.label,
-                target_material_dict
-            )
-        )
-        print(
-            '-------{}: {} (new_solute_dict)-------'.format(
-                target_vessel.label,
-                target_solute_dict
-            )
-        )
+        # print(
+        #     '-------{}: {} (new_material_dict)-------'.format(
+        #         self.label,
+        #         self._material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (new_solute_dict)-------'.format(
+        #         self.label,
+        #         self._solute_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (new_material_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (new_solute_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_solute_dict
+        #     )
+        # )
 
         # update target vessel's material amount
         event_1 = ['update material dict', target_material_dict]
@@ -1148,9 +1148,6 @@ class Vessel:
         ---------------
         None
         """
-        print("-------------dubug_mix------------")
-        print(self.label)
-        print(self._layers_position_dict)
         # set default reward equal to zero
         reward = 0
 
@@ -1243,8 +1240,6 @@ class Vessel:
         # deal with Air
         self._layers_position_dict['Air'] = new_layers_position[layers_counter]
 
-        print(self._layers_position_dict)
-
         return reward
 
     def _update_layers(
@@ -1300,13 +1295,6 @@ class Vessel:
         layers_amount.append(air_volume)
         layers_position.append(self._layers_position_dict['Air'])
         layers_color.append(self.Air.get_color())
-
-        print("===================================")
-        print(self.label)
-        print(layers_color)
-        print(layers_amount)
-        print(layers_position)
-        print("===================================")
 
         self._layers = separate.map_to_state(
             A=np.array(layers_amount),

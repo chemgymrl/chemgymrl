@@ -214,7 +214,7 @@ class Extraction:
                 vessels[1].push_event_to_queue(dt=self.dt)
                 vessels[2].push_event_to_queue(dt=self.dt)
             else:
-                d_volume = vessels[0].get_max_volume() * multiplier
+                d_volume = vessels[0].get_max_volume()/10 * multiplier
                 event = ['pour by volume', vessels[0], d_volume]
                 reward = ext_vessel.push_event_to_queue(events=[event], dt=self.dt)
                 vessels[1].push_event_to_queue(dt=self.dt)
