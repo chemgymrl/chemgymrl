@@ -509,24 +509,6 @@ class Vessel:
                     # reduce the available heat energy to 0
                     heat_available = 0
 
-            else:
-                # SHOULD WE IMPLEMENT A MAX BOIL VESSEL TEMP ???
-
-                # calculate the change in vessel temperature
-                vessel_temp_change = heat_available
-
-                print("Raising Boil Vessel Temperature by {}".format(vessel_temp_change))
-
-                # modify the boil vessel's temperature accordingly
-                self.temperature += vessel_temp_change
-
-                # updates total temp change and current temp
-                self.total_temp_change += self.temperature - self.current_temp
-                self.current_temp = self.temperature
-
-                # reduce the available heat energy to 0
-                heat_available = 0
-
         return 0
 
     def open_lid(self):
