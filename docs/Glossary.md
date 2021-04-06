@@ -18,13 +18,13 @@ Who takes decisions in an environment based on rewards and punishments.
 
 #### Bench
 
-
+A virtual environement that allows for a series of operations to occur.
 
 ## C
 
 #### Characterization
 
-
+The analysis of a vessel such that we are able to determine its contents.
 
 #### Command Line
 
@@ -39,6 +39,8 @@ Distillation is a process where components of a mixture are seperated using thei
 ## E
 
 #### Environment
+
+Medium in which a Lab Manager and/or agent interacts with vessels or other agents performing necessary operations.
 
 #### Extraction
 
@@ -55,12 +57,6 @@ Lab managers direct and inspect results from sub agents that carry out tasks for
 #### Material
 
 A material is a substance or mixture of substances that constitutes an object. 
-
-## O
-
-#### Observation
-
-
 
 ## R
 
