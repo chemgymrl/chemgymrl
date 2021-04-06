@@ -116,7 +116,7 @@ action[5] = 1    # Na
 
 Notice that we're only adding the reactants we need for the reaction to continue.
 
-![reaction](../sample_figures/lesson_2r_image1.png)
+![reaction](../tutorial_figures/lesson_2r_image1.png)
 
 Let's run our program and see what happens!
 
@@ -253,7 +253,7 @@ while not done:
 
 Notice that we get a total reward of 5.33. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
-![subplot](../sample_figures/lesson_2r_image3.PNG)
+![subplot](../tutorial_figures/lesson_2r_image3.PNG)
 
 This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
 

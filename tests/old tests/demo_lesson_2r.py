@@ -27,7 +27,7 @@ print(env_ids)
 # Cannot come from A-B as this doesn't make the desired property
 # Desired material in this case is initialized to be 4,5-diethyloctane
 # initializes environment
-env = gym.make("WurtzReact_overlap-v0")
+env = gym.make("WurtzReact-v2")
 render_mode = "human"
 
 done = False
@@ -56,8 +56,8 @@ while not done:
     if total_steps  < 20:
         action[0] = 1
         action[1] = 1
-        action[2] = 0.05 # 1-chlorohexane
-        action[3] = 0.05 # 2-chlorohexane
+        action[2] = 1    # 1-chlorohexane
+        action[3] = 1    # 2-chlorohexane
         action[4] = 1    # 3-chlorohexane
         action[5] = 1    # Na
 
@@ -87,10 +87,6 @@ while not done:
     # increment one step
     total_steps += 1
 
-    print(env.state[6])
-    print(env.state[7])
-    print(state)
-
     # append arrays for states over time
     reward_over_time.append(reward)
     total_reward_over_time.append(total_reward)
@@ -103,7 +99,7 @@ show_stats = input("Show Reaction Vessel Stats ('Y'/'N') >>> ")
 
 if show_stats.lower() in ["y", "yes"]:
     # open and check the material dict
-    vessel_path = os.path.join(os.getcwd(), "vessel_experiment_0.pickle")
+    vessel_path = os.path.join(os.getcwd(), "reaction_vessel.pickle")
     with open(vessel_path, 'rb') as open_file:
         v = pickle.load(open_file)
 

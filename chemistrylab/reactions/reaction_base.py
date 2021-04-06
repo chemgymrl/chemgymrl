@@ -460,14 +460,13 @@ class _Reaction:
 
         # ensure that solutes from vessels compatible with reaction
         solute_dict_vessel = vessels.get_solute_dict()
-        print(solute_dict_vessel)
         solute_list = []
         for solute_dict in solute_dict_vessel.values():
             for key in solute_dict.keys():
                 if key not in solute_list:
                     solute_list.append(key)
 
-        assert self.solutes==solute_list
+        assert self.solutes == solute_list
 
         # ensure that Tmin are the same
         assert self.Tmin==vessels.Tmin

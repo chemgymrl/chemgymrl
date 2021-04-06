@@ -201,7 +201,6 @@ class DistillationBenchEnv(gym.Env):
             boil_vessel=self.boil_vessel,
             target_material=self.target_material,
             dQ=1e+5,
-            n_increments=50
         )
 
     def _save_vessel(self, distillation_vessel=None, vessel_rootname=""):

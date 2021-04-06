@@ -102,8 +102,8 @@ class Vessel:
         """
 
         # define the Material Dict and Solute Dict first
-        self._material_dict = util.convert_material_dict_units(materials)
-        self._solute_dict = util.convert_solute_dict_units(solutes)
+        self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
+        self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
 
         # initialize parameters
         self.label = label
@@ -133,6 +133,11 @@ class Vessel:
 
         # layers gaussian representation
         self._layers_position_dict = {self.Air.get_name(): 0.0}  # material.name: position
+        for M in self._material_dict:
+            # do not fill in solute (solute does not form layer)
+            if not self._material_dict[M][0]().is_solute():
+                self._layers_position_dict[M] = 0.0
+
         self._layers_variance = 2.0
 
         # calculate the maximal pressure based on what material is in the vessel
@@ -235,7 +240,7 @@ class Vessel:
             # get the next event in event_queue
             event = self._event_queue.pop(0)
 
-            print('-------{}: {} (event)-------'.format(self.label, event[0]))
+            # print('-------{}: {} (event)-------'.format(self.label, event[0]))
 
             # use the name of the event to get the function form event_dict
             action = self._event_dict[event[0]]
@@ -256,12 +261,12 @@ class Vessel:
             # get the next event in event_queue
             feedback_event = merged.pop(0)
 
-            print(
-                '-------{}: {} (feedback_event)-------'.format(
-                    self.label,
-                    feedback_event[0]
-                )
-            )
+            # print(
+            #     '-------{}: {} (feedback_event)-------'.format(
+            #         self.label,
+            #         feedback_event[0]
+            #     )
+            # )
 
             # use the name of the event to get the function form event_dict
             action = self._event_dict[feedback_event[0]]
@@ -405,9 +410,8 @@ class Vessel:
                 print(
                     "No material remaining in the boil vessel. "
                     "Only the vessel and air will be heated. "
-                    "Press Enter to exit."
                 )
-                reward = -1
+                return -1
 
             if material_amounts:
                 # determine the material with the smallest boiling point and its value
@@ -424,16 +428,16 @@ class Vessel:
                 # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
                 temp_change_needed = smallest_bp - self.temperature
 
-            # calculate the total entropy of all the materials in J/K
-            total_entropy = 0
-            for i, material_amount in enumerate(material_amounts):
-                specific_heat = material_sp_heats[i]  # in J/g*K
-                molar_amount = material_amount  # in mol
-                molar_mass = material_objs[i]()._molar_mass  # in g/mol
+                # calculate the total entropy of all the materials in J/K
+                total_entropy = 0
+                for i, material_amount in enumerate(material_amounts):
+                    specific_heat = material_sp_heats[i]  # in J/g*K
+                    molar_amount = material_amount  # in mol
+                    molar_mass = material_objs[i]()._molar_mass  # in g/mol
 
-                # calculate the entropy
-                material_entropy = specific_heat * molar_amount * molar_mass
-                total_entropy += material_entropy
+                    # calculate the entropy
+                    material_entropy = specific_heat * molar_amount * molar_mass
+                    total_entropy += material_entropy
 
                 # calculate the energy needed to get to the smallest boiling point
                 heat_to_add = temp_change_needed * total_entropy
@@ -508,6 +512,22 @@ class Vessel:
 
                     # reduce the available heat energy to 0
                     heat_available = 0
+
+            else:
+                # calculate the change in vessel temperature
+                vessel_temp_change = heat_available
+
+                print("Raising Boil Vessel Temperature by {}".format(vessel_temp_change))
+
+                # modify the boil vessel's temperature accordingly
+                self.temperature += vessel_temp_change
+
+                # updates total temp change and current temp
+                self.total_temp_change += self.temperature - self.current_temp
+                self.current_temp = self.temperature
+
+                # reduce the available heat energy to 0
+                heat_available = 0
 
         return 0
 
@@ -755,30 +775,30 @@ class Vessel:
         __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
 
         # print the old and new dictionaries to the terminal
-        print(
-            '-------{}: {} (old_material_dict)-------'.format(
-                self.label,
-                self._material_dict
-            )
-        )
-        print(
-            '-------{}: {} (old_solute_dict)-------'.format(
-                self.label,
-                self._solute_dict
-            )
-        )
-        print(
-            '-------{}: {} (old_material_dict)-------'.format(
-                target_vessel.label,
-                target_material_dict
-            )
-        )
-        print(
-            '-------{}: {} (old_solute_dict)-------'.format(
-                target_vessel.label,
-                target_solute_dict
-            )
-        )
+        # print(
+        #     '-------{}: {} (old_material_dict)-------'.format(
+        #         self.label,
+        #         self._material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (old_solute_dict)-------'.format(
+        #         self.label,
+        #         self._solute_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (old_material_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (old_solute_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_solute_dict
+        #     )
+        # )
 
         # set default reward equal to zero
         reward = 0
@@ -952,30 +972,30 @@ class Vessel:
 
         reward += temp_reward
 
-        print(
-            '-------{}: {} (new_material_dict)-------'.format(
-                self.label,
-                self._material_dict
-            )
-        )
-        print(
-            '-------{}: {} (new_solute_dict)-------'.format(
-                self.label,
-                self._solute_dict
-            )
-        )
-        print(
-            '-------{}: {} (new_material_dict)-------'.format(
-                target_vessel.label,
-                target_material_dict
-            )
-        )
-        print(
-            '-------{}: {} (new_solute_dict)-------'.format(
-                target_vessel.label,
-                target_solute_dict
-            )
-        )
+        # print(
+        #     '-------{}: {} (new_material_dict)-------'.format(
+        #         self.label,
+        #         self._material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (new_solute_dict)-------'.format(
+        #         self.label,
+        #         self._solute_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (new_material_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_material_dict
+        #     )
+        # )
+        # print(
+        #     '-------{}: {} (new_solute_dict)-------'.format(
+        #         target_vessel.label,
+        #         target_solute_dict
+        #     )
+        # )
 
         # update target vessel's material amount
         event_1 = ['update material dict', target_material_dict]
@@ -1037,6 +1057,7 @@ class Vessel:
 
         # update self._layers_position_dict
         self._layers_position_dict = new_layers_position_dict
+        return 0
 
     def _update_material_dict(
             self,
@@ -1065,6 +1086,11 @@ class Vessel:
         new_material_dict = util.convert_material_dict_units(parameter[0])
 
         self._material_dict = util.organize_material_dict(new_material_dict)
+        self._layers_position_dict = {self.Air.get_name(): 0.0}  # material.name: position
+        for M in self._material_dict:
+            # do not fill in solute (solute does not form layer)
+            if not self._material_dict[M][0]().is_solute():
+                self._layers_position_dict[M] = 0.0
 
     def _update_solute_dict(
             self,
@@ -1122,7 +1148,6 @@ class Vessel:
         ---------------
         None
         """
-
         # set default reward equal to zero
         reward = 0
 
@@ -1260,8 +1285,8 @@ class Vessel:
                 # if not a solute
                 if not self._material_dict[M][0]().is_solute():
                     layers_amount.append(self_volume_dict[M])
-                layers_position.append((self._layers_position_dict[M]))
-                layers_color.append(self._material_dict[M][0]().get_color())
+                    layers_position.append((self._layers_position_dict[M]))
+                    layers_color.append(self._material_dict[M][0]().get_color())
 
         # calculate air
         air_volume = self.v_max - self_total_volume
@@ -1271,7 +1296,6 @@ class Vessel:
         layers_position.append(self._layers_position_dict['Air'])
         layers_color.append(self.Air.get_color())
 
-        '''
         self._layers = separate.map_to_state(
             A=np.array(layers_amount),
             B=np.array(layers_position),
@@ -1279,7 +1303,6 @@ class Vessel:
             colors=layers_color,
             x=separate.x
         )
-        '''
 
     # function to set the volume of the container and to specify the units
     def set_volume(self, volume: float, unit='l', override=False):

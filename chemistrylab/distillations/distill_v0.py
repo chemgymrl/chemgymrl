@@ -7,9 +7,7 @@ Available Actions for this Distillation Experiment:
 0: Add/Remove Heat (Heat value multiplier, relative of maximal heat change)
 1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
 2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-3: Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)
-4: Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)
-5: Done (Value doesn't matter)
+3: Done (Value doesn't matter)
 Physical Representation:
 A proper distillation experiment serves to extract one material from a vessel containing multiple
 materials by utilizing the material's differing boiling points. Our distillation experiment
@@ -88,7 +86,7 @@ class Distillation:
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
             max_vessel_volume=1.0, # maximal volume of empty vessels
-            n_actions=6 # number of available actions
+            n_actions=4 # number of available actions
     ):
         '''
         Constructor class for the Distillation class
@@ -155,6 +153,9 @@ class Distillation:
         # delete the solute dictionary from the boil vessel
         boil_vessel._solute_dict = {}
 
+        # set the unit of the boil vessel
+        boil_vessel.unit = 'l'
+
         # add the inputted boil vessel to the list of all vessels
         vessels = [boil_vessel]
 
@@ -202,8 +203,8 @@ class Distillation:
         do_action = int(action[0])
         multiplier = int(action[1])
 
-        # if the multiplier is 0, only actions 0 (heat change) and 5 (done) can be performed
-        if all([multiplier == 0, do_action not in [0, 5]]):
+        # if the multiplier is 0, only actions 0 (heat change) and 3 (done) can be performed
+        if all([multiplier == 0, do_action not in [0, 3]]):
             for vessel_obj in vessels:
                 __ = vessel_obj.push_event_to_queue(dt=self.dt)
                 reward = 0
@@ -252,32 +253,8 @@ class Distillation:
                 # push no events to the first beaker
                 boil_vessel.push_event_to_queue(dt=self.dt)
 
-            # Pour Beaker 1 into the boil vessel
-            if do_action == 3:
-                # determine the volume to pour
-                d_volume = beaker_1.get_max_volume() * multiplier/10
-
-                # push the event to the first beaker
-                event = ['pour by volume', boil_vessel, d_volume]
-                reward = beaker_1.push_event_to_queue(events=[event], dt=self.dt)
-
-                # push no events to the second beaker
-                beaker_2.push_event_to_queue(dt=self.dt)
-
-            # Pour Beaker 2 into the boil vessel
-            if do_action == 4:
-                # determine the volume to pour
-                d_volume = beaker_2.get_max_volume() * multiplier/10
-
-                # push the event to the second beaker
-                event = ['pour by volume', boil_vessel, d_volume]
-                reward = beaker_2.push_event_to_queue(events=[event], dt=self.dt)
-
-                # push no events to the first beaker
-                beaker_1.push_event_to_queue(dt=self.dt)
-
             # Indicate that all no more actions are to be completed
-            if do_action == 5:
+            if do_action == 3:
                 # pass the fulfilled `done` parameter
                 done = True
 

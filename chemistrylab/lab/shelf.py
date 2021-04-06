@@ -74,12 +74,15 @@ class Shelf:
             self.create_new_vessel()
             self.open_slot -= 1
             return self.vessels.pop(0)
-        elif index > self.open_slot:
+        elif index > self.open_slot or index >= len(self.vessels):
             self.open_slot -= 1
             return self.vessels.pop(-1)
-        else:
+        elif index < len(self.vessels):
             self.open_slot -= 1
             return self.vessels.pop(index)
+        else:
+            raise ValueError('you failed to consider a case nicholas')
+
 
     def delete_vessel(self, index):
         """

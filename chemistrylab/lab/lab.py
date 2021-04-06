@@ -45,7 +45,7 @@ class Lab(gym.Env, ABC):
         # the 1st index represents what environment the agent selects
         # the 2nd index represents what vessel from the shelf the agent uses
         # the 3rd index represents which agent will be used to perform the experiment
-        self.action_space = gym.spaces.MultiDiscrete([4,
+        self.action_space = gym.spaces.MultiDiscrete([5,
                                                       max([len(self.reactions),
                                                            len(self.extractions),
                                                            len(self.distillations),

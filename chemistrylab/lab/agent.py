@@ -23,3 +23,6 @@ class RandomAgent(Agent):
 
     def run_step(self, env, spectra):
         return env.action_space.sample()
+
+    def train_step(self, reward):
+        pass

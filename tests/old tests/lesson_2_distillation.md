@@ -151,7 +151,7 @@ action = np.array([0,6])
 When we run this code we should see that for every timestep that there is a heat change of 19999.99 joules and that the 
 temperature eventually reaches 1738.0 Kelvin. We end up with a final graph that looks like this:
 
-![graph](../sample_figures/lesson_2d_image1.PNG)
+![graph](../tutorial_figures/lesson_2d_image1.PNG)
 
 As you can see all the material is boiled off from the boiling vessel into the condensation vessel.
 
@@ -167,7 +167,7 @@ action = np.array([0,7])
 
 For this we will uncomment action 2. Now running this code gives us an interesting result. Run it yourself to see that we will get:
 
-![error](../sample_figures/lesson_2d_image3.PNG)
+![error](../tutorial_figures/lesson_2d_image3.PNG)
 
 We get this error as since we increased the temperature by a higher multiplier we were able to boil off all the  materials in the boiling vessel before letting the agent finish after 20 steps. It's important to note that choosing a very large multiplier can result in this error. 
 
@@ -185,7 +185,7 @@ We will now lower the temperature the absolute minimum it can be and see what ha
 
 Running this results in the following graph:
 
-![graph](../sample_figures/lesson_2d_image5.PNG)
+![graph](../tutorial_figures/lesson_2d_image5.PNG)
 
 As you will notice, nothing really changes. Of course this isn't much of a surprise since by lowering the temperature  none of the materials in the boiling vessel will boil into the condensation vessel (in this case; if you have materials  with lower boiling points this will change). You'll notice that the minimum temperature the boiling vessel will reach is  297 Kelvin.
 

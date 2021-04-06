@@ -1,4 +1,4 @@
-"""
+'''
 Module defining the ExtractWorld Engine
 
 :title: extractworld_v1_engine.py
@@ -6,7 +6,7 @@ Module defining the ExtractWorld Engine
 :author: Chris Beeler and Mitchell Shahen
 
 :history: 2020-06-24
-"""
+'''
 
 # pylint: disable=arguments-differ
 # pylint: disable=invalid-name
@@ -30,9 +30,10 @@ import numpy as np
 import gym
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 # import local modules
-sys.path.append("../../")  # access chemistrylab
+sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
 from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red, extraction_0
@@ -49,9 +50,36 @@ extraction_dict = {
 
 
 class ExtractBenchEnv(gym.Env):
-    """
+    '''
     Class object defining the ExtractWorld Engine
-    """
+
+    Parameters
+    ---------------
+    `n_steps` : `int` (default=`100`)
+        The number of steps in an episode.
+    `dt` : `float` (default=`0.01`)
+        The default time-step.
+    `extraction` : `str` (default="")
+        The name/title of the extraction.
+    `n_vessel_pixels` : `int` (default=`100`)
+        The number of pixels in a vessel.
+    `max_valve_speed` : `int` (default=`100`)
+        The maximal amount of material flowing through the valve in a given time-step.
+    `extraction_vessel` : `vessel` (default=`None`)
+        A vessel object containing state variables, materials, solutes, and spectral data.
+    `solute` : `str` (default=`""`)
+        The name of the added solute.
+    `target_material` : `str` (default=`""`)
+        The name of the required output material designated as reward.
+
+    Returns
+    ---------------
+    None
+
+    Raises
+    ---------------
+    None
+    '''
 
     def __init__(
             self,
@@ -61,41 +89,16 @@ class ExtractBenchEnv(gym.Env):
             n_vessel_pixels=100,
             max_valve_speed=10,
             extraction_vessel=None,
+
             solute="",
             target_material="",
             out_vessel_path="",
             extractor=None
     ):
-        """
-        Constructor class method for the Extract Bench Environment.
+        '''
+        Constructor class method for the Extract Bench Environment
+        '''
 
-        Parameters
-        ---------------
-        `n_steps` : `int` (default=`100`)
-            The number of steps in an episode.
-        `dt` : `float` (default=`0.01`)
-            The default time-step.
-        `extraction` : `str` (default="")
-            The name/title of the extraction.
-        `n_vessel_pixels` : `int` (default=`100`)
-            The number of pixels in a vessel.
-        `max_valve_speed` : `int` (default=`100`)
-            The maximal amount of material flowing through the valve in a given time-step.
-        `extraction_vessel` : `vessel` (default=`None`)
-            A vessel object containing state variables, materials, solutes, and spectral data.
-        `solute` : `str` (default=`""`)
-            The name of the added solute.
-        `target_material` : `str` (default=`""`)
-            The name of the required output material designated as reward.
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
 
         # validate the input parameters provided to the extract bench engine
         input_parameters = self._validate_parameters(
@@ -109,6 +112,7 @@ class ExtractBenchEnv(gym.Env):
             target_material=target_material,
             out_vessel_path=out_vessel_path
         )
+
 
         # set the validated input parameters
         self.n_steps = input_parameters["n_steps"]
@@ -149,20 +153,21 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self._plot_fig = None
         self._plot_axs = None
+        self.reset()
 
     @staticmethod
     def _validate_parameters(
-            n_steps=0,
-            dt=0.0,
-            extraction="",
-            n_vessel_pixels=0,
-            max_valve_speed=0,
-            extraction_vessel=None,
-            solute="",
-            target_material="",
-            out_vessel_path=""
+        n_steps=0,
+        dt=0.0,
+        extraction="",
+        n_vessel_pixels=0,
+        max_valve_speed=0,
+        extraction_vessel=None,
+        solute="",
+        target_material="",
+        out_vessel_path=""
     ):
-        """
+        '''
         Method to validate the parameters inputted to the extraction bench engine.
 
         Parameters
@@ -196,43 +201,43 @@ class ExtractBenchEnv(gym.Env):
         `TypeError`:
             Raised when either the `extraction` parameter is invalid or the `extraction_vessel`
             parameter is invalid or incompatible.
-        """
+        '''
 
         # ensure the n_steps parameter is a non-zero, non-negative integer
         if any([
-            not isinstance(n_steps, int),
-            n_steps <= 0
+                not isinstance(n_steps, int),
+                n_steps <= 0
         ]):
             print("Invalid 'Number of Steps per Action' type. The default will be provided.")
             n_steps = 1
 
         # the default timestep parameter must be a non-zero, non-negative floating point value
         if any([
-            not isinstance(dt, float),
-            dt <= 0.0
+                not isinstance(dt, float),
+                dt <= 0.0
         ]):
             print("Invalid 'Default Timestep' type. The default will be provided.")
             dt = 1.0
 
         # ensure the extraction parameter is a string indicating a valid extraction
         if any([
-            not isinstance(extraction, str),
-            extraction not in extraction_dict.keys()
+                not isinstance(extraction, str),
+                extraction not in extraction_dict.keys()
         ]):
             raise TypeError("Invalid 'extraction' given.")
 
         # ensure the n_vessel_pixels parameter is a non-zero, non-negative integer
         if any([
-            not isinstance(n_vessel_pixels, int),
-            n_vessel_pixels <= 0
+                not isinstance(n_vessel_pixels, int),
+                n_vessel_pixels <= 0
         ]):
             print("Invalid 'Number of Pixels per Vessel' type. The default will be provided.")
             n_vessel_pixels = 1
 
         # ensure the max_valve_speed parameter is a non-zero, non-negative integer
         if any([
-            not isinstance(max_valve_speed, int),
-            max_valve_speed <= 0
+                not isinstance(max_valve_speed, int),
+                max_valve_speed <= 0
         ]):
             print("Invalid 'Maximal Valve Speed' type. The default will be provided.")
             max_valve_speed = 1
@@ -252,7 +257,7 @@ class ExtractBenchEnv(gym.Env):
             target_material = ""
 
         # check that the target material is present in the extraction vessel
-        if target_material not in extraction_vessel._material_dict.keys():
+        if not target_material in extraction_vessel._material_dict.keys():
             print(
                 "The target material, {}, is not present in the extraction vessel's material dictionary.".format(
                     target_material
@@ -272,21 +277,70 @@ class ExtractBenchEnv(gym.Env):
 
         # collect the input parameters in a labelled dictionary
         input_parameters = {
-            "n_steps": n_steps,
-            "dt": dt,
-            "extraction": extraction,
-            "n_vessel_pixels": n_vessel_pixels,
-            "max_valve_speed": max_valve_speed,
-            "extraction_vessel": extraction_vessel,
-            "solute": solute,
-            "target_material": target_material,
-            "out_vessel_path": out_vessel_path
+            "n_steps" : n_steps,
+            "dt" : dt,
+            "extraction" : extraction,
+            "n_vessel_pixels" : n_vessel_pixels,
+            "max_valve_speed" : max_valve_speed,
+            "extraction_vessel" : extraction_vessel,
+            "solute" : solute,
+            "target_material" : target_material,
+            "out_vessel_path" : out_vessel_path
         }
 
         return input_parameters
 
+    def update_vessel(self, vessel):
+        self.extraction_vessel = vessel
+        self.vessels[0] = self.extraction_vessel
+        self.extraction = extraction_dict[self.extraction_name].Extraction(
+            extraction_vessel=self.extraction_vessel,
+            n_vessel_pixels=self.n_vessel_pixels,
+            max_valve_speed=self.max_valve_speed,
+            solute=self.solute,
+            target_material=self.target_material,
+            extractor=self.extractor
+        )
+
+        self.initial_target_amount = self.extraction_vessel.get_material_amount(
+            self.target_material
+        )
+
+    def _save_vessel(self, extract_vessel=None, vessel_rootname=""):
+        '''
+        Method to save a vessel as a pickle file.
+
+        Parameters
+        ---------------
+        `extract_vessel` : `vessel.Vessel` (default=`None`)
+            The vessel object designated to be saved.
+        `vessel_rootname` : `str` (default="")
+            The intended name/identifier of the pickle file to which the vessel is being saved.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # specify a vessel path for saving the extract vessel
+        file_directory = self.out_vessel_path
+        filename = "{}.pickle".format(vessel_rootname)
+        open_file = os.path.join(file_directory, filename)
+
+        # delete any existing vessel files to ensure the vessel is saved as intended
+        if os.path.exists(open_file):
+            os.remove(open_file)
+
+        # open the intended vessel file and save the vessel as a pickle file
+        with open(open_file, 'wb') as vessel_file:
+            pickle.dump(extract_vessel, vessel_file)
+
     def reset(self):
-        """
+        '''
         Initialize the environment
 
         Parameters
@@ -301,7 +355,7 @@ class ExtractBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        """
+        '''
 
         self.done = False
         self._first_render = True
@@ -312,7 +366,7 @@ class ExtractBenchEnv(gym.Env):
         return self.state
 
     def step(self, action):
-        """
+        '''
         Update the environment by performing an action.
 
         Parameters
@@ -335,12 +389,17 @@ class ExtractBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        """
+        '''
+
+        # define the necessary parameters
+        vessels = self.vessels
+        ext_vessels = self.external_vessels
+        done = self.done
 
         # perform the inputted action in the extraction module
         vessels, ext_vessels, reward, done = self.extraction.perform_action(
-            vessels=self.vessels,
-            ext_vessel=self.external_vessels,
+            vessels=vessels,
+            ext_vessel=ext_vessels,
             action=action
         )
 
@@ -364,6 +423,7 @@ class ExtractBenchEnv(gym.Env):
         if self.done:
             pass
             # after the last iteration, calculate the amount of target material in each vessel
+
             reward = ExtractionReward(
                 vessels=self.vessels,
                 desired_material=self.target_material,
@@ -381,15 +441,17 @@ class ExtractBenchEnv(gym.Env):
             )
 
             # save each validated vessel as pickle files
-            for i, valid_vessel in enumerate(valid_vessels):
-                valid_vessel.save_vessel(
+            for i, vessel in enumerate(valid_vessels):
+                self._save_vessel(
+                    extract_vessel=vessel,
                     vessel_rootname="extract_vessel_{}".format(i)
                 )
+
 
         return self.state, reward, self.done, {}
 
     def render(self, model='human'):
-        """
+        '''
         Select a render mode to display pertinent information.
 
         Parameters
@@ -404,13 +466,13 @@ class ExtractBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        """
+        '''
 
         if model == 'human':
             self.human_render()
 
     def human_render(self, mode='plot'):
-        """
+        '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
         Parameters
@@ -425,7 +487,7 @@ class ExtractBenchEnv(gym.Env):
         Raises
         ---------------
         None
-        """
+        '''
 
         # create a list containing an array for each vessel in `self.vessels`
         position_separate = []
@@ -455,7 +517,6 @@ class ExtractBenchEnv(gym.Env):
 
                     # populate the array
                     arr[j, k] = mat_vol * exponential
-
                 j += 1
 
         Ls = np.reshape(
@@ -561,7 +622,10 @@ class ExtractBenchEnv(gym.Env):
                     cmap=cmocean.cm.delta
                 )
 
+                # self._plot_axs[i, 1].colorbar(mappable)
+
                 # draw the subplot on the existing canvas
                 self._plot_fig.canvas.draw()
+                # plt.show() # adding this causes the plot to be unresponsive when updating
 
                 self._first_render = False
