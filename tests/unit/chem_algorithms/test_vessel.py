@@ -10,9 +10,9 @@ class TestVessel(TestCase):
     def test__update_temperature(self):
         vessel = Vessel("test")
         initial_temp = vessel.get_temperature()
-        event = ['temperature change', 400]
+        event = ['temperature change', 400, True]
         vessel.push_event_to_queue(feedback=[event], dt=0)
-        self.assertEqual(vessel.get_temperature(), initial_temp + 400)
+        self.assertEqual(vessel.get_temperature(), 400)
 
     def test__pour_by_volume(self):
         vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
