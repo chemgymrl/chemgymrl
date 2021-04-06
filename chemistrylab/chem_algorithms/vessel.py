@@ -349,7 +349,8 @@ class Vessel:
         self.total_temp_change = 0
         self.current_temp = self.temperature
 
-        print("Implement Heat Change of {} joules".format(heat_available))
+        # add logging message for heat change
+        # print("Implement Heat Change of {} joules".format(heat_available))
 
         while heat_available > 0:
             # get the names of the materials in the material dictionary (stored as dict keys)
@@ -376,10 +377,7 @@ class Vessel:
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
-                    input(
-                        "An error has caused the temperature of the vessel to exceed the "
-                        "boiling point of at least one material. Press Enter to exit."
-                    )
+                    # error for now...
                     exit()
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
             # contains no materials) no further operations will contribute to the distillation of materials

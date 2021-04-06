@@ -1,3 +1,4 @@
+
 # Meeting Notes
 
 ## Date: October 28, 2020

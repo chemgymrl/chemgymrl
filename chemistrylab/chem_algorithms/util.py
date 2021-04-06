@@ -33,6 +33,7 @@ def convert_material_dict_to_volume(material_dict,
     for M in material_dict:
 
         if not material_dict[M][0]().is_solute():
+            # get the mass (in grams) of the material using its molar mass (in grams/mol)
             mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
 
             if convert_density:
@@ -88,7 +89,7 @@ def check_overflow(material_dict,
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow
-        reward = -10  # punishment
+        reward = -1  # punishment
         d_percentage = v_max / total_volume  # calculate the percentage of material left
         for M in material_dict:
             material_dict[M][1] *= d_percentage

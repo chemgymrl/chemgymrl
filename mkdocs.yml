@@ -1,0 +1,36 @@
+site_name: ChemGymRL Documentation
+site_url: http://docs.ChemGymRL.org
+site_description: ChemGymRL supporting documentation.
+site_author: Isaac Tamblyn, Mark Crowley, Amanuel Dawit
+theme: readthedocs
+
+repo_url: https://github.com/chemgymrl/chemgymrl
+
+edit_uri: edit/main/docs/
+
+nav:
+- Home: index.md
+- Getting Started: 
+    - What is ChemGymRL?: WhatIsChemGymRL.md
+    - Installation: Installation.md
+    - Quick Start: QuickStart.md
+- User Manual:  
+    - Reaction Bench: reaction.md
+    - Extraction Bench: extraction.md
+    - Distillation Bench: distillation.md
+    - Characterization Bench: characterization.md
+    - Lab Manager: lab_manager.md
+    - Developers: Developers.md
+    - Glossary: Glossary.md
+    - Troubleshooting: Troubleshooting.md
+- Tutorials:
+    - Reaction Bench Tutorial, Lesson 1: lesson_1_react.md
+    - Reaction Bench Tutorial, Lesson 2: lesson_2_reaction.md
+    - Custom Reaction Lesson: custom_reaction_lesson.md
+    - Vessel Lesson: vessel_lesson.md
+    - Extraction Bench Tutorial: lesson_1_extract.md
+    - Custom Extraction Lesson: custom_extraction_lesson.md
+    - Distillation Bench Tutorial, Lesson 1: lesson_1_distillation.md 
+    - Distillation Bench Tutorial, Lesson 2: lesson_2_distillation.md 
+- Contact Us: Contact.md
+- Citation and Licence: License.md

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Isaac Tamblyn, Mark Crowley, Amanuel Dawit">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Lesson 1 distillation - ChemGymRL Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Lesson 1 distillation";
+    var mkdocs_page_input_path = "lesson_1_distillation.md";
+    var mkdocs_page_url = "/lesson_1_distillation/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> ChemGymRL Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../About/">About</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Contact/">Contact</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Developers/">Developers</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Directory/">Directory</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Glossary/">Glossary</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../License/">License</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Output/">Output</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../QuickStart/">QuickStart</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../RLalgo/">RLalgo</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Troubleshooting/">Troubleshooting</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../UsingCmdLine/">UsingCmdLine</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../VisualizingOutput/">VisualizingOutput</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../WhatIsChemGymRL/">WhatIsChemGymRL</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../custom_extraction_lesson/">Custom extraction lesson</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../custom_reaction_lesson/">Custom reaction lesson</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../input/">Input</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../jenkins/">Jenkins</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Lesson 1 distillation</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#distillation-bench-lesson-1">Distillation Bench: Lesson 1</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#familiarizing-actions-for-the-distillation-bench">Familiarizing Actions for the Distillation Bench</a></li>
+        
+            <li><a class="toctree-l3" href="#distillation-process-explained">Distillation Process Explained</a></li>
+        
+            <li><a class="toctree-l3" href="#running-the-environment">Running the environment</a></li>
+        
+            <li><a class="toctree-l3" href="#end-of-the-lesson">End of the lesson</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_1_extract/">Lesson 1 extract</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_1_react/">Lesson 1 react</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_2_distillation/">Lesson 2 distillation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../lesson_2_reaction/">Lesson 2 reaction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../vessel_lesson/">Vessel lesson</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">ChemGymRL Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Lesson 1 distillation</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/chemgymrl/chemgymrl/edit/main/docs/lesson_1_distillation.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="distillation-bench-lesson-1">Distillation Bench: Lesson 1</h2>
+<h3 id="familiarizing-actions-for-the-distillation-bench">Familiarizing Actions for the Distillation Bench</h3>
+<p>In this tutorial, we will be going through how the distillation environment works. We will be taking the <code>tests/test_extract_vessel.pickle</code> which is a pickle file generated when we ran the extraction bench. </p>
+<p>It is important to know that before running the distillation bench, you must first complete both reaction and extraction, in order to follow the workflow our environment. To find out more, take a look at the <a href="https://github.com/CLEANit/chemistrygym">readme.md</a> file on our github.</p>
+<p>Before we start talking about loading and running the environment, let's first familiarize ourselves with what's actually going on in the experiment.</p>
+<h3 id="distillation-process-explained">Distillation Process Explained</h3>
+<p>In the distillation environment there are 3 main containers or vessels.</p>
+<table>
+<thead>
+<tr>
+<th>vessel</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boiling vessel</td>
+<td>BV</td>
+</tr>
+<tr>
+<td>beaker 1/condensation vessel</td>
+<td>B1</td>
+</tr>
+<tr>
+<td>beaker 2/storage vessel</td>
+<td>B2</td>
+</tr>
+</tbody>
+</table>
+<p>The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials  that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.</p>
+<p><img alt="distillation" src="../../sample_figures/lesson_1d_aestheticimg_2.png" /></p>
+<p>The point of the process is to extract a target material from the boiling vessel, which contains numerous materials, and we do this by utilizing the different material's boiling points. Typically the process begins by raising the temperature of the BV which allows certain materials in that vessel to boil off into the condensation vessel or B1. </p>
+<p><img alt="distillation" src="../../sample_figures/lesson_1d_aestheticimg_3.png" /></p>
+<p>As a material's boiling point is reached, any more temperature added from this point will act to evaporate it.  The now gaseous material will rise out of the boiling vessel into the tube that feeds into the condensation vessel where it will condense back into its liquid form. In this virtual experiment  it is assumed that this takes place instantaneously. The amount of material evaporated is dependent on the enthalpy of vapour of material being evaporated. </p>
+<p>Once the entirety of the material has been boiled off, the condensation vessel is drained into the storage vessel. Now 
+the condensation vessel is empty, the boiling vessel's temperature can then be raised more until the next lowest boiling point is reached, thus repeating the process.</p>
+<p><img alt="evaporation" src="../../sample_figures/lesson_1d_aestheticimg_1" /></p>
+<p>The process is repeated until the desired material has been completely evaporated from the boiling vessel into  condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample. We can then choose to end the experiment.</p>
+<p>In lesson 3 in these sets of tutorial for the distillation bench, we will try to get a high reward by obtaining a high molar amount of pure dodecane in our condensation vessel. </p>
+<p>For this tutorial, we will just familiarize ourselves with the basic actions, fundamental theory behind distillation, and how you can run the environment on your own!</p>
+<h3 id="running-the-environment">Running the environment</h3>
+<p>We will first start by importing the necessary required modules, both external and local. By now this step should seem very familiar as we have done them in the reaction and extraction lessons.</p>
+<pre><code class="python">%matplotlib inline
+</code></pre>
+
+<pre><code class="python"># import all the required external modules
+import gym
+import numpy as np
+import os
+import pickle
+import sys
+from time import sleep
+from gym import envs
+import matplotlib.pyplot as plt
+import pandas as pd
+</code></pre>
+
+<pre><code class="python"># ensure all necessary modules can be found
+sys.path.append('../')
+sys.path.append(&quot;../chemistrylab/reactions&quot;) # to access all reactions
+</code></pre>
+
+<pre><code class="python"># import local modules
+import chemistrylab 
+</code></pre>
+
+<p>We can see all the possible variations of the distillation bench environment which can vary depending on the input vessel (in this case the <code>test_extract_vessel.pickle</code>), which is loaded into the boil vessel, as well as the target material. In this and following tutorials our target material will be dodecane</p>
+<pre><code class="python"># show all environments for distillation bench
+all_envs = envs.registry.all()
+env_ids = [env_spec.id for env_spec in all_envs if 'Distillation' in env_spec.id]
+print(env_ids)
+</code></pre>
+
+<p>We then get prompted with a message asking us to choose the environment we want to run. This is based off the indexing in the environment array we saw from the last cell.</p>
+<pre><code class="python"># allows user to pick which environment they want to use
+# initializes environment
+select_env = int(input(f&quot;Enter a number to choose which environment you want to run (0 - {len(env_ids) - 1}): \n&quot;))
+env = gym.make(env_ids[select_env])
+render_mode = &quot;human&quot; #select how graphs are rendered
+</code></pre>
+
+<p>We initialize done to False so our agent can run the experiment. We run reset() to return an initial observation.</p>
+<pre><code class="python">done = False
+__ = env.reset()
+print('\n')
+</code></pre>
+
+<p>Here we have the different possible actions that we can take with the environment. The <strong>action_set is an array indexed correspondingly to the action we want to perform.</strong></p>
+<p>The action_space is a multidiscrete action space of shape [6 10].</p>
+<p><strong>The first index allows us to choose from the action set. The second index allows us to pick a multiplier that will affect the action variably depending on our chosen multiplier.</strong></p>
+<p>For example, the following pair of numbers will add a great amount of heat compared to a multiplier of 6. </p>
+<p>Action: 0</p>
+<p>Action Multiplier: 10</p>
+<p>Here is a complete explanation of each action. Again, action[0] indicates the the event which is to take place. Action[1] is a number representing the multiplier for the event.</p>
+<table>
+<thead>
+<tr>
+<th>action[0]</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Pour B1 into BV (Volume multiplier, relative to max_vessel_volume)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Pour B2 into BV (Volume multiplier, relative to max_vessel_volume)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Done (Value doesn't matter)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="python">action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
+assert env.action_space.shape[0] == 2
+
+total_steps=0
+total_reward=0
+</code></pre>
+
+<p>Note that the multiplier affects each action differently. For examply the way the agents chosen multiplier affects heat change is given by the following code:</p>
+<p><img alt="heatchange" src="../../sample_figures/lesson_1d_image2.PNG" /></p>
+<p>Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentraion of the desired material (in our case dodecane) in a particular vessel.</p>
+<p>Please input the following action and multipliers:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th align="center">Action</th>
+<th align="right">Multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td align="center">0</td>
+<td align="right">8</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="center">2</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td>2</td>
+<td align="center">0</td>
+<td align="right">6</td>
+</tr>
+<tr>
+<td>3</td>
+<td align="center">3</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td>4</td>
+<td align="center">1</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td>5</td>
+<td align="center">4</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td>6</td>
+<td align="center">5</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="python">while not done:
+
+    action = np.zeros(env.action_space.shape[0])
+
+    for index, action_desc in enumerate(action_set):
+        print(f'{index}: {action_desc}')
+    print('Please enter an action and an action multiplier')
+    for i in range(2):
+        message = 'Action'
+        if i == 1:
+            message = 'Action Multiplier:'
+        action[i] = int(input(f'{message}: '))
+
+
+    # perform the action and update the reward
+    state, reward, done, __ = env.step(action)
+    print('-----------------------------------------')
+    print('total_steps: ', total_steps)
+    print('reward: %.2f ' % reward)
+    total_reward += reward
+    print('total reward: %.2f ' % total_reward)
+    print('Temperature of boiling vessel: %.1f ' % env.boil_vessel.temperature, ' K \n')
+    # print(state)
+
+    # render the plot
+    env.render(mode=render_mode)
+    # sleep(1)
+
+    #increment one step
+    total_steps += 1
+</code></pre>
+
+<h4 id="step-0-adding-temperature-to-the-vessel">Step 0: Adding temperature to the vessel</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<p>This will result in a temperature reaching the boiling point of water, which you will notice is now boiled off in beaker_0 (or the condensation vessel)</p>
+<p><img alt="add-temp" src="../../sample_figures/lesson_1d_image5.PNG" /></p>
+<h4 id="step-1-pour-from-condensation-to-storage-vessel">Step 1: Pour from condensation to storage vessel</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>We can then see that storage vessel is now filled with the H2O poured from the condensation vessel. </p>
+<p><strong><em>*plot not fixed yet</em></strong>*</p>
+<p><img alt="pour-beaker1" src="../../sample_figures/lesson_1d_image7.PNG" /></p>
+<h4 id="step-2-add-some-more-temperature">Step 2: Add some more temperature</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="add-temp" src="../../sample_figures/lesson_1d_image9.PNG" /></p>
+<h4 id="step-3-pouring-back-from-condensation-vessel-to-boiling-vessel">Step 3: Pouring back from condensation vessel to boiling vessel</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>You should see now that everything from the condensation vessel is back in the boiling vessel.</p>
+<p><strong>---Should insert graph here but it doesn't show the action correctly---</strong></p>
+<h4 id="step-4-pour-everything-from-boiling-vessel-into-condensation-vessel">Step 4: Pour everything from boiling vessel into condensation vessel</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>Notice now that all the materials are in the condensation vessel.</p>
+<p><img alt="pour-to-b1" src="../../sample_figures/lesson_1d_image12.PNG" /></p>
+<h4 id="step-5-pour-the-originally-boiled-off-h2o-in-the-storage-vessel-into-the-boiling-vessel">Step 5: Pour the originally boiled off H2O in the storage vessel into the boiling vessel</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>Now you can see that the H2O which was previously in the storage vessel, is now in the boiling vessel.</p>
+<p><img alt="pour-to-bv" src="../../sample_figures/lesson_1d_image14.PNG" /></p>
+<h4 id="step-6-ending-the-experiment">Step 6: Ending the experiment</h4>
+<table>
+<thead>
+<tr>
+<th>action</th>
+<th>multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="end-of-the-lesson">End of the lesson</h3>
+<p>This concludes the end of our tutorial. Hopefully you got a chance to see how the basic actions in the distillation environment works and see how you can use the agent in RL applications to maximize the distillation of a desired material.</p>
+<p>In the next tutorial we will perform 2 experiments where we heat up the boiling vessel to the maximum temperature it can reach, and vice versa where we cool it to the lowest temperature.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../lesson_1_extract/" class="btn btn-neutral float-right" title="Lesson 1 extract">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../jenkins/" class="btn btn-neutral" title="Jenkins"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/chemgymrl/chemgymrl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../jenkins/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../lesson_1_extract/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
