@@ -1,0 +1,11 @@
+language: python
+python:
+  - "3.8"
+install:
+  - pip install .
+script:
+  - cd tests/unit
+  - python -m unittest discover -p "*test*.py"
+env:
+  global:
+    secure: cQzKC1RUjYWX2x/tazBllCL3NX9Jc5xWgIA0SZLqkNmxLXphYID7CdDqymw6+fdQ+T/0I1GT0MJxU8DZlBorSGqzZ6eKKpWhjWqdhsoYZsxySBONuRG6Hq/sT48Jn0c4J+lkpzZ5/rRN//ELBVecT0hDvCneCVZM3kiB4ikJFP5iU2gwnybAIWHtV+Y3VkZezcgum/QDRLlrJ96C5Q2bwzrd3DrguncsoYacsA9qc+7aTglMyjiI9EHWdNXNEG01ENjC9JiM1jG75RXwWAJpt9I4Rst6fmkuUafnfAwUeGgkPZ2Eh0ff9uVZ19LSgS6+ed6Au6XXNvMnuasd1ROnA7Ct+aHqo7ZWMT9V07j2ihdPCI1RlaJQvENpb20pD+f/g2FbfknlJjcLFvjErcApfwmPy01E2e3J8+wX5AbzRLxPX3Rezkr+b1jju5vXr7tIa1bi4dxNijOzL9W1jc8akNLqrgysf5uiKnCamY7rQ6Q5FmQJwijahlICv/Mi7NXF2tiDzpdLrzmA5iCC8fN9p6SbWsdeCuzsX5tIponw7qpblOHXEnpzfFuog5/EgAve/I4d5NFFGJSuh1HZXLsrlyeg3nllwRqCim/1RV+FhJkiE59vSyKeh7DMPYINCsNvWMlCGpO2SAkST+Tt9rXyp5yRDxGRsu1zUgaffgesxew=
