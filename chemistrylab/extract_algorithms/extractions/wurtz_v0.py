@@ -1,4 +1,4 @@
-'''
+"""
 Module to describe the extraction of a desired material generated in a Wurtz reaction.
 
 :title: wurtz_v0.py
@@ -17,7 +17,7 @@ Available Actions for this Extraction Experiment are included below.
 5: Pour S1 into ExV (Volume multiplier, relative to max_vessel_volume)
 6: Pour S2 into ExV (Volume multiplier, relative to max_vessel_volume)
 7: Done (Value doesn't matter)
-'''
+"""
 
 # pylint: disable=invalid-name
 # pylint: disable=protected-access
@@ -38,43 +38,12 @@ import gym
 # import local modules
 sys.path.append("../../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
-from chemistrylab.reactions.get_reactions import convert_to_class
+
 
 class Extraction:
-    '''
+    """
     Class object for a Wurtz extraction experiment.
-
-    Parameters
-    ---------------
-    `extraction_vessel` : `vessel` (default=`None`)
-        A vessel object containing state variables, materials, solutes, and spectral data.
-    `solute` : `str` (default=`None`)
-        The name of the added solute.
-    `target_material` : `str` (default=`None`)
-        The name of the required output material designated as reward.
-    `nempty_vessels` : `int` (default=`2`)
-        The number of empty vessels to add.
-    `solute_volume` : `int` (default=`1000000000`)
-        The amount of `solute` available to add during the extraction.
-    `dt` : `float` (default=`0.01`)
-        The default time-step.
-    `max_vessel_volume` : `float` (default=`1000.0`)
-        The maximal volume of an added vessel.
-    `n_vessel_pixels` : `int` (default=`100`)
-        The number of pixels in a vessel.
-    `max_valve_speed` : `int` (default=`10`)
-        The maximal amount of material flowing through the valve in a given time-step.
-    `n_actions` : `int` (default=`8`)
-        The number of actions included in this extraction experiment.
-
-    Returns
-    ---------------
-    None
-
-    Raises
-    ---------------
-    None
-    '''
+    """
 
     def __init__(
             self,
@@ -90,9 +59,40 @@ class Extraction:
             n_actions=8,
             extractor=None
     ):
-        '''
-        Constructor class for the Wurtz Extraction class
-        '''
+        """
+        Constructor class for the Wurtz Extraction class.
+
+        Parameters
+        ---------------
+        `extraction_vessel` : `vessel` (default=`None`)
+            A vessel object containing state variables, materials, solutes, and spectral data.
+        `solute` : `str` (default=`None`)
+            The name of the added solute.
+        `target_material` : `str` (default=`None`)
+            The name of the required output material designated as reward.
+        `nempty_vessels` : `int` (default=`2`)
+            The number of empty vessels to add.
+        `solute_volume` : `int` (default=`1000000000`)
+            The amount of `solute` available to add during the extraction.
+        `dt` : `float` (default=`0.01`)
+            The default time-step.
+        `max_vessel_volume` : `float` (default=`1000.0`)
+            The maximal volume of an added vessel.
+        `n_vessel_pixels` : `int` (default=`100`)
+            The number of pixels in a vessel.
+        `max_valve_speed` : `int` (default=`10`)
+            The maximal amount of material flowing through the valve in a given time-step.
+        `n_actions` : `int` (default=`8`)
+            The number of actions included in this extraction experiment.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        """
 
         # set self variable
         self.dt = dt
@@ -109,7 +109,7 @@ class Extraction:
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
     def get_action_space(self):
-        '''
+        """
         Method to describe the actions index and multipliers available.
 
         Parameters
@@ -124,14 +124,14 @@ class Extraction:
         Raises
         ---------------
         None
-        '''
+        """
 
         action_space = gym.spaces.MultiDiscrete([self.n_actions, 5])
 
         return action_space
 
     def reset(self, extraction_vessel):
-        '''
+        """
         Method to reset the environment.
 
         Parameters
@@ -151,7 +151,7 @@ class Extraction:
         Raises
         ---------------
         None
-        '''
+        """
 
         # delete the extraction vessel's solute_dict and copy it into a list of vessels
         solute_dict = extraction_vessel._solute_dict
@@ -219,7 +219,7 @@ class Extraction:
         return vessels, external_vessels, state
 
     def perform_action(self, vessels, ext_vessel, action):
-        '''
+        """
         Method to perform the action designated by `action` and update
         the state, vessels, external vessels, and generate reward.
 
@@ -247,10 +247,15 @@ class Extraction:
         Raises
         ---------------
         None
-        '''
+        """
 
-        reward = -1  # default reward for each step
+        # default reward for each step
+        reward = -1
+
+        # set the completed variable
         done = False
+
+        # deconstruct the action
         do_action = int(action[0])
         multiplier = (action[1]) / 4 if action[1] != 0 else 0
 
