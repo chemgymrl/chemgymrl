@@ -737,7 +737,6 @@ class Vessel:
             feedback=[event_1, event_2, event_3],
             dt=dt
         )
-
         return reward
 
     def _drain_by_pixel(
