@@ -1,6 +1,6 @@
 # chemistrygym
 
-[![Build Status](https://travis-ci.com/chemgymrl/chemgymrl.svg?branch=master)](https://travis-ci.com/chemgymrl/chemgymrl)
+[![Build Status](https://travis-ci.com/chemgymrl/chemgymrl.svg?branch=main)](https://travis-ci.com/chemgymrl/chemgymrl)
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://chemgymrl.readthedocs.io/en/latest/)
 
 
