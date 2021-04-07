@@ -136,4 +136,4 @@ This will result in the following graph:
 
 As you can see the condensation vessel is mostly filled with dodecane which results in a successful distillation process. We are then given the reward of 0.97.
 
-![high reward)![image.png](../tutorial_figures/high_reward.png)
+![high reward](../tutorial_figures/high_reward.png)
