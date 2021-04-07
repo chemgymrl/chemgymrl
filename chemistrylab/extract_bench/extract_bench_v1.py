@@ -1,4 +1,4 @@
-'''
+"""
 Module to access and execute the ExtractWorld Engine
 
 :title: extractworld_v1.py
@@ -6,7 +6,7 @@ Module to access and execute the ExtractWorld Engine
 :author: Chris Beeler and Mitchell Shahen
 
 :history: 2020-06-24
-'''
+"""
 
 # pylint: disable=invalid-name
 # pylint: disable=wrong-import-position
@@ -21,8 +21,9 @@ sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms import material, util, vessel
 from chemistrylab.extract_bench.extract_bench_v1_engine import ExtractBenchEnv
 
+
 def get_extract_vessel(vessel_path=None, extract_vessel=None):
-    '''
+    """
     Function to obtain an extraction vessel containing materials.
 
     Parameters
@@ -41,7 +42,7 @@ def get_extract_vessel(vessel_path=None, extract_vessel=None):
     ---------------
     `IOError`:
         Raised if neither a path to a pickle file nor a vessel object is provided.
-    '''
+    """
 
     # ensure that at least one of the methods to obtain a vessel is provided
     if all([not os.path.exists(vessel_path), not extract_vessel]):
@@ -55,8 +56,9 @@ def get_extract_vessel(vessel_path=None, extract_vessel=None):
 
     return extract_vessel
 
+
 def oil_vessel():
-    '''
+    """
     Function to generate an input vessel for the oil and water extraction experiment.
 
     Parameters
@@ -71,7 +73,7 @@ def oil_vessel():
     Raises
     ---------------
     None
-    '''
+    """
 
     # initialize extraction vessel
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
@@ -93,15 +95,15 @@ def oil_vessel():
 
     # material_dict
     material_dict = {
-        H2O().get_name(): [H2O, 30.0],
-        Na().get_name(): [Na, 1.0],
-        Cl().get_name(): [Cl, 1.0]
+        H2O().get_name(): [H2O, 30.0, 'mol'],
+        Na().get_name(): [Na, 1.0, 'mol'],
+        Cl().get_name(): [Cl, 1.0, 'mol']
     }
 
     # solute_dict
     solute_dict = {
-        Na().get_name(): [H2O().get_name(), 1.0],
-        Cl().get_name(): [H2O().get_name(), 1.0],
+        Na().get_name(): {H2O().get_name(): [H2O, 1, 'mol']},
+        Cl().get_name(): {H2O().get_name(): [H2O, 1, 'mol']},
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
@@ -123,27 +125,29 @@ def oil_vessel():
 
     return extraction_vessel
 
+
 class ExtractWorld_v1(ExtractBenchEnv):
-    '''
+    """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
-    '''
+    """
 
     def __init__(self):
         super(ExtractWorld_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
-                extract_vessel=None
+                extract_vessel=vessel.Vessel(label='temp')
             ),
             solute="H2O",
             target_material='dodecane',
             out_vessel_path=os.getcwd()
         )
 
+
 class ExtractWorld_v2(ExtractBenchEnv):
-    '''
+    """
     Class to define an environment which performs a water-oil extraction on materials in a vessel.
-    '''
+    """
 
     def __init__(self):
         super(ExtractWorld_v2, self).__init__(

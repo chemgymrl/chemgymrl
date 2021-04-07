@@ -1,10 +1,7 @@
 '''
 Distillation Demo
-
 :title: distillation_bench_v1_engine.py
-
 :author: Mitchell Shahen
-
 :history: 2020-07-23
 '''
 
@@ -29,7 +26,6 @@ from chemistrylab.distillations import distill_v0
 class DistillationBenchEnv(gym.Env):
     '''
     Class object to create a Distillation environment.
-
     Parameters
     ---------------
     `boil_vessel` : `vessel` (default=`None`)
@@ -38,11 +34,9 @@ class DistillationBenchEnv(gym.Env):
         The name of the required output material designated as reward.
     `n_steps` : `int` (default=`100`)
         The number of steps in an episode.
-
     Returns
     ---------------
     None
-
     Raises
     ---------------
     None
@@ -107,7 +101,6 @@ class DistillationBenchEnv(gym.Env):
     def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, dQ=0.0, out_vessel_path=None):
         '''
         Checks and validates the input parameters submitted to the distillation bench.
-
         Parameters
         ---------------
         `n_steps` : `int` (default=`None`)
@@ -120,7 +113,6 @@ class DistillationBenchEnv(gym.Env):
             The maximal amount of heat to add to the boil vessel in one action.
         `out_vessel_path` : `str` (default=`None`)
             The directory path where the vessel object is to be saved.
-
         Returns
         ---------------
         `n_steps` : `int` (default=`100`)
@@ -133,7 +125,6 @@ class DistillationBenchEnv(gym.Env):
             The maximal amount of heat to add to the boil vessel in one action.
         `out_vessel_path` : `str` (default=`None`)
             The directory path where the vessel object is to be saved.
-
         Raises
         ---------------
         `TypeError`:
@@ -204,21 +195,27 @@ class DistillationBenchEnv(gym.Env):
 
         return input_parameters
 
+    def update_vessel(self, vessel):
+        self.boil_vessel = vessel
+        self.distillation = distill_v0.Distillation(
+            boil_vessel=self.boil_vessel,
+            target_material=self.target_material,
+            dQ=1e+5,
+        )
+
     def _save_vessel(self, distillation_vessel=None, vessel_rootname=""):
         '''
         Method to save a vessel as a pickle file.
-        
+
         Parameters
         ---------------
         `distillation_vessel` : `vessel.Vessel` (default=`None`)
             The vessel object designated to be saved.
         `vessel_rootname` : `str` (default="")
             The intended name/identifier of the pickle file to which the vessel is being saved.
-
         Returns
         ---------------
         None
-
         Raises
         ---------------
         None
@@ -240,15 +237,13 @@ class DistillationBenchEnv(gym.Env):
     def _update_state(self):
         '''
         Method to update the state variable.
-        
+
         Parameters
         ---------------
         None
-
         Returns
         ---------------
         None
-
         Raises
         ---------------
         None
@@ -294,7 +289,10 @@ class DistillationBenchEnv(gym.Env):
             # set up each set of material properties as separate packages (as lists)
             # each list has three elements: [material_name, material_class, material_amount]
             material_packages = []
-            for material_name, [material_class, material_amount] in vessel._material_dict.items():
+            for j in range(len( list(vessel._material_dict))):
+                material_name = list(vessel._material_dict.items())[j][0]
+                material_class = list(vessel._material_dict.items())[j][1][0]
+                material_amount = list(vessel._material_dict.items())[j][1][1]
                 material_package = [material_name, material_class, material_amount]
                 material_packages.append(material_package)
             for material_package in material_packages:
@@ -306,16 +304,13 @@ class DistillationBenchEnv(gym.Env):
     def reset(self):
         '''
         Initialize the environment
-
         Parameters
         ---------------
         None
-
         Returns
         ---------------
         `state` : `np.array`
             A numpy array containing state variables, material concentrations, and spectral data.
-
         Raises
         ---------------
         None
@@ -341,13 +336,11 @@ class DistillationBenchEnv(gym.Env):
     def step(self, action):
         '''
         Update the environment by performing an action.
-
         Parameters
         ---------------
         `action` : `list`
             A list of two numbers indicating the index of the action to
             perform and a multiplier to use in completing the action.
-
         Returns
         ---------------
         `state` : `np.array`
@@ -358,7 +351,6 @@ class DistillationBenchEnv(gym.Env):
             A boolean indicting if all the steps in an episode have been completed.
         `params` : `dict`
             A dictionary containing additional parameters or information that may be useful.
-
         Raises
         ---------------
         None
@@ -413,16 +405,13 @@ class DistillationBenchEnv(gym.Env):
     def render(self, model):
         '''
         Select a render mode to display pertinent information.
-
         Parameters
         ---------------
         `model` : `str` (default=`human`)
             The name of the render mode to use.
-
         Returns
         ---------------
         None
-
         Raises
         ---------------
         None

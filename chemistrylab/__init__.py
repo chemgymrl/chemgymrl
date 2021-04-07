@@ -24,17 +24,36 @@ register(
     max_episode_steps=100
 )
 
+register(
+    id='MethylRed_Extract-v1',
+    entry_point='chemistrylab.extract_bench.methyl_red:ExtractWorld_MethylRed',
+    max_episode_steps=100
+)
+
+register(
+    id='MethylRed_Extract-v2',
+    entry_point='chemistrylab.extract_bench.extraction_0:ExtractWorld_MethylRed',
+    max_episode_steps=100
+)
+
 ############################ ReactBench ####################################
 
 register(
-    id='WurtzReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0',
+    id='WurtzReact-v1',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_0',
     max_episode_steps=20
 )
 
 register(
-    id='WurtzReact_overlap-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v0:ReactionBenchEnv_0_Overlap',
+    id='DecompReact-v0',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
+    max_episode_steps=20
+)
+
+
+register(
+    id='WurtzReact-v2',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',
     max_episode_steps=20
 )
 
