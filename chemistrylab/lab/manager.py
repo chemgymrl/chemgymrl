@@ -447,5 +447,5 @@ class Manager:
 
 
 if __name__ == "__main__":
-    manager = Manager(mode='random')
+    manager = Manager(mode='human')
     manager.run()
