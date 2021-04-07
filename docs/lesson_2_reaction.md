@@ -1,25 +1,21 @@
-[chemgymrl.com](https://chemgymrl.com/)
-
 ## Reaction Bench Lesson 2
 
 ### Getting a high reward in a reaction of form: 
-A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
 
-In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be simulating in this lesson is specifically:
+- A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
+
+In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be taking an in depth look at in this lesson is specifically:
 - 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
 
-In similar fashion to lesson 1, the reactions used in this lesson are found in the reaction file. The reaction above is 1 of the 6 total reactions in the Wurtz reaction.
+We will try to get the desired material: 4,5-diethyloctane
 
-The particular reaction we will be simulating is performed in an aqueous state with ethoxyethane as the solvent.
+In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions file. This particular lesson will use the reaction file 'chloro_wurtz_v1.py' and is registered under the id 'WurtzReact-v2'
 
 From lesson 1 we know that our action space is a 6 element vector represented by:
 
 |              | Temperature | Volume | 1-chlorohexane | 2 chlorohexane | 3-chlorohexane | Na  | 
 |--------------|-------------|--------|----------------|----------------|----------------|-----|
-| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1  |
-
-Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease.
-If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase.
+| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1|
 
 First let's start by importing all the modules we need.
 
@@ -55,9 +51,6 @@ env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
 ```
 
-    ['WurtzReact-v0', 'WurtzReact_overlap-v0']
-    
-
 This explains the simulated reaction we are trying to simulate and is initializing the reaction environment.
 
 
@@ -68,7 +61,7 @@ This explains the simulated reaction we are trying to simulate and is initializi
 # Cannot come from A-B as this doesn't make the desired property
 # Desired material in this case is initialized to be 4,5-diethyloctane
 # initializes environment
-env = gym.make("WurtzReact-v0")
+env = gym.make("WurtzReact-v2")
 render_mode = "human"
 ```
 
@@ -84,9 +77,6 @@ num_actions_available = env.action_space.shape[0]
 total_steps=0
 total_reward=0
 ```
-
-    # of actions available:  6
-    
 
 We will store certain values in these arrays so can plot them later on to visually show how each variable changes over time.
 
@@ -106,19 +96,11 @@ continue. This means that we will only add 3-chlorohexane and Na with our action
 reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
 do this by running the following commands:
 
-```python
-if total_steps  < 20:
-action[0] = 1
-action[1] = 1
-action[2] = 0.05 # 1-chlorohexane
-action[3] = 0.05 # 2-chlorohexane
-action[4] = 1    # 3-chlorohexane
-action[5] = 1    # Na
-```
+![actions](../tutorial_figures/actions_reaction.png)
 
-Notice that we're only adding the reactants we need for the reaction to continue.
+Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane
 
-![reaction](sample_figures/lesson_2r_image1.png)
+![reaction](../tutorial_figures/reaction.png)
 
 Let's run our program and see what happens!
 
@@ -132,8 +114,8 @@ while not done:
     if total_steps  < 20:
         action[0] = 1
         action[1] = 1
-        action[2] = 0.05 # 1-chlorohexane
-        action[3] = 0.05 # 2-chlorohexane
+        action[2] = 0    # 1-chlorohexane
+        action[3] = 0    # 2-chlorohexane
         action[4] = 1    # 3-chlorohexane
         action[5] = 1    # Na
 
@@ -171,91 +153,9 @@ while not done:
     reactant_2.append(env.state[7])
 ```
 
-    -----------------------------------------
-    total_steps:  0
-    reward: 0.28 
-    total reward: 0.28
-    -----------------------------------------
-    total_steps:  1
-    reward: 0.28 
-    total reward: 0.57
-    -----------------------------------------
-    total_steps:  2
-    reward: 0.28 
-    total reward: 0.85
-    -----------------------------------------
-    total_steps:  3
-    reward: 0.28 
-    total reward: 1.13
-    -----------------------------------------
-    total_steps:  4
-    reward: 0.28 
-    total reward: 1.41
-    -----------------------------------------
-    total_steps:  5
-    reward: 0.28 
-    total reward: 1.69
-    -----------------------------------------
-    total_steps:  6
-    reward: 0.28 
-    total reward: 1.97
-    -----------------------------------------
-    total_steps:  7
-    reward: 0.28 
-    total reward: 2.25
-    -----------------------------------------
-    total_steps:  8
-    reward: 0.28 
-    total reward: 2.52
-    -----------------------------------------
-    total_steps:  9
-    reward: 0.28 
-    total reward: 2.80
-    -----------------------------------------
-    total_steps:  10
-    reward: 0.28 
-    total reward: 3.08
-    -----------------------------------------
-    total_steps:  11
-    reward: 0.28 
-    total reward: 3.35
-    -----------------------------------------
-    total_steps:  12
-    reward: 0.27 
-    total reward: 3.63
-    -----------------------------------------
-    total_steps:  13
-    reward: 0.26 
-    total reward: 3.89
-    -----------------------------------------
-    total_steps:  14
-    reward: 0.26 
-    total reward: 4.14
-    -----------------------------------------
-    total_steps:  15
-    reward: 0.25 
-    total reward: 4.39
-    -----------------------------------------
-    total_steps:  16
-    reward: 0.24 
-    total reward: 4.63
-    -----------------------------------------
-    total_steps:  17
-    reward: 0.24 
-    total reward: 4.87
-    -----------------------------------------
-    total_steps:  18
-    reward: 0.23 
-    total reward: 5.10
-    -----------------------------------------
-    total_steps:  19
-    reward: 0.23 
-    total reward: 5.33
-    
+Notice that we get a total reward of 2.45. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
-Notice that we get a total reward of 5.33. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
-
-![subplot](sample_figures/lesson_2r_image3.PNG)
+![subplot](../tutorial_figures/subplots.PNG)
 
 This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
 
@@ -291,34 +191,7 @@ if show_stats.lower() in ["y", "yes"]:
         print("{} : {}".format(solute, value_list))
 ```
 
-    Show Reaction Vessel Stats ('Y'/'N') >>> y
-    
-    ---------- VESSEL ----------
-    Label: new
-    
-    ---------- THERMODYNAMIC VARIABLES ----------
-    Temperature (in K): 1.000000e+00
-    Volume (in L): 1.197500e-06
-    Pressure (in kPa): 8.192200e-07
-    
-    ---------- MATERIAL_DICT ----------
-    1-chlorohexane : [<class 'chemistrylab.chem_algorithms.material.OneChlorohexane'>, 0.2768946]
-    2-chlorohexane : [<class 'chemistrylab.chem_algorithms.material.TwoChlorohexane'>, 0.0]
-    3-chlorohexane : [<class 'chemistrylab.chem_algorithms.material.ThreeChlorohexane'>, 0.0]
-    Na : [<class 'chemistrylab.chem_algorithms.material.Na'>, 0.2768946]
-    dodecane : [<class 'chemistrylab.chem_algorithms.material.Dodecane'>, 0.36155286]
-    5-methylundecane : [<class 'chemistrylab.chem_algorithms.material.FiveMethylundecane'>, 0.0]
-    4-ethyldecane : [<class 'chemistrylab.chem_algorithms.material.FourEthyldecane'>, 0.0]
-    5,6-dimethyldecane : [<class 'chemistrylab.chem_algorithms.material.FiveSixDimethyldecane'>, 0.0]
-    4-ethyl-5-methylnonane : [<class 'chemistrylab.chem_algorithms.material.FourEthylFiveMethylnonane'>, 0.0]
-    4,5-diethyloctane : [<class 'chemistrylab.chem_algorithms.material.FourFiveDiethyloctane'>, 0.0]
-    NaCl : [<class 'chemistrylab.chem_algorithms.material.NaCl'>, 0.7231057]
-    
-    ---------- SOLUTE_DICT ----------
-    ethoxyethane : [<class 'chemistrylab.chem_algorithms.material.Ethoxyethane'>, 1.0]
-    
-
-**Why 4,5-diethyloctane is not in the vessel stats????**
+This part of the code plots certain states over time.
 
 
 ```python
@@ -350,18 +223,10 @@ plt.savefig('Final Subplots Demo Lesson 3.png')
 plt.show()
 ```
 
-For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again. Note that this is still the same simulation of the reaction stated at the start.
-We are just changing the reactants that we're adding.
+For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again.
 
-```python
-# Adding Reactants not needed:
-action[0] = 1
-action[1] = 1
-action[5] = 1
-action[4] = 1
-action[2] = 1
-action[3] = 1
-```
-If we run this code we'll notice that our reward is significantly lower. It is now only 0.63 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
+![code](../tutorial_figures/actions_for_bad_reward.PNG)
+
+If we run this code we'll notice that our reward is significantly lower. It is now only 1.06 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
 
 The next step for this reaction environment is to write an RL implementation that will allow the agent to solve this problem for you essentially maximizing our output of the desired material! 
