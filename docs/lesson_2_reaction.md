@@ -3,7 +3,7 @@
 ## Reaction Bench Lesson 2
 
 ### Getting a high reward in a reaction of form: 
-### A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
+A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
 
 In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be simulating in this lesson is specifically:
 - 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
