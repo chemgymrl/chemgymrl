@@ -155,7 +155,7 @@ while not done:
 
 Notice that we get a total reward of 2.45. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
-![subplot](../tutorial_figures/subplots.PNG)
+![subplot](../tutorial_figures/subplots.png)
 
 This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
 
