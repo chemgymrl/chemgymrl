@@ -24,14 +24,17 @@ nav:
     - Glossary: Glossary.md
     - Troubleshooting: Troubleshooting.md
 - Tutorials:
+    - Reaction Lesson: reaction_lesson.md
     - Reaction Bench Tutorial, Lesson 1: lesson_1_react.md
     - Reaction Bench Tutorial, Lesson 2: lesson_2_reaction.md
     - Custom Reaction Lesson: custom_reaction_lesson.md
     - Vessel Lesson: vessel_lesson.md
+    - Extraction Lesson: extraction_lesson.md
+    - Custom Extraction Lesson: custom_extraction_lesson.md   
     - Extraction Bench Tutorial: lesson_1_extract.md
-    - Custom Extraction Lesson: custom_extraction_lesson.md
     - Distillation Bench Tutorial, Lesson 1: lesson_1_distillation.md 
     - Distillation Bench Tutorial, Lesson 2: lesson_2_distillation.md
     - Distillation Bench Tutorial, Lesson 3: lesson_3_distillation.md
+    - Lab Manager Tutorial: lab_tutorial.md
 - Contact Us: Contact.md
 - Citation and Licence: License.md
