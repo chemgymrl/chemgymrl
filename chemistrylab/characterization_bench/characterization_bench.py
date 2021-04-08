@@ -81,7 +81,6 @@ class CharacterizationBench:
         ---------------
         None
         """
-
         if not overlap:
             params = [item[0]().get_spectra_no_overlap() for __, item in vessel.get_material_dict().items()]
         else:
@@ -117,80 +116,80 @@ class CharacterizationBench:
 
         return absorb
 
-    @staticmethod
-    def get_spectra_peak(C, params, materials):
-        """
-        Method to populate a list with the spectral peak of each chemical.
-
-        Parameters
-        ---------------
-        `C` : `np.array`
-            An array containing the concentrations of all materials in the vessel.
-        `params` : `list`
-            A list of spectra overlap parameters.
-        `materials` : `list`
-            A list of the materials in the inputted vessel.
-
-        Returns
-        ---------------
-        `spectra_peak` : `list`
-            A list of parameters specifying the peak of the spectra for each chemical.
-
-        Raises
-        ---------------
-        None
-        """
-
-        # create a list of the spectral peak of each chemical
-        spectra_peak = []
-        for i, material in enumerate(materials):
-            spectra_peak.append([
-                params[i][:, 1] * 600 + 200,
-                C[i] * params[i][:, 0],
-                material
-            ])
-
-        return spectra_peak
-
-    @staticmethod
-    def get_dash_line_spectra(C, params):
-        """
-        Module to generate each individual spectral dataset using gaussian decay.
-
-        Parameters
-        ---------------
-        `C` : `np.array`
-            An array containing the concentrations of all materials in the vessel.
-        `params` : `list`
-            A list of spectra overlap parameters.
-
-        Returns
-        ---------------
-        dash_spectra : list
-            A list of all the spectral data of each chemical
-
-        Raises
-        ---------------
-        None
-        """
-
-        dash_spectra = []
-
-        # set the wavelength space
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
-
-        for i, item in enumerate(params):
-            each_absorb = np.zeros(x.shape[0], dtype=np.float32)
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                            (x[k] - params[i][j, 1]) / params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    each_absorb += amount * height * decay_rate
-            dash_spectra.append(each_absorb)
-
-        return dash_spectra
+    # @staticmethod
+    # def get_spectra_peak(C, params, materials):
+    #     """
+    #     Method to populate a list with the spectral peak of each chemical.
+    #
+    #     Parameters
+    #     ---------------
+    #     `C` : `np.array`
+    #         An array containing the concentrations of all materials in the vessel.
+    #     `params` : `list`
+    #         A list of spectra overlap parameters.
+    #     `materials` : `list`
+    #         A list of the materials in the inputted vessel.
+    #
+    #     Returns
+    #     ---------------
+    #     `spectra_peak` : `list`
+    #         A list of parameters specifying the peak of the spectra for each chemical.
+    #
+    #     Raises
+    #     ---------------
+    #     None
+    #     """
+    #
+    #     # create a list of the spectral peak of each chemical
+    #     spectra_peak = []
+    #     for i, material in enumerate(materials):
+    #         spectra_peak.append([
+    #             params[i][:, 1] * 600 + 200,
+    #             C[i] * params[i][:, 0],
+    #             material
+    #         ])
+    #
+    #     return spectra_peak
+    #
+    # @staticmethod
+    # def get_dash_line_spectra(C, params):
+    #     """
+    #     Module to generate each individual spectral dataset using gaussian decay.
+    #
+    #     Parameters
+    #     ---------------
+    #     `C` : `np.array`
+    #         An array containing the concentrations of all materials in the vessel.
+    #     `params` : `list`
+    #         A list of spectra overlap parameters.
+    #
+    #     Returns
+    #     ---------------
+    #     dash_spectra : list
+    #         A list of all the spectral data of each chemical
+    #
+    #     Raises
+    #     ---------------
+    #     None
+    #     """
+    #
+    #     dash_spectra = []
+    #
+    #     # set the wavelength space
+    #     x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
+    #
+    #     for i, item in enumerate(params):
+    #         each_absorb = np.zeros(x.shape[0], dtype=np.float32)
+    #         for j in range(item.shape[0]):
+    #             for k in range(x.shape[0]):
+    #                 amount = C[i]
+    #                 height = item[j, 0]
+    #                 decay_rate = np.exp(
+    #                     -0.5 * (
+    #                         (x[k] - params[i][j, 1]) / params[i][j, 2]
+    #                     ) ** 2.0
+    #                 )
+    #                 each_absorb += amount * height * decay_rate
+    #         dash_spectra.append(each_absorb)
+    #
+    #     return dash_spectra

@@ -456,7 +456,7 @@ class _Reaction:
             assert self.reactants.sort() == materials_array.sort()
         else:
             # after the first iteration materials_array should be filled with products as well
-            assert self.materials == materials_array
+            assert set(materials_array).issubset(set(self.materials))
 
         # ensure that solutes from vessels compatible with reaction
         solute_dict_vessel = vessels.get_solute_dict()
@@ -732,7 +732,7 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
-                vessels.get_concentration(),
+                vessels.get_concentration(self.materials),
                 temperature,
                 volume,
                 vessels.get_defaultdt(),

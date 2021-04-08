@@ -575,6 +575,7 @@ class ReactionBenchEnv(gym.Env):
 
         # reset the modifiable state variables
         self.t = 0.0
+        self.step_num = 1
 
         # reinitialize the reaction class
         self.vessels = self._prepare_vessel(in_vessel_path=None, materials=self.initial_materials,
