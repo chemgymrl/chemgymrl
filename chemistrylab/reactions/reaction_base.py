@@ -125,7 +125,7 @@ class _Reaction:
         self.initial_solutes = np.zeros(len(self.solutes))
 
         # include the available solvers
-        self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
+        self.solvers = {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA'}
 
         # select the intended solver or use the default
         if solver in self.solvers:
