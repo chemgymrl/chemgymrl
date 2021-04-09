@@ -8,13 +8,13 @@ Essentially what we're trying to do is isolate our targeted material into the co
 
 In this tutorial we will be trying to get a high reward by targeting our desired material **dodecane**. We will heat up the boiling vessel to a temperature right before dodecane's boiling point (489.5 Kelvin) which will allow us to boil off every other material in the boiling vessel into beaker 1. 
 
-![boil vessel](../tutorial_figures/boiling_vessel_2.png)
+![boil vessel](../tutorial_figures/distillation-lesson-3/boiling_vessel_2.png)
 
 Then we will dump all the contents currently in beaker 1, which are not dodecane into beaker 2. Finally we will heat up boiling vessel even more to exceed dodecane's boiling temperature thus boiling it into beaker 1. This will allow us to have a beaker that is mostly dodecane thus getting us a high reward.
 
 Before we start the tutorial please go into the distillation_bench folder and check the `distillation_bench_v1.py` file. You'll notice that there is the class:
 
-![dq value](../tutorial_figures/dQ_value.png)
+![dq value](../tutorial_figures/distillation-lesson-1/dQ_value.png)
 
 Please make sure that the following dQ is equal to 1000 before following this tutorial, as the actions contained here only works with dQ as 1000. 
 
@@ -132,8 +132,8 @@ while not done:
 
 This will result in the following graph:
 
-![isolated dodecane](../tutorial_figures/isolated_dodecane.png)
+![isolated dodecane](../tutorial_figures/distillation-lesson-3/isolated_dodecane.png)
 
 As you can see the condensation vessel is mostly filled with dodecane which results in a successful distillation process. We are then given the reward of 0.97.
 
-![high reward](../tutorial_figures/high_reward.png)
+![high reward](../tutorial_figures/distillation-lesson-3/high_reward.png)

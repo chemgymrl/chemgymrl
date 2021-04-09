@@ -18,20 +18,20 @@ In the distillation environment there are 3 main containers or vessels.
 
 The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials  that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.
 
-![vessels](../tutorial_figures/vessels_image.png)
+![vessels](../tutorial_figures/distillation-lesson-1/vessels_image.png)
 
 The point of the process is to extract a target material from the boiling vessel, which contains numerous materials, and we do this by utilizing the different material's boiling points. Typically the process begins by raising the temperature of the BV which allows certain materials in that vessel to boil off into the condensation vessel or B1. 
 
-![boiling vessel](../tutorial_figures/boiling_vessel.png)
+![boiling vessel](../tutorial_figures/distillation-lesson-1/boiling_vessel.png)
 
 As a material's boiling point is reached, any more temperature added from this point will act to evaporate it. The now gaseous material will rise out of the boiling vessel into the tube that feeds into the condensation vessel where it will condense back into its liquid form. In this virtual experiment  it is assumed that this takes place instantaneously. The amount of material evaporated is dependent on the enthalpy of vapour of material being evaporated.
 
-![distillation process](../tutorial_figures/distillation_process.png)
+![distillation process](../tutorial_figures/distillation-lesson-1/distillation_process.png)
 
 Once the entirety of the material has been boiled off, the condensation vessel is drained into the storage vessel. Now 
 the condensation vessel is empty, the boiling vessel's temperature can then be raised more until the next lowest boiling point is reached, thus repeating the process.
 
-![evaporation](../tutorial_figures/evaporation.png)
+![evaporation](../tutorial_figures/distillation-lesson-1/evaporation.png)
 
 The process is repeated until the desired material has been completely evaporated from the boiling vessel into  condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample. We can then choose to end the experiment.
 
@@ -138,11 +138,11 @@ total_reward=0
 
 Note that the multiplier affects each action differently. For examply the way the agents chosen multiplier affects heat change is given by the following code:
 
-![heatchange](../tutorial_figures/heat_change.PNG)
+![heatchange](../tutorial_figures/distillation-lesson-1/heat_change.PNG)
 
 Also note that when we are performing heat changes, it heavily relies on the given value of dQ. For our lessons we will be using a dQ of 1000.0. Please make sure to change your dQ value to 1000.0 if you are following this lesson to ensure our results stay the same. You can change this value in the `distillation_bench_v1.py` file under the distillation bench folder.
 
-![dQ value](../tutorial_figures/dQ_value.png)
+![dQ value](../tutorial_figures/distillation-lesson-1/dQ_value.png)
 
 Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentraion of the desired material (in our case dodecane) in a particular vessel.
 
@@ -198,7 +198,7 @@ while not done:
 
 This will result in a temperature reaching the boiling point of water, which you will notice is now boiled off in beaker_0 (or the condensation vessel)
 
-![add-temp](../tutorial_figures/boil_water.png)
+![add-temp](../tutorial_figures/distillation-lesson-1/boil_water.png)
 
 #### Step 1: Pour from condensation to storage vessel
 
@@ -207,7 +207,7 @@ This will result in a temperature reaching the boiling point of water, which you
 
 We can then see that storage vessel is now filled with the H2O poured from the condensation vessel. 
 
-![pour-to-beaker1](../tutorial_figures/pour-to-beaker1.png)
+![pour-to-beaker1](../tutorial_figures/distillation-lesson-1/pour-to-beaker1.png)
 
 #### Step 2: Add some more temperature
 
@@ -216,7 +216,7 @@ We can then see that storage vessel is now filled with the H2O poured from the c
 
 We can now add more temperature in order to boil off 2-chlorohexane into the now empty condensation vessel. 2-chlorohexane is boiled off as in the remaining materials in the boiling vessel, it has the lowest boiling point.
 
-![boil 2-chlorohexane](../tutorial_figures/boil_2-chl.png)
+![boil 2-chlorohexane](../tutorial_figures/distillation-lesson-1/boil_2-chl.png)
 
 #### Step 3: Pouring again from condensation to storage
 
@@ -225,7 +225,7 @@ We can now add more temperature in order to boil off 2-chlorohexane into the now
 
 We can again pour the contents of the condensation vessel to the storage vessel
 
-![pour 2-chlorohexane](../tutorial_figures/pour_2-chl.png)
+![pour 2-chlorohexane](../tutorial_figures/distillation-lesson-1/pour_2-chl.png)
 
 #### Step 4: Pour everything from boiling vessel into condensation vessel
 
@@ -234,7 +234,7 @@ We can again pour the contents of the condensation vessel to the storage vessel
 
 Notice now that all the materials are in the condensation vessel.
 
-![pour boiling vessel](../tutorial_figures/pour-bv.png)
+![pour boiling vessel](../tutorial_figures/distillation-lesson-1/pour-bv.png)
 
 #### Step 5: Ending the experiment
 

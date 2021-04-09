@@ -144,7 +144,7 @@ action = np.array([0,125])
 When we run this code we should see that for every timestep that there is a heat change of 24000 joules and that the 
 temperature eventually reaches 1738.0 Kelvin. We end up with a final graph that looks like this:
 
-![action 1](../tutorial_figures/increase_temp_slightly.png)
+![action 1](../tutorial_figures/distillation-lesson-2/increase_temp_slightly.png)
 
 As you can see most the materials are boiled off from the boiling vessel into the condensation vessel aside from 0.1 mols of NaCl.
 
@@ -160,11 +160,11 @@ action = np.array([0,500])
 
 For this we will uncomment action 2. Now running this code gives us an interesting result. Run it yourself to see that we will get:
 
-![negative reward](../tutorial_figures/negative_reward.png)
+![negative reward](../tutorial_figures/distillation-lesson-2/negative_reward.png)
 
 We get a negative reward as whenever we try the increase the temperature of an empty boiling vessel the environment will return a reward of -1. Since the multiplier we used in this action was greater than the multiplier used in action 1, we were able to boil off every material in the boiling vessel thus causing us to get this negative reward.
 
-![action 2](../tutorial_figures/increase_temp_drastically.png)
+![action 2](../tutorial_figures/distillation-lesson-2/increase_temp_drastically.png)
 
 ### Lower the temperature (ACTION 3)
 
@@ -172,7 +172,7 @@ We will now lower the temperature the absolute minimum it can be and see what ha
 
 Running this results in the following graph:
 
-![graph](../tutorial_figures/decrease_temp.PNG)
+![graph](../tutorial_figures/distillation-lesson-2/decrease_temp.PNG)
 
 As you will notice, nothing really changes. Of course this isn't much of a surprise since by lowering the temperature  none of the materials in the boiling vessel will boil into the condensation vessel (in this case; if you have materials  with lower boiling points this will change). You'll notice that the minimum temperature the boiling vessel will reach is  297 Kelvin.
 
