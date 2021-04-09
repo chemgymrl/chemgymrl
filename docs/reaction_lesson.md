@@ -36,7 +36,9 @@ Firtst let's load up the environment, I highly recommend you look at the source 
 reaction, it should help provide insight into how this all works. Further the lesson on creating a custom reaction
 environment will also help give insight into the reaction mechanics. If you run the cell below you will see a graph appear that looks something like this:
 
-![graph](sample_figures/tutorial/wurtz_overlap_0.png)
+![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_command_0.png)
+
+![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_0.png)
 
 
 ```python
