@@ -10,7 +10,7 @@ with the environment and to try and achieve a high reward!
 
 So start by running the `lessons/extraction_bench/oil_water.py` you should see a series of graphs like these appear:
 
-![graph](sample_figures/tutorial/oil_and_water_0.png)
+![graph](../tutorial_figures/extraction-lesson-1/oil_and_water_0.png)
 
 These graphs show the contents of each of our containers and the level of seperation between the materials. The graphs
 to the right then show the layers of materials forming in the container.
@@ -21,7 +21,7 @@ very simple task, and indeed it is. Using a non-polar solvent we can get the sod
 water into that solvent, in this case we can use oil as our non-polar solvent! so now that the environemnt is loaded,
 you should see a prompt in the command line. 
 
-![command line prompt](sample_figures/tutorial/oil_water_console_0.png)
+![command line prompt](../tutorial_figures/extraction-lesson-1/oil_water_console_0.png)
 
 Before we start playing around with the environment, let's take a look at
 the action space. For this case our action space is a matrix: {0, 1}<sup>n_action x multiplier</sup> in essence at each
@@ -41,45 +41,45 @@ we take in between each action. Now that we have a better idea of our action spa
 environment. As stated earlier we need to use oil to extract the sodium from the water, but if we look at the graph now,
 we can clearly see that there is no oil in the container, so let's add some!
 
-![image of command](sample_figures/tutorial/oil_water_console_1.png)
+![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_1.png)
 
-![image of graphs with added oil](sample_figures/tutorial/oil_and_water_1.png)
+![image of graphs with added oil](../tutorial_figures/extraction-lesson-1/oil_and_water_1.png)
 
 Now that we've added the oil we need to mix the vessel to get the sodium to transfer into the oil, so let's mix the
 vessel!
 
-![image of command](sample_figures/tutorial/oil_water_console_2.png)
+![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_2.png)
 
-![image of graphs mixed](sample_figures/tutorial/oil_and_water_2.png)
+![image of graphs mixed](../tutorial_figures/extraction-lesson-1/oil_and_water_2.png)
 
 Now that we have done some mixing we need to wait for the oil to settle to the top of the water so we can drain the
 water. Keep repeating the following command until the graph settles.
 
-![image of command](sample_figures/tutorial/oil_water_console_3.png)
+![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_3.png)
 
-![image of graphs waiting ](sample_figures/tutorial/oil_and_water_3.png)
+![image of graphs waiting ](../tutorial_figures/extraction-lesson-1/oil_and_water_3.png)
 
 Now that the water and oil have settled we want to drain out our water into beaker 1 so that we can pour out our oil
 into vessel 2.
 
-![image of command](sample_figures/tutorial/oil_water_console_4.png)
+![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_4.png)
 
-![image of graphs draining](sample_figures/tutorial/oil_water_4.png)
+![image of graphs draining](../tutorial_figures/extraction-lesson-1/oil_water_4.png)
 
 Keep repeating the command the changing the multiplier as needed until the graph looks something like this:
 
-![image of graphs draining](sample_figures/tutorial/oil_water_5.png)
+![image of graphs draining](../tutorial_figures/extraction-lesson-1/oil_water_5.png)
 
 Now we pour the oil into vessel 2.
 
-![image of command](sample_figures/tutorial/oil_water_console_5.png)
+![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_5.png)
 
-![image of graphs pouring](sample_figures/tutorial/oil_water_6.png)
+![image of graphs pouring](../tutorial_figures/extraction-lesson-1/tutorial/oil_water_6.png)
 
 Now if we want to we can pour back the water from vessel 1 into our extraction vessel and repeat the process to get a
 more of the sodium out of the oil. However, for an introduction this much should satisfy, now that we have finished,
 we want to see how well we did so now we enter the done command.
 
-![image of command](sample_figures/tutorial/oil_water_console_7.png)
+![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_7.png)
 
 We hope this tutorial helped with your understanding of how an agent might interact with the extraction environmenment!

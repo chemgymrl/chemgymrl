@@ -21,9 +21,9 @@ environment will also help give insight into the reaction mechanics. In order to
 `lessons/reaction_bench/reaction_wurtz.py`. When you run this file you should see a prompt like this in your command
 line along with the following graph:
 
-![graph](sample_figures/tutorial/wurtz_overlap_command_0.png)
+![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_command_0.png)
 
-![graph](sample_figures/tutorial/wurtz_overlap_0.png)
+![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_0.png)
 
 Understanding the graph above is important to understanding how the agent will have to understand the environment.
 On the left we can see the absorbance spectra of the materials in our reaction vessel, and on the right we have
