@@ -15,7 +15,7 @@ Much like bench agents, the lab manager is also learning how to best perform tas
 The lab manager's input are the three main environments that it will be working with, mainly the reaction, extraction,
 and distillation environments. This is made available and specified under `manager_v1.py`.
 
-![lab manager input](../tutorial_figures/labmanger/lab_input.png)
+![lab manager input](../tutorial_figures/labmanager/lab_input.png)
 
 ## Output
 
@@ -23,4 +23,4 @@ The lab manager's output will be messages from the environment that it is curren
 depend on the action that is being performed. The lab manager itself does not have any specific outputs. We can, 
 however, use lab manager to access the extraction environment and get outputs from that.
 
-![extract action](../tutorial_figures/labmanger/extract_output.png)
+![extract action](../tutorial_figures/labmanager/extract_output.png)
