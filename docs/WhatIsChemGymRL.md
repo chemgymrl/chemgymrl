@@ -1,6 +1,9 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## What is ChemGymRL?
+What is ChemGymRL?
+==================
+
+<span style="display:block;text-align:center">![WhatISChemGymRL](tutorial_figures/WhatIsChemGymRL.png)
 
 A chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the OpenAI Gym environment framework for use with reinforcement learning applications.
 
