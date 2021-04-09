@@ -162,6 +162,26 @@ class OilWaterTestCase(unittest.TestCase):
         vessels = env.vessels
         self.assertIn('ethyl acetate', vessels[0].get_material_dict())
 
+    def test_full_render(self):
+        env = gym.make(ENV_NAME)
+        env.reset()
+        env.render("full")
+        action = np.zeros(env.action_space.shape)
+        action[0] = 7
+        action[1] = 5
+        state, reward, done, _ = env.step(action)
+        env.render("full")
+
+    def test_human_render(self):
+        env = gym.make(ENV_NAME)
+        env.reset()
+        env.render()
+        action = np.zeros(env.action_space.shape)
+        action[0] = 7
+        action[1] = 5
+        state, reward, done, _ = env.step(action)
+        env.render()
+
     def test_done(self):
         env = gym.make(ENV_NAME)
         env.reset()

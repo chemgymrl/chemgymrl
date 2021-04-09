@@ -4,6 +4,7 @@ import numpy as np
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms import material, util
 from chemistrylab.chem_algorithms.vessel import Vessel
+import os
 
 
 class TestVessel(TestCase):
@@ -55,3 +56,17 @@ class TestVessel(TestCase):
         event = ['mix', 10]
         vessel.push_event_to_queue(feedback=[event], dt=0)
 
+    def test_save_load(self):
+        vessel = Vessel("test", materials={'Na': [material.Na, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
+        vessel.save_vessel("test")
+        new_vessel = Vessel("test")
+        new_vessel.load_vessel("test.pickle")
+        os.remove("test.pickle")
+
+    # def test_heat_change(self):
+    #     vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
+    #     new_vessel = Vessel("test_2")
+    #     temp = new_vessel.get_temperature()
+    #     event = ["change_heat", 10, new_vessel]
+    #     vessel.push_event_to_queue(feedback=[event], dt=0)
+    #     self.assertLess(temp, new_vessel.get_temperature())

@@ -70,6 +70,35 @@ class DecompositionTestCase(unittest.TestCase):
         self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
         self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
 
+    def test_full_render(self):
+        env = gym.make(ENV_NAME)
+        state_before = env.reset()
+        env.render(mode="full")
+        action = np.ones(env.action_space.shape)
+        action[0] = 1 / 2
+        action[1] = 1 / 2
+        env.step(action)
+        self.assertIn('Na', env.vessels.get_material_dict())
+        self.assertIn('1-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
+        env.render(mode="full")
+
+    def test_human_render(self):
+        env = gym.make(ENV_NAME)
+        state_before = env.reset()
+        env.render()
+        action = np.ones(env.action_space.shape)
+        action[0] = 1 / 2
+        action[1] = 1 / 2
+        env.step(action)
+        self.assertIn('Na', env.vessels.get_material_dict())
+        self.assertIn('1-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
+        env.render()
+
+
 
 if __name__ == '__main__':
     unittest.main()
