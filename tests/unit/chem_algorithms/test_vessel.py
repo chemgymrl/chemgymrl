@@ -83,3 +83,18 @@ class TestVessel(TestCase):
         event = ["change_heat", 10, new_vessel]
         vessel.push_event_to_queue(feedback=[event], dt=0)
         self.assertLess(temp, vessel.get_temperature())
+
+    def test_wait(self):
+        vessel = Vessel("test", materials={'H2O': [material.H2O, 100, 'mol']})
+        new_vessel = Vessel("test_2", materials={'H2O': [material.H2O, 100, 'mol']})
+        temp = vessel.get_temperature()
+        event = ["change_heat", 10, new_vessel]
+        vessel.push_event_to_queue(feedback=[event], dt=0)
+        self.assertLess(temp, vessel.get_temperature())
+        event = ["wait", temp, new_vessel, True]
+        vessel.push_event_to_queue(feedback=[event], dt=0)
+        self.assertEqual(temp, vessel.get_temperature())
+        event = ["wait", temp + 30, new_vessel, False]
+        vessel.push_event_to_queue(feedback=[event], dt=10)
+        self.assertLess(temp, vessel.get_temperature())
+
