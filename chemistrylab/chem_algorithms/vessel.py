@@ -153,12 +153,16 @@ class Vessel:
             'update solute dict': self._update_solute_dict,
             'mix': self._mix,
             'update_layer': self._update_layers,
-            'change_heat': self._change_heat
+            'change_heat': self._change_heat,
+            'wait': self._wait
         }
 
         # event queues
         self._event_queue = []  # [['event', parameters], ['event', parameters] ... ]
         self._feedback_queue = []  # [same structure as event queue]
+        self.thickness = 1e-3 # beaker is 1mm thick
+        self.height_to_diamater = 3/2 # default height to diameter ratio
+        self.dimensions = self.calculate_vessel_dimensions() # returns a tuple (max_height, radius)
 
     def push_event_to_queue(
             self,
@@ -319,6 +323,20 @@ class Vessel:
         return merged
 
     # ---------- START EVENT FUNCTIONS ---------- #
+    def _wait(self, parameter, dt):
+        room_temp = parameter[0]
+        initial_temp = self.get_temperature()
+        out_beaker = parameter[1]
+        wait_until_room = parameter[2]
+        if wait_until_room:
+            self._update_temperature([room_temp, False], dt)
+        else:
+            rate = 1.143 * self.get_material_surface_area() * (room_temp - initial_temp)/self.thickness
+            heat_change = rate * dt
+            self._change_heat([heat_change, out_beaker], dt)
+            if initial_temp > room_temp > self.get_temperature() or initial_temp < room_temp < self.get_temperature():
+                self._update_temperature(room_temp)
+        return 0
 
     def _change_heat(self, parameter, dt):
         """
@@ -2037,6 +2055,22 @@ class Vessel:
 
         return util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
 
+    def get_vessel_dimensions(self):
+        vol = self.v_max
+        diam = (vol / np.pi * 4 / self.height_to_diamater) ** 1 / 3
+        height = diam * self.height_to_diamater
+        return height, diam / 2
+
+    def get_material_surface_area(self):
+        vol = self.get_current_volume()[-1]
+        height = vol / np.pi / (self.dimensions[-1] ** 2)
+        surface_area = 2 * np.pi * self.dimensions[-1] ** 2 + 2 * np.pi * self.dimensions[-1] * height
+        return surface_area
+
+    def define_height_to_diameter(self, ratio):
+        self.height_to_diamater = ratio
+
+
     # ---------- SAVING/LOADING FUNCTIONS ---------- #
 
     def save_vessel(self, vessel_rootname: str):
@@ -2135,7 +2169,8 @@ class Vessel:
                 'update solute dict': self._update_solute_dict,
                 'mix': self._mix,
                 'update_layer': self._update_layers,
-                'change_heat': self._change_heat
+                'change_heat': self._change_heat,
+                'wait': self._wait
             }
 
             # event queues
