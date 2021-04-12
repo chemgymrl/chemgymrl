@@ -377,8 +377,10 @@ class Vessel:
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
+                    print([(material_obj().get_name(), material_obj()._boiling_point) for material_obj in material_objs])
+                    print(min(material_bps))
                     # error for now...
-                    return 0
+                    exit()
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
             # contains no materials) no further operations will contribute to the distillation of materials
             except ValueError:
@@ -409,7 +411,7 @@ class Vessel:
                 # update the vessel temperature
                 self._update_temperature(
                     parameter=[self.temperature + temp_change, False],
-                    dt=self.default_dt
+                    dt=self.default_dt,
                 )
 
                 # updates total temp change and current temp
@@ -507,7 +509,7 @@ class Vessel:
 
                 # modify the boil vessel's temperature accordingly
                 self._update_temperature(
-                    parameter=[self.temperature + vessel_temp_change],
+                    parameter=[self.temperature + vessel_temp_change, False],
                     dt=self.default_dt
                 )
 
@@ -1425,7 +1427,7 @@ class Vessel:
 
         # loop over all the materials in the vessel obtaining feedback from updating the temperatures of each material
         for material_obj in self._material_dict.values():
-            feedback = material_obj[0].update_temperature(
+            feedback = material_obj[0]().update_temperature(
                 target_temperature=target_temperature,
                 dt=dt
             )

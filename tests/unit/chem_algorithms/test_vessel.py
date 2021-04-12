@@ -77,9 +77,9 @@ class TestVessel(TestCase):
         vessel.get_material_position("H2O")
 
     def test_heat_change(self):
-        vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
-        new_vessel = Vessel("test_2")
-        temp = new_vessel.get_temperature()
+        vessel = Vessel("test", materials={'H2O': [material.H2O, 100, 'mol']})
+        new_vessel = Vessel("test_2", materials={'H2O': [material.H2O, 100, 'mol']})
+        temp = vessel.get_temperature()
         event = ["change_heat", 10, new_vessel]
         vessel.push_event_to_queue(feedback=[event], dt=0)
-        # self.assertLess(temp, new_vessel.get_temperature())
+        self.assertLess(temp, vessel.get_temperature())
