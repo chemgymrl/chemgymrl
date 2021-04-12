@@ -416,31 +416,9 @@ class Manager:
         # list the available vessels on the shelf and request a vessel to be saved in a certain location
         self.list_vessels()
 
-        while not valid_parameters:
-            vessel = int(input('What vessel do you wish to save: '))
-            path = input('Specify the relative path for the vessel: ')
 
-            # deconstruct the intended vessel path
-            vessel_filename = path.split("\\")[-1]
-            dir_path = path.replace("\\" + vessel_filename, "")
-
-            # ensure that the vessel is to be saved properly
-            if vessel_filename.split(".") == "pickle":
-                valid_parameters = True
-            else:
-                print(
-                    "The vessel has not been requested to be saved as a pickle file. "
-                    "All vessels must be saved as pickle file for compatibility with the rest of the environment."
-                )
-                valid_parameters = False
-
-            # validate that the requested path to the intended saved vessel is locatable
-            if os.path.isdir(dir_path):
-                if valid_parameters:
-                    valid_parameters = True
-            else:
-                print("Specified path will not save the vessel to a valid directory.")
-                valid_parameters = False
+        vessel = int(input('What vessel do you wish to save: '))
+        path = input('Specify the relative path for the vessel: ')
 
         # pass the vessel and intended vessel path to the lab shelf
         self.lab.shelf.vessels[vessel].save_vessel(path)

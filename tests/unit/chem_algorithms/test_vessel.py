@@ -32,6 +32,15 @@ class TestVessel(TestCase):
         final_volume = vessel.get_current_volume()
         self.assertLess(final_volume[1], initial_volume[1])
 
+    def test__drain_by_pixel_less(self):
+        vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
+        initial_volume = vessel.get_current_volume()
+        vessel2 = Vessel('test_2')
+        event = ['drain by pixel', vessel2, 10]
+        vessel.push_event_to_queue(events=[event], dt=1)
+        final_volume = vessel.get_current_volume()
+        self.assertLess(final_volume[1], initial_volume[1])
+
     def test__fully_mix(self):
         vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
         event = ['fully mix']
@@ -63,10 +72,14 @@ class TestVessel(TestCase):
         new_vessel.load_vessel("test.pickle")
         os.remove("test.pickle")
 
-    # def test_heat_change(self):
-    #     vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
-    #     new_vessel = Vessel("test_2")
-    #     temp = new_vessel.get_temperature()
-    #     event = ["change_heat", 10, new_vessel]
-    #     vessel.push_event_to_queue(feedback=[event], dt=0)
-    #     self.assertLess(temp, new_vessel.get_temperature())
+    def test_get_material_position(self):
+        vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
+        vessel.get_material_position("H2O")
+
+    def test_heat_change(self):
+        vessel = Vessel("test", materials={'C6H14': [material.C6H14, 1, 'mol'], 'H2O': [material.H2O, 1, 'mol']})
+        new_vessel = Vessel("test_2")
+        temp = new_vessel.get_temperature()
+        event = ["change_heat", 10, new_vessel]
+        vessel.push_event_to_queue(feedback=[event], dt=0)
+        # self.assertLess(temp, new_vessel.get_temperature())

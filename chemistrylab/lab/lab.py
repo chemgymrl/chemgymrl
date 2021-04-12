@@ -202,7 +202,8 @@ class Lab(gym.Env, ABC):
             if vessel_index > self.shelf.open_slot or env_index >= len(self.characterization):
                 total_reward -= 10
             else:
-                analysis = self.characterization_bench.analyze(self.shelf.get_vessel(vessel_index), self.characterization[env_index])
+                analysis, rtn_vessel = self.characterization_bench.analyze(self.shelf.get_vessel(vessel_index), self.characterization[env_index])
+                self.shelf.return_vessel_to_shelf(vessel=rtn_vessel)
             return total_reward, analysis
         else:
             raise KeyError(f'{bench} is not a recognized bench')

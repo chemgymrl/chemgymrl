@@ -57,8 +57,7 @@ class CharacterizationBench:
 
         # perform the specified analysis technique
         analysis = self.techniques[analysis](vessel, overlap)
-
-        return analysis
+        return analysis, vessel
 
     @staticmethod
     def get_spectra(vessel, overlap):

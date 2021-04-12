@@ -378,7 +378,7 @@ class Vessel:
             try:
                 if min(material_bps) < self.temperature:
                     # error for now...
-                    exit()
+                    return 0
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
             # contains no materials) no further operations will contribute to the distillation of materials
             except ValueError:
