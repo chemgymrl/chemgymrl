@@ -24,7 +24,7 @@ class DistillationTestCase(unittest.TestCase):
         boil_vessel = env.boil_vessel
         target_material= env.target_material
         dQ=env.dQ
-        n_actions=4
+        n_actions=5
 
         self.assertEqual(boil_vessel, env.distillation.boil_vessel)
         self.assertEqual(target_material, env.distillation.target_material)
