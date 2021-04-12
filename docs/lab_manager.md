@@ -2,6 +2,8 @@
 
 ## Lab Manager
 
+<span style="display:block;text-align:center">![Lab Manager](tutorial_figures/lab_manager.png)
+
 The lab manager acts as another agent in the ChemGymRL environment, yet the lab manager’s task is to organize and dictate the activity of bench agents, input and output vessels, benches, and bench environments.
  
 

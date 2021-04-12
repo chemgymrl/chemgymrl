@@ -2,6 +2,8 @@
 
 ## Reaction Bench
 
+<span style="display:block;text-align:center">![Reaction](tutorial_figures/reaction.png)
+
 The reaction bench is intended to receive an input vessel container and perform a series of reactions on the materials in that vessel, step-by-step, in the aim to yield a sufficient amount of a desired material. After performing sufficiently many reactions to acquire the desired material, the reaction bench outputs a vessel containing materials, including reactants and products in some measure, that may be operated on in subsequent benches.
 
 The inputted vessel is interpreted to be frozen in time and has been allowed to evolve or react in any way. Once the vessel is subjected to the reaction bench, time is allowed to flow and reactions are allowed to occur resulting in changes in the amounts of materials in the vessel. Once the agent operating in the reaction bench deems that a sufficient number of reaction iterations have occurred, the vessel is once again frozen in time, removed from the reaction bench, and put into storage ready to be withdrawn and inputted into other benches.

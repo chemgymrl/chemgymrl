@@ -2,6 +2,8 @@
 
 ## Extraction Bench
 
+<span style="display:block;text-align:center">![Extraction](tutorial_figures/extraction.png)
+
 The extraction bench aims to isolate and extract certain materials from an inputted vessel container containing multiple materials. This is done by means of transferring materials between a number of vessels and utilizing specifically selected solutes to demarcate and separate materials from each other. The intended output of this bench is at least one beaker, each containing a desired material in quantities that exceed a minimum threshold.
  
 A classic extraction experiment is the oil, alcohol, and water extraction experiment where oil is added to a beaker of water and alcohol settling above the water, but below the alcohol allowing the alcohol to be carefully poured into a secondary beaker. Similarly, in the extraction bench, solutes are added to act as the oil in the previous extraction experiment, separating collections of materials into layers that can be extracted and poured into auxiliary vessels. An agent performing this experiment will be able to use solutes and extract materials with the aim of extracting and isolating the specified desired material.

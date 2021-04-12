@@ -2,6 +2,8 @@
 
 ## Characterization Bench
 
+<span style="display:block;text-align:center">![Characterization](tutorial_figures/characterization.png)
+
 The characterization bench is the primary method in which an agent or lab manager can look inside vessel containers. The characterization bench does not manipulate the inputted vessel in any way, yet subjects it to analysis techniques that observe the state of the vessel including the materials inside it and their relative quantities. This allows an agent or lab manager to observe vessels, determine their contents, and allocate the vessel to the necessary bench for further experimentation.
  
 
