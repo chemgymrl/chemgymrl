@@ -105,7 +105,6 @@ class CharacterizationBench:
                             (x[k] - params[i][j, 1]) / params[i][j, 2]
                         ) ** 2.0
                     )
-                    print(decay_rate)
                     if decay_rate < 1e-30:
                         decay_rate = 0
                     absorb[k] += amount * height * decay_rate

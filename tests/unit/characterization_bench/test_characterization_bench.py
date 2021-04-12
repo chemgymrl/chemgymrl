@@ -12,5 +12,5 @@ class TestCharacterizationBench(TestCase):
         char_bench = CharacterizationBench()
         vessel = Vessel("test", materials={'Na': [material.Na, 1, 'mol']})
         analysis = char_bench.analyze(vessel, 'spectra')
-        self.assertEqual(len(analysis), 200)
+        self.assertEqual(len(analysis[0]), 200)
 
