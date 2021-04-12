@@ -160,7 +160,7 @@ class DistillationTestCase(unittest.TestCase):
 
         done = False
 
-        action = np.array([3,0])
+        action = np.array([4,0])
         __, __ , done, __ = env.step(action)
 
         self.assertTrue(done)
