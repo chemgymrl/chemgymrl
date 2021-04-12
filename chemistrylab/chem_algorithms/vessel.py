@@ -249,8 +249,12 @@ class Vessel:
             # use the name of the event to get the function form event_dict
             action = self._event_dict[event[0]]
 
-            # call the function corresponding to the event
-            reward += action(parameter=event[1:], dt=dt)
+            # if action is wait
+            if event[0] == 'wait':
+                reward += action(self, parameter=event[1:], dt=dt)
+            else:
+                # call the function corresponding to the event
+                reward += action(parameter=event[1:], dt=dt)
 
         # generate the merged queue from feedback queue and empty the feedback queue
         merged = self._merge_event_queue(

@@ -86,7 +86,7 @@ class Distillation:
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
             max_vessel_volume=1.0, # maximal volume of empty vessels
-            n_actions=4 # number of available actions
+            n_actions=5 # number of available actions
     ):
         '''
         Constructor class for the Distillation class
@@ -156,6 +156,9 @@ class Distillation:
         # set the unit of the boil vessel
         boil_vessel.unit = 'l'
 
+        # append wait to boil vessel (needed if using old pickle file)
+        boil_vessel._event_dict['wait'] = vessel.Vessel._wait
+
         # add the inputted boil vessel to the list of all vessels
         vessels = [boil_vessel]
 
@@ -203,8 +206,8 @@ class Distillation:
         do_action = int(action[0])
         multiplier = int(action[1])
 
-        # if the multiplier is 0, only actions 0 (heat change) and 3 (done) can be performed
-        if all([multiplier == 0, do_action not in [0, 3]]):
+        # if the multiplier is 0, only actions 0 (heat change), 3 (wait), 4 (done) can be performed
+        if all([multiplier == 0, do_action not in [0, 3 ,4]]):
             for vessel_obj in vessels:
                 __ = vessel_obj.push_event_to_queue(dt=self.dt)
                 reward = 0
@@ -253,8 +256,23 @@ class Distillation:
                 # push no events to the first beaker
                 boil_vessel.push_event_to_queue(dt=self.dt)
 
-            # Indicate that all no more actions are to be completed
+            # Wait an amount of time such that vessel temperature will tend toward room temperature
             if do_action == 3:
+
+                # room temperature
+                room_temp = beaker_1.get_temperature()
+
+                if multiplier != 0:
+                    wait_until_room = False
+                else:
+                    wait_until_room = True
+
+                # push the event to the boiling vessel
+                event = ['wait', room_temp, boil_vessel, wait_until_room]
+                reward = boil_vessel.push_event_to_queue(events=[event], dt=self.dt)
+
+            # Indicate that all no more actions are to be completed
+            if do_action == 4:
                 # pass the fulfilled `done` parameter
                 done = True
 
