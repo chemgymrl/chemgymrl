@@ -8,7 +8,7 @@ Serves as a reference for some of the key terms used in this documentation.
 
 #### Action
 
-What the agent does in an environment in order to obtain a reward.
+What the agent performs in an environment in order to obtain a reward.
 
 #### Agent
 
@@ -24,7 +24,7 @@ A virtual environement that allows for a series of operations to occur.
 
 #### Characterization
 
-The analysis of a vessel such that we are able to determine its contents.
+The process of analyzing a vessel such that we are able to determine its contents.
 
 #### Command Line
 
@@ -34,7 +34,7 @@ A place where a user can enter commands into the computer from a terminal.
 
 #### Distillation
 
-Distillation is a process where components of a mixture are seperated using their boiling points.
+Distillation is a process where materials in a mixture are seperated using their boiling points.
 
 ## E
 
@@ -50,7 +50,7 @@ Extraction is a separation process consisting in the separation of a substance f
 
 #### Lab Manager
 
-Lab managers direct and inspect results from sub agents that carry out tasks for individual benches, and also takes materials from bench to bench using a vessel.
+Lab managers direct actions and inspect results from sub agents that carry out tasks for individual benches. It also takes in materials from bench to bench using a vessel.
 
 ## M 
  
@@ -66,7 +66,7 @@ A type of Machine Learning that uses an agent to perform actions in an environme
 
 #### Reward
 
-Method used to train ML models to make optimal decisions.
+Method used to train Machine Learning models to make optimal decisions.
 
 ## S
 

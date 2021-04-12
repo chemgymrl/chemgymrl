@@ -2,10 +2,9 @@
 
 ### Getting a high reward in a reaction of form: 
 
-- A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
+A-X + A-X --> A-A + X-X and A-X + B-X --> A-B + X-X
 
-In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be taking an in depth look at in this lesson is specifically:
-- 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
+In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be taking an in depth look at in this lesson is 2 3-chlorohexane + 2 Na --> 4,5-diethyloctane + 2 NaCl
 
 We will try to get the desired material: 4,5-diethyloctane
 
@@ -16,6 +15,9 @@ From lesson 1 we know that our action space is a 6 element vector represented by
 |              | Temperature | Volume | 1-chlorohexane | 2 chlorohexane | 3-chlorohexane | Na  | 
 |--------------|-------------|--------|----------------|----------------|----------------|-----|
 | Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1|
+
+Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease.
+If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase.
 
 First let's start by importing all the modules we need.
 
@@ -96,11 +98,11 @@ continue. This means that we will only add 3-chlorohexane and Na with our action
 reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
 do this by running the following commands:
 
-![actions](../tutorial_figures/actions_reaction.png)
+![actions](../tutorial_figures/reaction-lesson-2/actions_reaction.png)
 
 Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane
 
-![reaction](../tutorial_figures/reaction.png)
+![reaction](../tutorial_figures/reaction-lesson-2/reaction.png)
 
 Let's run our program and see what happens!
 
@@ -155,7 +157,7 @@ while not done:
 
 Notice that we get a total reward of 2.45. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
-![subplot](../tutorial_figures/subplots.PNG)
+![subplot](../tutorial_figures/reaction-lesson-2/subplots.png)
 
 This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
 
@@ -225,7 +227,7 @@ plt.show()
 
 For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again.
 
-![code](../tutorial_figures/actions_for_bad_reward.PNG)
+![code](../tutorial_figures/reaction-lesson-2/actions_for_bad_reward.PNG)
 
 If we run this code we'll notice that our reward is significantly lower. It is now only 1.06 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
 

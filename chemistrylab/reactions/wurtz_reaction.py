@@ -102,7 +102,7 @@ class Reaction():
 
         # specify the desired material
         self.desired_material = desired
-
+        self.reactants = REACTANTS
         # convert the reactants and products to their class object representations
         self.reactant_classes = convert_to_class(materials=REACTANTS)
         self.product_classes = convert_to_class(materials=PRODUCTS)
@@ -298,7 +298,6 @@ class Reaction():
         self.rate[3] = k3 * (C[0] ** 0) * (C[1] ** 2) * (C[2] ** 0) * (C[3] ** 1)
         self.rate[4] = k4 * (C[0] ** 0) * (C[1] ** 1) * (C[2] ** 1) * (C[3] ** 1)
         self.rate[5] = k5 * (C[0] ** 0) * (C[1] ** 0) * (C[2] ** 2) * (C[3] ** 1)
-
         # calculate and store the changes in concentration of each chemical;
         # recall: change in concentration = molar concentration * rate * dt
         # ie. for A + 2B --> C and A + C --> D as parallel reactions
@@ -307,9 +306,9 @@ class Reaction():
         # change in C = (+1 * rate of reaction 1 * dt) + (-1 * rate of reaction 2 * dt)
         # change in D = (+1 * rate of reaction 2 * dt)
         # assuming both reactions have the same time-step, which is true for all reactions in this file
-        dC[0] = ((-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2])) * dt # change in 1-chlorohexane
-        dC[1] = ((-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4])) * dt # change in 2-chlorohexane
-        dC[2] = ((-2.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5])) * dt # change in 3-chlorohexane
+        dC[0] = (-2.0 * self.rate[0]) + (-1.0 * self.rate[1]) + (-1.0 * self.rate[2]) * dt # change in 1-chlorohexane
+        dC[1] = (-1.0 * self.rate[1]) + (-2.0 * self.rate[3]) + (-1.0 * self.rate[4]) * dt # change in 2-chlorohexane
+        dC[2] = (-1.0 * self.rate[2]) + (-1.0 * self.rate[4]) + (-2.0 * self.rate[5]) * dt # change in 3-chlorohexane
         dC[3] = -2.0 * (self.rate[0] + self.rate[1] + self.rate[2] + self.rate[3] + self.rate[4] + self.rate[5]) * dt # change in Na
         dC[4] = 1.0 * self.rate[0] * dt # change in dodecane
         dC[5] = 1.0 * self.rate[1] * dt # change in 5-methylundecane
@@ -330,11 +329,10 @@ class Reaction():
             # convert back to moles
             dn = dC[i] * V
             self.n[i] += dn # update the molar amount array
-
-            # check the list of molar amounts and set negligible amounts to 0
-            for i, amount in enumerate(self.n):
-                if amount < 1e-8:
-                    self.n[i] = 0
+        # check the list of molar amounts and set negligible amounts to 0
+        for i, amount in enumerate(self.n):
+            if amount < 1e-8:
+                self.n[i] = 0
 
 
     def get_total_pressure(self, V, T=300):
