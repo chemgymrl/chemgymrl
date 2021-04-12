@@ -123,6 +123,37 @@ class DistillationTestCase(unittest.TestCase):
         # beaker 2 should have the same material dict as beaker 1 before the pour
         self.assertEqual(b1_material_list_before, b2_material_list)
 
+    def test_render(self):
+        env=gym.make(ENV_NAME)
+        env.reset()
+        env.render("human")
+
+        # gets material dict of bv before the pour
+        bv_material_dict_before = env.boil_vessel.get_material_dict()
+
+        # material list of bv before the pour
+        # conversion to list is needed to compare with b1
+        bv_material_list_before = []
+        for key in bv_material_dict_before:
+            bv_material_list_before.append(bv_material_dict_before[key][:2])
+
+        # setting action to pour bv into b1
+        action = np.array([1, 10])
+        env.step(action)
+
+        env.render("human")
+
+        b1_material_list = []
+        # converting into a list of material class and mol, no units
+        for key in env.vessels[1]._material_dict:
+            b1_material_list.append(env.vessels[1]._material_dict[key][:2])
+
+        # env.boil_vessel._material_dict should be empty
+        self.assertFalse(env.boil_vessel._material_dict)
+
+        # beaker 1 should have the same material dict as boiling vessel before the pour
+        self.assertEqual(bv_material_list_before, b1_material_list)
+
     def test_done(self):
         env = gym.make(ENV_NAME)
         env.reset()

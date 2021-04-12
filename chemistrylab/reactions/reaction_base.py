@@ -125,7 +125,7 @@ class _Reaction:
         self.initial_solutes = np.zeros(len(self.solutes))
 
         # include the available solvers
-        self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
+        self.solvers = {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA'}
 
         # select the intended solver or use the default
         if solver in self.solvers:
@@ -456,7 +456,7 @@ class _Reaction:
             assert self.reactants.sort() == materials_array.sort()
         else:
             # after the first iteration materials_array should be filled with products as well
-            assert self.materials == materials_array
+            assert set(materials_array).issubset(set(self.materials))
 
         # ensure that solutes from vessels compatible with reaction
         solute_dict_vessel = vessels.get_solute_dict()
@@ -732,7 +732,7 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
-                vessels.get_concentration(),
+                vessels.get_concentration(self.materials),
                 temperature,
                 volume,
                 vessels.get_defaultdt(),
@@ -917,7 +917,7 @@ class _Reaction:
         )
 
         # calculate and record the molar concentrations of the reactants and products
-        C = vessels.get_concentration()
+        C = vessels.get_concentration(materials=self.materials)
         for j in range(self.n.shape[0]):
             plot_data_mol[j].append(self.n[j])
             plot_data_concentration[j].append(C[j])
@@ -1073,8 +1073,8 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = self.get_spectra_peak(vessels.get_concentration(self.materials))
-        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration(self.materials))
+        peak = self.get_spectra_peak(vessels.get_concentration(materials=self.materials))
+        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration(materials=self.materials))
 
         # The first render is required to initialize the figure
         if first_render:

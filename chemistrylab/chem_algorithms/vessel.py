@@ -377,6 +377,8 @@ class Vessel:
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
+                    print([(material_obj().get_name(), material_obj()._boiling_point) for material_obj in material_objs])
+                    print(min(material_bps))
                     # error for now...
                     exit()
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
@@ -409,7 +411,7 @@ class Vessel:
                 # update the vessel temperature
                 self._update_temperature(
                     parameter=[self.temperature + temp_change, False],
-                    dt=self.default_dt
+                    dt=self.default_dt,
                 )
 
                 # updates total temp change and current temp

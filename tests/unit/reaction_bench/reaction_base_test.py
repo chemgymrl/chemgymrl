@@ -7,6 +7,8 @@ import gym
 from chemistrylab.reactions.available_reactions.chloro_wurtz import *
 from chemistrylab.reactions.get_reactions import convert_to_class
 import numpy as np
+from gym import envs
+from chemistrylab.reaction_bench.reaction_bench_v1 import ReactionBenchEnv_0
 
 ENV_NAME = 'WurtzReact-v1'
 
@@ -214,6 +216,32 @@ class ReactionBaseTestCase(unittest.TestCase):
         # stepping through the action and checking to see if NaCl is in material_dict as it should be
         env.step(action)
         self.assertIn('NaCl', env.vessels.get_material_dict())
+
+    def test_solvers(self):
+        solvers = {'newton', 'RK45', 'RK23', 'DOP853', 'BDF', 'LSODA'}
+
+        for i in range(1):
+            for solver in solvers:
+                print(solver)
+                env = ReactionBenchEnv_0()
+                env.reaction.solver = solver
+                done = False
+                state = env.reset()
+                round = 0
+                while not done:
+                    action = np.zeros(env.action_space.shape[0])
+                    if round == 0:
+                        action = np.ones(env.action_space.shape[0])
+                    else:
+                        action[0] = 1
+                        action[1] = 1
+                    state, reward, done, _ = env.step(action)
+                    if round == 20:
+                        done = True
+                    round += 1
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
