@@ -507,7 +507,7 @@ class Vessel:
 
                 # modify the boil vessel's temperature accordingly
                 self._update_temperature(
-                    parameter=[self.temperature + vessel_temp_change],
+                    parameter=[self.temperature + vessel_temp_change, False],
                     dt=self.default_dt
                 )
 
@@ -1425,7 +1425,7 @@ class Vessel:
 
         # loop over all the materials in the vessel obtaining feedback from updating the temperatures of each material
         for material_obj in self._material_dict.values():
-            feedback = material_obj[0].update_temperature(
+            feedback = material_obj[0]().update_temperature(
                 target_temperature=target_temperature,
                 dt=dt
             )
