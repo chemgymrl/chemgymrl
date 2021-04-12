@@ -33,7 +33,7 @@ class DistillationTestCase(unittest.TestCase):
 
     def test_get_action_space(self):
         env = gym.make(ENV_NAME)
-        action_space = gym.spaces.MultiDiscrete([4,10])
+        action_space = gym.spaces.MultiDiscrete([5,10])
         self.assertEqual(action_space, env.distillation.get_action_space())
 
     def test_reset(self):
