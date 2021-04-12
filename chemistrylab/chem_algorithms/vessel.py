@@ -162,7 +162,7 @@ class Vessel:
         self._feedback_queue = []  # [same structure as event queue]
         self.thickness = 1e-3 # beaker is 1mm thick
         self.height_to_diamater = 3/2 # default height to diameter ratio
-        self.dimensions = self.calculate_vessel_dimensions() # returns a tuple (max_height, radius)
+        self.dimensions = self.get_vessel_dimensions() # returns a tuple (max_height, radius)
 
     def push_event_to_queue(
             self,
@@ -335,7 +335,7 @@ class Vessel:
             heat_change = rate * dt
             self._change_heat([heat_change, out_beaker], dt)
             if initial_temp > room_temp > self.get_temperature() or initial_temp < room_temp < self.get_temperature():
-                self._update_temperature(room_temp)
+                self._update_temperature([room_temp, False], dt)
         return 0
 
     def _change_heat(self, parameter, dt):
