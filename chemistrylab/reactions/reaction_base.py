@@ -1018,7 +1018,7 @@ class _Reaction:
             plt.pause(0.000001)
 
     def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration,
-                         n_steps, vessels: vessel.Vessel):
+                         n_steps, vessels: vessel.Vessel, step_num):
         '''
         Method to plot thermodynamic variables and spectral data.
         Plots a significant amount of data for a more in-depth
@@ -1038,9 +1038,11 @@ class _Reaction:
         `plot_data_concentration` : `list`
             A list containing the concentration of reactants and products
         `n_steps` : `int`
-            The number of increments into which the action is split.
+            The number of increments into which the action is split
         `vessels` : `vessel.Vessel`
             A vessel containing methods to obtain thermodynamic data
+        `step_num` : `int`
+            The step number the environment is currently on
 
         Returns
         ---------------
@@ -1081,50 +1083,54 @@ class _Reaction:
             self._plot_fig, self._plot_axs = plt.subplots(2, 3, figsize=(24, 12))
 
             # Time vs. Molar_Amount graph ********************** Index: (0, 0)
-            self._plot_lines_amount = []
+            self._plot_lines_amount = np.zeros((self.n.shape[0],2,20))
             for i in range(self.n.shape[0]):
-                self._plot_lines_amount.append(
-                    self._plot_axs[0, 0].plot(
-                        plot_data_state[0],  # time
-                        plot_data_mol[i],  # mol of species C[i]
-                        label=self.materials[i]  # names of species C[i]
-                    )[0]
+                self._plot_lines_amount[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_amount[i][1][step_num - 1:] = (plot_data_mol[i][0])
+                self._plot_axs[0, 0].plot(
+                    self._plot_lines_amount[i][0],
+                    self._plot_lines_amount[i][1],
+                    label=self.materials[i]
                 )
             self._plot_axs[0, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            # self._plot_axs[0, 0].set_ylim([0.0, np.max(self.nmax)])
+            self._plot_axs[0, 0].set_ylim([0.0, np.mean(plot_data_mol)])
             self._plot_axs[0, 0].set_xlabel('Time (s)')
             self._plot_axs[0, 0].set_ylabel('Molar Amount (mol)')
             self._plot_axs[0, 0].legend()
 
             # Time vs. Molar_Concentration graph *************** Index: (0, 1)
-            self._plot_lines_concentration = []
+            self._plot_lines_concentration = np.zeros((self.n.shape[0],2,20))
             for i in range(self.n.shape[0]):
-                self._plot_lines_concentration.append(
-                    self._plot_axs[0, 1].plot(
-                        plot_data_state[0],  # time
-                        plot_data_concentration[i],  # concentrations of species C[i]
-                        label=self.materials[i]  # names of species C[i]
-                    )[0]
+                self._plot_lines_concentration[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_concentration[i][1][step_num - 1:] = (plot_data_concentration[i][0])
+                self._plot_axs[0, 1].plot(
+                    self._plot_lines_concentration[i][0],
+                    self._plot_lines_concentration[i][1],
+                    label=self.materials[i]
                 )
             self._plot_axs[0, 1].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            self._plot_axs[0, 1].set_ylim([
-                0.0, np.max(self.nmax) / (vessels.get_min_volume())
-            ])
+            self._plot_axs[0, 1].set_ylim([0.0, np.mean(plot_data_concentration)])
             self._plot_axs[0, 1].set_xlabel('Time (s)')
             self._plot_axs[0, 1].set_ylabel('Molar Concentration (mol/L)')
             self._plot_axs[0, 1].legend()
 
             # Time vs. Temperature + Time vs. Volume graph *************** Index: (0, 2)
-            self._plot_line_1 = self._plot_axs[0, 2].plot(
-                plot_data_state[0],  # time
-                plot_data_state[1],  # Temperature
+            self._plot_lines_temp = np.zeros((1, 2, 20))
+            self._plot_lines_temp[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_temp[0][1][step_num - 1:] = (plot_data_state[1][0])
+            self._plot_axs[0, 2].plot(
+                self._plot_lines_temp[0][0],
+                self._plot_lines_temp[0][1],
                 label='T'
-            )[0]
-            self._plot_line_2 = self._plot_axs[0, 2].plot(
-                plot_data_state[0],  # time
-                plot_data_state[2],  # Volume
+            )
+            self._plot_lines_vol = np.zeros((1, 2, 20))
+            self._plot_lines_vol[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_vol[0][1][step_num - 1:] = (plot_data_state[2][0])
+            self._plot_axs[0, 2].plot(
+                self._plot_lines_vol[0][0],
+                self._plot_lines_vol[0][1],
                 label='V'
-            )[0]
+            )
             self._plot_axs[0, 2].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
             self._plot_axs[0, 2].set_ylim([0, 1])
             self._plot_axs[0, 2].set_xlabel('Time (s)')
@@ -1132,10 +1138,14 @@ class _Reaction:
             self._plot_axs[0, 2].legend()
 
             # Time vs. Pressure graph *************** Index: (1, 0)
-            self._plot_line_3 = self._plot_axs[1, 0].plot(
-                plot_data_state[0],  # time
-                plot_data_state[3]  # Pressure
-            )[0]
+            self._plot_lines_pressure = np.zeros((1, 2, 20))
+            self._plot_lines_pressure[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_pressure[0][1][step_num - 1:] = (plot_data_state[3][0])
+            self._plot_axs[1, 0].plot(
+                self._plot_lines_pressure[0][0],
+                self._plot_lines_pressure[0][1],
+                label='V'
+            )
             self._plot_axs[1, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
             self._plot_axs[1, 0].set_ylim([0, vessels.get_pmax()])
             self._plot_axs[1, 0].set_xlabel('Time (s)')
@@ -1179,29 +1189,51 @@ class _Reaction:
         else:
             # set data for the Time vs. Molar_Amount graph *************** Index: (0, 0)
             curent_time = plot_data_state[0][-1]
-            for i in range(self.n.shape[0]):
-                self._plot_lines_amount[i].set_xdata(plot_data_state[0])
-                self._plot_lines_amount[i].set_ydata(plot_data_mol[i])
 
-                # set data for the Time vs. Molar_Concentration graph *************** Index: (0, 1)
-                self._plot_lines_concentration[i].set_xdata(plot_data_state[0])
-                self._plot_lines_concentration[i].set_ydata(plot_data_concentration[i])
+            # update the lines data
+            for i in range(self.n.shape[0]):
+                # populate the lines amount array with the updated number of mols
+                self._plot_lines_amount[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_amount[i][1][step_num - 1:] = (plot_data_mol[i][0])
+                self._plot_axs[0,0].lines[i].set_xdata(self._plot_lines_amount[i][0])
+                self._plot_axs[0,0].lines[i].set_ydata(self._plot_lines_amount[i][1])
+
+                # populate the lines concentration array with the updated number of concentration
+                self._plot_lines_concentration[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_concentration[i][1][step_num - 1:] = (plot_data_concentration[i][0])
+                self._plot_axs[0, 1].lines[i].set_xdata(self._plot_lines_concentration[i][0])
+                self._plot_axs[0, 1].lines[i].set_ydata(self._plot_lines_concentration[i][1])
 
             # reset each plot's x-limit because the latest action occurred at a greater time-value
             self._plot_axs[0, 0].set_xlim([0.0, curent_time])
             self._plot_axs[0, 1].set_xlim([0.0, curent_time])
 
+            # reset each plot's y-limit in order to fit and show all materials on the graph
+            self._plot_axs[0,0].set_ylim([0.0, np.mean(plot_data_mol)])
+            self._plot_axs[0,1].set_ylim([0.0, np.mean(plot_data_concentration)])
+
             # set data for Time vs. Temp and Time vs. Volume graphs *************** Index: (0, 2)
-            self._plot_line_1.set_xdata(plot_data_state[0])
-            self._plot_line_1.set_ydata(plot_data_state[1])
-            self._plot_line_2.set_xdata(plot_data_state[0])
-            self._plot_line_2.set_ydata(plot_data_state[2])
-            self._plot_axs[0, 2].set_xlim([0.0, curent_time])  # reset xlime since t extend
+            self._plot_lines_temp[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_temp[0][1][step_num - 1:] = (plot_data_state[1][0])
+            self._plot_lines_vol[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_vol[0][1][step_num - 1:] = (plot_data_state[2][0])
+
+            self._plot_axs[0,2].lines[0].set_xdata(self._plot_lines_temp[0][0])
+            self._plot_axs[0,2].lines[0].set_ydata(self._plot_lines_temp[0][1])
+            self._plot_axs[0,2].lines[1].set_xdata(self._plot_lines_vol[0][0])
+            self._plot_axs[0,2].lines[1].set_ydata(self._plot_lines_vol[0][1])
+
+            # reset xlimit since t extend
+            self._plot_axs[0, 2].set_xlim([0.0, curent_time])
 
             # set data for Time vs. Pressure graph *************** Index: (1, 0)
-            self._plot_line_3.set_xdata(plot_data_state[0])
-            self._plot_line_3.set_ydata(plot_data_state[3])
+            self._plot_lines_pressure[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_pressure[0][1][step_num - 1:] = (plot_data_state[3][0])
+            self._plot_axs[1, 0].lines[0].set_xdata(self._plot_lines_pressure[0][0])
+            self._plot_axs[1, 0].lines[0].set_ydata(self._plot_lines_pressure[0][1])
+
             self._plot_axs[1, 0].set_xlim([0.0, curent_time])  # reset xlime since t extend
+            self._plot_axs[1, 0].set_ylim([0.0, np.max(plot_data_state[3])])
 
             # reset the Solid Spectra graph
             self._plot_axs[1, 1].cla()
