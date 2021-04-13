@@ -60,21 +60,12 @@ The Vessel class serves as any container you might find in a lab, a beaker, a dr
 
 ### Material
 
-Properties|Description
----|---
-name|Name of the material
-density|Density of the material, g/mL
-polarity|Polarity of the material
-temperature|Temperature of the material, K
-pressure|Pressure of the material, kPa
-phase|Phase of the material (g, l, s)
-charge|Charge of the material
-molar_mass|Molar mass of the material, g/mol
-color|A unique float number between 0 to 1 to represent the color of the the material, used in layer representation
-solute|A flag showing if it's the solute in vessel (True/False)
-solvent|A flag showing if it's the solvent in vessel (True/False)
-index|A integer number, unique for each material, used to fix the location of the material in state (matrix)
- 
+
+
+### Expected Output
+
+At the end of an experiment, the user can expect to receive a vessel containing the requested desired material. Such a vessel is stored locally as a pickle file. Additionally, a detailed log message will appear including the final cumulative reward supplied to the lab manager, the purity of the desired material in the output vessel and plots displaying the contents of the vessel and the vessel spectra. Since the outputted vessel is made available to the user, they have the option of performing their own analysis and operations on the vessel with the ChemGymRL environment or subject the vessel to another experiment.
+
 ### Installation
 
 #### Clone Repository:
