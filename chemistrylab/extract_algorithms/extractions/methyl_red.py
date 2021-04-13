@@ -221,8 +221,6 @@ class Extraction:
                 d_volume = 0.050 * multiplier
                 event = ['pour by volume', vessels[0], d_volume]
                 reward = ext_vessel.push_event_to_queue(events=[event], dt=self.dt)
-                event_2 = ['fully mix']
-                vessels[0].push_event_to_queue(events=None, feedback=[event_2], dt=0)
                 vessels[1].push_event_to_queue(dt=self.dt)
                 vessels[2].push_event_to_queue(dt=self.dt)
         elif 8 == int(action[0]):  # wait
