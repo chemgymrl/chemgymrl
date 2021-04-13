@@ -75,3 +75,39 @@ solute|A flag showing if it's the solute in vessel (True/False)
 solvent|A flag showing if it's the solvent in vessel (True/False)
 index|A integer number, unique for each material, used to fix the location of the material in state (matrix)
  
+### Installation
+
+#### Clone Repository:
+
+The first step of the install process is to clone the repository, that can be done using the following command line
+instructions:
+```commandline
+cd path/to/desired/install/location
+git clone https://github.com/chemgymrl/chemgymrl.git
+```
+now that the repo has been installed we need to enter into the repository:
+
+```commandline
+cd chemgymrl
+```
+
+#### Python Virtual Environment:
+
+ChemGymRL is set to use python 3, and more specifically python 3.8. The first step of this next part is to install
+[python](https://python.org), if you already have python then the next step is to create a virtual environment using
+your favourite virtual environment tool. In this tutorial we will use virtualenv, but anaconda works as well. The next
+steps will show you how to create and activate the correct virtual environment:
+
+```commandline
+python3.8 -m venv chemgymrl
+source chemgymrl/bin/activate
+```
+
+Now that the virtual environment is created and activated we will now look to install all the correct packages.
+
+#### Install Library:
+Now that everything is set up we simply seed to install the library.
+ 
+```commandline
+pip install .
+```
