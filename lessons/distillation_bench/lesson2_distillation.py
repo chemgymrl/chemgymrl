@@ -34,7 +34,8 @@ print('\n')
 #   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
 #   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
 #   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   3: Done (Value doesn't matter)
+#   3: Wait for boil vessel temp to decrease towards room temp (multiplier == 0, wait until room temp == true)
+#   4: Done (Value doesn't matter)
 
 print('# of actions available: ',env.action_space.shape[0])
 num_actions_available = env.action_space.shape[0]
@@ -46,7 +47,7 @@ while not done:
 
     # ACTION 1
     # increase temperature all the way up
-    # action = np.array([0,125])
+    action = np.array([0,125])
 
     # ACTION 2
     # results in temperature being too high and all material is boiled off in the vessel
@@ -54,7 +55,7 @@ while not done:
 
     # ACTION 3
     # decrease temperature all the way down
-    action = np.array([0,0])
+    # action = np.array([0,0])
 
     # perform the action and update the reward
     state, reward, done, __ = env.step(action)
