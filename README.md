@@ -58,7 +58,7 @@ The Vessel class serves as any container you might find in a lab, a beaker, a dr
   13. The lab manager subjects the vessel to the characterization bench once again determining its contents
   14. If the lab manager is satisfied that the desired material has been sufficiently isolated, the lab manager concludes the experiment
 
-### Material
+### Supported Materials
 
 
 
