@@ -9,56 +9,54 @@ ChemGymRL is a collection of reinforcement learning environments in the open AI 
 
 ChemGymRL simulates real-world chemistry experiments by allocating agents to benches to perform said experiments as dictated by a lab manager who has operational control over all agents in the environment. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
 
-## Data Structure
-
-volume: ml, amount: mole
-
 ### Bench Overview
 
 The ChemGymRL environment consists of four benches and a lab manager tasked with organizing the experimentation occurring at each bench. The four benches available to agents under the direction of the lab manager include: the reaction bench, the extraction bench, the distillation bench, and the characterization bench.
 
-The ChemGymRL environment aims to simulate laboratory processes performed by agents trained by means of reinforcement learning algorithms. The goal of the ChemGymRL environment, similar to many laboratory processes and experiments, is to produce, isolate, and extract a valuable material. The lab manager is instructed by the user to acquire such a material and the lab manager dispatches agents to the various benches to do so.
+#### Reaction Bench
 
-Each bench contributes to this goal by providing experimentation methods that, when used in tandem, can produce the desired output. The reaction bench performs a series of reactions yielding various products. The extraction bench allows for the extraction of certain materials that would otherwise be mixed together with unwanted byproducts. The distillation bench heats up materials allowing certain materials to be extracted in their gaseous forms. The characterization bench allows the agents and lab managers to inspect containers of materials and determine their contents.
+The reaction bench is intended to receive an input vessel container and perform a series of reactions on the materials in that vessel, step-by-step, in the aim to yield a sufficient amount of a desired material. After performing sufficiently many reactions to acquire the desired material, the reaction bench outputs a vessel containing materials, including reactants and products in some measure, that may be operated on in subsequent benches.
+
+#### Extraction Bench
+
+The extraction bench aims to isolate and extract certain materials from an inputted vessel container containing multiple materials. This is done by means of transferring materials between a number of vessels and utilizing specifically selected solutes to demarcate and separate materials from each other. The intended output of this bench is at least one beaker, each containing a desired material in quantities that exceed a minimum threshold.
+
+#### Distillation Bench
+
+The distillation bench provides another set of experimentation aimed at isolating a requested desired material. Similar to the reaction and extraction benches, a vessel containing materials including the desired material is required as input into this bench. The distillation bench utilizes the differing boiling points of materials in the inputted vessel to separate materials between vessels. The intended output from the distillation bench is a vessel containing a sufficiently high purity and amount of the requested desired material.
+
+#### Characterization Bench
+
+The characterization bench is the primary method in which an agent or lab manager can look inside vessel containers. The characterization bench does not manipulate the inputted vessel in any way, yet subjects it to analysis techniques that observe the state of the vessel including the materials inside it and their relative quantities. This allows an agent or lab manager to observe vessels, determine their contents, and allocate the vessel to the necessary bench for further experimentation.
+
+#### Lab Manager
+
+The lab manager acts as another agent in the ChemGymRL environment, yet the lab manager’s task is to organize and dictate the activity of bench agents, input and output vessels, benches, and bench environments.
 
 ### Reward Function
 
-The reward function is crucial such that it is how the agents determine which actions are seen as positive and which actions are seen as negative. The current hierarchy of positive states has the amount of desired material present be of greater importance compared to the number of vessels containing the desired material. That being said, vessels containing of purity of less than 20%, with respect to the desired material, are considered unfit for continuation. For example, if extraction bench yields a vessel with 50% purity and another vessel with 10% purity, the vessel with 50% purity exceeds the purity requirement and is exempt from further actions in the extraction bench, while the vessel with 10% purity must still undergo extraction bench actions to increase the purity above the required purity threshold of 20%.
+The reward function is crucial such that it is how the agents determine which actions are seen as positive and which actions are seen as negative. The current hierarchy of positive states has the amount of desired material present be of greater importance compared to the number of vessels containing the desired material. That being said, vessels containing of purity of less than 20%, with respect to the desired material, are considered unfit for continuation. For example, suppose performing actions in the extraction bench yields a vessel with 50% purity and another vessel with 10% purity. The purity threshold is arbitrary, so, for the sake of this example, let's suppose the purity threshold is set at 20%. The vessel with 50% purity exceeds the purity requirement and is exempt from further actions in the extraction bench, however the vessel with 10% purity must still undergo extraction bench actions to increase it's purity to the required 20%.
 
 ### Vessel
 
-Important Variables |Structure | Description
----|---|---
-_material_dict|{'material.name': [material(), amount], ...}|a dictionary holding all the material inside this vessel
-_solute_dict|{'solute.name': {solvent.name: amount, ...}, ...}|dictionary that represents the solution
-_event_dict|{'function name': function}|a dictionary holds the event functions of a vessel
-_event_queue|[['event', parameters], ['event', parameters] ... ]|a queue of events to be performed by vessel
-_feedback_queue|[['event', parameters], ['event', parameters] ... ]|a queue holding collected feedback from materials and unfinished events
+The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc.
 
 #### The Workflow
   
-  1. Agent choose action from the action space of an environment.
-  2. The environment does the calculation and update and generate events.
-  3. At the end of each action, if the action affect a vessel, use push_event_to_queue() to push the event into the vessel, if no event generated, call the function with events=None.
-  4. With push_event_to_queue() called, events are pushed into the vessel.
-  5. _update_materials is automatically called and perform events in the events_queue.
-  6. Each event has a corresponding event function, it first update properties of the vessel, then loop over the materials inside the vessel by calling the corresponding event functions of each material.
-  7. The materials' event function will return feedback by calling the push_event_to_queue(), which contains feedback and unfinished event 
-  8. The returned feedback is added to the _feedback_queue
-  9. The the _merge_event_queue() is called on _feedback_queue, which merge the events in the feedback_queue to generate a merged_queue and add default event into it, then empty the _feedback_queue
-  10. Then the merged_queue will be executed and new feedback are collected and added to _feedback_queue, which will be executed with the next action. 
-
-#### Event Functions
-
-Function Name|Description
----|---
-'pour by volume'|Pour from self vessel to target vessel by certain volume
-'drain by pixel|Drain from self vessel to target vessel by certain pixel
-'fully mix'|Shake self vessel to fully mix
-'update material dict'|Use input to update self vessel's material_dict
-'update solute dict'|Use input to update self vessel's solute_dict
-'mix'|Shake vessel of let vessel settle
-'update_layer'|Update self vessel's layer representation
+  1. Instruct the lab manager to acquire a desired material
+  2. The lab manager assigns a vessel and an agent to carry out reactions in the reaction bench
+  3. The reaction bench agent performs actions on the vessel generating products including the desired material
+  4. The agent gives the resulting vessel to the lab manager
+  5. The lab manager analyzes the vessel in the characterization bench determining its contents
+  6. Verifying that the vessel contains some of the desired material, the lab manager assigns another agent and the vessel to the extraction bench to isolate the material in high quantities
+  7. The extraction bench agent performs actions on the vessel moving its contents between many vessels sequentially isolating the desired material in greater quantities
+  8. The extraction bench agent gives the resulting vessel(s) to the lab manager
+  9. The lab manager analyzes in the characterization bench determining its contents and quantities
+  10. The lab manager selects the vessel with the highest quantity of the desired material and assigns it and an agent to the distillation bench to extract the desired material
+  11. The distillation bench agent performs operations on the vessel to heat and boil off materials from the vessel into ancillary vessels
+  12. The distillation bench agent passes the resulting vessel to the lab manager
+  13. The lab manager subjects the vessel to the characterization bench once again determining its contents
+  14. If the lab manager is satisfied that the desired material has been sufficiently isolated, the lab manager concludes the experiment
 
 ### Material
 
@@ -77,52 +75,3 @@ solute|A flag showing if it's the solute in vessel (True/False)
 solvent|A flag showing if it's the solvent in vessel (True/False)
 index|A integer number, unique for each material, used to fix the location of the material in state (matrix)
  
-
-### Util Functions
-
-Function|Description
----|---
-convert_material_dict_to_volume|Convert the input material_dict to a dictionary of {material's name: volume}
-convert_volume_to_mole|Handy function to calculate mole
-organize_material_dict|Organize the input material_dict, called by update_material_dict()
-organize_solute_dict|Organize the input solute_dict, called by update_solute_dict()
-check_overflow|Check if there's overflow, and calculate what remains in the vessel (always call it before push new material_dict and solute_dict to target vessel)
-generate_state|generate the state representation from a list of vessels
-
-### State Structure
-
-Each vessel has three matrices to represent the state:
-
-[material_dict_matrix, solute_dict_matrix, layer_vector]
-
-**material_dict_matrix (number of available material * 10):**
-
--|Density|Polarity|Temperature|Pressure|Solid Flag|Liquid Flag|Gas Flag|Charge|Molar Mass|Amount
----|---|---|---|---|---|---|---|---|---|---
-Air|
-H2O|
-H|
-H2|
-.|
-.|
-.|
-
-**solute_dict_matrix (number of available material * number of available material):**
-
-Each cell means how much of that solute (row) dissolved in that solvent (column)
-
--|Air|H2O|H|H2|.|.|.
----|---|---|---|---|---|---|----
-Air|
-H2O|
-H|
-H2|
-.|
-.|
-.|
-
-**layer_vector (1 * number of pixel):**
-
-acquired form vessel.get_layers()
-
-
