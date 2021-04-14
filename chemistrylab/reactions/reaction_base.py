@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 sys.path.append("../../")  # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
+from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.lab.de import De
 from scipy.integrate import solve_ivp
@@ -744,119 +745,6 @@ class _Reaction:
 
         return vessels
 
-    def get_spectra(self, C):
-        """
-        Class method to generate total spectral data using a guassian decay.
-
-        Parameters
-        ---------------
-        C : np.array
-            An array containing the concentrations of materials in the vessel.
-
-        Returns
-        ---------------
-        absorb : np.array
-            An array of the total absorption data of every chemical in the experiment
-
-        Raises
-        ---------------
-        None
-        """
-
-        # set the wavelength space
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
-
-        # define an array to contain absorption data
-        absorb = np.zeros(x.shape[0], dtype=np.float32)
-
-        # iterate through the spectral parameters in self.params and the wavelength space
-        for i, item in enumerate(self.params):
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    if decay_rate < 1e-30:
-                        decay_rate = 0
-                    absorb[k] += amount * height * decay_rate
-
-        # absorption must be between 0 and 1
-        absorb = np.clip(absorb, 0.0, 1.0)
-
-        return absorb
-
-    def get_spectra_peak(self, C):
-        """
-        Method to populate a list with the spectral peak of each chemical.
-
-        Parameters
-        ---------------
-        C : np.array
-            An array containing the concentrations of all the materials in the vessel.
-
-        Returns
-        ---------------
-        spectra_peak : list
-            A list of parameters specifying the peak of the spectra for each chemical
-
-        Raises
-        ---------------
-        None
-        """
-
-        # create a list of the spectral peak of each chemical
-        spectra_peak = []
-        for i, material in enumerate(self.materials):
-            spectra_peak.append([
-                self.params[i][:, 1] * 600 + 200,
-                C[i] * self.params[i][:, 0],
-                material
-            ])
-
-        return spectra_peak
-
-    def get_dash_line_spectra(self, C):
-        """
-        Module to generate each individual spectral dataset using gaussian decay.
-
-        Parameters
-        ---------------
-        C : np.array
-            An array containing the concentrations of materials in the vessel.
-
-        Returns
-        ---------------
-        dash_spectra : list
-            A list of all the spectral data of each chemical
-
-        Raises
-        ---------------
-        None
-        """
-
-        dash_spectra = []
-
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
-
-        for i, item in enumerate(self.params):
-            each_absorb = np.zeros(x.shape[0], dtype=np.float32)
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    each_absorb += amount * height * decay_rate
-            dash_spectra.append(each_absorb)
-
-        return dash_spectra
 
     def plotting_step(self, t, tmax, vessels: vessel.Vessel):
         '''
@@ -1071,8 +959,8 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = self.get_spectra_peak(vessels.get_concentration(materials=self.materials))
-        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration(materials=self.materials))
+        peak = CharacterizationBench.get_spectra_peak(vessels, materials=self.materials)
+        dash_spectra = CharacterizationBench.get_dash_line_spectra(vessels, materials=self.materials)
 
         # The first render is required to initialize the figure
         if first_render:
@@ -1152,7 +1040,7 @@ class _Reaction:
                 self._plot_axs[1, 1].plot(wave, spectra, linestyle='dashed')
 
             # include the labelling when plotting spectral peaks
-            for i in range(self.n.shape[0]):
+            for i in range(len(peak)):
                 self._plot_axs[1, 1].scatter(peak[i][0], peak[i][1], label=peak[i][2])
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
