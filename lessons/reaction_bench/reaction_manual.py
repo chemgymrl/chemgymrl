@@ -25,6 +25,7 @@ while not done:
     env.render(mode=render_mode)
     action = np.zeros(env.action_space.shape[0])
     print('--------------------')
+    print(env.reaction.cur_in_hand)
     for i, a in enumerate(action_set):
         action[i] = float(input(f'{a}: '))
     state, reward, done, _ = env.step(action)

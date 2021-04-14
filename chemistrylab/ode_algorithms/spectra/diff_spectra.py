@@ -191,9 +191,9 @@ S_2_chlorohexane[16, 0] = 0.73
 S_2_chlorohexane[16, 1] = 1-720/3500
 S_2_chlorohexane[16, 2] = 0.0014
 
-S_2_chlorohexane[10, 0] = 0.86
-S_2_chlorohexane[10, 1] = 1-620/3500
-S_2_chlorohexane[10, 2] = 0.006
+S_2_chlorohexane[17, 0] = 0.86
+S_2_chlorohexane[17, 1] = 1-620/3500
+S_2_chlorohexane[17, 2] = 0.006
 
 
 S_3_chlorohexane = np.zeros((3, 3))
