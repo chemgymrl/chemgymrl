@@ -217,7 +217,7 @@ S_dodecane[0,2] = 0.001
 
 S_dodecane[1,0] = 0.95
 S_dodecane[1,1] = 0.16
-s_dodecane[1,2] = 0.003
+S_dodecane[1,2] = 0.003
 
 S_dodecane[2,0] = 0.36
 S_dodecane[2,1] = 0.180
