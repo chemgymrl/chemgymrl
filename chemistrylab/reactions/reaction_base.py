@@ -1020,7 +1020,7 @@ class _Reaction:
                 label='V'
             )
             self._plot_axs[0, 2].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            self._plot_axs[0, 2].set_ylim([0, 1])
+            self._plot_axs[0, 2].set_ylim([0, 1.2])
             self._plot_axs[0, 2].set_xlabel('Time (s)')
             self._plot_axs[0, 2].set_ylabel('T and V (map to range [0, 1])')
             self._plot_axs[0, 2].legend()
@@ -1121,7 +1121,7 @@ class _Reaction:
             self._plot_axs[1, 0].lines[0].set_ydata(self._plot_lines_pressure[0][1])
 
             self._plot_axs[1, 0].set_xlim([0.0, curent_time])  # reset xlime since t extend
-            self._plot_axs[1, 0].set_ylim([0.0, np.max(plot_data_state[3])])
+            self._plot_axs[1, 0].set_ylim([0.0, np.max(plot_data_state[3])*1.1])
 
             # reset the Solid Spectra graph
             self._plot_axs[1, 1].cla()
