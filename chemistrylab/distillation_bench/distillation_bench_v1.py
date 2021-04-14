@@ -132,8 +132,7 @@ def boil_vessel():
         events=None,
         feedback=[
             ['update material dict', material_dict],
-            ['update solute dict', solute_dict],
-            ['fully mix']
+            ['update solute dict', solute_dict]
         ],
         dt=0
     )
