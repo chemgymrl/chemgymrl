@@ -41,11 +41,6 @@ class TestVessel(TestCase):
         final_volume = vessel.get_current_volume()
         self.assertLess(final_volume[1], initial_volume[1])
 
-    def test__fully_mix(self):
-        vessel = Vessel("test", materials={"H2O": [material.H2O, 100, 'mol']})
-        event = ['fully mix']
-        vessel.push_event_to_queue(feedback=[event], dt=0)
-
     def test__update_material_dict(self):
         vessel = Vessel("test")
         material_dict = {'H2O': [material.H2O, 100, 'mol'], 'C6H14': [material.C6H14, 30, 'mol']}

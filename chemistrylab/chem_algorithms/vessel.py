@@ -148,7 +148,6 @@ class Vessel:
             'temperature change': self._update_temperature,
             'pour by volume': self._pour_by_volume,
             'drain by pixel': self._drain_by_pixel,
-            'fully mix': self._fully_mix,
             'update material dict': self._update_material_dict,
             'update solute dict': self._update_solute_dict,
             'mix': self._mix,
@@ -249,8 +248,12 @@ class Vessel:
             # use the name of the event to get the function form event_dict
             action = self._event_dict[event[0]]
 
-            # call the function corresponding to the event
-            reward += action(parameter=event[1:], dt=dt)
+            # if action is wait
+            if event[0] == 'wait':
+                reward += action(self, parameter=event[1:], dt=dt)
+            else:
+                # call the function corresponding to the event
+                reward += action(parameter=event[1:], dt=dt)
 
         # generate the merged queue from feedback queue and empty the feedback queue
         merged = self._merge_event_queue(
@@ -738,13 +741,16 @@ class Vessel:
         event_2 = ['update solute dict', target_solute_dict]
 
         # create a event to reset material's position and variance in target vessel
-        event_3 = ['fully mix']
-
         # push event to target vessel
         __ = target_vessel.push_event_to_queue(
             events=None,
-            feedback=[event_1, event_2, event_3],
+            feedback=[event_1, event_2],
             dt=dt
+        )
+        __ = target_vessel.push_event_to_queue(
+            events=None,
+            feedback=None,
+            dt=-100000
         )
         return reward
 
@@ -1012,60 +1018,21 @@ class Vessel:
         event_2 = ['update solute dict', target_solute_dict]
 
         # create a event to reset material's position and variance in target vessel
-        event_3 = ['fully mix']
 
         # push event to target vessel
         __ = target_vessel.push_event_to_queue(
             events=None,
-            feedback=[event_1, event_2, event_3],
+            feedback=[event_1, event_2],
             dt=dt
         )
 
+        __ = target_vessel.push_event_to_queue(
+            events=None,
+            feedback=None,
+            dt=-100000
+        )
+
         return reward
-
-    def _fully_mix(
-            self,
-            parameter,
-            dt
-    ):
-        """
-        Method to completely mix a beaker.
-
-        Parameters
-        ---------------
-        `parameters` : `list`
-            A list containing parameters used to properly perform the fully mix event.
-        `dt` : `np.float32`
-            The time-step of actions occurring in or to the vessel.
-
-        Returns
-        ---------------
-        `merged` : `list`
-            The events queue list updated with additional events depending on the switches.
-
-        Raises
-        ---------------
-        None
-        """
-
-        # create new layer_position_dict
-        new_layers_position_dict = {}
-
-        # iterate through each material
-        for M in self._material_dict:
-            # do not fill in solute (solute does not form layer)
-            if not self._material_dict[M][0]().is_solute():
-                new_layers_position_dict[M] = 0.0
-
-        # Add Air
-        new_layers_position_dict[self.Air.get_name()] = 0.0
-
-        # reset the variances
-        self._layers_variance = 2.0
-
-        # update self._layers_position_dict
-        self._layers_position_dict = new_layers_position_dict
-        return 0
 
     def _update_material_dict(
             self,
@@ -2164,7 +2131,6 @@ class Vessel:
                 'temperature change': self._update_temperature,
                 'pour by volume': self._pour_by_volume,
                 'drain by pixel': self._drain_by_pixel,
-                'fully mix': self._fully_mix,
                 'update material dict': self._update_material_dict,
                 'update solute dict': self._update_solute_dict,
                 'mix': self._mix,

@@ -117,10 +117,14 @@ def oil_vessel():
         events=None,
         feedback=[
             ['update material dict', material_dict],
-            ['update solute dict', solute_dict],
-            ['fully mix']
+            ['update solute dict', solute_dict]
         ],
         dt=0
+    )
+    extraction_vessel.push_event_to_queue(
+        events=None,
+        feedback=None,
+        dt=-100000
     )
 
     return extraction_vessel

@@ -34,11 +34,10 @@ material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
 
 event_1 = ['update material dict', material_dict]
 event_2 = ['update solute dict', solute_dict]
-event_3 = ['fully mix']
 
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_1], dt=0)
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_2], dt=0)
-extraction_vessel.push_event_to_queue(events=None, feedback=[event_3], dt=0)
+extraction_vessel.push_event_to_queue(events=None, feedback=None, dt=-100000)
 
 
 class ExtractWorld_MethylRed(ExtractBenchEnv):

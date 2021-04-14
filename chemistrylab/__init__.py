@@ -50,7 +50,6 @@ register(
     max_episode_steps=20
 )
 
-
 register(
     id='WurtzReact-v2',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',

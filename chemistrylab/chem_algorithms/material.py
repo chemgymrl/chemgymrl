@@ -263,6 +263,7 @@ class H(Material):
                          molar_mass=1.008,
                          color=0.1,
                          charge=0.0,
+                         boiling_point=20.25,
                          specific_heat=None,
                          index=2
                          )
@@ -279,7 +280,8 @@ class H2(Material):
                          molar_mass=2.016,
                          color=0.1,
                          charge=0.0,
-                         specific_heat=None,
+                         boiling_point=20.25,
+                         specific_heat=14.304,
                          index=3
                          )
 
@@ -295,6 +297,7 @@ class O(Material):
                          molar_mass=15.999,
                          color=0.15,
                          charge=0.0,
+                         boiling_point=90.188,
                          specific_heat=None,
                          index=4
                          )
@@ -311,7 +314,8 @@ class O2(Material):
                          molar_mass=31.999,
                          color=0.1,
                          charge=0.0,
-                         specific_heat=None,
+                         boiling_point=90.188,
+                         specific_heat=0.918,
                          index=5
                          )
 
@@ -327,6 +331,7 @@ class O3(Material):
                          molar_mass=47.998,
                          color=0.1,
                          charge=-1.0,
+                         boiling_point=161.15,
                          specific_heat=None,
                          index=6
                          )
@@ -344,6 +349,7 @@ class C6H14(Material):
                          color=0.65,
                          charge=0.0,
                          solvent=True,
+                         boiling_point=342.15,
                          specific_heat=2.26,
                          index=7
                          )
@@ -407,6 +413,7 @@ class Cl(Material):
                          molar_mass=35.453,
                          color=0.8,
                          charge=0.0,
+                         boiling_point=239.11,
                          specific_heat=0.48,
                          enthalpy_fusion=3200.0,
                          enthalpy_vapor=10200.0,
@@ -427,6 +434,7 @@ class Cl2(Material):
                          molar_mass=70.906,
                          color=0.8,
                          charge=0.0,
+                         boiling_point=238.55,
                          specific_heat=1.0,
                          index=11
                          )
@@ -443,6 +451,7 @@ class LiF(Material):
                          molar_mass=25.939,
                          color=0.9,
                          charge=0.0,
+                         boiling_point=1953.15,
                          specific_heat=1.0,
                          index=12
                          )
@@ -459,6 +468,7 @@ class Li(Material):
                          molar_mass=6.941,
                          color=0.95,
                          charge=0.0,
+                         boiling_point=1603.15,
                          specific_heat=1.0,
                          index=13
                          )
@@ -476,6 +486,7 @@ class F(Material):
                          molar_mass=18.998,
                          color=0.8,
                          charge=0.0,
+                         boiling_point=85.05,
                          specific_heat=None,
                          index=14
                          )
@@ -492,7 +503,8 @@ class F2(Material):
                          molar_mass=37.997,
                          color=0.8,
                          charge=0.0,
-                         specific_heat=None,
+                         boiling_point=85.15,
+                         specific_heat=0.824,
                          index=15
                          )
 
@@ -561,8 +573,8 @@ class Dodecane(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
+            spectra_overlap=spec.S_dodecane,
+            spectra_no_overlap=spec.S_dodecane,
             index=16
         )
 
@@ -585,8 +597,8 @@ class OneChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=15490.0,
             enthalpy_vapor=42800.0,
-            spectra_overlap=spec.S_1,
-            spectra_no_overlap=spec.S_1,
+            spectra_overlap=spec.S_1_chlorohexane,
+            spectra_no_overlap=spec.S_1_chlorohexane,
             index=17
         )
 
@@ -609,8 +621,8 @@ class TwoChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=43820.0,
-            spectra_overlap=spec.S_2,
-            spectra_no_overlap=spec.S_2,
+            spectra_overlap=spec.S_2_chlorohexane,
+            spectra_no_overlap=spec.S_2_chlorohexane,
             index=18
         )
 
@@ -633,8 +645,8 @@ class ThreeChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=32950.0,
-            spectra_overlap=spec.S_3,
-            spectra_no_overlap=spec.S_3,
+            spectra_overlap=spec.S_3_chlorohexane,
+            spectra_no_overlap=spec.S_3_chlorohexane,
             index=19
         )
 

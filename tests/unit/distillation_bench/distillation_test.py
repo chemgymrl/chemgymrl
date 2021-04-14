@@ -24,7 +24,7 @@ class DistillationTestCase(unittest.TestCase):
         boil_vessel = env.boil_vessel
         target_material= env.target_material
         dQ=env.dQ
-        n_actions=4
+        n_actions=5
 
         self.assertEqual(boil_vessel, env.distillation.boil_vessel)
         self.assertEqual(target_material, env.distillation.target_material)
@@ -33,7 +33,7 @@ class DistillationTestCase(unittest.TestCase):
 
     def test_get_action_space(self):
         env = gym.make(ENV_NAME)
-        action_space = gym.spaces.MultiDiscrete([4,10])
+        action_space = gym.spaces.MultiDiscrete([5,10])
         self.assertEqual(action_space, env.distillation.get_action_space())
 
     def test_reset(self):
@@ -160,7 +160,7 @@ class DistillationTestCase(unittest.TestCase):
 
         done = False
 
-        action = np.array([3,0])
+        action = np.array([4,0])
         __, __ , done, __ = env.step(action)
 
         self.assertTrue(done)
