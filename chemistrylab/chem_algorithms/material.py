@@ -573,8 +573,8 @@ class Dodecane(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
+            spectra_overlap=spec.s_dodecane,
+            spectra_no_overlap=spec.s_dodecane,
             index=16
         )
 
