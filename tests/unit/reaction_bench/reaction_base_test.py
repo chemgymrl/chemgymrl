@@ -140,8 +140,8 @@ class ReactionBaseTestCase(unittest.TestCase):
             state_mols[i + 4] = env.reaction.n[i]
 
         # test if plot_data_state is the correct value
-        np.testing.assert_almost_equal(plot_data_state, env.state[:4].tolist(), decimal=5)
-        np.testing.assert_almost_equal(plot_data_mol, state_mols[4:].tolist(), decimal=5)
+        np.testing.assert_almost_equal(plot_data_state, env.state[:4].tolist(), decimal=3)
+        np.testing.assert_almost_equal(plot_data_mol, state_mols[4:].tolist(), decimal=3)
 
     def test_temperature_increase(self):
 
