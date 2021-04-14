@@ -92,6 +92,31 @@ S_3_3[2, 0] = 0.5 # Maximum height of peak 2
 S_3_3[2, 1] = 0.85 # Position of peak 2 on x-axis
 S_3_3[2, 2] = 0.015 # Variance of peak 0
 
+### ------------ dodecane -------------- ###
+s_dodecane = np.zeros((6,3))
+s_dodecane[0,0] = 0.403
+s_dodecane[0,1] = 0.157
+s_dodecane[0,2] = 0.001
+
+s_dodecane[1,0] = 0.95
+s_dodecane[1,1] = 0.16
+s_dodecane[1,2] = 0.003
+
+s_dodecane[2,0] = 0.36
+s_dodecane[2,1] = 0.180
+s_dodecane[2,2] = 0.008
+
+s_dodecane[3,0] = 0.069
+s_dodecane[3,1] = 0.588
+s_dodecane[3,2] = 0.012
+
+s_dodecane[4,0] = 0.025
+s_dodecane[4,1] = 0.615
+s_dodecane[4,2] = 0.007
+
+s_dodecane[5,0] = 0.016
+s_dodecane[5,1] = 0.8
+s_dodecane[5,2] = 0.007
 
 # plot these single peak spectra
 def plot_single_peak():
