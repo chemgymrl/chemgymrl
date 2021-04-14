@@ -871,7 +871,7 @@ class _Reaction:
             )[0]
             self._plot_axs[0].set_xlim([wave_min, wave_max])
             self._plot_axs[0].set_ylim([0, 1.2])
-            self._plot_axs[0].set_xlabel('Wavelength (nm)')
+            self._plot_axs[0].set_xlabel('1/CM')
             self._plot_axs[0].set_ylabel('Absorbance')
 
             # bar chart displaying time, temperature, pressure,
@@ -1055,7 +1055,7 @@ class _Reaction:
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
             self._plot_axs[1, 1].set_ylim([0, 1.2])
-            self._plot_axs[1, 1].set_xlabel('Wavelength (nm)')
+            self._plot_axs[1, 1].set_xlabel('1/CM')
             self._plot_axs[1, 1].set_ylabel('Absorbance')
             self._plot_axs[1, 1].legend()
 
@@ -1140,7 +1140,7 @@ class _Reaction:
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
             self._plot_axs[1, 1].set_ylim([0, 1.2])
-            self._plot_axs[1, 1].set_xlabel('Wavelength (nm)')
+            self._plot_axs[1, 1].set_xlabel('1/CM')
             self._plot_axs[1, 1].set_ylabel('Absorbance')
             self._plot_axs[1, 1].legend()
 

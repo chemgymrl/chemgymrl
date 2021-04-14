@@ -292,7 +292,7 @@ def plot_triple_peak():
 
 # plot these triple peak spectra
 def plot_mix_peak():
-    triple_peak = [S_3_chlorohexane]
+    triple_peak = [S_1_chlorohexane]
     # Initialize array for wavelength[0, 1] and absorbance
     x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
     wave = np.linspace(wave_min, wave_max, x.shape[0], endpoint=True, dtype=np.float32)

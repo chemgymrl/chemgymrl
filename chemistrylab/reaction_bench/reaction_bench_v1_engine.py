@@ -39,9 +39,7 @@ from chemistrylab.chem_algorithms import vessel, util
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.reactions.reaction_base import _Reaction
 
-R = 0.008314462618  # Gas constant (kPa * m**3 * mol**-1 * K**-1)
-wave_max = 800
-wave_min = 200
+R = 0.008314462618  # Gas constant (kPa * m**3 * mol**-1 * K**-1)\
 
 
 class ReactionBenchEnv(gym.Env):
@@ -725,7 +723,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
-
+        wave_max = 500
+        wave_min = 4000
         # Wavelength array and array length for plotting
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
         absorb = self.state[4 + self.reaction.initial_in_hand.shape[0]:]
@@ -772,6 +771,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
+        wave_max = 500
+        wave_min = 4000
 
         # define the length of the spectral data array and the array itself
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
