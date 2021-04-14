@@ -34,6 +34,7 @@ import sys
 sys.path.append("../../")  # to access chemistrylab
 sys.path.append("../reactions/")  # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
+from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 from chemistrylab.chem_algorithms import vessel, util
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.reactions.reaction_base import _Reaction
@@ -164,7 +165,7 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = self.reaction.get_spectra(self.vessels.get_concentration(materials=self.reaction.materials))
+        absorb = CharacterizationBench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -513,7 +514,7 @@ class ReactionBenchEnv(gym.Env):
         V = self.vessels.get_volume()
 
         # acquire the absorption spectra for the materials in the vessel
-        absorb = self.reaction.get_spectra(self.vessels.get_concentration(materials=self.reaction.materials))
+        absorb = CharacterizationBench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # create an array to contain all state variables
         state = np.zeros(
@@ -806,11 +807,13 @@ class ReactionBenchEnv(gym.Env):
         )
 
         # get the spectral data peak and dashed spectral lines
-        peak = self.reaction.get_spectra_peak(
-            self.vessels.get_concentration(materials=self.reaction.materials)
+        peak = CharacterizationBench.get_spectra_peak(
+            self.vessels,
+            materials=self.reaction.materials
         )
-        dash_spectra = self.reaction.get_dash_line_spectra(
-            self.vessels.get_concentration(materials=self.reaction.materials)
+        dash_spectra = CharacterizationBench.get_dash_line_spectra(
+            self.vessels,
+            materials=self.reaction.materials
         )
 
         # The first render is required to initialize the figure

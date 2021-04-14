@@ -50,10 +50,6 @@ class OilWaterTestCase(unittest.TestCase):
         action[1] = 5
         state, reward, done, _ = env.step(action)
 
-        # event_2 = ['fully mix']
-        #
-        # env.vessels[0].push_event_to_queue(events=None, feedback=[event_2], dt=0)
-
         v0_initial_layers = env.vessels[0].get_layers()
 
         action = np.zeros(env.action_space.shape)

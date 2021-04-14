@@ -597,8 +597,8 @@ class OneChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=15490.0,
             enthalpy_vapor=42800.0,
-            spectra_overlap=spec.S_1,
-            spectra_no_overlap=spec.S_1,
+            spectra_overlap=spec.S_1_chlorohexane,
+            spectra_no_overlap=spec.S_1_chlorohexane,
             index=17
         )
 
@@ -621,8 +621,8 @@ class TwoChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=43820.0,
-            spectra_overlap=spec.S_2,
-            spectra_no_overlap=spec.S_2,
+            spectra_overlap=spec.S_2_chlorohexane,
+            spectra_no_overlap=spec.S_2_chlorohexane,
             index=18
         )
 
@@ -645,8 +645,8 @@ class ThreeChlorohexane(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=32950.0,
-            spectra_overlap=spec.S_3,
-            spectra_no_overlap=spec.S_3,
+            spectra_overlap=spec.S_3_chlorohexane,
+            spectra_no_overlap=spec.S_3_chlorohexane,
             index=19
         )
 
