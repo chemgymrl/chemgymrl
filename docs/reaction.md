@@ -39,7 +39,7 @@ being performed by the agent. There are two main plot modes:
     'surface-level' understanding of the information portrayed.
     - Plots absorbance, time, temperature, volume, pressure, and the amount of reactants remaining.
   
-![human render output](../tutorial_figures/reaction/human_render_reaction.png)
+![human render output](tutorial_figures/reaction/human_render_reaction.png)
 
 - Full Render
     -  Plots thermodynamic variables and spectral data. The full render plots a significant amount of data for a more 
@@ -48,7 +48,7 @@ being performed by the agent. There are two main plot modes:
     absorbance of both reactants and products. It also plots the temperature and pressure mapped to range between 0 and 
     1, as well as the pressure in units kPa.            
 
-![full render output](../tutorial_figures/reaction/full_render_reaction.png)
+![full render output](tutorial_figures/reaction/full_render_reaction.png)
 
 In addition to these plots, the reaction engine will also provide a vessel of the completed reaction which contains 
 information on the updated thermodynamic variables, material dictionary, and solute dictionary after the reaction. This 
