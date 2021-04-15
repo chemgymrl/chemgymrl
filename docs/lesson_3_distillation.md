@@ -73,7 +73,7 @@ print('\n')
 
 
 ```python
-action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Pour B1 into BV', 'Pour B2 into BV', 'Done']
+action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait', 'Done']
 assert env.action_space.shape[0] == 2
 print(env.action_space)
 
@@ -107,7 +107,7 @@ while not done:
     elif total_steps == 3:
         action = np.array([0,75])
     elif total_steps == 4:
-        action = np.array([3,0])
+        action = np.array([4,0])
 
 
 

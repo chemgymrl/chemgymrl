@@ -38,7 +38,7 @@ environment will also help give insight into the reaction mechanics. If you run 
 
 ![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_command_0.png)
 
-![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_0.png)
+![graph](../tutorial_figures/reaction-lesson-1/wurtz_lesson_0.png)
 
 
 ```python

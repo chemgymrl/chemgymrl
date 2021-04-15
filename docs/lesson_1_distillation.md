@@ -124,12 +124,13 @@ Action Multiplier: 10
 # action[0] is a number indicating the event to take place
 # action[1] is a number representing a multiplier for the event
 # Actions and multipliers include:
-#   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
-#   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
-#   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+#   0: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
+#   1: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+#   2: Wait for boil vessel temp to decrease towards room temp (multiplier == 0, wait until room temp == true)
 #   3: Done (Value doesn't matter)
+#   4: Done (Value doesn't matter)
 
-action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Done']
+action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait','Done']
 assert env.action_space.shape[0] == 2
 
 total_steps=0
@@ -144,7 +145,7 @@ Also note that when we are performing heat changes, it heavily relies on the giv
 
 ![dQ value](../tutorial_figures/distillation-lesson-1/dQ_value.png)
 
-Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentraion of the desired material (in our case dodecane) in a particular vessel.
+Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentration of the desired material (in our case dodecane) in a particular vessel.
 
 Please input the following action and multipliers:
 
@@ -155,7 +156,7 @@ Please input the following action and multipliers:
 | 2      | 0        | 100         |
 | 3      | 2        | 10          |
 | 4      | 1        | 10          |
-| 5      | 3        | 0           |
+| 5      | 4        | 0           |
 
 
 ```python
@@ -238,7 +239,7 @@ Notice now that all the materials are in the condensation vessel.
 
 #### Step 5: Ending the experiment
 
-- action: 3
+- action: 4
 - multiplier: 0
 
 ### End of the lesson

@@ -60,7 +60,9 @@ The Vessel class serves as any container you might find in a lab, a beaker, a dr
 
 ### Supported Materials
 
+All the materials supported by the environments will be located in `../chemistrylab/chem_algorithms/material.py`. This file contains the material class where materials and their properties can be defined. There are numerous, already defined materials, available for use. These materials contains properties including the name, density, polarity, boiling point, melting point, specific heat, enthalpy of vapor, enthalpy of fusion, and many more. The material properties are listed to be consistent and the intended units are included in the file's docstring.
 
+If you need to add any materials, it is quite easy to do so as most properties are relative straightforward to add. It's important to note that when adding spectra you will need to add the desired spectrum to the `../chemistrylab/ode_algorithms/spectra/diff_spectra.py` file so that the material class can access it from there.
 
 ### Expected Output
 

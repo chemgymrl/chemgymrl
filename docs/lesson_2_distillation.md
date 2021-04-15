@@ -80,11 +80,12 @@ print('\n')
 # action[0] is a number indicating the event to take place
 # action[1] is a number representing a multiplier for the event
 # Actions and multipliers include:
-#   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
-#   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
-#   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+#   0: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
+#   1: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+#   2: Wait for boil vessel temp to decrease towards room temp (multiplier == 0, wait until room temp == true)
 #   3: Done (Value doesn't matter)
-action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Done']
+#   4: Done (Value doesn't matter)
+action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait', 'Done']
 assert env.action_space.shape[0] == 2
 ```
 
