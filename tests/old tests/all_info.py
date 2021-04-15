@@ -1,4 +1,19 @@
 '''
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 A file including valuable information about the capabilities of each environment.
 '''
 
@@ -6,8 +21,8 @@ import itertools
 import sys
 
 # ensure all necessary modules can be found
-sys.path.append("../") # to access chemistrylab
-sys.path.append("../chemistrylab/reactions") # to access all reactions
+sys.path.append("../../") # to access chemistrylab
+sys.path.append("../../chemistrylab/reactions") # to access all reactions
 
 # import all local modules
 import chemistrylab

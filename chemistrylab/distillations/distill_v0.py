@@ -1,7 +1,22 @@
 '''
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 Module to perform actions to isolate a desired material generated in a Wurtz reaction.
 :title: distill_v0.py
-:author: Mitchell Shahen
+:author: Mitchell Shahen, Mark Baula
 :history: 2020-07-22
 Available Actions for this Distillation Experiment:
 0: Add/Remove Heat (Heat value multiplier, relative of maximal heat change)

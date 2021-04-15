@@ -1,6 +1,0 @@
-Meeting Notes:
-
-- Amanuel:
-	- Working on deployment of website and Travis CI for continuous integration
-	- Added links and fixed bugs
-	- Is looking to work on making the website compatible for mobile users as well
