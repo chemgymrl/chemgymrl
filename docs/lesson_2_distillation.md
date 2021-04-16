@@ -161,4 +161,4 @@ As you can see the condensation vessel is mostly filled with dodecane which resu
 
 We can also see how reward changes over time.
 
-![reward over time](tutorial_figures/distillation-lesson-2/reward_over_time.png)
+![reward over time](tutorial_figures/distillation-lesson-2/reward_over_time.png.png)
