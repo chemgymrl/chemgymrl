@@ -1,10 +1,10 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-# Distillation Bench: Lesson 3
+# Distillation Bench: Lesson 2
 
 ### Getting a High Reward in the Distillation Bench
 
-In this tutorial we will finally talk about getting a high reward in the distillation bench. An in depth explanation of the distillation process is explained in [Distillation Bench: Lesson 1](https://chemgymrl.com/ChemGymRL/lesson_1_distillation/).
+In this tutorial we will talk about getting a high reward in the distillation bench. An in depth explanation of the distillation process is explained in [Distillation Bench: Lesson 1](https://chemgymrl.com/ChemGymRL/lesson_1_distillation/).
 
 Essentially what we're trying to do is isolate our targeted material into the condensation vessel. We want to get a pure and high molar amount of it in this vessel.
 

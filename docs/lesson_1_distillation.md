@@ -248,4 +248,4 @@ Notice now that all the materials are in the condensation vessel.
 
 This concludes the end of our tutorial. Hopefully you got a chance to see how the basic actions in the distillation environment works and see how you can use the agent in RL applications to maximize the distillation of a desired material.
 
-In the next tutorial we will perform 2 experiments where we heat up the boiling vessel to the maximum temperature it can reach, and vice versa where we cool it to the lowest temperature.
+In the next tutorial we will try to perform the distillation process and try to get a high reward by isolating dodecane.
