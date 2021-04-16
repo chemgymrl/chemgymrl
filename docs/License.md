@@ -6,7 +6,7 @@
 
 Please use the following citation for ChemGymRL:
 
-* Crowley, M., Tamblyn, I., et al, ChemGymRL, April 2021, chemgymrl.com
+* Crowley, M., Tamblyn, I., et al, ChemGymRL, April 2021. URL: https://chemgymrl.com/
 
 ### License 
 
