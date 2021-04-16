@@ -10,8 +10,7 @@ meant to simulate the use of any given you might find in a chemistry lad, such a
 Here we will be going through the important concepts, functions and attributes that make up the vessel class so that you
 can easily use it when designing your own reactions.
 
-If you want a more detailed look into each function of the vessel I suggest you go to our [documentation]() on the data
-structure. 
+If you want a more detailed look into each function of the vessel I suggest you go to our documentation on the data structure. 
 
 The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc. This is performed using an event que, which we will look at later in this lesson. First an overview of some of the important variables that make up the vessel class:
 
