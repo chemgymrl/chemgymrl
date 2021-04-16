@@ -886,7 +886,7 @@ class _Reaction:
             )[0]
             self._plot_axs[0].set_xlim([wave_min, wave_max])
             self._plot_axs[0].set_ylim([0, 1.2])
-            self._plot_axs[0].set_xlabel('1/CM')
+            self._plot_axs[0].set_xlabel('Wavelength (nm)')
             self._plot_axs[0].set_ylabel('Absorbance')
 
             # bar chart displaying time, temperature, pressure,
@@ -976,8 +976,8 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = CharacterizationBench.get_spectra_peak(vessels, materials=self.materials)
-        dash_spectra = CharacterizationBench.get_dash_line_spectra(vessels, materials=self.materials)
+        peak = CharacterizationBench().get_spectra_peak(vessels, materials=self.materials)
+        dash_spectra = CharacterizationBench().get_dash_line_spectra(vessels, materials=self.materials)
 
         # The first render is required to initialize the figure
         if first_render:
@@ -1070,7 +1070,7 @@ class _Reaction:
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
             self._plot_axs[1, 1].set_ylim([0, 1.2])
-            self._plot_axs[1, 1].set_xlabel('1/CM')
+            self._plot_axs[1, 1].set_xlabel('Wavelength (nm)')
             self._plot_axs[1, 1].set_ylabel('Absorbance')
             self._plot_axs[1, 1].legend()
 
@@ -1150,12 +1150,12 @@ class _Reaction:
                 self._plot_axs[1, 1].plot(wave, item, linestyle='dashed')
 
             # reset the spectra peak labelling
-            for i in range(self.n.shape[0]):
+            for i in range(len(peak)):
                 self._plot_axs[1, 1].scatter(peak[i][0], peak[i][1], label=peak[i][2])
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
             self._plot_axs[1, 1].set_ylim([0, 1.2])
-            self._plot_axs[1, 1].set_xlabel('1/CM')
+            self._plot_axs[1, 1].set_xlabel('Wavelength (nm)')
             self._plot_axs[1, 1].set_ylabel('Absorbance')
             self._plot_axs[1, 1].legend()
 
