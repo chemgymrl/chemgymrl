@@ -1,6 +1,6 @@
 ## Reaction Bench: Lesson 1
 
-### Part 1:
+### Part 1
 
 In this lesson I will be taking you through how our reaction bench environment works and how an RL agent might interact with the environment.
 
@@ -92,7 +92,7 @@ while not done:
     print(f'total_reward: {total_reward}')
 ```
 
-### Part 2:
+### Part 2
 
 
 Here I will provide instructions on how to maximize the return of this reaction environment.

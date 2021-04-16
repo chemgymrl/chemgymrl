@@ -1,5 +1,5 @@
 ## Extraction Bench: Lesson 1
-### Using a non-polar solute to extract a solute from water
+#### Using a non-polar solute to extract a solute from water
 
 In this tutorial, I am going to walk you through how our extraction environment works and hopefully give some insight into how an
 RL agent might interact with the environment. In this extraction we are going to be using oil to extract sodium and

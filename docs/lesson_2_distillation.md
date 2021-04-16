@@ -134,7 +134,9 @@ while not done:
     total_steps += 1
 ```
 
-### Let's try increasing the temperature of the boiling vessel (ACTION 1)
+## Action 1
+#### Increasing the temperature of the boiling vessel 
+
 
 ```
 # ACTION 1
@@ -149,7 +151,8 @@ temperature eventually reaches 1738.0 Kelvin. We end up with a final graph that 
 
 As you can see most the materials are boiled off from the boiling vessel into the condensation vessel aside from 0.1 mols of NaCl.
 
-### Increasing the temperature with a higher multiplier (ACTION 2)
+## Action 2
+#### Increasing the temperature with a higher multiplier
 
 ```
 # ACTION 2
@@ -167,7 +170,8 @@ We get a negative reward as whenever we try the increase the temperature of an e
 
 ![action 2](../tutorial_figures/distillation-lesson-2/increase_temp_drastically.png)
 
-### Lower the temperature (ACTION 3)
+## Action 3
+#### Lower the temperature
 
 We will now lower the temperature the absolute minimum it can be and see what happens. 
 

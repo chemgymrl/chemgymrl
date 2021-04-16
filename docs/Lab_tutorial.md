@@ -2,7 +2,7 @@
 
 The lab environment serves as an environment for a user to conduct chemical experiments as they would in a physical lab, further the lab environment provides the opportunity to train a highlevel agent to synthesize materials using the 4 lab benches and tha gents associated with each. The environment allows the user to use a variety of reward functions based on the cost of real world lab equipment, material costs purity and labour costs. In this tutorial we will walk through how a lab manager agent would walk through the process of trying to synthesize dodecane. Further we will walk through the manager wrapper that we have developed which gives a simple api for an agent to run in an environment.
 
-## Lab:
+## Lab
 
 First off we can go over the 4 lab benches that the agent will have access to when trying to synthesize a material.
 
@@ -319,7 +319,7 @@ lab.step(analysis_action)
 
 Lastly we use the characterization bench. In this case we are going to perform an absobtion spectra analysis on our vessel that we get back. This is designed so that the agent can identify what is in the vessel without explicitly telling the agent. That's all for this part of the tutorial on the Lab environment, next we will cover the Lab Manager wrapper for the lab environment. 
 
-## Lab Manager:
+## Lab Manager
 
 The Lab Manager at the moment doesn't support training agents, however it does support pre trained or heuristic agents, or even a human agent.
 
@@ -405,5 +405,5 @@ manager.run()
     Distillation-v0
 
 
-### Closing Remarks:
+## Closing Remarks
 And the api is just as simple as that! We hope this has been informative and you should now be able to run the Lab and Lab Manager smoothly.

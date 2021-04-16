@@ -1,6 +1,6 @@
 ## Vessel: Lesson
 
-### Overview:
+### Overview
 
 In this lesson, we will be going through a class that is vital to the operation of all of our benches, the vessel class.
 The source code for this can be found here: `chemistrylab/chem_algorithms/vessel.py`. The vessel class as it is named is
@@ -64,7 +64,7 @@ _merge_event_queue()|merge the feedback_queue passed in, and all the default eve
 From the list above, the most important function is push_event_to_que(). The rest of the functions are handeled in the backend by the events que. As stated before, the vessel class works off of an event que where we push a set of events to the event que and the event que then performs those events to the vessel, along with a specified dt parameter to specify how much time to wait after performing the events. Below we have a list of the current event functions that can be performed by the vessel and below that we have a demonstration of how to push events to the vessel.
 
 
-#### Event Functions
+### Event Functions
 Function Name|Description
 ---|---
 'pour by volume'|Pour from self vessel to target vessel by certain volume
@@ -101,7 +101,7 @@ Here we have a graph of the seperation between the oil and the water when we ini
 Here we have the solution after we drain some of it (notice that the top of the vessel is now air):
 
 ![drained oil and water](../tutorial_figures/vessel/vessel_2.png)
-#### The Workflow
+### The Workflow
   
   1. Agent choose action from the action space of an environment.
   2. The environment does the calculation and update and generate events.
