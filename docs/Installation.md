@@ -8,7 +8,7 @@ created a [video](https://youtu.be/tE8aVln64_0) which will be of some help, you 
 
 
 <div style="text-align: center; margin-bottom: 2em;">
-<iframe width="560" height="315" src="https://youtu.be/tE8aVln64_0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tE8aVln64_0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 
 ### Clone Repository
