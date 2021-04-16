@@ -1071,8 +1071,8 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = self.get_spectra_peak(vessels.get_concentration())
-        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration())
+        peak = self.get_spectra_peak(vessels.get_concentration(self.materials))
+        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration(self.materials))
 
         # The first render is required to initialize the figure
         if first_render:
@@ -1091,7 +1091,7 @@ class _Reaction:
                     )[0]
                 )
             self._plot_axs[0, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            self._plot_axs[0, 0].set_ylim([0.0, np.max(self.nmax)])
+            # self._plot_axs[0, 0].set_ylim([0.0, np.max(self.nmax)])
             self._plot_axs[0, 0].set_xlabel('Time (s)')
             self._plot_axs[0, 0].set_ylabel('Molar Amount (mol)')
             self._plot_axs[0, 0].legend()

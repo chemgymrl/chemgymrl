@@ -800,7 +800,8 @@ class ReactionBenchEnv(gym.Env):
             self.plot_data_mol,
             self.plot_data_concentration,
             self.n_steps,
-            self.vessels
+            self.vessels,
+            self.step_num
         )
 
         # get the spectral data peak and dashed spectral lines
