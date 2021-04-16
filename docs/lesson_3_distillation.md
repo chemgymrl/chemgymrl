@@ -81,6 +81,10 @@ print(env.action_space)
 
 total_steps=0
 total_reward=0
+
+steps_over_time = []
+total_reward_over_time = []
+
 ```
 
 ### Explained Process
@@ -130,6 +134,21 @@ while not done:
 
     #increment one step
     total_steps += 1
+
+    # append array for reward over time
+    total_reward_over_time.append(reward)
+    steps_over_time.append(total_steps)
+
+total_reward_over_time = pd.Series(total_reward_over_time)
+steps_over_time = pd.Series(steps_over_time)
+
+fig, ax = plt.subplots()
+ax.plot(steps_over_time, total_reward_over_time)
+ax.set_ylabel('Reward')
+ax.set_xlabel('Steps')
+plt.savefig('Rewards over time - Distillation Lesson 3')
+plt.show()
+
 ```
 
 This will result in the following graph:
@@ -139,3 +158,7 @@ This will result in the following graph:
 As you can see the condensation vessel is mostly filled with dodecane which results in a successful distillation process. We are then given the reward of 0.97.
 
 ![high reward](../tutorial_figures/distillation-lesson-3/high_reward.png)
+
+We can also see how reward changes over time.
+
+![reward over time](../tutorial_figures/distillation-lesson-3/reward_over_time.png)
