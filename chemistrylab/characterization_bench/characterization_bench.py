@@ -26,6 +26,10 @@ Class to initialize reaction vessels, prepare the reaction base environment, and
 """
 
 import numpy as np
+import copy
+import sys
+sys.path.append("../../")
+from chemistrylab.ode_algorithms.spectra.diff_spectra import convert_inverse_cm_to_nm
 
 
 class CharacterizationBench:
@@ -52,6 +56,10 @@ class CharacterizationBench:
 
         # specify the analysis techniques available in this bench
         self.techniques = {'spectra': self.get_spectra}
+        self.params = {'spectra': {'range_ir': (2000, 20000)}}
+
+    def update_ir_range(self, min, max):
+        self.params['spectra']['range_ir'] = (min, max)
 
     def analyze(self, vessel, analysis, overlap=False):
         """
@@ -74,8 +82,17 @@ class CharacterizationBench:
         analysis = self.techniques[analysis](vessel, overlap)
         return analysis, vessel
 
-    @staticmethod
-    def get_spectra(vessel, materials=None, overlap=True):
+    def normalize_spectra(self, params, ir_range):
+        spectras = copy.deepcopy(params)
+        min = ir_range[0]
+        wave_range = abs(ir_range[1] - ir_range[0])
+        for i in range(len(spectras)):
+            if spectras[i] is not None:
+                for k in range(len(spectras[i])):
+                    spectras[i][k][1] = abs(spectras[i][k][1] - min)/wave_range
+        return spectras
+
+    def get_spectra(self, vessel, materials=None, overlap=True):
         """
         Class method to generate total spectral data using a guassian decay.
 
@@ -107,7 +124,8 @@ class CharacterizationBench:
             params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
         else:
             params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
-
+        params = convert_inverse_cm_to_nm(params)
+        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
@@ -135,8 +153,7 @@ class CharacterizationBench:
 
         return absorb
 
-    @staticmethod
-    def get_spectra_peak(vessel, materials=None, overlap=True):
+    def get_spectra_peak(self, vessel, materials=None, overlap=True):
         """
         Method to populate a list with the spectral peak of each chemical.
 
@@ -168,7 +185,8 @@ class CharacterizationBench:
             params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
         else:
             params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
-
+        params = convert_inverse_cm_to_nm(params)
+        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         # create a list of the spectral peak of each chemical
         spectra_peak = []
         for i, material in enumerate(materials):
@@ -181,8 +199,7 @@ class CharacterizationBench:
 
         return spectra_peak
 
-    @staticmethod
-    def get_dash_line_spectra(vessel, materials=None, overlap=True):
+    def get_dash_line_spectra(self, vessel, materials=None, overlap=True):
         """
         Module to generate each individual spectral dataset using gaussian decay.
 
@@ -212,7 +229,8 @@ class CharacterizationBench:
             params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
         else:
             params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
-
+        params = convert_inverse_cm_to_nm(params)
+        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         dash_spectra = []
 
         # set the wavelength space

@@ -73,8 +73,8 @@ class Material:
                  specific_heat=1.0,  # in J/g*K
                  enthalpy_fusion=1.0,  # in J/mol
                  enthalpy_vapor=1.0,  # in J/mol
-                 spectra_overlap=np.zeros((3, 3, 3), dtype=np.float32),
-                 spectra_no_overlap=np.zeros((3, 3, 3), dtype=np.float32),
+                 spectra_overlap=None,
+                 spectra_no_overlap=None,
                  index=None
                  ):
         self._name = name
@@ -261,8 +261,6 @@ class H2O(Material):
                          solvent=True,
                          specific_heat=4.1813,
                          enthalpy_vapor=40650.0,
-                         spectra_overlap=spec.S_7,
-                         spectra_no_overlap=spec.S_3,
                          index=1
                          )
 
@@ -279,7 +277,6 @@ class H(Material):
                          color=0.1,
                          charge=0.0,
                          boiling_point=20.25,
-                         specific_heat=None,
                          index=2
                          )
 
@@ -386,8 +383,6 @@ class NaCl(Material):
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,
                          enthalpy_vapor=229700.0,
-                         spectra_overlap=spec.S_3_3,
-                         spectra_no_overlap=spec.S_8,
                          index=8
                          )
 
@@ -409,8 +404,6 @@ class Na(Material):
                          specific_heat=1.23,
                          enthalpy_fusion=2600.0,
                          enthalpy_vapor=97700.0,
-                         spectra_overlap=spec.S_4,
-                         spectra_no_overlap=spec.S_4,
                          index=9
                          )
 
@@ -432,8 +425,6 @@ class Cl(Material):
                          specific_heat=0.48,
                          enthalpy_fusion=3200.0,
                          enthalpy_vapor=10200.0,
-                         spectra_overlap=spec.S_7,
-                         spectra_no_overlap=spec.S_3,
                          index=10
                          )
 
@@ -502,7 +493,6 @@ class F(Material):
                          color=0.8,
                          charge=0.0,
                          boiling_point=85.05,
-                         specific_heat=None,
                          index=14
                          )
 
@@ -540,8 +530,6 @@ class CuSO4(Material):
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,
                          enthalpy_vapor=229700.0,
-                         spectra_overlap=spec.S_6,
-                         spectra_no_overlap=spec.S_1,
                          index=8
                          )
 
@@ -562,8 +550,6 @@ class CuSO4Pentahydrate(Material):
                          specific_heat=0.853,
                          enthalpy_fusion=27950.0,
                          enthalpy_vapor=229700.0,
-                         spectra_overlap=spec.S_3_3,
-                         spectra_no_overlap=spec.S_5,
                          index=8
                          )
 
@@ -684,8 +670,6 @@ class FiveMethylundecane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
             index=20
         )
 
@@ -708,8 +692,6 @@ class FourEthyldecane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
             index=21
         )
 
@@ -732,8 +714,6 @@ class FiveSixDimethyldecane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
             index=22
         )
 
@@ -756,8 +736,6 @@ class FourEthylFiveMethylnonane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
             index=23
         )
 
@@ -780,8 +758,6 @@ class FourFiveDiethyloctane(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_2_3,
-            spectra_no_overlap=spec.S_8,
             index=24
         )
 

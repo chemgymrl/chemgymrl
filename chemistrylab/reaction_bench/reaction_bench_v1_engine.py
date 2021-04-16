@@ -178,7 +178,8 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = CharacterizationBench.get_spectra(self.vessels, materials=self.reaction.materials)
+        self.char_bench = CharacterizationBench()
+        absorb = self.char_bench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -527,7 +528,7 @@ class ReactionBenchEnv(gym.Env):
         V = self.vessels.get_volume()
 
         # acquire the absorption spectra for the materials in the vessel
-        absorb = CharacterizationBench.get_spectra(self.vessels, materials=self.reaction.materials)
+        absorb = self.char_bench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # create an array to contain all state variables
         state = np.zeros(
@@ -738,8 +739,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
-        wave_max = 500
-        wave_min = 4000
+        wave_max = self.char_bench.params['spectra']['range_ir'][1]
+        wave_min = self.char_bench.params['spectra']['range_ir'][0]
         # Wavelength array and array length for plotting
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
         absorb = self.state[4 + self.reaction.initial_in_hand.shape[0]:]
@@ -786,8 +787,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
-        wave_max = 500
-        wave_min = 4000
+        wave_max = self.char_bench.params['spectra']['range_ir'][1]
+        wave_min = self.char_bench.params['spectra']['range_ir'][0]
 
         # define the length of the spectral data array and the array itself
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
@@ -823,11 +824,11 @@ class ReactionBenchEnv(gym.Env):
         )
 
         # get the spectral data peak and dashed spectral lines
-        peak = CharacterizationBench.get_spectra_peak(
+        peak = self.char_bench.get_spectra_peak(
             self.vessels,
             materials=self.reaction.materials
         )
-        dash_spectra = CharacterizationBench.get_dash_line_spectra(
+        dash_spectra = self.char_bench.get_dash_line_spectra(
             self.vessels,
             materials=self.reaction.materials
         )
