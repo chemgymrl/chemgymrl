@@ -58,6 +58,9 @@ class CharacterizationBench:
         self.techniques = {'spectra': self.get_spectra}
         self.params = {'spectra': {'range_ir': (2000, 20000)}}
 
+    def update_ir_range(self, min, max):
+        self.params['spectra']['range_ir'] = (min, max)
+
     def analyze(self, vessel, analysis, overlap=False):
         """
         Constructor class method to pass thermodynamic variables to class methods.
