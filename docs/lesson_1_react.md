@@ -6,7 +6,7 @@
 
 In this lesson I will be taking you through how our reaction bench environment works and how an RL agent might interact with the environment.
 
-The reaction bench environment is meant to as it sounds simulate a reaction, in most reaction benches the agent will have a number of reagents and the ability to play with the environmental conditions of the reaction and through doing this the agent is trying to maximize the yield of a certain desired material. For the reaction bench we use a reaction file which specifies the mechanics of a certain reaction or multiple reactions. For instance the Wurtz reaction is made up of 6 different reactions and as such is a very complicated reaction which the agent has to try and learn the mechanisms of the reaction environment it is in. For this lesson we will be using a simplified version of the wurtz reaction to introduce you to how actions affect the environment.
+The reaction bench environment is meant to, as it sounds, simulate a reaction, in most reaction benches the agent will have a number of reagents and the ability to play with the environmental conditions of the reaction and through doing this the agent is trying to maximize the yield of a certain desired material. For the reaction bench we use a reaction file which specifies the mechanics of a certain reaction or multiple reactions. For instance the Wurtz reaction is made up of 6 different reactions and as such is a very complicated reaction which the agent has to try and learn the mechanisms of the reaction environment it is in. For this lesson we will be using a simplified version of the wurtz reaction to introduce you to how actions affect the environment.
 
 Below is just some simple code that loads our desired environment
 
@@ -35,7 +35,7 @@ assert len(action_set) == env.action_space.shape[0]
 ```
 
 Firtst let's load up the environment, I highly recommend you look at the source code for the reaction bench and
-reaction, it should help provide insight into how this all works. Further the lesson on creating a custom reaction
+reaction, it should help provide insight into how this all works. Further, the lesson on creating a custom reaction
 environment will also help give insight into the reaction mechanics. If you run the cell below you will see a graph appear that looks something like this:
 
 ![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_command_0.png)
@@ -56,7 +56,7 @@ for it to try and optimize the reaction pathway.
 
 The reaction we are using is as follows:
 
-2 1-chlorohexane + 2 Na --> dodecane + 2 NaCl
+2 1-chlorohexane + 2 Na -> dodecane + 2 NaCl
 
 This reaction is performed in an aqueous state with ethoxyethane as the solvent.
 
