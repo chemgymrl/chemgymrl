@@ -168,6 +168,8 @@ into vessel 2.
 
 ![image of command](../tutorial_figures/extraction-lesson-1/drain_vessel.png)
 
+<a style="font-size: 10px">(source: https://chem.libretexts.org/Bookshelves/Organic_Chemistry/Book%3A_Organic_Chemistry_Lab_Techniques_(Nichols)/04%3A_Extraction/4.06%3A_Step-by-Step_Procedures_For_Extractions)</a>
+
 ![image of graphs draining](../tutorial_figures/extraction-lesson-1/oil_water_4.png)
 
 Keep repeating the command the changing the multiplier as needed until the graph looks something like this:
