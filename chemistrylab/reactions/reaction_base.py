@@ -585,6 +585,7 @@ class _Reaction:
         # open the provided vessel to get the material and solute dictionaries
         material_dict = vessels.get_material_dict()
         solute_dict = vessels.get_solute_dict()
+        solvent_dict = vessels.get_solvent_dict()
 
         # acquire the amounts of reactant materials
         for i, material_name in enumerate(material_dict.keys()):
@@ -600,6 +601,7 @@ class _Reaction:
             'react_vessel',
             materials=material_dict,
             solutes=solute_dict,
+            solvents=solvent_dict,
             temperature=self.Ti,
             v_max=self.Vmax,
             v_min=self.Vmin,
@@ -656,38 +658,20 @@ class _Reaction:
 
         # set the intended vessel temperature in the differential equation module
         self.de.temp = temp
-
+        print("initial_conc")
+        print(conc)
         # implement the differential equation solver
         if self.solver != 'newton':
-            print("prev_conc")
-            print(conc)
-            print("prev_total_amount")
-            print(self.n)
-
             new_conc = self._solver(self.de, (t, t + dt * n_steps), conc, method=self.solver).y[:, -1]
             for i in range(self.n.shape[0]):
                 # convert back to moles and update the molar amount array
                 self.n[i] = new_conc[i] * volume
-
-            print("new_conc")
-            print(new_conc)
-            print("new_total_amount")
-            print(self.n)
         else:
-            print("prev_conc")
-            print(conc)
-            print("prev_total_amount")
-            print(self.n)
             conc_change = self.de.run(conc, temp) * dt
             for i in range(self.n.shape[0]):
                 # convert back to moles and update the molar amount array
                 dn = conc_change[i] * volume
                 self.n[i] += dn
-
-            print("conc_change")
-            print(conc_change)
-            print("new_total_amount")
-            print(self.n)
 
         # check the list of molar amounts and set negligible amounts to 0
         for i, amount in enumerate(self.n):

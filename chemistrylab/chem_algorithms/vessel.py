@@ -60,7 +60,8 @@ class Vessel:
             volume=1.0,  # L
             unit='l',
             materials={},  # moles of materials
-            solutes={},  # moles of solutes
+            solutes={},  # moles of solutes,
+            solvents = {},
             v_max=1.0,  # L
             v_min=0.001,  # L
             Tmax=500.0,  # Kelvin
@@ -119,7 +120,7 @@ class Vessel:
         # define the Material Dict and Solute Dict first
         self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
         self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
-
+        self._solvent_dict = util.convert_material_dict_units(solvents)
         # initialize parameters
         self.label = label
         self.w2v = None
@@ -641,7 +642,8 @@ class Vessel:
         # collect data from the target vessel
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit="l")
+        target_solvent_dict = target_solute_dict.get_solvent_dict()
+        __, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solvent_dict, unit="l")
 
         # set default reward equal to zero
         reward = 0
@@ -682,6 +684,24 @@ class Vessel:
                         'mol'
                     ]
 
+            for sol in copy.deepcopy(self._solvent_dict):
+                # calculate the change of amount(mole) of each material
+                d_mole = self._solvent_dict[sol][1] * d_percentage
+
+                # update material dict for this vessel
+                self._solvent_dict[sol][1] -= d_mole
+
+                # update material dict for the target vessel, if it's in target vessel
+                if sol in target_solvent_dict:
+                    target_solvent_dict[sol][1] += d_mole
+                # if it's not in target vessel, create it in material dict
+                else:
+                    target_solvent_dict[sol] = [
+                        copy.deepcopy(self._solvent_dict[sol][0]),
+                        d_mole,
+                        'mol'
+                    ]
+
             for Solute in copy.deepcopy(self._solute_dict):
                 # if solute not in target vessel, create it in solute dict
                 if Solute not in target_solute_dict:
@@ -718,6 +738,23 @@ class Vessel:
                 if M in self._layers_position_dict:
                     self._layers_position_dict.pop(M)
 
+            for sol in copy.deepcopy(self._solvent_dict):
+                # pour all of this material
+                d_mole = self._solvent_dict[sol][1]
+
+                # check if this material is in the target vessel and update the material dictionary
+                if sol in target_material_dict:
+                    target_solvent_dict[sol][1] += d_mole
+                else:
+                    target_solvent_dict[sol] = [copy.deepcopy(self._solvent_dict[sol][0]), d_mole, 'mol']
+
+                # remove the material from this vessel
+                self._solvent_dict.pop(sol)
+
+                # also remove the material from `self._layers_position_dict` if it's in the dict
+                if M in self._layers_position_dict:
+                    self._layers_position_dict.pop(M)
+
             # update solute_dict for both vessels
             for solute in copy.deepcopy(self._solute_dict):
                 # if solute not in target vessel, create its entry
@@ -739,9 +776,10 @@ class Vessel:
 
         # deal with overflow
         v_max = target_vessel.get_max_volume()
-        target_material_dict, target_solute_dict, temp_reward = util.check_overflow(
+        target_material_dict, target_solute_dict, target_solvent_dict, temp_reward = util.check_overflow(
             material_dict=target_material_dict,
             solute_dict=target_solute_dict,
+            solvent_dict=target_solvent_dict,
             v_max=v_max,
             unit=self.unit
         )
@@ -762,6 +800,7 @@ class Vessel:
             feedback=[event_1, event_2],
             dt=dt
         )
+        target_vessel._solvent_dict = target_solvent_dict
         __ = target_vessel.push_event_to_queue(
             events=None,
             feedback=None,
@@ -801,33 +840,8 @@ class Vessel:
         # collect data
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
-
-        # print the old and new dictionaries to the terminal
-        # print(
-        #     '-------{}: {} (old_material_dict)-------'.format(
-        #         self.label,
-        #         self._material_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_solute_dict)-------'.format(
-        #         self.label,
-        #         self._solute_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_material_dict)-------'.format(
-        #         target_vessel.label,
-        #         target_material_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_solute_dict)-------'.format(
-        #         target_vessel.label,
-        #         target_solute_dict
-        #     )
-        # )
+        target_solvent_dict = target_material_dict.get_solvent_dict()
+        __, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solvent_dict, unit=self.unit)
 
         # set default reward equal to zero
         reward = 0
@@ -952,6 +966,89 @@ class Vessel:
                             # pop this solvent from the solute
                             self._solute_dict[Solute].pop(M)
 
+        for sol in self.get_solvent_dict():
+            if self._solvent_dict[sol][0]().get_color() in color_to_pixel:
+                # calculate the d_mole of this solvent
+                pixel_count = color_to_pixel[self._solvent_dict[sol][0]().get_color()]
+                d_volume = (pixel_count / self.n_pixels) * self.v_max
+
+                # convert volume to amount (mole)
+                density = self._solvent_dict[sol][0]().get_density()
+                molar_mass = self._solvent_dict[sol][0]().get_molar_mass()
+                d_mole = util.convert_volume_to_mole(
+                    volume=d_volume,
+                    density=density,
+                    molar_mass=molar_mass
+                )
+
+                # if there is some of this solvent left
+                if self._solvent_dict[sol][1] - d_mole > 1e-6:
+                    # calculate the drained ratio
+                    d_percentage = d_mole / self._solvent_dict[sol][1]
+
+                    # update the vessel's material dictionary
+                    self._solvent_dict[sol][1] -= d_mole
+
+                    # check if the solvent is in target vessel and update it's material dictionary
+                    if sol in target_solvent_dict:
+                        target_solvent_dict[sol][1] += d_mole
+                    else:
+                        target_solvent_dict[sol] = [copy.deepcopy(self._solvent_dict[sol][0]), d_mole, 'mol']
+
+                    for Solute in self._solute_dict:
+                        if sol in self._solute_dict[Solute]:
+                            # calculate the amount of moles
+                            d_mole = self._solute_dict[Solute][sol][1] * d_percentage
+
+                            # update the material dictionaries
+                            self._solute_dict[Solute][sol][1] -= d_mole
+                            d_solute[Solute] += d_mole
+
+                            # if all solutes are used up, eliminate the solute dictionary
+                            if Solute not in target_solute_dict:
+                                target_solute_dict[Solute] = {}
+
+                            # update the target solute dictionary
+                            if sol in target_solute_dict[Solute]:
+                                target_solute_dict[Solute][sol][1] += d_mole
+                            else:
+                                target_solute_dict[Solute][sol] = [convert_to_class([sol])[0], d_mole, 'mol']
+                # if all materials are drained out
+                else:
+                    # calculate the d_mole of this solvent
+                    d_mole = self._solvent_dict[sol][1]
+
+                    # check if it's in target vessel and update the material dictionary
+                    if sol in target_solvent_dict:
+                        target_solvent_dict[sol][1] += d_mole
+                    else:
+                        target_solvent_dict[sol] = [copy.deepcopy(self._solvent_dict[sol][0]), d_mole, 'mol']
+
+                    self._solvent_dict.pop(sol)
+                    self._layers_position_dict.pop(sol)
+
+                    # update solute_dict for both vessels
+                    for Solute in copy.deepcopy(self._solute_dict):
+                        if sol in self._solute_dict[Solute]:
+                            # calculate the amount to drain
+                            d_mole = self._solute_dict[Solute][sol][1]
+
+                            # store the change of solute in d_solute
+                            d_solute[Solute] += d_mole
+
+                            # if all solutes are used up, eliminate the solute dictionary
+                            if Solute not in target_solute_dict:
+                                target_solute_dict[Solute] = {}
+
+                            # update the target solute dictionary
+                            if sol in target_solute_dict[Solute]:
+                                target_solute_dict[Solute][sol][1] += d_mole
+                            else:
+                                target_solute_dict[Solute][sol] = [convert_to_class([sol])[0], d_mole, 'mol']
+
+                            # pop this solvent from the solute
+                            self._solute_dict[Solute].pop(sol)
+
         for Solute in copy.deepcopy(self._solute_dict):
             empty_flag = True
 
@@ -992,9 +1089,10 @@ class Vessel:
 
         # deal with overflow
         v_max = target_vessel.get_max_volume()
-        target_material_dict, target_solute_dict, temp_reward = util.check_overflow(
+        target_material_dict, target_solute_dict, target_solvent_dict, temp_reward = util.check_overflow(
             material_dict=target_material_dict,
             solute_dict=target_solute_dict,
+            solvent_dict=target_solvent_dict,
             v_max=v_max,
             unit=self.unit
         )
@@ -1040,7 +1138,7 @@ class Vessel:
             feedback=[event_1, event_2],
             dt=dt
         )
-
+        target_vessel._solvent_dict = target_solvent_dict
         __ = target_vessel.push_event_to_queue(
             events=None,
             feedback=None,
@@ -1147,7 +1245,7 @@ class Vessel:
         # collect data (according to separate.mix()):
 
         # convert the material dictionary to volumes in mL
-        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+        self_volume_dict, __ = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solvent_dict, unit=self.unit)
 
         layers_variance = self._layers_variance
 
@@ -1261,8 +1359,9 @@ class Vessel:
         layers_position = []
         layers_color = []
         layers_variance = self._layers_variance
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+        self_volume_dict, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(
             self._material_dict,
+            self._solvent_dict,
             unit=self.unit
         )
 
@@ -1321,7 +1420,7 @@ class Vessel:
             self.volume = util.convert_volume(volume, unit)
         elif override:
             self.volume = util.convert_volume(volume, unit)
-            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict,
+            self._material_dict, self._solute_dict, self._solvent_dict, _ = util.check_overflow(self._material_dict, self._solute_dict, self._solvent_dict,
                                                                             self.volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
@@ -1582,8 +1681,9 @@ class Vessel:
         None
         """
 
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+        self_volume_dict, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(
             self._material_dict,
+            self._solvent_dict,
             unit=self.unit
         )
 
@@ -1732,6 +1832,9 @@ class Vessel:
         """
 
         return copy.deepcopy(self._material_dict)
+
+    def get_solvent_dict(self):
+        return copy.deepcopy(self._solvent_dict)
 
     def get_solute_dict(self):
         """
@@ -2035,7 +2138,7 @@ class Vessel:
         None
         """
 
-        return util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+        return util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solvent_dict, unit=self.unit)
 
     def get_vessel_dimensions(self):
         vol = self.v_max

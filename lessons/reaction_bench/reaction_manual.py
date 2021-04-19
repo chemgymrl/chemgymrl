@@ -47,5 +47,7 @@ while not done:
         action[i] = float(input(f'{a}: '))
     state, reward, done, _ = env.step(action)
     total_reward += reward
+    print("materials")
+    print(env.vessels.get_material_dict())
     print(f'reward: {reward}')
     print(f'total_reward: {total_reward}')

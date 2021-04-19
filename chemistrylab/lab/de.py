@@ -187,7 +187,7 @@ class De:
         n_reactions = activ_energy_arr.shape[0]
 
         # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = conc
+        reactant_conc = conc[:self.num_reagents]
 
         # only non-zero reactant concentrations will be of use, so these are isolated
         non_zero_conc = np.array([conc for conc in reactant_conc if conc != 0.0])
@@ -208,7 +208,7 @@ class De:
             rate_constant_dim = rate_exponential - 1
 
             # get the dimensionality of the aggregate concentration
-            agg_conc_dim = len(non_zero_conc)
+            agg_conc_dim = len(non_zero_conc) if len(non_zero_conc) != 0 else 1
 
             # calculate the exponential needed to be applied to the aggregate concentration
             # to properly define the rate constant's pre-exponential factor
@@ -221,9 +221,11 @@ class De:
             scaling_arr[i] = scaling_factor
 
         # use the activation energy and scaling factor arrays to calculate the rate constants for each reaction
+        assert 0 not in scaling_arr
+        assert np.nan not in scaling_arr
+        assert np.inf not in scaling_arr
         scaling_coefficients = 1 / scaling_arr
         k = scaling_coefficients * np.exp((-1.0 * activ_energy_arr) / (R * temp))
-        k = np.array([1.5, 0.4])
 
         return k
 

@@ -34,10 +34,11 @@ VOLUME_TABLE = {'l': 1,
                   'nl': 1e-9,
                 }
 
-def convert_material_dict_to_volume(material_dict,
-                                    unit='l'
-                                    # the density of solution does not affect the original volume of solvent
-                                    ):
+def convert_material_dict_and_solute_dict_to_volume(material_dict,
+                                                    solvent_dict,
+                                                    unit='l'
+                                                    # the density of solution does not affect the original volume of solvent
+                                                    ):
 
     # decide whether to convert density or not depending on volume unit
     convert_density = False
@@ -47,20 +48,31 @@ def convert_material_dict_to_volume(material_dict,
     volume_dict = {}
     total_volume = 0
     for M in material_dict:
+        # get the mass (in grams) of the material using its molar mass (in grams/mol)
+        mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
 
-        if not material_dict[M][0]().is_solute():
-            # get the mass (in grams) of the material using its molar mass (in grams/mol)
-            mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
+        if convert_density:
+            # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
+            volume = (mass / material_dict[M][0]().get_density(convert_density))*1000
+        else:
+            # results in cm^3
+            volume = mass / material_dict[M][0]().get_density(convert_density)
 
-            if convert_density:
-                # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
-                volume = (mass / material_dict[M][0]().get_density(convert_density))*1000
-            else:
-                # results in cm^3
-                volume = mass / material_dict[M][0]().get_density(convert_density)
+        volume_dict[M] = volume
+        total_volume += volume
+    for mat in solvent_dict:
+        # get the mass (in grams) of the material using its molar mass (in grams/mol)
+        mass = solvent_dict[mat][0]().get_molar_mass() * solvent_dict[mat][1]
 
-            volume_dict[M] = volume
-            total_volume += volume
+        if convert_density:
+            # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
+            volume = (mass / solvent_dict[mat][0]().get_density(convert_density)) * 1000
+        else:
+            # results in cm^3
+            volume = mass / solvent_dict[mat][0]().get_density(convert_density)
+
+        volume_dict[mat] = volume
+        total_volume += volume
 
     return volume_dict, total_volume
 
@@ -98,10 +110,12 @@ def organize_solute_dict(material_dict,
 
 def check_overflow(material_dict,
                    solute_dict,
+                   solvent_dict,
                    v_max,
                    unit='l'
                    ):
-    __, total_volume = convert_material_dict_to_volume(material_dict, unit)  # convert from mole to
+    assert solvent_dict != {}
+    __, total_volume = convert_material_dict_and_solute_dict_to_volume(material_dict, solvent_dict, unit)  # convert from mole to
     overflow = total_volume - v_max  # calculate overflow
     reward = 0  # default 0 if no overflow
     if overflow > 1e-6:  # if overflow
@@ -109,13 +123,15 @@ def check_overflow(material_dict,
         d_percentage = v_max / total_volume  # calculate the percentage of material left
         for M in material_dict:
             material_dict[M][1] *= d_percentage
+        for sol in solvent_dict:
+            solvent_dict[sol][1] *= d_percentage
         # solute dict
         if solute_dict:  # if not empty
             for Solute in solute_dict:
                 for Solvent in solute_dict[Solute]:
                     solute_dict[Solute][Solvent][1] *= d_percentage  # update the solute_dict based on percentage
 
-    return material_dict, solute_dict, reward
+    return material_dict, solute_dict, solvent_dict, reward
 
 
 def generate_state(vessel_list,
