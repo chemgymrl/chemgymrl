@@ -51,7 +51,7 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", overlap=False, solver='newton'):
+    def __init__(self, reaction_file_identifier="", overlap=False, solver='RK45'):
         """
         Constructor class module for the Reaction class.
 
@@ -111,7 +111,11 @@ class _Reaction:
         self.de = De(self.stoich_coeff_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
 
         # specify the full list of materials
-        self.materials = self.reactants + self.products
+        self.materials = []
+
+        for mat in self.reactants + self.products:
+            if mat not in self.materials:
+                self.materials.append(mat)
 
         # set a threshold value for the minimum, non-negligible material molar amount
         self.threshold = 1e-8
@@ -622,7 +626,7 @@ class _Reaction:
 
         return vessels
 
-    def update(self, conc, temp, volume, dt, n_steps):
+    def update(self, conc, temp, volume, t, dt, n_steps):
         """
         Method to update the environment.
         This involves using reactants, generating products, and obtaining rewards.
@@ -652,10 +656,9 @@ class _Reaction:
 
         # set the intended vessel temperature in the differential equation module
         self.de.temp = temp
-
         # implement the differential equation solver
         if self.solver != 'newton':
-            new_conc = self._solver(self.de, (0, dt * n_steps), conc, method=self.solver).y[:, -1]
+            new_conc = self._solver(self.de, (t, t + dt * n_steps), conc, method=self.solver).y[:, -1]
             for i in range(self.n.shape[0]):
                 # convert back to moles and update the molar amount array
                 self.n[i] = new_conc[i] * volume
@@ -671,7 +674,7 @@ class _Reaction:
             if amount < self.threshold:
                 self.n[i] = 0
 
-    def perform_action(self, action, vessels: vessel.Vessel, n_steps, step_num):
+    def perform_action(self, action, vessels: vessel.Vessel, t, n_steps, step_num):
         """
         Update the environment with processes defined in `action`.
 
@@ -708,6 +711,7 @@ class _Reaction:
 
         # deconstruct the vessel: acquire the vessel temperature and volume and create the n array
         temperature, volume = self.vessel_deconstruct(vessels=vessels)
+        current_volume = vessels.get_current_volume()[-1]
 
         # perform the complete action over a series of increments
         if self.solver != 'newton':
@@ -748,9 +752,10 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
-                vessels.get_concentration(self.materials),
+                self.n/current_volume,
                 temperature,
-                volume,
+                current_volume,
+                t,
                 vessels.get_defaultdt(),
                 n_steps
             )

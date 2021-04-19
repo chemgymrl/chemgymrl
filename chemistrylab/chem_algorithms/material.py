@@ -91,6 +91,7 @@ class Material:
         self._solvent = solvent
         self._boiling_point = boiling_point
         self._melting_point = melting_point
+        self._melting_point = melting_point
         self._specific_heat = specific_heat
         self._enthalpy_fusion = enthalpy_fusion
         self._enthalpy_vapor = enthalpy_vapor

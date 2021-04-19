@@ -60,7 +60,8 @@ class Vessel:
             volume=1.0,  # L
             unit='l',
             materials={},  # moles of materials
-            solutes={},  # moles of solutes
+            solutes={},  # moles of solutes,
+            solvents = {},
             v_max=1.0,  # L
             v_min=0.001,  # L
             Tmax=500.0,  # Kelvin
@@ -119,7 +120,6 @@ class Vessel:
         # define the Material Dict and Solute Dict first
         self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
         self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
-
         # initialize parameters
         self.label = label
         self.w2v = None
@@ -641,7 +641,7 @@ class Vessel:
         # collect data from the target vessel
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit="l")
+        __, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit="l")
 
         # set default reward equal to zero
         reward = 0
@@ -801,33 +801,7 @@ class Vessel:
         # collect data
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
-
-        # print the old and new dictionaries to the terminal
-        # print(
-        #     '-------{}: {} (old_material_dict)-------'.format(
-        #         self.label,
-        #         self._material_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_solute_dict)-------'.format(
-        #         self.label,
-        #         self._solute_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_material_dict)-------'.format(
-        #         target_vessel.label,
-        #         target_material_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_solute_dict)-------'.format(
-        #         target_vessel.label,
-        #         target_solute_dict
-        #     )
-        # )
+        __, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit=self.unit)
 
         # set default reward equal to zero
         reward = 0
@@ -1040,7 +1014,6 @@ class Vessel:
             feedback=[event_1, event_2],
             dt=dt
         )
-
         __ = target_vessel.push_event_to_queue(
             events=None,
             feedback=None,
@@ -1147,7 +1120,7 @@ class Vessel:
         # collect data (according to separate.mix()):
 
         # convert the material dictionary to volumes in mL
-        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+        self_volume_dict, __ = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit=self.unit)
 
         layers_variance = self._layers_variance
 
@@ -1261,8 +1234,9 @@ class Vessel:
         layers_position = []
         layers_color = []
         layers_variance = self._layers_variance
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+        self_volume_dict, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(
             self._material_dict,
+            solute_dict=self._solute_dict,
             unit=self.unit
         )
 
@@ -1321,7 +1295,7 @@ class Vessel:
             self.volume = util.convert_volume(volume, unit)
         elif override:
             self.volume = util.convert_volume(volume, unit)
-            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict,
+            self._material_dict, self._solute_dict,  _ = util.check_overflow(self._material_dict, self._solute_dict,
                                                                             self.volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
@@ -1493,7 +1467,7 @@ class Vessel:
             materials = list(self._material_dict.keys())
 
         # get the vessel volume
-        V = self.get_volume()
+        V = self.get_current_volume()[-1]
 
         # set up lists to contain the vessel's materials and the material amounts
         materials_in_vessel = []
@@ -1582,8 +1556,9 @@ class Vessel:
         None
         """
 
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+        self_volume_dict, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(
             self._material_dict,
+            self._solute_dict,
             unit=self.unit
         )
 
@@ -2035,7 +2010,7 @@ class Vessel:
         None
         """
 
-        return util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+        return util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit=self.unit)
 
     def get_vessel_dimensions(self):
         vol = self.v_max

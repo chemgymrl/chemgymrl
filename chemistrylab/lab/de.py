@@ -33,6 +33,7 @@ Used throughout this class are the following arrays:
 """
 
 import numpy as np
+import copy
 
 # specify the R constant
 R = 8.314462619
@@ -133,7 +134,6 @@ class De:
 
         # ensure the concentration changes do not exceed limitations
         conc_change = self.conc_limit(conc_change, conc)
-
         return conc_change
 
     def get_reaction_constants(self, temp, conc):
@@ -187,7 +187,7 @@ class De:
         n_reactions = activ_energy_arr.shape[0]
 
         # acquire the concentrations of the reactants from the full concentration array
-        reactant_conc = conc
+        reactant_conc = conc[:self.num_reagents]
 
         # only non-zero reactant concentrations will be of use, so these are isolated
         non_zero_conc = np.array([conc for conc in reactant_conc if conc != 0.0])
@@ -208,7 +208,7 @@ class De:
             rate_constant_dim = rate_exponential - 1
 
             # get the dimensionality of the aggregate concentration
-            agg_conc_dim = len(non_zero_conc)
+            agg_conc_dim = len(non_zero_conc) if len(non_zero_conc) != 0 else 1
 
             # calculate the exponential needed to be applied to the aggregate concentration
             # to properly define the rate constant's pre-exponential factor
@@ -221,6 +221,9 @@ class De:
             scaling_arr[i] = scaling_factor
 
         # use the activation energy and scaling factor arrays to calculate the rate constants for each reaction
+        assert 0 not in scaling_arr
+        assert np.nan not in scaling_arr
+        assert np.inf not in scaling_arr
         scaling_coefficients = 1 / scaling_arr
         k = scaling_coefficients * np.exp((-1.0 * activ_energy_arr) / (R * temp))
 
@@ -248,10 +251,10 @@ class De:
         """
 
         # get the reaction rates by raising the concentrations of reactants to their stiochiometric coefficients
-        rates = conc[:self.num_reagents] ** self.stoich_coeff_arr
-
-        # multiply the rates by the intended rate constant to properly scale them
-        rates = k * np.array([np.product(x) for x in rates])
+        rates = copy.deepcopy(k)
+        for i in range(len(rates)):
+            for k in range(self.num_reagents):
+                rates[i] *= conc[k] ** self.stoich_coeff_arr[i][k]
 
         return rates
 
@@ -275,8 +278,10 @@ class De:
         """
 
         # use the concentration coefficients and the rates of each reaction to calculate the changes in concentration
-        conc_change = np.array([np.sum(x) for x in self.conc_coeff_arr * rates])
-
+        conc_change = np.zeros(len(self.conc_coeff_arr))
+        for i in range(len(conc_change)):
+            for k in range(len(rates)):
+                conc_change[i] += self.conc_coeff_arr[i][k]*rates[k]
         return conc_change
 
     def conc_limit(self, conc_change, conc):
@@ -303,5 +308,29 @@ class De:
         # ensure that all the intended concentration changes do not exceed the initial available concentrations
         for i in range(self.num_reagents):
             conc_change[i] = np.max([conc_change[i], -1 * conc[i]])
-
+        # print("reagent_conc")
+        # print(conc[:self.num_reagents])
+        # print("conc_change: before")
+        # print(conc_change)
+        # reactions = copy.deepcopy(self.conc_coeff_arr.T)
+        # frac_array = np.zeros(len(reactions))
+        # for i in range(self.num_reagents):
+        #     for elem in self.conc_coeff_arr[i]:
+        #         if elem < 0:
+        #             frac_array += np.abs(elem)
+        # produced = np.zeros(len(reactions))
+        # for i, reaction in enumerate(reactions):
+        #     for k in range(self.num_reagents):
+        #         if reaction[k] != 0:
+        #             if produced[i] == 0:
+        #                 produced[i] = abs(conc_change[k] / frac_array[k])
+        #             else:
+        #                 produced[i] = min(abs(conc_change[k] / frac_array[k] ), produced[i])
+        # print("produced")
+        # print(produced)
+        # for i in range(self.num_reagents, len(conc_change)):
+        #     conc_change[i] = np.sum(self.conc_coeff_arr[i] * produced)
+        # print("conc_change: after")
+        # print("+++++++++++++++++++++++++++++++++")
+        # print(conc_change)
         return conc_change

@@ -46,7 +46,7 @@ DESIRED = "4,5-diethyloctane"
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin
-Vi = 0.002 # in Litres
+Vi = 1 # in Litres
 
 # additional vessel parameters
 dt = 0.01
@@ -54,32 +54,32 @@ Tmin = 250.0
 Tmax = 500.0
 dT = 50.0
 Vmin = 0.001
-Vmax = 0.005
-dV = 0.0005
+Vmax = 2
+dV = 0.005
 
 # add the arrays containing rate calculation parameters; these include:
     # the activation energies for each reaction (6x1 array)
     # the stoichiometric coefficients (6x4 array)
 activ_energy_arr = np.array(
     [
-        1.0, # activation energy for reaction 0
-        1.0, # activation energy for reaction 1
-        1.0, # activation energy for reaction 2
-        1.0, # activation energy for reaction 3
-        1.0, # activation energy for reaction 4
-        1.0  # activation energy for reaction 5
+        500, # activation energy for reaction 0
+        1000, # activation energy for reaction 1
+        750, # activation energy for reaction 2
+        900, # activation energy for reaction 3
+        1100, # activation energy for reaction 4
+        600  # activation energy for reaction 5
     ]
 )
 
 # Note: R0 = 1-chlorohexane, R1 = 2-chlorohexane, R2 = 3-chlorohexane, R3 = Na
 stoich_coeff_arr = np.array(
     [ #  R0   R1   R2   R3
-        [2.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 0
-        [1.0, 1.0, 0.0, 1.0], # stoichiometric coefficients for reaction 1
-        [1.0, 0.0, 1.0, 1.0], # stoichiometric coefficients for reaction 2
-        [0.0, 2.0, 0.0, 1.0], # stoichiometric coefficients for reaction 3
-        [0.0, 1.0, 1.0, 1.0], # stoichiometric coefficients for reaction 4
-        [0.0, 0.0, 2.0, 1.0]  # stoichiometric coefficients for reaction 5
+        [2.0, 0.0, 0.0, 2.0], # stoichiometric coefficients for reaction 0
+        [1.0, 1.0, 0.0, 2.0], # stoichiometric coefficients for reaction 1
+        [1.0, 0.0, 1.0, 2.0], # stoichiometric coefficients for reaction 2
+        [0.0, 2.0, 0.0, 2.0], # stoichiometric coefficients for reaction 3
+        [0.0, 1.0, 1.0, 2.0], # stoichiometric coefficients for reaction 4
+        [0.0, 0.0, 2.0, 2.0]  # stoichiometric coefficients for reaction 5
     ]
 )
 

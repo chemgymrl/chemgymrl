@@ -152,7 +152,6 @@ class ReactionBenchEnv(gym.Env):
             materials=input_parameters["materials"],
             solutes=input_parameters["solutes"]
         )
-
         # set up a state variable
         self.state = None
 
@@ -457,7 +456,7 @@ class ReactionBenchEnv(gym.Env):
                 solute_dict[name] = {}
                 for solvent in solutes:
                     solvent_class = convert_to_class([solvent['Material']])
-                    solute_dict[name][solvent['Material']] = [solvent_class, solvent["Initial"], 'mol']
+                    solute_dict[name][solvent['Material']] = [solvent_class[0], solvent["Initial"], 'mol']
 
         return solute_dict
 
@@ -483,7 +482,6 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
-
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         if in_vessel_path is None:
             # prepare the provided materials into a compatible material dictionary
@@ -499,6 +497,7 @@ class ReactionBenchEnv(gym.Env):
                 solutes=solute_dict,
                 default_dt=self.dt
             )
+
         else:
             with open(in_vessel_path, 'rb') as handle:
                 vessels = pickle.load(handle)
@@ -665,7 +664,7 @@ class ReactionBenchEnv(gym.Env):
         reward = 0.0
 
         # pass the action and vessel to the reaction base class's perform action function
-        self.vessels = self.reaction.perform_action(action, self.vessels, self.n_steps, self.step_num)
+        self.vessels = self.reaction.perform_action(action, self.vessels, self.t, self.n_steps, self.step_num)
 
         # Increase time by time step
         self.t += self.n_steps * self.dt
