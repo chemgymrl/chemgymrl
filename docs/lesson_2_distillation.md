@@ -12,6 +12,8 @@ In this tutorial we will be trying to get a high reward by targeting our desired
 
 ![boil vessel](tutorial_figures/distillation-lesson-2/boiling_vessel_2.png)
 
+(source: http://clipart-library.com/clipart/chemistry-gases-cliparts_12.htm)
+
 Then we will dump all the contents currently in beaker 1, which are not dodecane into beaker 2. Finally we will heat up boiling vessel even more to exceed dodecane's boiling temperature thus boiling it into beaker 1. This will allow us to have a beaker that is mostly dodecane thus getting us a high reward.
 
 Before we start the tutorial please go into the distillation_bench folder and check the `distillation_bench_v1.py` file. You'll notice that there is the class:
