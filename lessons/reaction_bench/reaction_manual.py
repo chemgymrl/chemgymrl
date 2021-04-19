@@ -43,6 +43,8 @@ while not done:
     action = np.zeros(env.action_space.shape[0])
     print('--------------------')
     print(env.reaction.cur_in_hand)
+    print("solute_dict")
+    print(env.vessels.get_solute_dict())
     for i, a in enumerate(action_set):
         action[i] = float(input(f'{a}: '))
     state, reward, done, _ = env.step(action)

@@ -486,7 +486,6 @@ class ReactionBenchEnv(gym.Env):
         if in_vessel_path is None:
             # prepare the provided materials into a compatible material dictionary
             material_dict = self._prepare_materials(materials=materials)
-            solvent_dict = self._prepare_materials(solutes)
 
             # prepare the solutes that have been provided
             solute_dict = self._prepare_solutes(material_dict=material_dict, solutes=solutes)
@@ -496,7 +495,6 @@ class ReactionBenchEnv(gym.Env):
                 'default',
                 materials=material_dict,
                 solutes=solute_dict,
-                solvents=solvent_dict,
                 default_dt=self.dt
             )
 
