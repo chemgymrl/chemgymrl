@@ -1,4 +1,4 @@
-# Distillation Bench: Lesson 3
+# Distillation Bench: Lesson 2
 
 ### Getting a High Reward in the Distillation Bench
 

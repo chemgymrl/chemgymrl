@@ -11,7 +11,7 @@ env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
 select_env = int(input(f"enter a number to chose which environment you want to run (0-{len(env_ids) - 1}): "))
 env = gym.make(env_ids[select_env])
-render_mode = "human"
+render_mode = "full"
 
 action_set = ['Temperature', 'Volume', "1-chlorohexane", "2-chlorohexane", "3-chlorohexane", "Na"]
 
