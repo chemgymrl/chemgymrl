@@ -11,7 +11,7 @@ Now let's get started.
 
 ![custom extraction](../tutorial_figures/custom-extraction/custom-extraction.png)
 
-<a style="font-size: 5px">(source: https://chem.libretexts.org/@api/deki/files/126179/Nichols_Screenshot_4-5-1.png?revision=1)</a>
+<a style="font-size: 10px">(source: https://chem.libretexts.org/@api/deki/files/126179/Nichols_Screenshot_4-5-1.png?revision=1)</a>
 
 The extraction bench is one of the more complicated environments to build since there are a lot more actions to take in
 the environment and as a result a lot more to set up. As a result we are starting with a very simple, single extraction
