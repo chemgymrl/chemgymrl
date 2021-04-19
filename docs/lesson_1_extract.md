@@ -103,7 +103,7 @@ we can clearly see that there is no oil in the container, so let's add some!
 
 ![pouring](../tutorial_figures/extraction-lesson-1/pouring.png)
 
-<a style="font-size: 10px">(source: https://www.shutterstock.com/video/clip-4620521-pouring-liquid-science-beaker)<a>
+<a style="font-size: 10px">(source: https://www.shutterstock.com/video/clip-4620521-pouring-liquid-science-beaker)</a>
 
 ![image of graphs with added oil](../tutorial_figures/extraction-lesson-1/oil_and_water_1.png)
 
