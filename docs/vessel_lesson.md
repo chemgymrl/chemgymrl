@@ -70,7 +70,6 @@ Function Name|Description
 ---|---
 'pour by volume'|Pour from self vessel to target vessel by certain volume
 'drain by pixel|Drain from self vessel to target vessel by certain pixel
-'fully mix'|Shake self vessel to fully mix
 'update material dict'|Use input to update self vessel's material_dict
 'update solute dict'|Use input to update self vessel's solute_dict
 'mix'|Shake vessel of let vessel settle
@@ -86,7 +85,6 @@ vessel_2 = vessel.Vessel(label='vessel_2')
 event_1 = ['update material dict', material_dict]
 event_2 = ['update solute dict', solute_dict]
 event_3 = ['drain by pixel', vessel_2, 100]
-event_4 = ['fully mix']
 
 # Here we are adding the materials and solutions specified above into our first vessel, and then we pour 100ml
 # of this solution from vessel 1 into vessel 2
