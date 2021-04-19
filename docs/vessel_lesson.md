@@ -6,13 +6,13 @@
 
 In this lesson, we will be going through a class that is vital to the operation of all of our benches, the vessel class.
 The source code for this can be found here: `chemistrylab/chem_algorithms/vessel.py`. The vessel class as it is named is
-meant to simulate the use of any given you might find in a chemistry lad, such as a beaker or an extraction vessel.
+meant to simulate the use of any given you might find in a chemistry lab, such as a beaker or an extraction vessel.
 Here we will be going through the important concepts, functions and attributes that make up the vessel class so that you
 can easily use it when designing your own reactions.
 
 If you want a more detailed look into each function of the vessel I suggest you go to our documentation on the data structure. 
 
-The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc. This is performed using an event que, which we will look at later in this lesson. First an overview of some of the important variables that make up the vessel class:
+The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc. This is performed using an event queue, which we will look at later in this lesson. First an overview of some of the important variables that make up the vessel class:
 
 Important Variables |Structure | Description
 ---|---|---
@@ -62,7 +62,7 @@ _update_materials()|automatically called by push_event_to_queue(), execute event
 _merge_event_queue()|merge the feedback_queue passed in, and all the default events (switches) are appended to _feedback_queue by this function
 
 
-From the list above, the most important function is push_event_to_que(). The rest of the functions are handeled in the backend by the events que. As stated before, the vessel class works off of an event que where we push a set of events to the event que and the event que then performs those events to the vessel, along with a specified dt parameter to specify how much time to wait after performing the events. Below we have a list of the current event functions that can be performed by the vessel and below that we have a demonstration of how to push events to the vessel.
+From the list above, the most important function is push_event_to_queue(). The rest of the functions are handeled in the backend by the events queue. As stated before, the vessel class works off of an event queue where we push a set of events to the event queue and the event queue then performs those events to the vessel, along with a specified dt parameter to specify how much time to wait after performing the events. Below we have a list of the current event functions that can be performed by the vessel and below that we have a demonstration of how to push events to the vessel.
 
 
 ### Event Functions
@@ -114,9 +114,6 @@ Here we have the solution after we drain some of it (notice that the top of the 
   8. The returned feedback is added to the _feedback_queue
   9. The the _merge_event_queue() is called on _feedback_queue, which merge the events in the feedback_queue to generate a merged_queue and add default event into it, then empty the _feedback_queue
   10. Then the merged_queue will be executed and new feedback are collected and added to _feedback_queue, which will be executed with the next action. 
-
-
-
 
 ```python
 
