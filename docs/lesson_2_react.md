@@ -12,7 +12,7 @@ In this lesson we will try to get a high reward in the reaction of the form abov
 
 We will try to get the desired material: 4,5-diethyloctane
 
-In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions file. This particular lesson will use the reaction file 'chloro_wurtz_v1.py' and is registered under the id 'WurtzReact-v2'
+In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions file. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v2`
 
 From lesson 1 we know that our action space is a 6 element vector represented by:
 
@@ -20,8 +20,8 @@ From lesson 1 we know that our action space is a 6 element vector represented by
 |--------------|-------------|--------|----------------|----------------|----------------|-----|
 | Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1|
 
-Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease.
-If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase.
+Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease by dt.
+If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase by dt.
 
 First let's start by importing all the modules we need.
 
