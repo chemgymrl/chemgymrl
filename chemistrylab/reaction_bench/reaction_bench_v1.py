@@ -158,9 +158,9 @@ class ReactionBenchEnv_ODE_Test(ReactionBenchEnv):
             in_vessel_path=None, # do not include an input vessel
             out_vessel_path=os.getcwd(), # include an output vessel directory
             materials=[ # initialize the bench with the following materials
-                {"Material": "Na", "Initial": 1.0},
-                {"Material": "Cl", "Initial": 1.0},
-                {"Material": "NaCl", "Initial": 1.0}
+                {"Material": "Na", "Initial": 0.1},
+                {"Material": "Cl", "Initial": 0.1},
+                {"Material": "NaCl", "Initial": 0.1}
             ],
             solutes=[ # initialize the bench with the following solutes available
                 {"Material": "H2O", "Initial": 100}

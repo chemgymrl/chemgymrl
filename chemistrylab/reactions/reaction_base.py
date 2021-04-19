@@ -419,7 +419,7 @@ class _Reaction:
         temperature = vessels.get_temperature()
 
         # acquire the vessel's volume property
-        volume = vessels.get_current_volume()
+        volume = vessels.get_volume()
 
         return temperature, volume
 
@@ -731,6 +731,7 @@ class _Reaction:
 
         # deconstruct the vessel: acquire the vessel temperature and volume and create the n array
         temperature, volume = self.vessel_deconstruct(vessels=vessels)
+        current_volume = vessels.get_current_volume()[-1]
 
         # perform the complete action over a series of increments
         if self.solver != 'newton':
@@ -771,9 +772,9 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
-                vessels.get_concentration(self.materials),
+                self.n/current_volume,
                 temperature,
-                volume,
+                current_volume,
                 t,
                 vessels.get_defaultdt(),
                 n_steps

@@ -1493,7 +1493,7 @@ class Vessel:
             materials = list(self._material_dict.keys())
 
         # get the vessel volume
-        V = self.get_volume()
+        V = self.get_current_volume()[-1]
 
         # set up lists to contain the vessel's materials and the material amounts
         materials_in_vessel = []
