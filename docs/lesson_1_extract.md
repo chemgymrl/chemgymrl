@@ -103,7 +103,7 @@ we can clearly see that there is no oil in the container, so let's add some!
 
 ![pouring](../tutorial_figures/extraction-lesson-1/pouring.png)
 
-(source: https://www.shutterstock.com/video/clip-4620521-pouring-liquid-science-beaker)
+<a style="font-size: 5px">(source: https://www.shutterstock.com/video/clip-4620521-pouring-liquid-science-beaker)<a>
 
 ![image of graphs with added oil](../tutorial_figures/extraction-lesson-1/oil_and_water_1.png)
 
@@ -128,7 +128,7 @@ vessel!As seen in the graph below we can see that based on the layer representat
 
 ![image of command](../tutorial_figures/extraction-lesson-1/mixing.png)
 
-(source: https://www.dreamstime.com/royalty-free-stock-photography-mixing-chemicals-image10434567#res26615551)
+<a style="font-size: 5px">(source: https://www.dreamstime.com/royalty-free-stock-photography-mixing-chemicals-image10434567#res26615551)</a>
 
 ![image of graphs mixed](../tutorial_figures/extraction-lesson-1/oil_and_water_2.png)
 
@@ -148,7 +148,7 @@ water. Keep repeating the following command until the graph settles.
 
 ![image of command](https://media.sciencephoto.com/image/c0119092/800wm)
 
-(source: https://media.sciencephoto.com/image/c0119092/800wm)
+<a style="font-size: 5px">(source: https://media.sciencephoto.com/image/c0119092/800wm)</a>
 
 ![image of graphs waiting ](../tutorial_figures/extraction-lesson-1/oil_and_water_3.png)
 

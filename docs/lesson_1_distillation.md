@@ -22,26 +22,26 @@ The boiling vessel (BV) contains all the materials at the initial state of the e
 
 ![vessels](../tutorial_figures/distillation-lesson-1/vessels_image.png)
 
-(source: https://play.google.com/store/apps/details?id=com.ionicframework.labnursing502994&hl=en_IE&gl=US)
+<a style="font-size: 5px">(source: https://play.google.com/store/apps/details?id=com.ionicframework.labnursing502994&hl=en_IE&gl=US)</a>
 
 The point of the process is to extract a target material from the boiling vessel, which contains numerous materials, and we do this by utilizing the different material's boiling points. Typically the process begins by raising the temperature of the BV which allows certain materials in that vessel to boil off into the condensation vessel or B1. 
 
 ![boiling vessel](../tutorial_figures/distillation-lesson-1/boiling_vessel.png)
 
-(source: https://webstockreview.net/image/experiment-clipart-thermochemistry/1029802.html)
+<a style="font-size: 5px">(source: https://webstockreview.net/image/experiment-clipart-thermochemistry/1029802.html)</a>
 
 As a material's boiling point is reached, any more temperature added from this point will act to evaporate it. The now gaseous material will rise out of the boiling vessel into the tube that feeds into the condensation vessel where it will condense back into its liquid form. In this virtual experiment  it is assumed that this takes place instantaneously. The amount of material evaporated is dependent on the enthalpy of vapour of material being evaporated.
 
 ![distillation process](../tutorial_figures/distillation-lesson-1/distillation_process.png)
 
-(source: https://www.youtube.com/watch?v=Vz2la3947I0)
+<a style="font-size: 5px">(source: https://www.youtube.com/watch?v=Vz2la3947I0)</a>
 
 Once the entirety of the material has been boiled off, the condensation vessel is drained into the storage vessel. Now 
 the condensation vessel is empty, the boiling vessel's temperature can then be raised more until the next lowest boiling point is reached, thus repeating the process.
 
 ![evaporation](../tutorial_figures/distillation-lesson-1/evaporation.png)
 
-(source: Encyclopedia Britannica, inc.)
+<a style="font-size: 5px">(source: Encyclopedia Britannica, inc.)</a>
 
 The process is repeated until the desired material has been completely evaporated from the boiling vessel into  condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample. We can then choose to end the experiment.
 

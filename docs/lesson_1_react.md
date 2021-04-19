@@ -110,7 +110,7 @@ action vector of:
 
 ![image of reaction](https://image1.masterfile.com/getImage/NjQwLTAzMjU4NDA1ZW4uMDAwMDAwMDA=ANb9FF/640-03258405en_Masterfile.jpg)
 
-(source: https://image1.masterfile.com/getImage/NjQwLTAzMjU4NDA1ZW4uMDAwMDAwMDA=ANb9FF/640-03258405en_Masterfile.jpg)
+<a style="font-size: 5px">(source: https://image1.masterfile.com/getImage/NjQwLTAzMjU4NDA1ZW4uMDAwMDAwMDA=ANb9FF/640-03258405en_Masterfile.jpg)</a>
 
 Then at every next step we are going to keep the solvent volume constant and increase the temperature
 
@@ -120,7 +120,7 @@ Then at every next step we are going to keep the solvent volume constant and inc
 
 ![heating up vessel](https://media.sciencephoto.com/image/c0150431/800wm)
 
-(source: https://media.sciencephoto.com/image/c0150431/800wm)
+<a style="font-size: 5px">(source: https://media.sciencephoto.com/image/c0150431/800wm)</a>
 
 To see this in action simply run the following code cell:
 

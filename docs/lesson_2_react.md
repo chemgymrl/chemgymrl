@@ -108,7 +108,7 @@ Notice that we're only adding the reactants we need for the reaction to continue
 
 ![reaction](../tutorial_figures/reaction-lesson-2/reaction.png)
 
-(source http://butane.chem.uiuc.edu/pshapley/Enlist/Labs/RateEquilib/RateEquilib.html)
+<a style="font-size: 5px">(source http://butane.chem.uiuc.edu/pshapley/Enlist/Labs/RateEquilib/RateEquilib.html)</a>
 
 Let's run our program and see what happens!
 
