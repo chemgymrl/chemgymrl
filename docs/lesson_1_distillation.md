@@ -4,9 +4,9 @@
 
 ### Familiarizing Actions for the Distillation Bench
 
-In this tutorial, we will be going through how the distillation environment works. We will be taking the `tests/test_extract_vessel.pickle` which is a pickle file generated when we ran the extraction bench. 
+In this tutorial, we will be going through how the distillation environment works. We will be using the boil vessel method in `distillation_bench_v1.py` in order to generate an input boiling vessel for our distillation bench to use.
 
-It is important to know that before running the distillation bench, you must first complete both reaction and extraction, in order to follow the workflow our environment. To find out more, take a look at our [documentation](https://chemgymrl.readthedocs.io/en/latest/WhatIsChemGymRL/)
+It is important to know that normally, before running the distillation bench, you must first complete both reaction and extraction in order to follow the workflow our environments. To find out more, take a look at our [documentation](https://chemgymrl.readthedocs.io/en/latest/WhatIsChemGymRL/)
 
 Before we start talking about loading and running the environment, let's first familiarize ourselves with what's actually going on in the experiment.
 
@@ -18,7 +18,7 @@ In the distillation environment there are 3 main containers or vessels.
 - beaker 1       (B1)
 - beaker 2       (B2)
 
-The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials  that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.
+The boiling vessel (BV) contains all the materials at the initial state of the experiment. Beaker 1 (B1) can be thought of as a  condensation vessel which is connected to the distillation vessel via a tube and this will contain all the materials that are being boiled off. Beaker 2 (B2) is then the storage vessel, where the condensation vessel can be emptied, in order to make room for other material.
 
 ![vessels](../tutorial_figures/distillation-lesson-1/vessels_image.png)
 
