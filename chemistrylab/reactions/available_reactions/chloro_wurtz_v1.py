@@ -62,24 +62,24 @@ dV = 0.0005
     # the stoichiometric coefficients (6x4 array)
 activ_energy_arr = np.array(
     [
-        1.0, # activation energy for reaction 0
-        1.0, # activation energy for reaction 1
-        1.0, # activation energy for reaction 2
-        1.0, # activation energy for reaction 3
-        1.0, # activation energy for reaction 4
-        1.0  # activation energy for reaction 5
+        1, # activation energy for reaction 0
+        1, # activation energy for reaction 1
+        1, # activation energy for reaction 2
+        1, # activation energy for reaction 3
+        1, # activation energy for reaction 4
+        1  # activation energy for reaction 5
     ]
 )
 
 # Note: R0 = 1-chlorohexane, R1 = 2-chlorohexane, R2 = 3-chlorohexane, R3 = Na
 stoich_coeff_arr = np.array(
     [ #  R0   R1   R2   R3
-        [2.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 0
-        [1.0, 1.0, 0.0, 1.0], # stoichiometric coefficients for reaction 1
-        [1.0, 0.0, 1.0, 1.0], # stoichiometric coefficients for reaction 2
-        [0.0, 2.0, 0.0, 1.0], # stoichiometric coefficients for reaction 3
-        [0.0, 1.0, 1.0, 1.0], # stoichiometric coefficients for reaction 4
-        [0.0, 0.0, 2.0, 1.0]  # stoichiometric coefficients for reaction 5
+        [2.0, 0.0, 0.0, 2.0], # stoichiometric coefficients for reaction 0
+        [1.0, 1.0, 0.0, 2.0], # stoichiometric coefficients for reaction 1
+        [1.0, 0.0, 1.0, 2.0], # stoichiometric coefficients for reaction 2
+        [0.0, 2.0, 0.0, 2.0], # stoichiometric coefficients for reaction 3
+        [0.0, 1.0, 1.0, 2.0], # stoichiometric coefficients for reaction 4
+        [0.0, 0.0, 2.0, 2.0]  # stoichiometric coefficients for reaction 5
     ]
 )
 

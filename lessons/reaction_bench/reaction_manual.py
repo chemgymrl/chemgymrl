@@ -27,12 +27,13 @@ env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
 select_env = int(input(f"enter a number to chose which environment you want to run (0-{len(env_ids) - 1}): "))
 env = gym.make(env_ids[select_env])
-render_mode = "human"
+render_mode = "full"
 
 action_set = ['Temperature', 'Volume'] + env.reaction.reactants
 
 assert len(action_set) == env.action_space.shape[0]
 print(env.vessels.get_material_dict())
+env.reaction.solver = "RK45"
 done = False
 state = env.reset()
 total_reward = 0
