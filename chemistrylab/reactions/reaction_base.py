@@ -988,7 +988,7 @@ class _Reaction:
         if first_render:
             plt.close('all')
             plt.ion()
-            self._plot_fig, self._plot_axs = plt.subplots(2, 3, figsize=(24, 12))
+            self._plot_fig, self._plot_axs = plt.subplots(3, 3, figsize=(24, 12))
 
             # Time vs. Molar_Amount graph ********************** Index: (0, 0)
             self._plot_lines_amount = np.zeros((self.n.shape[0],2,20))
@@ -1008,6 +1008,9 @@ class _Reaction:
 
             # Time vs. Molar_Concentration graph *************** Index: (0, 1)
             self._plot_lines_concentration = np.zeros((self.n.shape[0],2,20))
+            total_conc = 0
+            for i in range(self.n.shape[0]):
+                total_conc += plot_data_concentration[i][0]
             for i in range(self.n.shape[0]):
                 self._plot_lines_concentration[i][0][step_num - 1:] = (plot_data_state[0][0])
                 self._plot_lines_concentration[i][1][step_num - 1:] = (plot_data_concentration[i][0])
@@ -1016,6 +1019,14 @@ class _Reaction:
                     self._plot_lines_concentration[i][1],
                     label=self.materials[i]
                 )
+
+                self._plot_axs[2, 0].plot(
+                    self._plot_lines_concentration[i][0],
+                    self._plot_lines_concentration[i][1]/total_conc,
+                    label=self.materials[i]
+                )
+
+
             self._plot_axs[0, 1].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
             self._plot_axs[0, 1].set_ylim([0.0, np.mean(plot_data_concentration)])
             self._plot_axs[0, 1].set_xlabel('Time (s)')
@@ -1088,6 +1099,12 @@ class _Reaction:
             )[0]
             self._plot_axs[1, 2].set_ylim([0, 1])
 
+            self._plot_axs[2, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
+            self._plot_axs[2, 0].set_ylim([0.0, 1.0])
+            self._plot_axs[2, 0].set_xlabel('Time (s)')
+            self._plot_axs[2, 0].set_ylabel('Purity')
+            self._plot_axs[2, 0].legend()
+
             # draw and show the full graph
             self._plot_fig.canvas.draw()
             plt.show()
@@ -1099,6 +1116,9 @@ class _Reaction:
             curent_time = plot_data_state[0][-1]
 
             # update the lines data
+            total_conc = 0
+            for i in range(self.n.shape[0]):
+                total_conc += plot_data_concentration[i][0]
             for i in range(self.n.shape[0]):
                 # populate the lines amount array with the updated number of mols
                 self._plot_lines_amount[i][0][step_num - 1:] = (plot_data_state[0][0])
@@ -1111,6 +1131,9 @@ class _Reaction:
                 self._plot_lines_concentration[i][1][step_num - 1:] = (plot_data_concentration[i][0])
                 self._plot_axs[0, 1].lines[i].set_xdata(self._plot_lines_concentration[i][0])
                 self._plot_axs[0, 1].lines[i].set_ydata(self._plot_lines_concentration[i][1])
+
+                self._plot_axs[2, 0].lines[i].set_xdata(self._plot_lines_concentration[i][0])
+                self._plot_axs[2, 0].lines[i].set_ydata(self._plot_lines_concentration[i][1]/total_conc)
 
             # reset each plot's x-limit because the latest action occurred at a greater time-value
             self._plot_axs[0, 0].set_xlim([0.0, curent_time])
