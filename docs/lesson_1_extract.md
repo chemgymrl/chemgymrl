@@ -3,6 +3,8 @@
 ## Extraction Bench: Lesson 1
 #### Using a non-polar solute to extract a solute from water
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/extraction_lesson.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 In this tutorial, I am going to walk you through how our extraction environment works and hopefully give some insight into how an
 RL agent might interact with the environment. In this extraction we are going to be using oil to extract sodium and
 chlorine from water. We are going to be using this jupyter notebook in order to interact
