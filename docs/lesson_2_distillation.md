@@ -2,6 +2,8 @@
 
 # Distillation Bench: Lesson 2
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/notebook_lesson_2d.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 ### Getting a High Reward in the Distillation Bench
 
 In this tutorial we will talk about getting a high reward in the distillation bench. An in depth explanation of the distillation process is explained in [Distillation Bench: Lesson 1](https://chemgymrl.readthedocs.io/en/latest/lesson_1_distillation/).
