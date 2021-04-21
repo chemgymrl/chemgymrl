@@ -6,8 +6,8 @@
 Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/extraction_lesson.ipynb) to the jupyter notebook, please use it at your pleasure.
 
 In this tutorial, I am going to walk you through how our extraction environment works and hopefully give some insight into how an
-RL agent might interact with the environment. In this extraction we are going to be using oil to extract sodium and
-chlorine from water. We are going to be using this jupyter notebook in order to interact
+RL agent might interact with the environment. In this extraction, we are going to be using oil to extract sodium and
+chlorine from water. We are going to be using this jupyter notebook to interact
 with the environment and to try to achieve a high reward!
 
 
@@ -44,7 +44,7 @@ action_set = ['Draining from ExV to Beaker1', 'Mix ExV', "Mix B1", "Mix B2", "Po
     542.0762286860582
 
 
-So start by running the the code cell below you should see a series of graphs like these appear:
+So start by running the code cell below you should see a series of graphs like these appear:
 
 ![graph](../tutorial_figures/extraction-lesson-1/oil_and_water_0.png)
 
@@ -77,11 +77,11 @@ env.render(mode=render_mode)
 These graphs show the contents of each of our containers and the level of separation between the materials. The graphs
 to the right then show the layers of materials forming in the container.
 
-When we start the environment we will see that we have a container filled with water, Na and Cl. The objective of this
+When we start the environment we will see that we have a container filled with water, Na, and Cl. The objective of this
 environment is to get the Na out of the water, but how might we do this? As the chemists among us will say this is a
 very simple task, and indeed it is. Using a non-polar solvent we can get the sodium and chlorine to diffuse from the
-water into that solvent, in this case we can use oil as our non-polar solvent! so now that the environemnt is loaded,
-if you run the code block below you should see a promt similar to this:
+water into that solvent, in this case, we can use oil as our non-polar solvent! so now that the environment is loaded,
+if you run the code block below you should see a prompt similar to this:
 
 ![command line prompt](../tutorial_figures/extraction-lesson-1/oil_water_console_0.png)
 
@@ -95,11 +95,11 @@ time step the RL agent selects from a set of actions and then in turn picks a mu
 | Drain beaker 1 into 2  | 0             | 0             | 0             | 0             |
 | Pour oil into beaker 1 | 0             | 0             | 0             | 0             |
 
-As an example the agent might want to pour a certain amount of solution out of our container, so the row controls what action they take,
+As an example, the agent might want to pour a certain amount of solution out of our container, so the row controls what action they take,
 and the column represents an action multiplier. So in the example of pouring out a certain amount of solution, the
 multiplier might control how much of the solution we pour out of our container. so our action matrix will thus be a
-matrix of zeroes with a single 1. In the set up of the environment we select a dT, this dT represents the period of time
-we take in between each action. Now that we have a better idea of our action space we can move onto testing out the
+matrix of zeroes with a single 1. In the setup of the environment we select a dT, this dT represents the period of time
+we take in between each action. Now that we have a better idea of our action space we can move on to testing out the
 environment. As stated earlier we need to use oil to extract the sodium from the water, but if we look at the graph now,
 we can clearly see that there is no oil in the container, so let's add some!
 
@@ -127,7 +127,7 @@ total_reward += reward
 ```
 
 Now that we've added the oil we need to mix the vessel to get the sodium to transfer into the oil, so let's mix the
-vessel!As seen in the graph below we can see that based on the layer representation that we have mixed the oil and the water.
+vessel! As seen in the graph below we can see that based on the layer representation that we have mixed the oil and the water.
 
 ![stirring](https://upload.wikimedia.org/wikipedia/commons/3/32/Magnetic_Stirrer.JPG)
 
@@ -215,8 +215,7 @@ state, reward, done, _ = env.step(action)
 total_reward += reward
 ```
 
-Now if we want to we can pour back the water from vessel 1 into our extraction vessel and repeat the process to get a
-more of the sodium out of the oil. However, for an introduction this much should satisfy, now that we have finished,
+Now if we want to we can pour back the water from vessel 1 into our extraction vessel and repeat the process to get more of the sodium out of the oil. However, for an introduction, this much should satisfy, now that we have finished,
 we want to see how well we did so now we enter the done command.
 
 ![image of command](../tutorial_figures/extraction-lesson-1/oil_water_console_7.png)
@@ -232,4 +231,4 @@ state, reward, done, _ = env.step(action)
 total_reward += reward
 ```
 
-I hope this tutorial helped with your understanding of how an agent might interact with the extraction environmenment!
+I hope this tutorial helped with your understanding of how an agent might interact with the extraction environment!
