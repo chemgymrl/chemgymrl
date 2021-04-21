@@ -104,13 +104,21 @@ continue. This means that we will only add 3-chlorohexane and Na with our action
 reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
 do this by running the following commands:
 
-![actions](../tutorial_figures/reaction-lesson-2/actions_reaction.png)
+```python
+if total_steps  < 20:
+    action[0] = 1
+    action[1] = 1
+    action[2] = 0    # 1-chlorohexane
+    action[3] = 0    # 2-chlorohexane
+    action[4] = 1    # 3-chlorohexane
+    action[5] = 1    # Na
+```
 
 Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane
 
-![reaction](../tutorial_figures/reaction-lesson-2/reaction.png)
+![reaction](https://cdn.pixabay.com/photo/2012/04/02/13/57/chemical-reaction-24562__340.png)
 
-<a style="font-size: 10px">(source http://butane.chem.uiuc.edu/pshapley/Enlist/Labs/RateEquilib/RateEquilib.html)</a>
+<a style="font-size: 10px">(source https://pixabay.com/vectors/chemical-reaction-experiment-flask-24562/)</a>
 
 Let's run our program and see what happens!
 
@@ -235,7 +243,15 @@ plt.show()
 
 For the second part of the experiment let's uncomment the code that adds the reactants not needed and run our code again.
 
-![code](../tutorial_figures/reaction-lesson-2/actions_for_bad_reward.PNG)
+```python
+# Adding Reactants not needed:
+action[0] = 1
+action[1] = 1
+action[5] = 1
+action[4] = 1
+action[2] = 1
+action[3] = 1
+```
 
 If we run this code we'll notice that our reward is significantly lower. It is now only 1.06 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
 
