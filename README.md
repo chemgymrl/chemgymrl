@@ -5,7 +5,7 @@
 
 ## Overview
 
-Check out our [website](chemgymrl.com)
+Check out our [website](https://chemgymrl.com)
 
 ChemGymRL is a collection of reinforcement learning environments in the open AI standard which are designed for experimentation and exploration with reinforcement learning in the context of chemical discovery. These experiments are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry.
 
