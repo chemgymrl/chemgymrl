@@ -39,7 +39,8 @@ print('\n')
 #   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
 #   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
 #   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   3: Done (Value doesn't matter)
+#   3: Wait for boil vessel temp to decrease towards room temp (if multiplier == 0, wait until room temp == true)
+#   4: Done (Value doesn't matter)
 
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Done']
 assert env.action_space.shape[0] == 2
