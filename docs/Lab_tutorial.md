@@ -4,7 +4,7 @@
 
 Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/Lab%20tutorial.ipynb) to the jupyter notebook, please use it at your pleasure.
 
-The lab environment serves as an environment for a user to conduct chemical experiments as they would in a physical lab, further the lab environment provides the opportunity to train a highlevel agent to synthesize materials using the 4 lab benches and tha gents associated with each. The environment allows the user to use a variety of reward functions based on the cost of real world lab equipment, material costs purity and labour costs. In this tutorial we will walk through how a lab manager agent would walk through the process of trying to synthesize dodecane. Further we will walk through the manager wrapper that we have developed which gives a simple api for an agent to run in an environment.
+The lab environment serves as an environment for a user to conduct chemical experiments as they would in a physical lab, further the lab environment provides the opportunity to train a high-level agent to synthesize materials using the 4 lab benches and the agents associated with each. The environment allows the user to use a variety of reward functions based on the cost of real-world lab equipment, material costs purity, and labour costs. In this tutorial, we will walk through how a lab manager agent would walk through the process of trying to synthesize dodecane. Further, we will walk through the manager wrapper that we have developed which gives a simple api for an agent to run in an environment.
 
 ## Lab
 
@@ -12,10 +12,10 @@ First off we can go over the 4 lab benches that the agent will have access to wh
 
 | Bench Index: | Bench Name:            | Bench Description:                                                                                                                                                                                                                                                                                                                                                            |
 |--------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0            | Reaction Bench         | The reaction bench serves as a tool for an  agent to operate within an environment where  they can learn how to optimize the process by  which they synthesize a material. By using a  predefined reaction, we simulate the reaction  allowing the agent to learn how best to  optimize the reaction.                                                                         |
-| 1            | Extraction Bench       | The extraction bench serves as a tool for an  agent to learn how to extract materials from  one solution to another.                                                                                                                                                                                                                                                          |
-| 2            | Distillation Bench     | The distillation bench serves as a tool for  an agent to learn how to distill and purify  solutions down to a single desired material.                                                                                                                                                                                                                                        |
-| 3            | Characterization Bench | The characterization bench is different from  the rest of the benches as it doesn't have an agent trained to run in it. In this case the  characterization bench takes in a vessel and  a desired analysis technique and returns the  results of that analysis, for instance  performing an absorbtion spectra analysis  and returning the spectral graph back to the  agent. |
+| 0            | Reaction Bench         | The reaction bench serves as a tool for an agent to operate within an environment where they can learn how to optimize the process by which they synthesize a material. By using a  predefined reaction, we simulate the reaction allowing the agent to learn how best to optimize the reaction.                                                                         |
+| 1            | Extraction Bench       | The extraction bench serves as a tool for an agent to learn how to extract materials from one solution to another.                                                                                                                                                                                                                                                          |
+| 2            | Distillation Bench     | The distillation bench serves as a tool for an agent to learn how to distill and purify solutions down to a single desired material.                                                                                                                                                                                                                                        |
+| 3            | Characterization Bench | The characterization bench is different from the rest of the benches as it doesn't have an agent trained to run in it. In this case, the characterization bench takes in a vessel and the desired analysis technique and returns the results of that analysis, for instance performing an absorption spectra analysis and returning the spectral graph to the agent. |
 
 
 ```python
@@ -35,15 +35,15 @@ lab = Lab()
 lab.shelf.vessels
 ```
 
-Now that we have initialized the lab environmet we should take a look at the action space for the lab environment.
+Now that we have initialized the lab environment we should take a look at the action space for the lab environment.
 
 | Bench Index | Bench Env Index | Vessel Index      | Agent Index      |
 |-------------|-----------------|-------------------|------------------|
 | 0 - 4         | 0 - Max_Num_Env   | 0 - Max_Num_Vessels | 0 - Max_Num_Agents |
 
-So part of the challenge for an agent running in this environment will be that each bench has a different number of bench environments, and available agents. For instance the user could have 10 unique reactions which only require a general extraction and a general distillation, in this case Max_Num_Env will be 10 even if the extraction bench is selected and even though there is only 1 registered environment for the extraction bench. As such if the user selects an agent or bench environment that are not available for a certain bench the agent will recieve a negative reward. Now that we have looked over the action space it will help to look over the lab environment in some examples that will give some more detail.
+So part of the challenge for an agent running in this environment will be that each bench has a different number of bench environments and available agents. For instance, the user could have 10 unique reactions which only require a general extraction and a general distillation, in this case, Max_Num_Env will be 10 even if the extraction bench is selected and even though there is only 1 registered environment for the extraction bench. As such if the user selects an agent or bench environment that is not available for a certain bench the agent will receive a negative reward. Now that we have looked over the action space it will help to look over the lab environment in some examples that will give some more detail.
 
-First let's take a look at all the environemnts registered to each bench:
+First, let's take a look at all the environments registered to each bench:
 
 
 ```python
@@ -146,7 +146,7 @@ lab.step(react_action)
 
 
 
-From above we see that the react_action is loading the reaction bench with the WurtzReact-v1 environment, the 0th vessel and a random agent. From the output we see the following: ((reward, analysis_array), Done). Now that we have run a step, let's take a look at the vessels available to the lab:
+From above we see that the react_action is loading the reaction bench with the WurtzReact-v1 environment, the 0th vessel, and a random agent. From the output we see the following: ((reward, analysis_array), Done). Now that we have run a step, let's take a look at the vessels available to the lab:
 
 
 ```python
@@ -195,7 +195,7 @@ lab.shelf.vessels[0].get_material_dict()
 
 
 
-notice how we now have a vessel in the shelf and when we look at it we can see chemicals from the wurtz reaction. Now that we have these leftover in our vessel, we want to try and extract dodecane out of the vessel.
+notice how we now have a vessel in the shelf and when we look at it we can see chemicals from the wurtz reaction. Now that we have these leftover materials in our vessel, we want to try and extract dodecane out of the vessel.
 
 
 ```python
@@ -208,7 +208,7 @@ lab.step(extract_action)
 
 
 
-From above we see that the extract_action is loading the extraction bench with the 'WurtzExtract-v1' environment, the 0th vessel (as seen above) and a random agent
+From above we see that the extract_action is loading the extraction bench with the 'WurtzExtract-v1' environment, the 0th vessel (as seen above), and a random agent
 
 
 ```python
@@ -230,7 +230,7 @@ for vessel in lab.shelf.vessels:
     _____________
 
 
-From the above we can clearly see that there are 2 new vessels that have been added to our shelf courtesy of the extraction bench.
+From the above, we can see that 2 new vessels have been added to our shelf courtesy of the extraction bench.
 
 
 ```python
@@ -243,7 +243,7 @@ lab.step(distill_action)
 
 
 
-From above we see that the distill_action is loading the distillation bench with the 'Distillation-v0' environment, the 0th vessel (as seen above) and a random agent
+From above we see that the distill_action is loading the distillation bench with the 'Distillation-v0' environment, the 0th vessel (as seen above), and a random agent
 
 
 ```python
@@ -321,11 +321,11 @@ lab.step(analysis_action)
 
 
 
-Lastly we use the characterization bench. In this case we are going to perform an absobtion spectra analysis on our vessel that we get back. This is designed so that the agent can identify what is in the vessel without explicitly telling the agent. That's all for this part of the tutorial on the Lab environment, next we will cover the Lab Manager wrapper for the lab environment. 
+Lastly, we use the characterization bench. In this case, we are going to perform an absorption spectra analysis on our vessel that we get back. This is designed so that the agent can identify what is in the vessel without explicitly telling the agent. That's all for this part of the tutorial on the Lab environment, next we will cover the Lab Manager wrapper for the lab environment. 
 
 ## Lab Manager
 
-The Lab Manager at the moment doesn't support training agents, however it does support pre trained or heuristic agents, or even a human agent.
+The Lab Manager at the moment doesn't support training agents, however, it does support pre-trained or heuristic agents, or even a human agent.
 
 
 ```python
