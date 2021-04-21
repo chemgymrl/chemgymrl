@@ -5,6 +5,8 @@
 
 ## Overview
 
+Check out our [website](chemgymrl.com)
+
 ChemGymRL is a collection of reinforcement learning environments in the open AI standard which are designed for experimentation and exploration with reinforcement learning in the context of chemical discovery. These experiments are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry.
 
 ChemGymRL simulates real-world chemistry experiments by allocating agents to benches to perform said experiments as dictated by a lab manager who has operational control over all agents in the environment. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
@@ -99,7 +101,7 @@ source chemgymrl/bin/activate
 Now that the virtual environment is created and activated we will now look to install all the correct packages.
 
 #### Install Library:
-Now that everything is set up we simply seed to install the library.
+Now that everything is set up we simply seed to install the library. If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
  
 ```commandline
 pip install .

@@ -2,6 +2,8 @@
 
 ## Reaction Bench Lesson 2
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/notebook_lesson2r.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 #### Getting a high reward in a reaction of form: 
 
 A-X + A-X -> A-A + X-X and A-X + B-X -> A-B + X-X

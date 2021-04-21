@@ -1,19 +1,3 @@
-"""
-This file is part of ChemGymRL.
-
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
-"""
 # import all the required external modules
 import gym
 import numpy as np
@@ -55,10 +39,10 @@ print('\n')
 #   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
 #   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
 #   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   3: Wait for boil vessel temp to decrease towards room temp (multiplier == 0, wait until room temp == true)
-#   3: Done (Value doesn't matter)
+#   3: Wait for boil vessel temp to decrease towards room temp (if multiplier == 0, wait until room temp == true)
+#   4: Done (Value doesn't matter)
 
-action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait', 'Done']
+action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Done']
 assert env.action_space.shape[0] == 2
 print(env.action_space)
 

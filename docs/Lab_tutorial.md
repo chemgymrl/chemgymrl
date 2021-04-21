@@ -2,6 +2,8 @@
 
 # Lab / Lab Manager Tutorial
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/Lab%20tutorial.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 The lab environment serves as an environment for a user to conduct chemical experiments as they would in a physical lab, further the lab environment provides the opportunity to train a highlevel agent to synthesize materials using the 4 lab benches and tha gents associated with each. The environment allows the user to use a variety of reward functions based on the cost of real world lab equipment, material costs purity and labour costs. In this tutorial we will walk through how a lab manager agent would walk through the process of trying to synthesize dodecane. Further we will walk through the manager wrapper that we have developed which gives a simple api for an agent to run in an environment.
 
 ## Lab

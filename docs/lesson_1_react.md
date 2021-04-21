@@ -2,6 +2,8 @@
 
 ## Reaction Bench: Lesson 1
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/reaction_lesson.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 ### Part 1
 
 In this lesson I will be taking you through how our reaction bench environment works and how an RL agent might interact with the environment.

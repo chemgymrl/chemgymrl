@@ -2,6 +2,8 @@
 
 ## Distillation Bench: Lesson 1
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/notebook_lesson1d.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 ### Familiarizing Actions for the Distillation Bench
 
 In this tutorial, we will be going through how the distillation environment works. We will be using the boil vessel method in `distillation_bench_v1.py` in order to generate an input boiling vessel for our distillation bench to use.
@@ -134,10 +136,10 @@ Action Multiplier: 10
 # action[0] is a number indicating the event to take place
 # action[1] is a number representing a multiplier for the event
 # Actions and multipliers include:
-#   0: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
-#   1: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-#   2: Wait for boil vessel temp to decrease towards room temp (multiplier == 0, wait until room temp == true)
-#   3: Done (Value doesn't matter)
+#   0: Add/Remove Heat (Heat Value multiplier, relative of maximal heat change)
+#   1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
+#   2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
+#   3: Wait for boil vessel temp to decrease towards room temp (if multiplier == 0, wait until room temp == true)
 #   4: Done (Value doesn't matter)
 
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait','Done']
