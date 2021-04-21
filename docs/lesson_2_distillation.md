@@ -12,9 +12,9 @@ Essentially what we're trying to do is isolate our targeted material into the co
 
 In this tutorial we will be trying to get a high reward by targeting our desired material **dodecane**. We will heat up the boiling vessel to a temperature right before dodecane's boiling point (489.5 Kelvin) which will allow us to boil off every other material in the boiling vessel into beaker 1. 
 
-![boil vessel](tutorial_figures/distillation-lesson-2/boiling_vessel_2.png)
+![boil vessel](https://cdn.pixabay.com/photo/2013/07/13/12/52/beaker-160528_960_720.png)
 
-<a style="font-size: 10px">(source: http://clipart-library.com/clipart/chemistry-gases-cliparts_12.htm)</a>
+<a style="font-size: 10px">(source: https://pixabay.com/vectors/beaker-bubbles-chemistry-reaction-160528/)</a>
 
 Then we will dump all the contents currently in beaker 1, which are not dodecane into beaker 2. Finally we will heat up boiling vessel even more to exceed dodecane's boiling temperature thus boiling it into beaker 1. This will allow us to have a beaker that is mostly dodecane thus getting us a high reward.
 
