@@ -2,17 +2,17 @@
 
 ## Building A Custom Reaction File
 
-For this tutorial we are going to be creating a very simple reaction 
+For this tutorial, we are going to be creating a very simple reaction 
 
 NaCl<sub>aq</sub> ->  Na<sup>+</sup><sub>aq</sub> + Cl<sup>-</sup><sub>aq</sub>
 
-In order to start with creating an environment for this reaction we first have to create a reaction file which simulates
+To start with creating an environment for this reaction we first have to create a reaction file that simulates
 the mechanics of this decomposition. </br></br> In the directory ```chemistrylab/reactions/available_reactions```
 
-For this case we will create a new reaction file from the reaction template file ```template_reaction.py```,
+For this case, we will create a new reaction file from the reaction template file ```template_reaction.py```,
 and let's name it ```nacl_decomp.py```.
 
-The first change we have to make is to the list of reactants, products and solutes located at line 42
+The first change we have to make is to the list of reactants, products, and solutes located at line 42
 
 ```python
 REACTION_CLASS = "template reactions"
@@ -38,19 +38,19 @@ SOLUTES = ['H2O']
 DESIRED = 'Na'
 ```
 
-In this case we are letting the reaction file know what reagents we are using and the desired product so that we can
+In this case, we are letting the reaction file know what reagents we are using and the desired product so that we can
 easily track and display their concentrations.
 
 Now we need to establish a few arrays that we use to calculate the change in concentration. The first array that we
-reqire is a n_reactions x 1 array which represents the activation energy of each reaction, in this case we only have 1
+require is a n_reactions x 1 array which represents the activation energy of each reaction, in this case, we only have 1
 reaction:
 
 ```python
 activ_energy_arr = np.array([1.0])
 ```
 
-The next array relates to the calculations of the rates of reactions, for this we use the stoichiometric coeffficients
-from the reaction in order to calculate the rates. Since in this reaction there is 
+The next array relates to the calculations of the rates of reactions, for this, we use the stoichiometric coefficients
+from the reaction to calculate the rates. Since in this reaction, there is 
 
 ```python
 stoich_coeff_arr = np.array([
@@ -103,7 +103,7 @@ class ReactionBenchEnv_1(ReactionBenchEnv):
         )
 ```
 
-This code simply sets up the environement we will be using. So in this case we establish the materials that the reaction
+This code simply sets up the environment we will be using. So in this case we establish the materials that the reaction
 will use and the initial quantity of that substance in mols. We then also establish our solute, in this case, 1 mol of
 water. This takes us to the final step which is registering the environment with gym. In this file: 
 ```chemistrylab/__init__.py``` we are going to add a few more lines of code.
@@ -129,4 +129,4 @@ print(env_ids)
 #[..., 'DecompReactLesson-v1', ...]
 ```
 
-Here we can clearly see that our environment has been added!
+Here we can see that our environment has been added!
