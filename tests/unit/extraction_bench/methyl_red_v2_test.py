@@ -1,3 +1,19 @@
+"""
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+"""
 import unittest
 import sys
 sys.path.append('../../../')
@@ -49,10 +65,6 @@ class OilWaterTestCase(unittest.TestCase):
         action[0] = 7
         action[1] = 5
         state, reward, done, _ = env.step(action)
-
-        # event_2 = ['fully mix']
-        #
-        # env.vessels[0].push_event_to_queue(events=None, feedback=[event_2], dt=0)
 
         v0_initial_layers = env.vessels[0].get_layers()
 
@@ -161,6 +173,26 @@ class OilWaterTestCase(unittest.TestCase):
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
         self.assertIn('ethyl acetate', vessels[0].get_material_dict())
+
+    def test_full_render(self):
+        env = gym.make(ENV_NAME)
+        env.reset()
+        env.render("full")
+        action = np.zeros(env.action_space.shape)
+        action[0] = 7
+        action[1] = 5
+        state, reward, done, _ = env.step(action)
+        env.render("full")
+
+    def test_human_render(self):
+        env = gym.make(ENV_NAME)
+        env.reset()
+        env.render()
+        action = np.zeros(env.action_space.shape)
+        action[0] = 7
+        action[1] = 5
+        state, reward, done, _ = env.step(action)
+        env.render()
 
     def test_done(self):
         env = gym.make(ENV_NAME)

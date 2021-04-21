@@ -1,4 +1,19 @@
 """
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 Characterization Bench Class
 
 :title: characterization_bench
@@ -11,6 +26,10 @@ Class to initialize reaction vessels, prepare the reaction base environment, and
 """
 
 import numpy as np
+import copy
+import sys
+sys.path.append("../../")
+from chemistrylab.ode_algorithms.spectra.diff_spectra import convert_inverse_cm_to_nm
 
 
 class CharacterizationBench:
@@ -37,6 +56,10 @@ class CharacterizationBench:
 
         # specify the analysis techniques available in this bench
         self.techniques = {'spectra': self.get_spectra}
+        self.params = {'spectra': {'range_ir': (2000, 20000)}}
+
+    def update_ir_range(self, min, max):
+        self.params['spectra']['range_ir'] = (min, max)
 
     def analyze(self, vessel, analysis, overlap=False):
         """
@@ -57,11 +80,19 @@ class CharacterizationBench:
 
         # perform the specified analysis technique
         analysis = self.techniques[analysis](vessel, overlap)
+        return analysis, vessel
 
-        return analysis
+    def normalize_spectra(self, params, ir_range):
+        spectras = copy.deepcopy(params)
+        min = ir_range[0]
+        wave_range = abs(ir_range[1] - ir_range[0])
+        for i in range(len(spectras)):
+            if spectras[i] is not None:
+                for k in range(len(spectras[i])):
+                    spectras[i][k][1] = abs(spectras[i][k][1] - min)/wave_range
+        return spectras
 
-    @staticmethod
-    def get_spectra(vessel, overlap):
+    def get_spectra(self, vessel, materials=None, overlap=True):
         """
         Class method to generate total spectral data using a guassian decay.
 
@@ -82,14 +113,19 @@ class CharacterizationBench:
         None
         """
 
-        if not overlap:
-            params = [item[0]().get_spectra_no_overlap() for __, item in vessel.get_material_dict().items()]
-        else:
-            params = [item[0]().get_spectra_overlap() for __, item in vessel.get_material_dict().items()]
-
         # acquire the array of material concentrations
-        C = vessel.get_concentration()
+        if not materials:
+            materials = list(vessel.get_material_dict().keys())
 
+        C = vessel.get_concentration(materials=materials)
+        mat_dict = vessel.get_material_dict()
+
+        if not overlap:
+            params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+        else:
+            params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
+        params = convert_inverse_cm_to_nm(params)
+        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
@@ -98,27 +134,26 @@ class CharacterizationBench:
 
         # iterate through the spectral parameters in self.params and the wavelength space
         for i, item in enumerate(params):
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                            (x[k] - params[i][j, 1]) / params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    print(decay_rate)
-                    if decay_rate < 1e-30:
-                        decay_rate = 0
-                    absorb[k] += amount * height * decay_rate
+            if item is not None:
+                for j in range(item.shape[0]):
+                    for k in range(x.shape[0]):
+                        amount = C[i]/sum(C)
+                        height = item[j, 0]
+                        decay_rate = np.exp(
+                            -0.5 * (
+                                (x[k] - params[i][j, 1]) / params[i][j, 2]
+                            ) ** 2.0
+                        )
+                        if decay_rate < 1e-30:
+                            decay_rate = 0
+                        absorb[k] += amount * height * decay_rate
 
         # absorption must be between 0 and 1
         absorb = np.clip(absorb, 0.0, 1.0)
 
         return absorb
 
-    @staticmethod
-    def get_spectra_peak(C, params, materials):
+    def get_spectra_peak(self, vessel, materials=None, overlap=True):
         """
         Method to populate a list with the spectral peak of each chemical.
 
@@ -140,20 +175,31 @@ class CharacterizationBench:
         ---------------
         None
         """
+        if not materials:
+            materials = list(vessel.get_material_dict().keys())
 
+        C = vessel.get_concentration(materials=materials)
+        mat_dict = vessel.get_material_dict()
+
+        if not overlap:
+            params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+        else:
+            params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
+        params = convert_inverse_cm_to_nm(params)
+        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         # create a list of the spectral peak of each chemical
         spectra_peak = []
         for i, material in enumerate(materials):
-            spectra_peak.append([
-                params[i][:, 1] * 600 + 200,
-                C[i] * params[i][:, 0],
-                material
-            ])
+            if params[i] is not None:
+                spectra_peak.append([
+                    params[i][:, 1] * 600 + 200,
+                    C[i] * params[i][:, 0],
+                    material
+                ])
 
         return spectra_peak
 
-    @staticmethod
-    def get_dash_line_spectra(C, params):
+    def get_dash_line_spectra(self, vessel, materials=None, overlap=True):
         """
         Module to generate each individual spectral dataset using gaussian decay.
 
@@ -173,24 +219,36 @@ class CharacterizationBench:
         ---------------
         None
         """
+        if not materials:
+            materials = list(vessel.get_material_dict().keys())
 
+        C = vessel.get_concentration(materials=materials)
+        mat_dict = vessel.get_material_dict()
+
+        if not overlap:
+            params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+        else:
+            params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
+        params = convert_inverse_cm_to_nm(params)
+        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         dash_spectra = []
 
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
         for i, item in enumerate(params):
-            each_absorb = np.zeros(x.shape[0], dtype=np.float32)
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                            (x[k] - params[i][j, 1]) / params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    each_absorb += amount * height * decay_rate
-            dash_spectra.append(each_absorb)
+            if item is not None:
+                each_absorb = np.zeros(x.shape[0], dtype=np.float32)
+                for j in range(item.shape[0]):
+                    for k in range(x.shape[0]):
+                        amount = C[i]
+                        height = item[j, 0]
+                        decay_rate = np.exp(
+                            -0.5 * (
+                                (x[k] - params[i][j, 1]) / params[i][j, 2]
+                            ) ** 2.0
+                        )
+                        each_absorb += amount * height * decay_rate
+                dash_spectra.append(each_absorb)
 
         return dash_spectra

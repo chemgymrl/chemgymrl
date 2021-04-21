@@ -1,4 +1,19 @@
 """
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 Module to define the vessel object and it's associated functionality.
 :title: vessel.py
 :author: Chris Beeler, Nicholas Paquin, and Mitchell Shahen
@@ -45,7 +60,8 @@ class Vessel:
             volume=1.0,  # L
             unit='l',
             materials={},  # moles of materials
-            solutes={},  # moles of solutes
+            solutes={},  # moles of solutes,
+            solvents = {},
             v_max=1.0,  # L
             v_min=0.001,  # L
             Tmax=500.0,  # Kelvin
@@ -104,7 +120,6 @@ class Vessel:
         # define the Material Dict and Solute Dict first
         self._material_dict = util.convert_material_dict_units(materials)  # material.name: [material(), amount]; amount is in mole
         self._solute_dict = util.convert_solute_dict_units(solutes)  # solute.name: [solvent(), amount]; amount is in mole
-
         # initialize parameters
         self.label = label
         self.w2v = None
@@ -148,17 +163,20 @@ class Vessel:
             'temperature change': self._update_temperature,
             'pour by volume': self._pour_by_volume,
             'drain by pixel': self._drain_by_pixel,
-            'fully mix': self._fully_mix,
             'update material dict': self._update_material_dict,
             'update solute dict': self._update_solute_dict,
             'mix': self._mix,
             'update_layer': self._update_layers,
-            'change_heat': self._change_heat
+            'change_heat': self._change_heat,
+            'wait': self._wait
         }
 
         # event queues
         self._event_queue = []  # [['event', parameters], ['event', parameters] ... ]
         self._feedback_queue = []  # [same structure as event queue]
+        self.thickness = 1e-3 # beaker is 1mm thick
+        self.height_to_diamater = 3/2 # default height to diameter ratio
+        self.dimensions = self.get_vessel_dimensions() # returns a tuple (max_height, radius)
 
     def push_event_to_queue(
             self,
@@ -245,8 +263,12 @@ class Vessel:
             # use the name of the event to get the function form event_dict
             action = self._event_dict[event[0]]
 
-            # call the function corresponding to the event
-            reward += action(parameter=event[1:], dt=dt)
+            # if action is wait
+            if event[0] == 'wait':
+                reward += action(self, parameter=event[1:], dt=dt)
+            else:
+                # call the function corresponding to the event
+                reward += action(parameter=event[1:], dt=dt)
 
         # generate the merged queue from feedback queue and empty the feedback queue
         merged = self._merge_event_queue(
@@ -319,6 +341,20 @@ class Vessel:
         return merged
 
     # ---------- START EVENT FUNCTIONS ---------- #
+    def _wait(self, parameter, dt):
+        room_temp = parameter[0]
+        initial_temp = self.get_temperature()
+        out_beaker = parameter[1]
+        wait_until_room = parameter[2]
+        if wait_until_room:
+            self._update_temperature([room_temp, False], dt)
+        else:
+            rate = 1.143 * self.get_material_surface_area() * (room_temp - initial_temp)/self.thickness
+            heat_change = rate * dt
+            self._change_heat([heat_change, out_beaker], dt)
+            if initial_temp > room_temp > self.get_temperature() or initial_temp < room_temp < self.get_temperature():
+                self._update_temperature([room_temp, False], dt)
+        return 0
 
     def _change_heat(self, parameter, dt):
         """
@@ -377,6 +413,8 @@ class Vessel:
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
+                    print([(material_obj().get_name(), material_obj()._boiling_point) for material_obj in material_objs])
+                    print(min(material_bps))
                     # error for now...
                     exit()
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
@@ -409,7 +447,7 @@ class Vessel:
                 # update the vessel temperature
                 self._update_temperature(
                     parameter=[self.temperature + temp_change, False],
-                    dt=self.default_dt
+                    dt=self.default_dt,
                 )
 
                 # updates total temp change and current temp
@@ -507,7 +545,7 @@ class Vessel:
 
                 # modify the boil vessel's temperature accordingly
                 self._update_temperature(
-                    parameter=[self.temperature + vessel_temp_change],
+                    parameter=[self.temperature + vessel_temp_change, False],
                     dt=self.default_dt
                 )
 
@@ -603,7 +641,7 @@ class Vessel:
         # collect data from the target vessel
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit="l")
+        __, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit="l")
 
         # set default reward equal to zero
         reward = 0
@@ -718,13 +756,16 @@ class Vessel:
         event_2 = ['update solute dict', target_solute_dict]
 
         # create a event to reset material's position and variance in target vessel
-        event_3 = ['fully mix']
-
         # push event to target vessel
         __ = target_vessel.push_event_to_queue(
             events=None,
-            feedback=[event_1, event_2, event_3],
+            feedback=[event_1, event_2],
             dt=dt
+        )
+        __ = target_vessel.push_event_to_queue(
+            events=None,
+            feedback=None,
+            dt=-100000
         )
         return reward
 
@@ -760,33 +801,7 @@ class Vessel:
         # collect data
         target_material_dict = target_vessel.get_material_dict()
         target_solute_dict = target_vessel.get_solute_dict()
-        __, self_total_volume = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
-
-        # print the old and new dictionaries to the terminal
-        # print(
-        #     '-------{}: {} (old_material_dict)-------'.format(
-        #         self.label,
-        #         self._material_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_solute_dict)-------'.format(
-        #         self.label,
-        #         self._solute_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_material_dict)-------'.format(
-        #         target_vessel.label,
-        #         target_material_dict
-        #     )
-        # )
-        # print(
-        #     '-------{}: {} (old_solute_dict)-------'.format(
-        #         target_vessel.label,
-        #         target_solute_dict
-        #     )
-        # )
+        __, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit=self.unit)
 
         # set default reward equal to zero
         reward = 0
@@ -992,60 +1007,20 @@ class Vessel:
         event_2 = ['update solute dict', target_solute_dict]
 
         # create a event to reset material's position and variance in target vessel
-        event_3 = ['fully mix']
 
         # push event to target vessel
         __ = target_vessel.push_event_to_queue(
             events=None,
-            feedback=[event_1, event_2, event_3],
+            feedback=[event_1, event_2],
             dt=dt
+        )
+        __ = target_vessel.push_event_to_queue(
+            events=None,
+            feedback=None,
+            dt=-100000
         )
 
         return reward
-
-    def _fully_mix(
-            self,
-            parameter,
-            dt
-    ):
-        """
-        Method to completely mix a beaker.
-
-        Parameters
-        ---------------
-        `parameters` : `list`
-            A list containing parameters used to properly perform the fully mix event.
-        `dt` : `np.float32`
-            The time-step of actions occurring in or to the vessel.
-
-        Returns
-        ---------------
-        `merged` : `list`
-            The events queue list updated with additional events depending on the switches.
-
-        Raises
-        ---------------
-        None
-        """
-
-        # create new layer_position_dict
-        new_layers_position_dict = {}
-
-        # iterate through each material
-        for M in self._material_dict:
-            # do not fill in solute (solute does not form layer)
-            if not self._material_dict[M][0]().is_solute():
-                new_layers_position_dict[M] = 0.0
-
-        # Add Air
-        new_layers_position_dict[self.Air.get_name()] = 0.0
-
-        # reset the variances
-        self._layers_variance = 2.0
-
-        # update self._layers_position_dict
-        self._layers_position_dict = new_layers_position_dict
-        return 0
 
     def _update_material_dict(
             self,
@@ -1145,7 +1120,7 @@ class Vessel:
         # collect data (according to separate.mix()):
 
         # convert the material dictionary to volumes in mL
-        self_volume_dict, __ = util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+        self_volume_dict, __ = util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit=self.unit)
 
         layers_variance = self._layers_variance
 
@@ -1259,8 +1234,9 @@ class Vessel:
         layers_position = []
         layers_color = []
         layers_variance = self._layers_variance
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+        self_volume_dict, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(
             self._material_dict,
+            solute_dict=self._solute_dict,
             unit=self.unit
         )
 
@@ -1319,7 +1295,7 @@ class Vessel:
             self.volume = util.convert_volume(volume, unit)
         elif override:
             self.volume = util.convert_volume(volume, unit)
-            self._material_dict, self._solute_dict, _ = util.check_overflow(self._material_dict, self._solute_dict,
+            self._material_dict, self._solute_dict,  _ = util.check_overflow(self._material_dict, self._solute_dict,
                                                                             self.volume, unit)
         else:
             raise ValueError('Material dictionary or solute dictionary is not empty')
@@ -1425,7 +1401,7 @@ class Vessel:
 
         # loop over all the materials in the vessel obtaining feedback from updating the temperatures of each material
         for material_obj in self._material_dict.values():
-            feedback = material_obj[0].update_temperature(
+            feedback = material_obj[0]().update_temperature(
                 target_temperature=target_temperature,
                 dt=dt
             )
@@ -1491,7 +1467,7 @@ class Vessel:
             materials = list(self._material_dict.keys())
 
         # get the vessel volume
-        V = self.get_volume()
+        V = self.get_current_volume()[-1]
 
         # set up lists to contain the vessel's materials and the material amounts
         materials_in_vessel = []
@@ -1580,8 +1556,9 @@ class Vessel:
         None
         """
 
-        self_volume_dict, self_total_volume = util.convert_material_dict_to_volume(
+        self_volume_dict, self_total_volume = util.convert_material_dict_and_solute_dict_to_volume(
             self._material_dict,
+            self._solute_dict,
             unit=self.unit
         )
 
@@ -2033,7 +2010,23 @@ class Vessel:
         None
         """
 
-        return util.convert_material_dict_to_volume(self._material_dict, unit=self.unit)
+        return util.convert_material_dict_and_solute_dict_to_volume(self._material_dict, self._solute_dict, unit=self.unit)
+
+    def get_vessel_dimensions(self):
+        vol = self.v_max
+        diam = (vol / np.pi * 4 / self.height_to_diamater) ** 1 / 3
+        height = diam * self.height_to_diamater
+        return height, diam / 2
+
+    def get_material_surface_area(self):
+        vol = self.get_current_volume()[-1]
+        height = vol / np.pi / (self.dimensions[-1] ** 2)
+        surface_area = 2 * np.pi * self.dimensions[-1] ** 2 + 2 * np.pi * self.dimensions[-1] * height
+        return surface_area
+
+    def define_height_to_diameter(self, ratio):
+        self.height_to_diamater = ratio
+
 
     # ---------- SAVING/LOADING FUNCTIONS ---------- #
 
@@ -2128,12 +2121,12 @@ class Vessel:
                 'temperature change': self._update_temperature,
                 'pour by volume': self._pour_by_volume,
                 'drain by pixel': self._drain_by_pixel,
-                'fully mix': self._fully_mix,
                 'update material dict': self._update_material_dict,
                 'update solute dict': self._update_solute_dict,
                 'mix': self._mix,
                 'update_layer': self._update_layers,
-                'change_heat': self._change_heat
+                'change_heat': self._change_heat,
+                'wait': self._wait
             }
 
             # event queues

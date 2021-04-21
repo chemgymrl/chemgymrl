@@ -1,4 +1,19 @@
 """
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 Module to perform a series of reactions as specified by an accompanying reaction file.
 
 :title: reaction_base.py
@@ -26,6 +41,7 @@ import matplotlib.pyplot as plt
 sys.path.append("../../")  # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
+from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.lab.de import De
 from scipy.integrate import solve_ivp
@@ -35,7 +51,7 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", overlap=False, solver='newton'):
+    def __init__(self, reaction_file_identifier="", overlap=False, solver='RK45'):
         """
         Constructor class module for the Reaction class.
 
@@ -95,7 +111,11 @@ class _Reaction:
         self.de = De(self.stoich_coeff_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
 
         # specify the full list of materials
-        self.materials = self.reactants + self.products
+        self.materials = []
+
+        for mat in self.reactants + self.products:
+            if mat not in self.materials:
+                self.materials.append(mat)
 
         # set a threshold value for the minimum, non-negligible material molar amount
         self.threshold = 1e-8
@@ -125,7 +145,7 @@ class _Reaction:
         self.initial_solutes = np.zeros(len(self.solutes))
 
         # include the available solvers
-        self.solvers = {'RK45', 'RK23', 'DOP853', 'Radau', 'DBF', 'LSODA'}
+        self.solvers = {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA'}
 
         # select the intended solver or use the default
         if solver in self.solvers:
@@ -456,7 +476,7 @@ class _Reaction:
             assert self.reactants.sort() == materials_array.sort()
         else:
             # after the first iteration materials_array should be filled with products as well
-            assert self.materials == materials_array
+            assert set(materials_array).issubset(set(self.materials))
 
         # ensure that solutes from vessels compatible with reaction
         solute_dict_vessel = vessels.get_solute_dict()
@@ -606,7 +626,7 @@ class _Reaction:
 
         return vessels
 
-    def update(self, conc, temp, volume, dt, n_steps):
+    def update(self, conc, temp, volume, t, dt, n_steps):
         """
         Method to update the environment.
         This involves using reactants, generating products, and obtaining rewards.
@@ -636,10 +656,9 @@ class _Reaction:
 
         # set the intended vessel temperature in the differential equation module
         self.de.temp = temp
-
         # implement the differential equation solver
         if self.solver != 'newton':
-            new_conc = self._solver(self.de, (0, dt * n_steps), conc, method=self.solver).y[:, -1]
+            new_conc = self._solver(self.de, (t, t + dt * n_steps), conc, method=self.solver).y[:, -1]
             for i in range(self.n.shape[0]):
                 # convert back to moles and update the molar amount array
                 self.n[i] = new_conc[i] * volume
@@ -655,7 +674,7 @@ class _Reaction:
             if amount < self.threshold:
                 self.n[i] = 0
 
-    def perform_action(self, action, vessels: vessel.Vessel, n_steps, step_num):
+    def perform_action(self, action, vessels: vessel.Vessel, t, n_steps, step_num):
         """
         Update the environment with processes defined in `action`.
 
@@ -692,6 +711,7 @@ class _Reaction:
 
         # deconstruct the vessel: acquire the vessel temperature and volume and create the n array
         temperature, volume = self.vessel_deconstruct(vessels=vessels)
+        current_volume = vessels.get_current_volume()[-1]
 
         # perform the complete action over a series of increments
         if self.solver != 'newton':
@@ -732,9 +752,10 @@ class _Reaction:
 
             # perform the reaction and update the molar concentrations of the reactants and products
             self.update(
-                vessels.get_concentration(),
+                self.n/current_volume,
                 temperature,
-                volume,
+                current_volume,
+                t,
                 vessels.get_defaultdt(),
                 n_steps
             )
@@ -744,119 +765,6 @@ class _Reaction:
 
         return vessels
 
-    def get_spectra(self, C):
-        """
-        Class method to generate total spectral data using a guassian decay.
-
-        Parameters
-        ---------------
-        C : np.array
-            An array containing the concentrations of materials in the vessel.
-
-        Returns
-        ---------------
-        absorb : np.array
-            An array of the total absorption data of every chemical in the experiment
-
-        Raises
-        ---------------
-        None
-        """
-
-        # set the wavelength space
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
-
-        # define an array to contain absorption data
-        absorb = np.zeros(x.shape[0], dtype=np.float32)
-
-        # iterate through the spectral parameters in self.params and the wavelength space
-        for i, item in enumerate(self.params):
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    if decay_rate < 1e-30:
-                        decay_rate = 0
-                    absorb[k] += amount * height * decay_rate
-
-        # absorption must be between 0 and 1
-        absorb = np.clip(absorb, 0.0, 1.0)
-
-        return absorb
-
-    def get_spectra_peak(self, C):
-        """
-        Method to populate a list with the spectral peak of each chemical.
-
-        Parameters
-        ---------------
-        C : np.array
-            An array containing the concentrations of all the materials in the vessel.
-
-        Returns
-        ---------------
-        spectra_peak : list
-            A list of parameters specifying the peak of the spectra for each chemical
-
-        Raises
-        ---------------
-        None
-        """
-
-        # create a list of the spectral peak of each chemical
-        spectra_peak = []
-        for i, material in enumerate(self.materials):
-            spectra_peak.append([
-                self.params[i][:, 1] * 600 + 200,
-                C[i] * self.params[i][:, 0],
-                material
-            ])
-
-        return spectra_peak
-
-    def get_dash_line_spectra(self, C):
-        """
-        Module to generate each individual spectral dataset using gaussian decay.
-
-        Parameters
-        ---------------
-        C : np.array
-            An array containing the concentrations of materials in the vessel.
-
-        Returns
-        ---------------
-        dash_spectra : list
-            A list of all the spectral data of each chemical
-
-        Raises
-        ---------------
-        None
-        """
-
-        dash_spectra = []
-
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
-
-        for i, item in enumerate(self.params):
-            each_absorb = np.zeros(x.shape[0], dtype=np.float32)
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    amount = C[i]
-                    height = item[j, 0]
-                    decay_rate = np.exp(
-                        -0.5 * (
-                                (x[k] - self.params[i][j, 1]) / self.params[i][j, 2]
-                        ) ** 2.0
-                    )
-                    each_absorb += amount * height * decay_rate
-            dash_spectra.append(each_absorb)
-
-        return dash_spectra
 
     def plotting_step(self, t, tmax, vessels: vessel.Vessel):
         '''
@@ -917,7 +825,7 @@ class _Reaction:
         )
 
         # calculate and record the molar concentrations of the reactants and products
-        C = vessels.get_concentration()
+        C = vessels.get_concentration(materials=self.materials)
         for j in range(self.n.shape[0]):
             plot_data_mol[j].append(self.n[j])
             plot_data_concentration[j].append(C[j])
@@ -1018,7 +926,7 @@ class _Reaction:
             plt.pause(0.000001)
 
     def plot_full_render(self, first_render, wave_data_dict, plot_data_state, plot_data_mol, plot_data_concentration,
-                         n_steps, vessels: vessel.Vessel):
+                         n_steps, vessels: vessel.Vessel, step_num):
         '''
         Method to plot thermodynamic variables and spectral data.
         Plots a significant amount of data for a more in-depth
@@ -1038,9 +946,11 @@ class _Reaction:
         `plot_data_concentration` : `list`
             A list containing the concentration of reactants and products
         `n_steps` : `int`
-            The number of increments into which the action is split.
+            The number of increments into which the action is split
         `vessels` : `vessel.Vessel`
             A vessel containing methods to obtain thermodynamic data
+        `step_num` : `int`
+            The step number the environment is currently on
 
         Returns
         ---------------
@@ -1071,71 +981,90 @@ class _Reaction:
         wave_min = wave_data_dict["wave_min"]
         wave_max = wave_data_dict["wave_max"]
 
-        peak = self.get_spectra_peak(vessels.get_concentration(self.materials))
-        dash_spectra = self.get_dash_line_spectra(vessels.get_concentration(self.materials))
+        peak = CharacterizationBench().get_spectra_peak(vessels, materials=self.materials)
+        dash_spectra = CharacterizationBench().get_dash_line_spectra(vessels, materials=self.materials)
 
         # The first render is required to initialize the figure
         if first_render:
             plt.close('all')
             plt.ion()
-            self._plot_fig, self._plot_axs = plt.subplots(2, 3, figsize=(24, 12))
+            self._plot_fig, self._plot_axs = plt.subplots(3, 3, figsize=(24, 12))
 
             # Time vs. Molar_Amount graph ********************** Index: (0, 0)
-            self._plot_lines_amount = []
+            self._plot_lines_amount = np.zeros((self.n.shape[0],2,20))
             for i in range(self.n.shape[0]):
-                self._plot_lines_amount.append(
-                    self._plot_axs[0, 0].plot(
-                        plot_data_state[0],  # time
-                        plot_data_mol[i],  # mol of species C[i]
-                        label=self.materials[i]  # names of species C[i]
-                    )[0]
+                self._plot_lines_amount[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_amount[i][1][step_num - 1:] = (plot_data_mol[i][0])
+                self._plot_axs[0, 0].plot(
+                    self._plot_lines_amount[i][0],
+                    self._plot_lines_amount[i][1],
+                    label=self.materials[i]
                 )
             self._plot_axs[0, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            # self._plot_axs[0, 0].set_ylim([0.0, np.max(self.nmax)])
+            self._plot_axs[0, 0].set_ylim([0.0, np.mean(plot_data_mol)])
             self._plot_axs[0, 0].set_xlabel('Time (s)')
             self._plot_axs[0, 0].set_ylabel('Molar Amount (mol)')
             self._plot_axs[0, 0].legend()
 
             # Time vs. Molar_Concentration graph *************** Index: (0, 1)
-            self._plot_lines_concentration = []
+            self._plot_lines_concentration = np.zeros((self.n.shape[0],2,20))
+            total_conc = 0
             for i in range(self.n.shape[0]):
-                self._plot_lines_concentration.append(
-                    self._plot_axs[0, 1].plot(
-                        plot_data_state[0],  # time
-                        plot_data_concentration[i],  # concentrations of species C[i]
-                        label=self.materials[i]  # names of species C[i]
-                    )[0]
+                total_conc += plot_data_concentration[i][0]
+            for i in range(self.n.shape[0]):
+                self._plot_lines_concentration[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_concentration[i][1][step_num - 1:] = (plot_data_concentration[i][0])
+                self._plot_axs[0, 1].plot(
+                    self._plot_lines_concentration[i][0],
+                    self._plot_lines_concentration[i][1],
+                    label=self.materials[i]
                 )
+
+                self._plot_axs[2, 0].plot(
+                    self._plot_lines_concentration[i][0],
+                    self._plot_lines_concentration[i][1]/total_conc,
+                    label=self.materials[i]
+                )
+
+
             self._plot_axs[0, 1].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            self._plot_axs[0, 1].set_ylim([
-                0.0, np.max(self.nmax) / (vessels.get_min_volume())
-            ])
+            self._plot_axs[0, 1].set_ylim([0.0, np.mean(plot_data_concentration)])
             self._plot_axs[0, 1].set_xlabel('Time (s)')
             self._plot_axs[0, 1].set_ylabel('Molar Concentration (mol/L)')
             self._plot_axs[0, 1].legend()
 
             # Time vs. Temperature + Time vs. Volume graph *************** Index: (0, 2)
-            self._plot_line_1 = self._plot_axs[0, 2].plot(
-                plot_data_state[0],  # time
-                plot_data_state[1],  # Temperature
+            self._plot_lines_temp = np.zeros((1, 2, 20))
+            self._plot_lines_temp[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_temp[0][1][step_num - 1:] = (plot_data_state[1][0])
+            self._plot_axs[0, 2].plot(
+                self._plot_lines_temp[0][0],
+                self._plot_lines_temp[0][1],
                 label='T'
-            )[0]
-            self._plot_line_2 = self._plot_axs[0, 2].plot(
-                plot_data_state[0],  # time
-                plot_data_state[2],  # Volume
+            )
+            self._plot_lines_vol = np.zeros((1, 2, 20))
+            self._plot_lines_vol[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_vol[0][1][step_num - 1:] = (plot_data_state[2][0])
+            self._plot_axs[0, 2].plot(
+                self._plot_lines_vol[0][0],
+                self._plot_lines_vol[0][1],
                 label='V'
-            )[0]
+            )
             self._plot_axs[0, 2].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
-            self._plot_axs[0, 2].set_ylim([0, 1])
+            self._plot_axs[0, 2].set_ylim([0, 1.2])
             self._plot_axs[0, 2].set_xlabel('Time (s)')
             self._plot_axs[0, 2].set_ylabel('T and V (map to range [0, 1])')
             self._plot_axs[0, 2].legend()
 
             # Time vs. Pressure graph *************** Index: (1, 0)
-            self._plot_line_3 = self._plot_axs[1, 0].plot(
-                plot_data_state[0],  # time
-                plot_data_state[3]  # Pressure
-            )[0]
+            self._plot_lines_pressure = np.zeros((1, 2, 20))
+            self._plot_lines_pressure[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_pressure[0][1][step_num - 1:] = (plot_data_state[3][0])
+            self._plot_axs[1, 0].plot(
+                self._plot_lines_pressure[0][0],
+                self._plot_lines_pressure[0][1],
+                label='V'
+            )
             self._plot_axs[1, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
             self._plot_axs[1, 0].set_ylim([0, vessels.get_pmax()])
             self._plot_axs[1, 0].set_xlabel('Time (s)')
@@ -1152,7 +1081,7 @@ class _Reaction:
                 self._plot_axs[1, 1].plot(wave, spectra, linestyle='dashed')
 
             # include the labelling when plotting spectral peaks
-            for i in range(self.n.shape[0]):
+            for i in range(len(peak)):
                 self._plot_axs[1, 1].scatter(peak[i][0], peak[i][1], label=peak[i][2])
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])
@@ -1170,6 +1099,12 @@ class _Reaction:
             )[0]
             self._plot_axs[1, 2].set_ylim([0, 1])
 
+            self._plot_axs[2, 0].set_xlim([0.0, vessels.get_defaultdt() * n_steps])
+            self._plot_axs[2, 0].set_ylim([0.0, 1.0])
+            self._plot_axs[2, 0].set_xlabel('Time (s)')
+            self._plot_axs[2, 0].set_ylabel('Purity')
+            self._plot_axs[2, 0].legend()
+
             # draw and show the full graph
             self._plot_fig.canvas.draw()
             plt.show()
@@ -1179,29 +1114,57 @@ class _Reaction:
         else:
             # set data for the Time vs. Molar_Amount graph *************** Index: (0, 0)
             curent_time = plot_data_state[0][-1]
-            for i in range(self.n.shape[0]):
-                self._plot_lines_amount[i].set_xdata(plot_data_state[0])
-                self._plot_lines_amount[i].set_ydata(plot_data_mol[i])
 
-                # set data for the Time vs. Molar_Concentration graph *************** Index: (0, 1)
-                self._plot_lines_concentration[i].set_xdata(plot_data_state[0])
-                self._plot_lines_concentration[i].set_ydata(plot_data_concentration[i])
+            # update the lines data
+            total_conc = 0
+            for i in range(self.n.shape[0]):
+                total_conc += plot_data_concentration[i][0]
+            for i in range(self.n.shape[0]):
+                # populate the lines amount array with the updated number of mols
+                self._plot_lines_amount[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_amount[i][1][step_num - 1:] = (plot_data_mol[i][0])
+                self._plot_axs[0,0].lines[i].set_xdata(self._plot_lines_amount[i][0])
+                self._plot_axs[0,0].lines[i].set_ydata(self._plot_lines_amount[i][1])
+
+                # populate the lines concentration array with the updated number of concentration
+                self._plot_lines_concentration[i][0][step_num - 1:] = (plot_data_state[0][0])
+                self._plot_lines_concentration[i][1][step_num - 1:] = (plot_data_concentration[i][0])
+                self._plot_axs[0, 1].lines[i].set_xdata(self._plot_lines_concentration[i][0])
+                self._plot_axs[0, 1].lines[i].set_ydata(self._plot_lines_concentration[i][1])
+
+                self._plot_axs[2, 0].lines[i].set_xdata(self._plot_lines_concentration[i][0])
+                self._plot_axs[2, 0].lines[i].set_ydata(self._plot_lines_concentration[i][1]/total_conc)
 
             # reset each plot's x-limit because the latest action occurred at a greater time-value
             self._plot_axs[0, 0].set_xlim([0.0, curent_time])
             self._plot_axs[0, 1].set_xlim([0.0, curent_time])
 
+            # reset each plot's y-limit in order to fit and show all materials on the graph
+            self._plot_axs[0,0].set_ylim([0.0, np.mean(plot_data_mol)])
+            self._plot_axs[0,1].set_ylim([0.0, np.mean(plot_data_concentration)])
+
             # set data for Time vs. Temp and Time vs. Volume graphs *************** Index: (0, 2)
-            self._plot_line_1.set_xdata(plot_data_state[0])
-            self._plot_line_1.set_ydata(plot_data_state[1])
-            self._plot_line_2.set_xdata(plot_data_state[0])
-            self._plot_line_2.set_ydata(plot_data_state[2])
-            self._plot_axs[0, 2].set_xlim([0.0, curent_time])  # reset xlime since t extend
+            self._plot_lines_temp[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_temp[0][1][step_num - 1:] = (plot_data_state[1][0])
+            self._plot_lines_vol[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_vol[0][1][step_num - 1:] = (plot_data_state[2][0])
+
+            self._plot_axs[0,2].lines[0].set_xdata(self._plot_lines_temp[0][0])
+            self._plot_axs[0,2].lines[0].set_ydata(self._plot_lines_temp[0][1])
+            self._plot_axs[0,2].lines[1].set_xdata(self._plot_lines_vol[0][0])
+            self._plot_axs[0,2].lines[1].set_ydata(self._plot_lines_vol[0][1])
+
+            # reset xlimit since t extend
+            self._plot_axs[0, 2].set_xlim([0.0, curent_time])
 
             # set data for Time vs. Pressure graph *************** Index: (1, 0)
-            self._plot_line_3.set_xdata(plot_data_state[0])
-            self._plot_line_3.set_ydata(plot_data_state[3])
+            self._plot_lines_pressure[0][0][step_num - 1:] = (plot_data_state[0][0])
+            self._plot_lines_pressure[0][1][step_num - 1:] = (plot_data_state[3][0])
+            self._plot_axs[1, 0].lines[0].set_xdata(self._plot_lines_pressure[0][0])
+            self._plot_axs[1, 0].lines[0].set_ydata(self._plot_lines_pressure[0][1])
+
             self._plot_axs[1, 0].set_xlim([0.0, curent_time])  # reset xlime since t extend
+            self._plot_axs[1, 0].set_ylim([0.0, np.max(plot_data_state[3])*1.1])
 
             # reset the Solid Spectra graph
             self._plot_axs[1, 1].cla()
@@ -1215,7 +1178,7 @@ class _Reaction:
                 self._plot_axs[1, 1].plot(wave, item, linestyle='dashed')
 
             # reset the spectra peak labelling
-            for i in range(self.n.shape[0]):
+            for i in range(len(peak)):
                 self._plot_axs[1, 1].scatter(peak[i][0], peak[i][1], label=peak[i][2])
 
             self._plot_axs[1, 1].set_xlim([wave_min, wave_max])

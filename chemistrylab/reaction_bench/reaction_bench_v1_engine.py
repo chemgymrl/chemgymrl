@@ -1,9 +1,24 @@
 """
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 Reaction Bench Engine Class
 
 :title: reaction_bench_v0_engine
 
-:author: Chris Beeler and Mitchell Shahen
+:author: Chris Beeler, Mitchell Shahen and Nicholas Paquin
 
 :history: 21-05-2020
 
@@ -34,13 +49,12 @@ import sys
 sys.path.append("../../")  # to access chemistrylab
 sys.path.append("../reactions/")  # to access all reactions
 from chemistrylab.chem_algorithms.reward import ReactionReward
+from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 from chemistrylab.chem_algorithms import vessel, util
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.reactions.reaction_base import _Reaction
 
-R = 0.008314462618  # Gas constant (kPa * m**3 * mol**-1 * K**-1)
-wave_max = 800
-wave_min = 200
+R = 0.008314462618  # Gas constant (kPa * m**3 * mol**-1 * K**-1)\
 
 
 class ReactionBenchEnv(gym.Env):
@@ -138,7 +152,6 @@ class ReactionBenchEnv(gym.Env):
             materials=input_parameters["materials"],
             solutes=input_parameters["solutes"]
         )
-
         # set up a state variable
         self.state = None
 
@@ -164,7 +177,8 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        absorb = self.reaction.get_spectra(self.vessels.get_concentration(materials=self.reaction.materials))
+        self.char_bench = CharacterizationBench()
+        absorb = self.char_bench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # Observations have several attributes
         # + 4 indicates state variables time, temperature, volume, and pressure
@@ -442,7 +456,7 @@ class ReactionBenchEnv(gym.Env):
                 solute_dict[name] = {}
                 for solvent in solutes:
                     solvent_class = convert_to_class([solvent['Material']])
-                    solute_dict[name][solvent['Material']] = [solvent_class, solvent["Initial"], 'mol']
+                    solute_dict[name][solvent['Material']] = [solvent_class[0], solvent["Initial"], 'mol']
 
         return solute_dict
 
@@ -468,7 +482,6 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
-
         # initialize vessels by providing a empty default vessel or loading an existing saved vessel
         if in_vessel_path is None:
             # prepare the provided materials into a compatible material dictionary
@@ -484,6 +497,7 @@ class ReactionBenchEnv(gym.Env):
                 solutes=solute_dict,
                 default_dt=self.dt
             )
+
         else:
             with open(in_vessel_path, 'rb') as handle:
                 vessels = pickle.load(handle)
@@ -513,7 +527,7 @@ class ReactionBenchEnv(gym.Env):
         V = self.vessels.get_volume()
 
         # acquire the absorption spectra for the materials in the vessel
-        absorb = self.reaction.get_spectra(self.vessels.get_concentration(materials=self.reaction.materials))
+        absorb = self.char_bench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # create an array to contain all state variables
         state = np.zeros(
@@ -575,6 +589,7 @@ class ReactionBenchEnv(gym.Env):
 
         # reset the modifiable state variables
         self.t = 0.0
+        self.step_num = 1
 
         # reinitialize the reaction class
         self.vessels = self._prepare_vessel(in_vessel_path=None, materials=self.initial_materials,
@@ -649,7 +664,7 @@ class ReactionBenchEnv(gym.Env):
         reward = 0.0
 
         # pass the action and vessel to the reaction base class's perform action function
-        self.vessels = self.reaction.perform_action(action, self.vessels, self.n_steps, self.step_num)
+        self.vessels = self.reaction.perform_action(action, self.vessels, self.t, self.n_steps, self.step_num)
 
         # Increase time by time step
         self.t += self.n_steps * self.dt
@@ -723,7 +738,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
-
+        wave_max = self.char_bench.params['spectra']['range_ir'][1]
+        wave_min = self.char_bench.params['spectra']['range_ir'][0]
         # Wavelength array and array length for plotting
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
         absorb = self.state[4 + self.reaction.initial_in_hand.shape[0]:]
@@ -770,6 +786,8 @@ class ReactionBenchEnv(gym.Env):
         ---------------
         None
         """
+        wave_max = self.char_bench.params['spectra']['range_ir'][1]
+        wave_min = self.char_bench.params['spectra']['range_ir'][0]
 
         # define the length of the spectral data array and the array itself
         spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
@@ -805,11 +823,13 @@ class ReactionBenchEnv(gym.Env):
         )
 
         # get the spectral data peak and dashed spectral lines
-        peak = self.reaction.get_spectra_peak(
-            self.vessels.get_concentration(materials=self.reaction.materials)
+        peak = self.char_bench.get_spectra_peak(
+            self.vessels,
+            materials=self.reaction.materials
         )
-        dash_spectra = self.reaction.get_dash_line_spectra(
-            self.vessels.get_concentration(materials=self.reaction.materials)
+        dash_spectra = self.char_bench.get_dash_line_spectra(
+            self.vessels,
+            materials=self.reaction.materials
         )
 
         # The first render is required to initialize the figure

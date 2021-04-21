@@ -1,4 +1,19 @@
 """
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
 File to specify the parameters required to instruct reaction_base.py to perform the
 chloro-wurtz reactions
 """
@@ -31,7 +46,7 @@ DESIRED = "dodecane"
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin
-Vi = 0.002 # in Litres
+Vi = 1 # in Litres
 
 # additional vessel parameters
 dt = 0.01
@@ -39,8 +54,9 @@ Tmin = 250.0
 Tmax = 500.0
 dT = 50.0
 Vmin = 0.001
-Vmax = 0.005
-dV = 0.0005
+Vmax = 2
+dV = 0.005
+
 
 # add the arrays containing rate calculation parameters; these include:
     # the activation energies for each reaction (6x1 array)

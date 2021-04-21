@@ -1,3 +1,19 @@
+"""
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+"""
 import numpy as np
 import gym
 import math
@@ -222,8 +238,6 @@ class Extraction:
                 d_volume = 0.05 * multiplier
                 event = ['pour by volume', vessels[0], d_volume]
                 reward = ext_vessel.push_event_to_queue(events=[event], dt=self.dt)
-                event_2 = ['fully mix']
-                vessels[0].push_event_to_queue(events=None, feedback=[event_2], dt=0)
                 vessels[1].push_event_to_queue(dt=self.dt)
                 vessels[2].push_event_to_queue(dt=self.dt)
         elif 8 == int(action[0]):  # wait

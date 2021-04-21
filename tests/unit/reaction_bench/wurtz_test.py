@@ -1,3 +1,19 @@
+"""
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+"""
 import unittest
 import sys
 sys.path.append('../../../')
@@ -69,6 +85,35 @@ class DecompositionTestCase(unittest.TestCase):
         self.assertIn('1-chlorohexane', env.vessels.get_material_dict())
         self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
         self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
+
+    def test_full_render(self):
+        env = gym.make(ENV_NAME)
+        state_before = env.reset()
+        env.render(mode="full")
+        action = np.ones(env.action_space.shape)
+        action[0] = 1 / 2
+        action[1] = 1 / 2
+        env.step(action)
+        self.assertIn('Na', env.vessels.get_material_dict())
+        self.assertIn('1-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
+        env.render(mode="full")
+
+    def test_human_render(self):
+        env = gym.make(ENV_NAME)
+        state_before = env.reset()
+        env.render()
+        action = np.ones(env.action_space.shape)
+        action[0] = 1 / 2
+        action[1] = 1 / 2
+        env.step(action)
+        self.assertIn('Na', env.vessels.get_material_dict())
+        self.assertIn('1-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('2-chlorohexane', env.vessels.get_material_dict())
+        self.assertIn('3-chlorohexane', env.vessels.get_material_dict())
+        env.render()
+
 
 
 if __name__ == '__main__':

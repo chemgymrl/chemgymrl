@@ -1,3 +1,19 @@
+"""
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+"""
 import numpy as np
 import gym
 import gym.spaces
@@ -34,11 +50,10 @@ material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
 
 event_1 = ['update material dict', material_dict]
 event_2 = ['update solute dict', solute_dict]
-event_3 = ['fully mix']
 
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_1], dt=0)
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_2], dt=0)
-extraction_vessel.push_event_to_queue(events=None, feedback=[event_3], dt=0)
+extraction_vessel.push_event_to_queue(events=None, feedback=None, dt=-100000)
 
 
 class ExtractWorld_MethylRed(ExtractBenchEnv):
