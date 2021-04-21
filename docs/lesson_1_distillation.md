@@ -2,6 +2,8 @@
 
 ## Distillation Bench: Lesson 1
 
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/notebook_lesson1d.ipynb) to the jupyter notebook, please use it at your pleasure.
+
 ### Familiarizing Actions for the Distillation Bench
 
 In this tutorial, we will be going through how the distillation environment works. We will be using the boil vessel method in `distillation_bench_v1.py` in order to generate an input boiling vessel for our distillation bench to use.
