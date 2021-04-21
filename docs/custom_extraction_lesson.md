@@ -76,11 +76,12 @@ material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
 # Here we push events that update the material dictionary, solute dictionary and then mix all of the materials together
 event_1 = ['update material dict', material_dict]
 event_2 = ['update solute dict', solute_dict]
-event_3 = ['fully mix']
+event_3 = [None]
 
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_1], dt=0)
 extraction_vessel.push_event_to_queue(events=None, feedback=[event_2], dt=0)
-extraction_vessel.push_event_to_queue(events=None, feedback=[event_3], dt=0)
+# fully mixing the vessel
+extraction_vessel.push_event_to_queue(events=None, feedback=[event_3], dt=-100000)
 
 # Here is our initialization of the extraction bench environment
 # Make sure to give it a unique name and specify the correct extraction bench that we have defined above
