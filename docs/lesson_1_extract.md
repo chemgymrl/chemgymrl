@@ -103,9 +103,10 @@ we take in between each action. Now that we have a better idea of our action spa
 environment. As stated earlier we need to use oil to extract the sodium from the water, but if we look at the graph now,
 we can clearly see that there is no oil in the container, so let's add some!
 
-![pouring](../tutorial_figures/extraction-lesson-1/pouring.png)
+![pouring](https://www.wannapik.com/media/W1siZiIsIjIwMTYvMDgvMjIvNXVhOHpnb3Rmd183cGhoODRvcDJnX3Blb3AyODU2LnBuZyJdXQ/6e0ba1585cde8e71/7phh84op2g_peop2856.png)
 
-<a style="font-size: 10px">(source: https://www.shutterstock.com/video/clip-4620521-pouring-liquid-science-beaker)</a>
+<a style="font-size: 10px">(source: https://www.wannapik.com/ author: WannapikStudio)</a>
+
 
 ![image of graphs with added oil](../tutorial_figures/extraction-lesson-1/oil_and_water_1.png)
 
@@ -128,9 +129,9 @@ total_reward += reward
 Now that we've added the oil we need to mix the vessel to get the sodium to transfer into the oil, so let's mix the
 vessel!As seen in the graph below we can see that based on the layer representation that we have mixed the oil and the water.
 
-![image of command](../tutorial_figures/extraction-lesson-1/mixing.png)
+![stirring](https://upload.wikimedia.org/wikipedia/commons/3/32/Magnetic_Stirrer.JPG)
 
-<a style="font-size: 10px">(source: https://www.dreamstime.com/royalty-free-stock-photography-mixing-chemicals-image10434567#res26615551)</a>
+<a href="https://commons.wikimedia.org/wiki/File:Magnetic_Stirrer.JPG">User:Ruhrfisch</a>, <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>, via Wikimedia Commons
 
 ![image of graphs mixed](../tutorial_figures/extraction-lesson-1/oil_and_water_2.png)
 
@@ -148,9 +149,9 @@ total_reward += reward
 Now that we have done some mixing we need to wait for the oil to settle to the top of the water so we can drain the
 water. Keep repeating the following command until the graph settles.
 
-![image of command](https://media.sciencephoto.com/image/c0119092/800wm)
+![beakers distilled](https://snappygoat.com/b/60fdba1753ca3da1929058cf221c8dcd10edbb70)
 
-<a style="font-size: 10px">(source: https://media.sciencephoto.com/image/c0119092/800wm)</a>
+<a style="font-size: 10px">(source: https://snappygoat.com)</a>
 
 ![image of graphs waiting ](../tutorial_figures/extraction-lesson-1/oil_and_water_3.png)
 
@@ -196,7 +197,9 @@ total_reward += reward
 
 Now we pour the oil into vessel 2.
 
-![image of command](https://ak.picdn.net/shutterstock/videos/4620521/thumb/4.jpg)
+![pouring](https://www.wannapik.com/media/W1siZiIsIjIwMTYvMDgvMjIvNXVhOHpnb3Rmd183cGhoODRvcDJnX3Blb3AyODU2LnBuZyJdXQ/6e0ba1585cde8e71/7phh84op2g_peop2856.png)
+
+<a style="font-size: 10px">(source: https://www.wannapik.com/ author: WannapikStudio)</a>
 
 ![image of graphs pouring](../tutorial_figures/extraction-lesson-1/oil_water_6.png)
 
