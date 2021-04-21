@@ -3,7 +3,11 @@
 ## Quick Start
 
 For this quick start guide we will run through the Lab Manager demo as seen in this 
-[video](https://www.youtube.com/watch?v=Oy5dHE1rRKU&t=137s&ab_channel=NicholasPaquin)
+[video](https://youtu.be/HJtxiDbloUQ)
+
+<div style="text-align: center; margin-bottom: 2em;">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HJtxiDbloUQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 
 To follow along with the video and test all the actions for yourself simply run the following commands `./chemgymrl`
 

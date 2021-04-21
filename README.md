@@ -1,144 +1,106 @@
-# chemistrygym
+# ChemGymRL
 
-[![Build Status](https://travis-ci.com/chemgymrl/chemgymrl.svg?branch=master)](https://travis-ci.com/chemgymrl/chemgymrl)
+[![Build Status](https://travis-ci.com/chemgymrl/chemgymrl.svg?branch=main)](https://travis-ci.com/chemgymrl/chemgymrl)
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://chemgymrl.readthedocs.io/en/latest/)
 
+## Overview
 
-A  chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the OpenAI Gym environment framework for use with reinforcement learning applications.
+ChemGymRL is a collection of reinforcement learning environments in the open AI standard which are designed for experimentation and exploration with reinforcement learning in the context of chemical discovery. These experiments are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry.
 
-## Data Structure
-volume: ml, amount: mole
+ChemGymRL simulates real-world chemistry experiments by allocating agents to benches to perform said experiments as dictated by a lab manager who has operational control over all agents in the environment. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
 
 ### Bench Overview
-The chemistrygym environment has three benches available: the reaction bench, the extraction bench, and the distillation bench. The reaction bench performs a series of reactions in a single vessel, the extraction bench moves materials between a series of vessels, and the distillation bench evaporates and isolates individual materials. Each bench utilizes vessels to contain materials and perform processes on the vessels. The reaction bench uses a single vessel while the extraction and distillation benches each use three vessels. Upon completing a bench, the final vessel(s), the vessel(s) containing the desired material or is of the most value, is(are) saved locally as a pickle file. Each bench can be initiated with an empty vessel(s) or be provided with a vessel(s) from previously completed benches. For the purposes of creating a realistic experiment, the workflow is intended to be the following.
 
-reaction bench --> extraction bench --> distillation bench
+The ChemGymRL environment consists of four benches and a lab manager tasked with organizing the experimentation occurring at each bench. The four benches available to agents under the direction of the lab manager include: the reaction bench, the extraction bench, the distillation bench, and the characterization bench.
 
-Firstly, a series of reactions are performed in a reaction vessel and one material is designated as the "desired material". The reaction vessel is then saved and uploaded into the extraction bench. The extraction bench introduces at least one solute to allow for the individual movement of materials between three vessels. Any number of the final extraction vessels are saved and uploaded into the distillation bench. Note: more than one final extraction vessel may be of interest (ie. contains some amount of the desired material), but only one vessel can be loaded into the distillation bench at one time. The distillation bench applies heat energy to the uploaded vessel until a material begins to boil off into a secondary beaker and once the material has been completely boiled off that material is drained into a tertiary vessel. This process is repeated until the desired material has been completely isolated in its own vessel at which point the vessel is saved as it has 100% purity of the desired material.
+#### Reaction Bench
+
+The reaction bench is intended to receive an input vessel container and perform a series of reactions on the materials in that vessel, step-by-step, in the aim to yield a sufficient amount of a desired material. After performing sufficiently many reactions to acquire the desired material, the reaction bench outputs a vessel containing materials, including reactants and products in some measure, that may be operated on in subsequent benches.
+
+#### Extraction Bench
+
+The extraction bench aims to isolate and extract certain materials from an inputted vessel container containing multiple materials. This is done by means of transferring materials between a number of vessels and utilizing specifically selected solutes to demarcate and separate materials from each other. The intended output of this bench is at least one beaker, each containing a desired material in quantities that exceed a minimum threshold.
+
+#### Distillation Bench
+
+The distillation bench provides another set of experimentation aimed at isolating a requested desired material. Similar to the reaction and extraction benches, a vessel containing materials including the desired material is required as input into this bench. The distillation bench utilizes the differing boiling points of materials in the inputted vessel to separate materials between vessels. The intended output from the distillation bench is a vessel containing a sufficiently high purity and amount of the requested desired material.
+
+#### Characterization Bench
+
+The characterization bench is the primary method in which an agent or lab manager can look inside vessel containers. The characterization bench does not manipulate the inputted vessel in any way, yet subjects it to analysis techniques that observe the state of the vessel including the materials inside it and their relative quantities. This allows an agent or lab manager to observe vessels, determine their contents, and allocate the vessel to the necessary bench for further experimentation.
+
+#### Lab Manager
+
+The lab manager acts as another agent in the ChemGymRL environment, yet the lab manager’s task is to organize and dictate the activity of bench agents, input and output vessels, benches, and bench environments.
 
 ### Reward Function
-The reward function is crucial such that it is how the agents determine which actions are seen as positive and which actions are seen as negative. The current hierarchy of positive states has the amount of desired material present be of greater importance compared to the number of vessels containing the desired material. That being said, vessels containing of purity of less than 20%, with respect to the desired material, are considered unfit for continuation. For example, if extraction bench yields a vessel with 50% purity and another vessel with 10% purity, the vessel with 50% purity exceeds the purity requirement and is exempt from further actions in the extraction bench, while the vessel with 10% purity must still undergo extraction bench actions to increase the purity above the required purity threshold of 20%.
+
+The reward function is crucial such that it is how the agents determine which actions are seen as positive and which actions are seen as negative. The current hierarchy of positive states has the amount of desired material present be of greater importance compared to the number of vessels containing the desired material. That being said, vessels containing of purity of less than 20%, with respect to the desired material, are considered unfit for continuation. For example, suppose performing actions in the extraction bench yields a vessel with 50% purity and another vessel with 10% purity. The purity threshold is arbitrary, so, for the sake of this example, let's suppose the purity threshold is set at 20%. The vessel with 50% purity exceeds the purity requirement and is exempt from further actions in the extraction bench, however the vessel with 10% purity must still undergo extraction bench actions to increase it's purity to the required 20%.
 
 ### Vessel
-Important Variables |Structure | Description
----|---|---
-_material_dict|{'material.name': [material(), amount], ...}|a dictionary holding all the material inside this vessel
-_solute_dict|{'solute.name': {solvent.name: amount, ...}, ...}|dictionary that represents the solution
-_event_dict|{'function name': function}|a dictionary holds the event functions of a vessel
-_event_queue|[['event', parameters], ['event', parameters] ... ]|a queue of events to be performed by vessel
-_feedback_queue|[['event', parameters], ['event', parameters] ... ]|a queue holding collected feedback from materials and unfinished events
 
-#### An example of _material_dict and _solute_dict
-(vessel with Na and Cl dissolved in H2O and C6H14)
-```bash
-H2O = material.H2O()
-C6H14 = material.C6H14()
-Na = material.Na()
-Cl = material.Cl()
-
-Na.set_charge(1.0)
-Na.set_solute_flag(True)
-Cl.set_charge(-1.0)
-Cl.set_solute_flag(True)
-
-material_dict = {'H2O': [H2O, 100], 'C6H14': [C6H14, 100], 'Na': [Na, 1.0], 'Cl': [Cl, 1.0]}
-solute_dict = {'Na': {'H2O': 0.5, 'C6H14': 0.5}, 'Cl': {'H2O': 0.5, 'C6H14': 0.5}}
-```
-
-Important functions | Description
----|---
-push_event_to_queue()|used to pass event into the vessel
-_update_materials()|automatically called by push_event_to_queue(), execute events in _event_queue and _feedback_queue
-_merge_event_queue()|merge the feedback_queue passed in, and all the default events (switches) are appended to _feedback_queue by this function
+The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc.
 
 #### The Workflow
   
-  1. Agent choose action from the action space of an environment.
-  2. The environment does the calculation and update and generate events.
-  3. At the end of each action, if the action affect a vessel, use push_event_to_queue() to push the event into the vessel, if no event generated, call the function with events=None.
-  4. With push_event_to_queue() called, events are pushed into the vessel.
-  5. _update_materials is automatically called and perform events in the events_queue.
-  6. Each event has a corresponding event function, it first update properties of the vessel, then loop over the materials inside the vessel by calling the corresponding event functions of each material.
-  7. The materials' event function will return feedback by calling the push_event_to_queue(), which contains feedback and unfinished event 
-  8. The returned feedback is added to the _feedback_queue
-  9. The the _merge_event_queue() is called on _feedback_queue, which merge the events in the feedback_queue to generate a merged_queue and add default event into it, then empty the _feedback_queue
-  10. Then the merged_queue will be executed and new feedback are collected and added to _feedback_queue, which will be executed with the next action. 
+  1. Instruct the lab manager to acquire a desired material
+  2. The lab manager assigns a vessel and an agent to carry out reactions in the reaction bench
+  3. The reaction bench agent performs actions on the vessel generating products including the desired material
+  4. The agent gives the resulting vessel to the lab manager
+  5. The lab manager analyzes the vessel in the characterization bench determining its contents
+  6. Verifying that the vessel contains some of the desired material, the lab manager assigns another agent and the vessel to the extraction bench to isolate the material in high quantities
+  7. The extraction bench agent performs actions on the vessel moving its contents between many vessels sequentially isolating the desired material in greater quantities
+  8. The extraction bench agent gives the resulting vessel(s) to the lab manager
+  9. The lab manager analyzes in the characterization bench determining its contents and quantities
+  10. The lab manager selects the vessel with the highest quantity of the desired material and assigns it and an agent to the distillation bench to extract the desired material
+  11. The distillation bench agent performs operations on the vessel to heat and boil off materials from the vessel into ancillary vessels
+  12. The distillation bench agent passes the resulting vessel to the lab manager
+  13. The lab manager subjects the vessel to the characterization bench once again determining its contents
+  14. If the lab manager is satisfied that the desired material has been sufficiently isolated, the lab manager concludes the experiment
 
-#### Event Functions
-Function Name|Description
----|---
-'pour by volume'|Pour from self vessel to target vessel by certain volume
-'drain by pixel|Drain from self vessel to target vessel by certain pixel
-'fully mix'|Shake self vessel to fully mix
-'update material dict'|Use input to update self vessel's material_dict
-'update solute dict'|Use input to update self vessel's solute_dict
-'mix'|Shake vessel of let vessel settle
-'update_layer'|Update self vessel's layer representation
+### Supported Materials
 
-### Material
+All the materials supported by the environments will be located in `../chemistrylab/chem_algorithms/material.py`. This file contains the material class where materials and their properties can be defined. There are numerous, already defined materials, available for use. These materials contains properties including the name, density, polarity, boiling point, melting point, specific heat, enthalpy of vapor, enthalpy of fusion, and many more. The material properties are listed to be consistent and the intended units are included in the file's docstring.
 
-Properties|Description
----|---
-name|Name of the material
-density|Density of the material, g/mL
-polarity|Polarity of the material
-temperature|Temperature of the material, K
-pressure|Pressure of the material, kPa
-phase|Phase of the material (g, l, s)
-charge|Charge of the material
-molar_mass|Molar mass of the material, g/mol
-color|A unique float number between 0 to 1 to represent the color of the the material, used in layer representation
-solute|A flag showing if it's the solute in vessel (True/False)
-solvent|A flag showing if it's the solvent in vessel (True/False)
-index|A integer number, unique for each material, used to fix the location of the material in state (matrix)
+If you need to add any materials, it is quite easy to do so as most properties are relative straightforward to add. It's important to note that when adding spectra you will need to add the desired spectrum to the `../chemistrylab/ode_algorithms/spectra/diff_spectra.py` file so that the material class can access it from there.
+
+### Expected Output
+
+At the end of an experiment, the user can expect to receive a vessel containing the requested desired material. Such a vessel is stored locally as a pickle file. Additionally, a detailed log message will appear including the final cumulative reward supplied to the lab manager, the purity of the desired material in the output vessel and plots displaying the contents of the vessel and the vessel spectra. Since the outputted vessel is made available to the user, they have the option of performing their own analysis and operations on the vessel with the ChemGymRL environment or subject the vessel to another experiment.
+
+### Installation
+
+#### Clone Repository:
+
+The first step of the install process is to clone the repository, that can be done using the following command line
+instructions:
+```commandline
+cd path/to/desired/install/location
+git clone https://github.com/chemgymrl/chemgymrl.git
+```
+now that the repo has been installed we need to enter into the repository:
+
+```commandline
+cd chemgymrl
+```
+
+#### Python Virtual Environment:
+
+ChemGymRL is set to use python 3, and more specifically python 3.8. The first step of this next part is to install
+[python](https://python.org), if you already have python then the next step is to create a virtual environment using
+your favourite virtual environment tool. In this tutorial we will use virtualenv, but anaconda works as well. The next
+steps will show you how to create and activate the correct virtual environment:
+
+```commandline
+python3.8 -m venv chemgymrl
+source chemgymrl/bin/activate
+```
+
+Now that the virtual environment is created and activated we will now look to install all the correct packages.
+
+#### Install Library:
+Now that everything is set up we simply seed to install the library.
  
-
-### Util Functions
-Function|Description
----|---
-convert_material_dict_to_volume|Convert the input material_dict to a dictionary of {material's name: volume}
-convert_volume_to_mole|Handy function to calculate mole
-organize_material_dict|Organize the input material_dict, called by update_material_dict()
-organize_solute_dict|Organize the input solute_dict, called by update_solute_dict()
-check_overflow|Check if there's overflow, and calculate what remains in the vessel (always call it before push new material_dict and solute_dict to target vessel)
-generate_state|generate the state representation from a list of vessels
-
-### State Structure
-Each vessel has three matrices to represent the state:
-
-[material_dict_matrix, solute_dict_matrix, layer_vector]
-
-**material_dict_matrix (number of available material * 10):**
-
--|Density|Polarity|Temperature|Pressure|Solid Flag|Liquid Flag|Gas Flag|Charge|Molar Mass|Amount
----|---|---|---|---|---|---|---|---|---|---
-Air|
-H2O|
-H|
-H2|
-.|
-.|
-.|
-
-**solute_dict_matrix (number of available material * number of available material):**
-
-Each cell means how much of that solute (row) dissolved in that solvent (column)
-
--|Air|H2O|H|H2|.|.|.
----|---|---|---|---|---|---|----
-Air|
-H2O|
-H|
-H2|
-.|
-.|
-.|
-
-**layer_vector (1 * number of pixel):**
-
-acquired form vessel.get_layers()
-
-## To install:
-```bash
-pip install ./
+```commandline
+pip install .
 ```
