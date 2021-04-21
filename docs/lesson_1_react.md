@@ -110,9 +110,9 @@ action vector of:
 |-------------|--------|----------------|----------------|----------------|-----|
 | 1         | 1/2    | 1            | 0            | 0            | 1 |
 
-![image of reaction](https://image1.masterfile.com/getImage/NjQwLTAzMjU4NDA1ZW4uMDAwMDAwMDA=ANb9FF/640-03258405en_Masterfile.jpg)
+![image of reaction](https://www.wannapik.com/media/W1siZiIsIjIwMTYvMDgvMjIvNXVhOHpnb3Rmd183cGhoODRvcDJnX3Blb3AyODU2LnBuZyJdXQ/6e0ba1585cde8e71/7phh84op2g_peop2856.png)
 
-<a style="font-size: 10px">(source: https://image1.masterfile.com/getImage/NjQwLTAzMjU4NDA1ZW4uMDAwMDAwMDA=ANb9FF/640-03258405en_Masterfile.jpg)</a>
+<a style="font-size: 10px">(source: https://www.wannapik.com/ author: WannapikStudio)</a>
 
 Then at every next step we are going to keep the solvent volume constant and increase the temperature
 
@@ -120,9 +120,9 @@ Then at every next step we are going to keep the solvent volume constant and inc
 |-------------|--------|----------------|----------------|----------------|-----|
 | 1         | 1/2    | 0            | 0            | 0            | 0 |
 
-![heating up vessel](https://media.sciencephoto.com/image/c0150431/800wm)
+![heating up vessel](https://live.staticflickr.com/3025/2760845690_b11135d74f_b.jpg)
 
-<a style="font-size: 10px">(source: https://media.sciencephoto.com/image/c0150431/800wm)</a>
+<a style="font-size: 10px">(source: https://www.flickr.com/photos/exquisitur/2760845690 Author: Jason Hickey)</a>
 
 To see this in action simply run the following code cell:
 
