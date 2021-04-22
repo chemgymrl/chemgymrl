@@ -131,7 +131,7 @@ vessel! As seen in the graph below we can see that based on the layer representa
 
 ![stirring](https://upload.wikimedia.org/wikipedia/commons/3/32/Magnetic_Stirrer.JPG)
 
-<a href="https://commons.wikimedia.org/wiki/File:Magnetic_Stirrer.JPG">User:Ruhrfisch</a>, <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>, via Wikimedia Commons
+<a style="font-size: 10px" href="https://commons.wikimedia.org/wiki/File:Magnetic_Stirrer.JPG">User:Ruhrfisch</a>, <a style="font-size: 10px" href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> <a style="font-size: 10px">, via Wikimedia Commons</a>
 
 ![image of graphs mixed](../tutorial_figures/extraction-lesson-1/oil_and_water_2.png)
 
