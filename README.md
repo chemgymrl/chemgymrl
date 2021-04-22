@@ -5,15 +5,15 @@
 
 ## Overview
 
-Check out our [website](https://chemgymrl.com)
+Check out our website at [chemgymrl.com](https://chemgymrl.com)
 
 ChemGymRL is a collection of reinforcement learning environments in the open AI standard which are designed for experimentation and exploration with reinforcement learning in the context of chemical discovery. These experiments are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry.
 
-ChemGymRL simulates real-world chemistry experiments by allocating agents to benches to perform said experiments as dictated by a lab manager who has operational control over all agents in the environment. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
+ChemGymRL simulates real-world chemistry experiments by allocating agents to benches to perform said experiments as dictated by a lab manager who has operational control over all agents in the environment. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents. For more information, visit our documentation at [https://chemgymrl.readthedocs.io/en/latest/](https://chemgymrl.readthedocs.io/en/latest/).
 
 ### Bench Overview
 
-The ChemGymRL environment consists of four benches and a lab manager tasked with organizing the experimentation occurring at each bench. The four benches available to agents under the direction of the lab manager include: the reaction bench, the extraction bench, the distillation bench, and the characterization bench.
+The ChemGymRL environment consists of four benches and a lab manager tasked with organizing the experimentation occurring at each bench. The four benches available to agents under the direction of the lab manager include: the reaction bench, the extraction bench, the distillation bench, and the characterization bench. For more information about these benches, be sure to check out our documentation [here](https://chemgymrl.readthedocs.io/en/latest/).
 
 #### Reaction Bench
 
@@ -41,7 +41,7 @@ The reward function is crucial such that it is how the agents determine which ac
 
 ### Vessel
 
-The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc.
+The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc. For more information about the vessel class, make sure to check out our documentation at [https://chemgymrl.readthedocs.io/en/latest/vessel_lesson/](https://chemgymrl.readthedocs.io/en/latest/vessel_lesson/)
 
 #### The Workflow
   
@@ -68,7 +68,8 @@ If you need to add any materials, it is quite easy to do so as most properties a
 
 ### Expected Output
 
-At the end of an experiment, the user can expect to receive a vessel containing the requested desired material. Such a vessel is stored locally as a pickle file. Additionally, a detailed log message will appear including the final cumulative reward supplied to the lab manager, the purity of the desired material in the output vessel and plots displaying the contents of the vessel and the vessel spectra. Since the outputted vessel is made available to the user, they have the option of performing their own analysis and operations on the vessel with the ChemGymRL environment or subject the vessel to another experiment.
+At the end of an experiment, the user can expect to receive a vessel containing the requested desired material. Such a vessel is stored locally as a pickle file. Additionally, a detailed log message will appear including the final cumulative reward supplied to the lab manager, the purity of the desired material in the output vessel and plots displaying the contents of the vessel and the vessel spectra. Since the outputted vessel is made available to the user, they have the option of performing their own analysis and operations on the vessel with the ChemGymRL environment or subject the vessel to another experiment. For more information about the input of every individual bench, you can check out the documentation at [https://chemgymrl.readthedocs.io/en/latest/](https://chemgymrl.readthedocs.io/en/latest/).
+
 
 ### Installation
 
