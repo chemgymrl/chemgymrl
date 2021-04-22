@@ -2,7 +2,7 @@
 
 # Distillation Bench: Lesson 2
 
-Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/notebook_lesson_2d.ipynb) to the jupyter notebook, please use it at your pleasure.
+Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/notebook_lesson2d.ipynb) to the jupyter notebook, please use it at your pleasure.
 
 ### Getting a High Reward in the Distillation Bench
 
