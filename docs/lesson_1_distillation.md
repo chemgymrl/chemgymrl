@@ -10,7 +10,7 @@ In this tutorial, we will be going through how the distillation environment work
 
 It is important to know that normally, before running the distillation bench, you must first complete both reaction and extraction in order to follow the workflow our environments. To find out more, take a look at our [documentation](https://chemgymrl.readthedocs.io/en/latest/WhatIsChemGymRL/)
 
-Before we start talking about loading and running the environment, let's first familiarize ourselves with what's actually going on in the experiment.
+Before we start talking about loading and running the environment, let's first familiarize ourselves with what's actually going on in the experiment. More details on the distillation process can be found in the [distillation page](https://chemgymrl.readthedocs.io/en/latest/distillation/)
 
 ### Distillation Process Explained
 
@@ -46,8 +46,6 @@ the condensation vessel is empty, the boiling vessel's temperature can then be r
 <a style="font-size: 10px">(source: https://thenounproject.com/term/water-evaporate/1639425/.)</a>
 
 The process is repeated until the desired material has been completely evaporated from the boiling vessel into  condensation vessel. From this point on the desired material is completely isolated and we obtain a hopefully pure sample. We can then choose to end the experiment.
-
-In [lesson 3](https://chemgymrl.readthedocs.io/en/latest/lesson_3_distillation/) in these sets of tutorial for the distillation bench, we will try to get a high reward by obtaining a high molar amount of pure dodecane in our condensation vessel. 
 
 For this tutorial, we will just familiarize ourselves with the basic actions, fundamental theory behind distillation, and how you can run the environment on your own!
 
@@ -87,7 +85,7 @@ sys.path.append("../chemistrylab/reactions") # to access all reactions
 import chemistrylab 
 ```
 
-We can see all the possible variations of the distillation bench environment which can vary depending on the input vessel (in this case the `test_extract_vessel.pickle`), which is loaded into the boil vessel, as well as the target material. In this and following tutorials our target material will be dodecane
+We can see all the possible variations of the distillation bench environment which can vary depending on the input vessel, in this case the generated boil vessel method, as well as the target material. In this and following tutorials our target material will be dodecane.
 
 
 ```python
@@ -119,11 +117,11 @@ print('\n')
 
 Here we have the different possible actions that we can take with the environment. The **action_set is an array indexed correspondingly to the action we want to perform.**
 
-The action_space is a multidiscrete action space of shape [4 10].
+The action_space is a multidiscrete action space of shape [5 10].
 
 **The first index allows us to choose from the action set. The second index allows us to pick a multiplier that will affect the action variably depending on our chosen multiplier.**
 
-For example, the following pair of numbers will add a great amount of heat compared to a multiplier of 6. 
+For example, the following pair of numbers will add a great amount of heat compared to a multiplier of 600. 
 
 Action: 0
 
