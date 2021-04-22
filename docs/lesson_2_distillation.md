@@ -6,7 +6,7 @@ Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebo
 
 ### Getting a High Reward in the Distillation Bench
 
-In this tutorial we will talk about getting a high reward in the distillation bench. An in depth explanation of the distillation process is explained in [Distillation Bench: Lesson 1](https://chemgymrl.readthedocs.io/en/latest/lesson_1_distillation/).
+In this tutorial we will talk about getting a high reward in the distillation bench. An in depth explanation of the distillation process is explained in [Distillation Bench: Lesson 2](https://chemgymrl.readthedocs.io/en/latest/lesson_1_distillation/).
 
 Essentially what we're trying to do is isolate our targeted material into the condensation vessel. We want to get a pure and high molar amount of it in this vessel.
 
@@ -16,7 +16,7 @@ In this tutorial we will be trying to get a high reward by targeting our desired
 
 <a style="font-size: 10px">(source: https://pixabay.com/vectors/beaker-bubbles-chemistry-reaction-160528/)</a>
 
-Then we will dump all the contents currently in beaker 1, which are not dodecane into beaker 2. Finally we will heat up boiling vessel even more to exceed dodecane's boiling temperature thus boiling it into beaker 1. This will allow us to have a beaker that is mostly dodecane thus getting us a high reward.
+Then we will dump all the contents currently in beaker 1, which are not dodecane into beaker 2. Finally we will heat up boiling vessel even more to exceed dodecane's boiling temperature thus boiling it from the boiling vessel into beaker 1. This will allow us to have a beaker that is mostly dodecane thus getting us a high reward.
 
 Before we start the tutorial please go into the distillation_bench folder and check the `distillation_bench_v1.py` file. You'll notice that there is the class:
 
