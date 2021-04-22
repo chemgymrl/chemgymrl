@@ -20,7 +20,7 @@ From lesson 1 we know that our action space is a 6 element vector represented by
 
 |              | Temperature | Volume | 1-chlorohexane | 2 chlorohexane | 3-chlorohexane | Na  | 
 |--------------|-------------|--------|----------------|----------------|----------------|-----|
-| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1|
+| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            |0-1  |
 
 Each index corresponds to the following label and how we change them. For example is action[0] = 0 then the temperature will decrease by dt.
 If it is set to 0.5 then it will stay the same and if set to 1 then the temperature will increase by dt.
