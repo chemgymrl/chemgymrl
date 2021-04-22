@@ -14,7 +14,7 @@ In this lesson we will try to get a high reward in the reaction of the form abov
 
 We will try to get the desired material: 4,5-diethyloctane
 
-In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions file. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v2`
+In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions directory. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v2`. The main difference between this reaction file and the one used in lesson 1 is that this file's target material is 4,5-diethyloctane instead of dodecane.
 
 From lesson 1 we know that our action space is a 6 element vector represented by:
 
@@ -59,7 +59,7 @@ env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
 ```
 
-This explains the simulated reaction we are trying to simulate and is initializing the reaction environment.
+This explains the reaction we are trying to simulate and is initializing the reaction environment.
 
 
 ```python
@@ -101,7 +101,7 @@ action = np.ones(env.action_space.shape)
 
 The key to achieving a high reward in this simulation is to only add the reactants that are needed for the reaction to 
 continue. This means that we will only add 3-chlorohexane and Na with our actions. This will allow us to maximize our 
-reward as a large quantity of these reactants means the reaction with our target material will occur more often. We 
+reward. A large quantity of these reactants means the reaction with our target material will occur more often. We 
 do this by running the following commands:
 
 ```python
@@ -114,7 +114,7 @@ if total_steps  < 20:
     action[5] = 1    # Na
 ```
 
-Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane
+Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane and Na.
 
 ![reaction](https://cdn.pixabay.com/photo/2012/04/02/13/57/chemical-reaction-24562__340.png)
 
@@ -171,7 +171,7 @@ while not done:
     reactant_2.append(env.state[7])
 ```
 
-Notice that we get a total reward of 2.45. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
+Notice that we get a high total reward. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
 ![subplot](../tutorial_figures/reaction-lesson-2/subplots.png)
 
@@ -253,6 +253,6 @@ action[2] = 1
 action[3] = 1
 ```
 
-If we run this code we'll notice that our reward is significantly lower. It is now only 1.06 which is a drop-off from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. 
+If we run this code we'll notice that our reward is significantly lower. It is a significant drop-off from the reward we get from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. This is because we add additional reactants such as 1-chlorohexane and 2-chlorohexane.
 
 The next step for this reaction environment is to write an RL implementation that will allow the agent to solve this problem for you essentially maximizing our output of the desired material! 
