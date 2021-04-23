@@ -22,7 +22,8 @@ Available Actions for this Distillation Experiment:
 0: Add/Remove Heat (Heat value multiplier, relative of maximal heat change)
 1: Pour BV into B1 (Volume multiplier, relative to max_vessel_volume)
 2: Pour B1 into B2 (Volume multiplier, relative to max_vessel_volume)
-3: Done (Value doesn't matter)
+3: Wait for boil vessel temp to decrease towards room temp (if multiplier == 0, wait until room temp == true)
+4: Done (Value doesn't matter)
 Physical Representation:
 A proper distillation experiment serves to extract one material from a vessel containing multiple
 materials by utilizing the material's differing boiling points. Our distillation experiment
