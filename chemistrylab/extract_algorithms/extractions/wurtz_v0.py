@@ -41,6 +41,7 @@ Available Actions for this Extraction Experiment are included below.
 # import external modules
 import copy
 import sys
+import numpy as np
 
 # import OpenAI Gym
 import gym
