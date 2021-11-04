@@ -236,9 +236,10 @@ class Extraction:
             external_vessels.append(solute_vessel)
 
         # generate the state
-        state = util.generate_state(
+        state = util.generate_layers_obs(
             vessel_list=vessels,
-            max_n_vessel=self.n_total_vessels
+            max_n_vessel=self.n_total_vessels,
+            n_vessel_pixels=self.n_vessel_pixels
         )
 
         return vessels, external_vessels, state

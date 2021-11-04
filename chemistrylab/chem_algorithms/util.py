@@ -141,9 +141,9 @@ def generate_layers_obs(vessel_list,
     if len(vessel_list) > max_n_vessel:
         raise ValueError('number of vessels exceeds the max')
 
-    state = np.array((max_n_vessel, n_vessel_pixels), dtype=np.float32)
+    state = np.zeros((max_n_vessel, n_vessel_pixels), dtype=np.float32)
     for i, vessel in enumerate(vessel_list):
-        state[i] = vessel.get_layers()
+        state[i] = np.array(vessel.get_layers())
 
     return state
 
