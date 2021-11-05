@@ -162,7 +162,7 @@ class ExtractBenchEnv(gym.Env):
         # saved if it exceeds this minimum purity threshold)
         self.min_purity_threshold = 0.5
 
-        # self.observation_space = self.extraction.get_observation_space()
+        self.observation_space = self.extraction.get_observation_space()
         self.action_space = self.extraction.get_action_space()
         self.done = False
         self._first_render = True
@@ -393,7 +393,7 @@ class ExtractBenchEnv(gym.Env):
         Returns
         ---------------
         `state` : `np.array`
-            A numpy array containing state variables, material concentrations, and spectral data.
+            A numpy array containing state variables.
         `reward` : `float`
             The amount of reward generated in perfoming the action.
         `done` : `bool`
@@ -424,9 +424,10 @@ class ExtractBenchEnv(gym.Env):
         self.done = done
 
         # determine the state after performing the action
-        self.state = util.generate_state(
+        self.state = util.generate_layers_obs(
             self.vessels,
-            max_n_vessel=self.extraction.n_total_vessels
+            max_n_vessel=self.extraction.n_total_vessels,
+            n_vessel_pixels=self.n_vessel_pixels
         )
 
         # document the most recent step and determine if future steps are necessary

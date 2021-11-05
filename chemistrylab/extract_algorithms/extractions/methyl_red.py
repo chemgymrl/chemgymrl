@@ -58,11 +58,11 @@ class Extraction:
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
-    # def get_observation_space(self):
-    #     obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
-    #     return observation_space
+    def get_observation_space(self):
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+        observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
+        return observation_space
 
     def get_action_space(self):
         '''
@@ -123,7 +123,7 @@ class Extraction:
         event = ['update material dict', ethyl_vessel_material_dict]
         ethyl_vessel.push_event_to_queue(feedback=[event], dt=0)
 
-        state = util.generate_state(vessels, max_n_vessel=self.n_total_vessels)
+        state = util.generate_layers_obs(vessels, max_n_vessel=self.n_total_vessels, n_vessel_pixels=self.n_vessel_pixels)
 
         return vessels, ethyl_vessel, state
 

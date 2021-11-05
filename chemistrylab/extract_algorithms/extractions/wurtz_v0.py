@@ -41,6 +41,7 @@ Available Actions for this Extraction Experiment are included below.
 # import external modules
 import copy
 import sys
+import numpy as np
 
 # import OpenAI Gym
 import gym
@@ -114,6 +115,12 @@ class Extraction:
         self.solute = solute
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
+
+    def get_observation_space(self):
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+        observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
+        return observation_space
 
     def get_action_space(self):
         """
@@ -229,9 +236,10 @@ class Extraction:
             external_vessels.append(solute_vessel)
 
         # generate the state
-        state = util.generate_state(
+        state = util.generate_layers_obs(
             vessel_list=vessels,
-            max_n_vessel=self.n_total_vessels
+            max_n_vessel=self.n_total_vessels,
+            n_vessel_pixels=self.n_vessel_pixels
         )
 
         return vessels, external_vessels, state

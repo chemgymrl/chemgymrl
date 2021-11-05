@@ -134,6 +134,18 @@ def check_overflow(material_dict,
 
     return material_dict, solute_dict, reward
 
+def generate_layers_obs(vessel_list,
+                        max_n_vessel=5,
+                        n_vessel_pixels=100):
+    # check error
+    if len(vessel_list) > max_n_vessel:
+        raise ValueError('number of vessels exceeds the max')
+
+    state = np.zeros((max_n_vessel, n_vessel_pixels), dtype=np.float32)
+    for i, vessel in enumerate(vessel_list):
+        state[i] = np.array(vessel.get_layers())
+
+    return state
 
 def generate_state(vessel_list,
                    max_n_vessel=5):
