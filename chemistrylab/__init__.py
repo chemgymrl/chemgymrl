@@ -41,25 +41,25 @@ register(
 register(
     id='WurtzReact-v1',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_0',
-    max_episode_steps=20
+    max_episode_steps=100
 )
 
 register(
     id='DecompReact-v0',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
-    max_episode_steps=20
+    max_episode_steps=100
 )
 
 register(
     id='WurtzReact-v2',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',
-    max_episode_steps=20
+    max_episode_steps=100
 )
 
 register(
     id='ODETestReact-v0',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_ODE_Test',
-    max_episode_steps=20
+    max_episode_steps=100
 )
 
 ############################ DistillationBench ####################################
@@ -67,7 +67,7 @@ register(
 register(
     id='Distillation-v0',
     entry_point='chemistrylab.distillation_bench.distillation_bench_v1:Distillation_v1',
-    max_episode_steps=20
+    max_episode_steps=100
 )
 
 ############################ LabManager ####################################
@@ -75,5 +75,5 @@ register(
 register(
     id='LabManager-v0',
     entry_point='chemistrylab.manager.manager_v1:LabManager',
-    max_episode_steps=20
+    max_episode_steps=100
 )

@@ -273,7 +273,7 @@ class Extraction:
         """
 
         # default reward for each step
-        reward = -1
+        reward = 0
 
         # set the completed variable
         done = False

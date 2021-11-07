@@ -440,12 +440,6 @@ class ExtractBenchEnv(gym.Env):
             pass
             # after the last iteration, calculate the amount of target material in each vessel
 
-            reward = ExtractionReward(
-                vessels=self.vessels,
-                desired_material=self.target_material,
-                initial_target_amount=self.initial_target_amount
-            ).calc_reward()
-
             # use the extraction reward class's `validate_vessels` method to output only the
             # vessels that pass a certain reward threshold;
             valid_vessels = ExtractionReward(
@@ -455,6 +449,12 @@ class ExtractBenchEnv(gym.Env):
             ).validate_vessels(
                 purity_threshold=self.min_purity_threshold
             )
+
+            reward = ExtractionReward(
+                vessels=self.vessels,
+                desired_material=self.target_material,
+                initial_target_amount=self.initial_target_amount
+            ).calc_reward()
 
             # save each validated vessel as pickle files
             for i, vessel in enumerate(valid_vessels):

@@ -142,7 +142,7 @@ class Extraction:
         :return: new vessels, oil vessel, reward, done
         '''
 
-        reward = -1  # default reward for each step
+        reward = 0  # default reward for each step
         done = False
         multiplier = (action[1]) / 4 if action[1] != 0 else 0
         # multiplier = action[1]
@@ -244,7 +244,6 @@ class Extraction:
         # 9: Done
         elif 9 == int(action[0]):
             done = True
-            reward = self.done_reward(vessels[2])
 
         return vessels, ext_vessel, reward, done
 
