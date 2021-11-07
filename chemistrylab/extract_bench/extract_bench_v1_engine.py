@@ -46,6 +46,7 @@ import gym
 import matplotlib.pyplot as plt
 import os
 import pickle
+import copy
 
 # import local modules
 sys.path.append("../../") # access chemistrylab
@@ -116,7 +117,7 @@ class ExtractBenchEnv(gym.Env):
 
 
         # validate the input parameters provided to the extract bench engine
-        input_parameters = self._validate_parameters(
+        self.input_parameters = self._validate_parameters(
             n_steps=n_steps,
             dt=dt,
             extraction=extraction,
@@ -128,18 +129,17 @@ class ExtractBenchEnv(gym.Env):
             out_vessel_path=out_vessel_path
         )
 
-
         # set the validated input parameters
-        self.n_steps = input_parameters["n_steps"]
-        self.dt = input_parameters["dt"]
-        self.n_vessel_pixels = input_parameters["n_vessel_pixels"]
-        self.max_valve_speed = input_parameters["max_valve_speed"]
-        self.extraction_vessel = input_parameters["extraction_vessel"]
-        self.solute = input_parameters["solute"]
-        self.target_material = input_parameters["target_material"]
-        self.out_vessel_path = input_parameters["out_vessel_path"]
+        self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
+        self.dt = self.input_parameters["dt"]
+        self.n_vessel_pixels = self.input_parameters["n_vessel_pixels"]
+        self.max_valve_speed = self.input_parameters["max_valve_speed"]
+        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+        self.solute = self.input_parameters["solute"]
+        self.target_material = self.input_parameters["target_material"]
+        self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
-        self.extraction_name = input_parameters["extraction"]
+        self.extraction_name = self.input_parameters["extraction"]
         self.extraction = extraction_dict[self.extraction_name].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
@@ -291,7 +291,7 @@ class ExtractBenchEnv(gym.Env):
             out_vessel_path = os.getcwd()
 
         # collect the input parameters in a labelled dictionary
-        input_parameters = {
+        self.input_parameters = {
             "n_steps" : n_steps,
             "dt" : dt,
             "extraction" : extraction,
@@ -303,7 +303,7 @@ class ExtractBenchEnv(gym.Env):
             "out_vessel_path" : out_vessel_path
         }
 
-        return input_parameters
+        return self.input_parameters
 
     def update_vessel(self, vessel):
         self.extraction_vessel = vessel
@@ -374,6 +374,19 @@ class ExtractBenchEnv(gym.Env):
 
         self.done = False
         self._first_render = True
+        self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
+
+        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+
+        self.extraction = extraction_dict[self.extraction_name].Extraction(
+            extraction_vessel=self.extraction_vessel,
+            n_vessel_pixels=self.n_vessel_pixels,
+            max_valve_speed=self.max_valve_speed,
+            solute=self.solute,
+            target_material=self.target_material,
+            extractor=self.extractor
+        )
+
         self.vessels, self.external_vessels, self.state = self.extraction.reset(
             extraction_vessel=self.extraction_vessel
         )
