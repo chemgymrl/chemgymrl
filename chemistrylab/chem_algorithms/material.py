@@ -571,7 +571,7 @@ class Dodecane(Material):
             charge=0.0,
             boiling_point=489.5,
             melting_point=263.6,
-            solute=False,
+            solute=True,
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,

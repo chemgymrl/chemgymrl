@@ -179,34 +179,36 @@ class Extraction:
 
         # generate a list of external vessels to contain solutes
         external_vessels = []
+        solvents = ["DiEthylEther", "H2O"]
 
-        # generate a vessel to contain the main solute
-        solute_vessel = vessel.Vessel(
-            label='solute_vessel0',
-            v_max=self.solute_volume,
-            n_pixels=self.n_vessel_pixels,
-            settling_switch=False,
-            layer_switch=False,
-        )
+        for mat in solvents:
+            # generate a vessel to contain the main solute
+            solute_vessel = vessel.Vessel(
+                label='solute_vessel0',
+                v_max=self.solute_volume,
+                n_pixels=self.n_vessel_pixels,
+                settling_switch=False,
+                layer_switch=False,
+            )
 
-        # create the material dictionary for the solute vessel
-        solute_material_dict = {}
-        solute_class = convert_to_class(materials=[self.solute])[0]
-        solute_material_dict[self.solute] = [solute_class, self.solute_volume]
+            # create the material dictionary for the solute vessel
+            solute_material_dict = {}
+            solute_class = convert_to_class(materials=[mat])[0]
+            solute_material_dict[mat] = [solute_class, self.solute_volume]
 
-        # check for overflow
-        solute_material_dict, _, _ = util.check_overflow(
-            material_dict=solute_material_dict,
-            solute_dict={},
-            v_max=solute_vessel.get_max_volume()
-        )
+            # check for overflow
+            solute_material_dict, _, _ = util.check_overflow(
+                material_dict=solute_material_dict,
+                solute_dict={},
+                v_max=solute_vessel.get_max_volume()
+            )
 
-        # instruct the vessel to update its material dictionary
-        event = ['update material dict', solute_material_dict]
-        solute_vessel.push_event_to_queue(feedback=[event], dt=0)
+            # instruct the vessel to update its material dictionary
+            event = ['update material dict', solute_material_dict]
+            solute_vessel.push_event_to_queue(feedback=[event], dt=0)
 
-        # add the main solute vessel to the list of external vessels
-        external_vessels.append(solute_vessel)
+            # add the main solute vessel to the list of external vessels
+            external_vessels.append(solute_vessel)
 
         # generate vessels for each solute in the extraction vessel
         for solute_name in solute_dict:
@@ -273,7 +275,7 @@ class Extraction:
         """
 
         # default reward for each step
-        reward = -1
+        reward = 0
 
         # set the completed variable
         done = False
@@ -287,114 +289,111 @@ class Extraction:
             for vessel_obj in vessels:
                 __ = vessel_obj.push_event_to_queue(dt=self.dt)
         else:
-            if len(ext_vessel) != 2:
-                return vessels, ext_vessel, -10, True
-            else:
-                # obtain the necessary vessels
-                extract_vessel = vessels[0]
-                beaker_1 = vessels[1]
-                beaker_2 = vessels[2]
-                solute_vessel1 = ext_vessel[0]
-                solute_vessel2 = ext_vessel[1]
+            # obtain the necessary vessels
+            extract_vessel = vessels[0]
+            beaker_1 = vessels[1]
+            beaker_2 = vessels[2]
+            solute_vessel1 = ext_vessel[0]
+            solute_vessel2 = ext_vessel[1]
 
-                # Open Valve (Speed multiplier)
-                if do_action == 0:
-                    # calculate the number of pixels being drained
-                    drained_pixels = multiplier * self.max_valve_speed
+            # Open Valve (Speed multiplier)
+            if do_action == 0:
+                # calculate the number of pixels being drained
+                drained_pixels = multiplier * self.max_valve_speed
 
-                    # drain the extraction vessel into the first beaker;
-                    event = ['drain by pixel', beaker_1, drained_pixels]
+                # drain the extraction vessel into the first beaker;
+                event = ['drain by pixel', beaker_1, drained_pixels]
 
-                    # push the event to the extraction vessel
-                    reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the extraction vessel
+                reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to the second beaker
-                    __ = beaker_2.push_event_to_queue(dt=self.dt)
+                # push no events to the second beaker
+                __ = beaker_2.push_event_to_queue(dt=self.dt)
 
-                # Mix the Extraction Vessel
-                if do_action == 1:
-                    # mix the extraction vessel
-                    event = ['mix', -multiplier]
+            # Mix the Extraction Vessel
+            if do_action == 1:
+                # mix the extraction vessel
+                event = ['mix', -multiplier]
 
-                    # push the event to the extraction vessel
-                    reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the extraction vessel
+                reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to either beaker
-                    __ = beaker_1.push_event_to_queue(dt=self.dt)
-                    __ = beaker_2.push_event_to_queue(dt=self.dt)
+                # push no events to either beaker
+                __ = beaker_1.push_event_to_queue(dt=self.dt)
+                __ = beaker_2.push_event_to_queue(dt=self.dt)
 
-                # pour Beaker 1 into the Extraction Vessel
-                if do_action == 2:
-                    # determine the volume to pour from the first beaker into the extraction vessel
-                    d_volume = beaker_1.get_max_volume() * multiplier
+            # pour Beaker 1 into the Extraction Vessel
+            if do_action == 2:
+                # determine the volume to pour from the first beaker into the extraction vessel
+                d_volume = beaker_1.get_max_volume() * multiplier
 
-                    # push the event to the first beaker
-                    event = ['pour by volume', extract_vessel, d_volume]
-                    reward = beaker_1.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the first beaker
+                event = ['pour by volume', extract_vessel, d_volume]
+                reward = beaker_1.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to the second beaker
-                    __ = beaker_2.push_event_to_queue(dt=self.dt)
+                # push no events to the second beaker
+                __ = beaker_2.push_event_to_queue(dt=self.dt)
 
-                # Pour Beaker 2 into the Extraction Vessel
-                if do_action == 3:
-                    # determine the volume to pour from the second beaker into the extraction vessel
-                    d_volume = beaker_2.get_max_volume() * multiplier
+            # Pour Beaker 2 into the Extraction Vessel
+            if do_action == 3:
+                # determine the volume to pour from the second beaker into the extraction vessel
+                d_volume = beaker_2.get_max_volume() * multiplier
 
-                    # push the event to the second beaker
-                    event = ['pour by volume', extract_vessel, d_volume]
-                    reward = beaker_2.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the second beaker
+                event = ['pour by volume', extract_vessel, d_volume]
+                reward = beaker_2.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to the first beaker
-                    beaker_1.push_event_to_queue(dt=self.dt)
+                # push no events to the first beaker
+                beaker_1.push_event_to_queue(dt=self.dt)
 
-                # Pour the Extraction Vessel into Beaker 2
-                if do_action == 4:
-                    # determine the volume to pour from the extraction vessel into the second beaker
-                    d_volume = 1.0 * multiplier # use the default volume for the extraction vessel
+            # Pour the Extraction Vessel into Beaker 2
+            if do_action == 4:
+                # determine the volume to pour from the extraction vessel into the second beaker
+                d_volume = 1.0 * multiplier # use the default volume for the extraction vessel
 
-                    # push the event to the extraction vessel
-                    event = ['pour by volume', beaker_2, d_volume]
-                    reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the extraction vessel
+                event = ['pour by volume', beaker_2, d_volume]
+                reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to the first beaker
-                    beaker_1.push_event_to_queue(dt=self.dt)
+                # push no events to the first beaker
+                beaker_1.push_event_to_queue(dt=self.dt)
 
-                # pour the (first) Solute Vessel into the Extraction Vessel
-                if do_action == 5:
-                    # determine the volume to pour from the solute vessel into the extraction vessel
-                    d_volume = solute_vessel1.get_max_volume() * multiplier
+            # pour the (first) Solute Vessel into the Extraction Vessel
+            if do_action == 5:
+                # determine the volume to pour from the solute vessel into the extraction vessel
+                d_volume = solute_vessel1.get_max_volume() * multiplier
 
-                    # push the event to the solute vessel
-                    event = ['pour by volume', extract_vessel, d_volume]
-                    reward = solute_vessel1.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the solute vessel
+                event = ['pour by volume', extract_vessel, d_volume]
+                reward = solute_vessel1.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to either of the beakers
-                    beaker_1.push_event_to_queue(dt=self.dt)
-                    beaker_2.push_event_to_queue(dt=self.dt)
+                # push no events to either of the beakers
+                beaker_1.push_event_to_queue(dt=self.dt)
+                beaker_2.push_event_to_queue(dt=self.dt)
 
-                # pour the (second) Solute Vessel into the Extraction Vessel
-                if do_action == 6:
-                    # determine the volume to pour from the solute vessel into the extraction vessel
-                    d_volume = solute_vessel2.get_max_volume() * multiplier
+            # pour the (second) Solute Vessel into the Extraction Vessel
+            if do_action == 6:
+                # determine the volume to pour from the solute vessel into the extraction vessel
+                d_volume = solute_vessel2.get_max_volume() * multiplier
 
-                    # push the event to the solute vessel
-                    event = ['pour by volume', extract_vessel, d_volume]
-                    reward = solute_vessel2.push_event_to_queue(events=[event], dt=self.dt)
+                # push the event to the solute vessel
+                event = ['pour by volume', extract_vessel, d_volume]
+                reward = solute_vessel2.push_event_to_queue(events=[event], dt=self.dt)
 
-                    # push no events to either of the beakers
-                    beaker_1.push_event_to_queue(dt=self.dt)
-                    beaker_2.push_event_to_queue(dt=self.dt)
+                # push no events to either of the beakers
+                beaker_1.push_event_to_queue(dt=self.dt)
+                beaker_2.push_event_to_queue(dt=self.dt)
 
-                # Indicate that all no more actions are to be completed
-                if do_action == 7:
-                    # pass the fulfilled `done` parameter
-                    done = True
+            # Indicate that all no more actions are to be completed
+            if do_action == 7:
+                # pass the fulfilled `done` parameter
+                done = True
 
-                    # look through each vessel's material dict looking for the target material
-                    reward = 0
+                # look through each vessel's material dict looking for the target material
+                reward = 0
 
-                # redefine the vessels and external_vessels parameters
-                vessels = [extract_vessel, beaker_1, beaker_2]
-                ext_vessel = [solute_vessel1, solute_vessel2]
+            # redefine the vessels and external_vessels parameters
+            vessels = [extract_vessel, beaker_1, beaker_2]
+            ext_vessel = [solute_vessel1, solute_vessel2]
 
         return vessels, ext_vessel, reward, done

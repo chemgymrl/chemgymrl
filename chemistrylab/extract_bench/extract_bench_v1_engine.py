@@ -46,6 +46,7 @@ import gym
 import matplotlib.pyplot as plt
 import os
 import pickle
+import copy
 
 # import local modules
 sys.path.append("../../") # access chemistrylab
@@ -116,7 +117,7 @@ class ExtractBenchEnv(gym.Env):
 
 
         # validate the input parameters provided to the extract bench engine
-        input_parameters = self._validate_parameters(
+        self.input_parameters = self._validate_parameters(
             n_steps=n_steps,
             dt=dt,
             extraction=extraction,
@@ -128,18 +129,17 @@ class ExtractBenchEnv(gym.Env):
             out_vessel_path=out_vessel_path
         )
 
-
         # set the validated input parameters
-        self.n_steps = input_parameters["n_steps"]
-        self.dt = input_parameters["dt"]
-        self.n_vessel_pixels = input_parameters["n_vessel_pixels"]
-        self.max_valve_speed = input_parameters["max_valve_speed"]
-        self.extraction_vessel = input_parameters["extraction_vessel"]
-        self.solute = input_parameters["solute"]
-        self.target_material = input_parameters["target_material"]
-        self.out_vessel_path = input_parameters["out_vessel_path"]
+        self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
+        self.dt = self.input_parameters["dt"]
+        self.n_vessel_pixels = self.input_parameters["n_vessel_pixels"]
+        self.max_valve_speed = self.input_parameters["max_valve_speed"]
+        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+        self.solute = self.input_parameters["solute"]
+        self.target_material = self.input_parameters["target_material"]
+        self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
-        self.extraction_name = input_parameters["extraction"]
+        self.extraction_name = self.input_parameters["extraction"]
         self.extraction = extraction_dict[self.extraction_name].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
@@ -271,15 +271,6 @@ class ExtractBenchEnv(gym.Env):
             print("Invalid `desired` type. The default will be provided.")
             target_material = ""
 
-        # check that the target material is present in the extraction vessel
-        if not target_material in extraction_vessel._material_dict.keys():
-            print(
-                "The target material, {}, is not present in the extraction vessel's material dictionary.".format(
-                    target_material
-                )
-            )
-            target_material = ""
-
         # ensure the output vessel parameter points to a legitimate directory
         if not isinstance(out_vessel_path, str):
             print("The provided output vessel path is invalid. The default will be provided.")
@@ -374,6 +365,19 @@ class ExtractBenchEnv(gym.Env):
 
         self.done = False
         self._first_render = True
+        self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
+
+        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+
+        self.extraction = extraction_dict[self.extraction_name].Extraction(
+            extraction_vessel=self.extraction_vessel,
+            n_vessel_pixels=self.n_vessel_pixels,
+            max_valve_speed=self.max_valve_speed,
+            solute=self.solute,
+            target_material=self.target_material,
+            extractor=self.extractor
+        )
+
         self.vessels, self.external_vessels, self.state = self.extraction.reset(
             extraction_vessel=self.extraction_vessel
         )
@@ -410,7 +414,7 @@ class ExtractBenchEnv(gym.Env):
         vessels = self.vessels
         ext_vessels = self.external_vessels
         done = self.done
-
+        
         # perform the inputted action in the extraction module
         vessels, ext_vessels, reward, done = self.extraction.perform_action(
             vessels=vessels,
@@ -422,7 +426,7 @@ class ExtractBenchEnv(gym.Env):
         self.vessels = vessels
         self.external_vessels = ext_vessels
         self.done = done
-
+        
         # determine the state after performing the action
         self.state = util.generate_layers_obs(
             self.vessels,
@@ -434,17 +438,11 @@ class ExtractBenchEnv(gym.Env):
         self.n_steps -= 1
         if self.n_steps == 0:
             self.done = True
-
+        
         # once all the steps have been completed, calculate the final reward and save any vessels
         if self.done:
             pass
             # after the last iteration, calculate the amount of target material in each vessel
-
-            reward = ExtractionReward(
-                vessels=self.vessels,
-                desired_material=self.target_material,
-                initial_target_amount=self.initial_target_amount
-            ).calc_reward()
 
             # use the extraction reward class's `validate_vessels` method to output only the
             # vessels that pass a certain reward threshold;
@@ -455,6 +453,12 @@ class ExtractBenchEnv(gym.Env):
             ).validate_vessels(
                 purity_threshold=self.min_purity_threshold
             )
+
+            reward = ExtractionReward(
+                vessels=self.vessels,
+                desired_material=self.target_material,
+                initial_target_amount=self.initial_target_amount
+            ).calc_reward()
 
             # save each validated vessel as pickle files
             for i, vessel in enumerate(valid_vessels):

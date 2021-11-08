@@ -144,14 +144,105 @@ def oil_vessel():
 
     return extraction_vessel
 
+def wurtz_vessel():
+    """
+    Function to generate an input vessel for the oil and water extraction experiment.
 
-class ExtractWorld_v1(ExtractBenchEnv):
+    Parameters
+    ---------------
+    None
+
+    Returns
+    ---------------
+    `extract_vessel` : `vessel`
+        A vessel object containing state variables, materials, solutes, and spectral data.
+
+    Raises
+    ---------------
+    None
+    """
+
+    # initialize extraction vessel
+    extraction_vessel = vessel.Vessel(label='extraction_vessel')
+
+    # initialize H2O
+    H2O = material.H2O
+
+    # initialize Na
+    Na = material.Na
+    Na().set_charge(1.0)
+    Na().set_solute_flag(True)
+    Na().set_polarity(2.0)
+
+    # initialize Cl
+    Cl = material.Cl
+    Cl().set_charge(-1.0)
+    Cl().set_solute_flag(True)
+    Cl().set_polarity(2.0)
+
+    # initialize Dodecane
+    Dodecane = material.Dodecane
+    Dodecane().set_solute_flag(True)
+
+    # material_dict
+    material_dict = {
+        H2O().get_name(): [H2O, 30.0, 'mol'],
+        Na().get_name(): [Na, 1.0, 'mol'],
+        Cl().get_name(): [Cl, 1.0, 'mol'],
+        Dodecane().get_name(): [Dodecane, 0.1, 'mol']
+    }
+
+    # solute_dict
+    solute_dict = {
+        Na().get_name(): {H2O().get_name(): [H2O, 1.0, 'mol']},
+        Cl().get_name(): {H2O().get_name(): [H2O, 1.0, 'mol']},
+        Dodecane().get_name(): {H2O().get_name(): [H2O, 0.1, 'mol']}
+    }
+
+    material_dict, solute_dict, _ = util.check_overflow(
+        material_dict=material_dict,
+        solute_dict=solute_dict,
+        v_max=extraction_vessel.get_max_volume()
+    )
+
+    # set events and push them to the queue
+    extraction_vessel.push_event_to_queue(
+        events=None,
+        feedback=[
+            ['update material dict', material_dict],
+            ['update solute dict', solute_dict]
+        ],
+        dt=0
+    )
+    extraction_vessel.push_event_to_queue(
+        events=None,
+        feedback=None,
+        dt=-100000
+    )
+
+    return extraction_vessel
+
+class ExtractWorld_Wurtz_v1(ExtractBenchEnv):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
     def __init__(self):
-        super(ExtractWorld_v1, self).__init__(
+        super(ExtractWorld_Wurtz_v1, self).__init__(
+            extraction='wurtz',
+            extraction_vessel=wurtz_vessel(),
+            solute="H2O",
+            target_material='dodecane',
+            out_vessel_path=os.getcwd()
+        )
+
+class ExtractWorld_Wurtz_Ctd_v1(ExtractBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        super(ExtractWorld_Wurtz_Ctd_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
@@ -163,13 +254,13 @@ class ExtractWorld_v1(ExtractBenchEnv):
         )
 
 
-class ExtractWorld_v2(ExtractBenchEnv):
+class ExtractWorld_Oil_v1(ExtractBenchEnv):
     """
     Class to define an environment which performs a water-oil extraction on materials in a vessel.
     """
 
     def __init__(self):
-        super(ExtractWorld_v2, self).__init__(
+        super(ExtractWorld_Oil_v1, self).__init__(
             extraction='water_oil',
             extraction_vessel=oil_vessel(),
             target_material='Na'

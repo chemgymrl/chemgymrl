@@ -304,11 +304,14 @@ class ExtractionReward:
             reward = 0.0
         else:
             try:
-                # ensure the initial, available desired material is non-negligible
-                assert abs(initial_target_amount - 0.0) > 1e-6
-
+                # get the total amount of material in the vessel
+                materials = list(vessel.get_material_dict().keys())
+                total_material_amount = 0.0
+                for mat in materials:
+                    total_material_amount += vessel.get_material_amount(mat)
+                
                 # find the ratio of the current desired material to the available desired material
-                reward = material_amount / initial_target_amount
+                reward = material_amount / total_material_amount
 
                 print(
                     "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
