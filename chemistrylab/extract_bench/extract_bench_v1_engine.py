@@ -271,15 +271,6 @@ class ExtractBenchEnv(gym.Env):
             print("Invalid `desired` type. The default will be provided.")
             target_material = ""
 
-        # check that the target material is present in the extraction vessel
-        if not target_material in extraction_vessel._material_dict.keys():
-            print(
-                "The target material, {}, is not present in the extraction vessel's material dictionary.".format(
-                    target_material
-                )
-            )
-            target_material = ""
-
         # ensure the output vessel parameter points to a legitimate directory
         if not isinstance(out_vessel_path, str):
             print("The provided output vessel path is invalid. The default will be provided.")
@@ -291,7 +282,7 @@ class ExtractBenchEnv(gym.Env):
             out_vessel_path = os.getcwd()
 
         # collect the input parameters in a labelled dictionary
-        self.input_parameters = {
+        input_parameters = {
             "n_steps" : n_steps,
             "dt" : dt,
             "extraction" : extraction,
@@ -303,7 +294,7 @@ class ExtractBenchEnv(gym.Env):
             "out_vessel_path" : out_vessel_path
         }
 
-        return self.input_parameters
+        return input_parameters
 
     def update_vessel(self, vessel):
         self.extraction_vessel = vessel
@@ -423,7 +414,7 @@ class ExtractBenchEnv(gym.Env):
         vessels = self.vessels
         ext_vessels = self.external_vessels
         done = self.done
-
+        
         # perform the inputted action in the extraction module
         vessels, ext_vessels, reward, done = self.extraction.perform_action(
             vessels=vessels,
@@ -435,7 +426,7 @@ class ExtractBenchEnv(gym.Env):
         self.vessels = vessels
         self.external_vessels = ext_vessels
         self.done = done
-
+        
         # determine the state after performing the action
         self.state = util.generate_layers_obs(
             self.vessels,
@@ -447,7 +438,7 @@ class ExtractBenchEnv(gym.Env):
         self.n_steps -= 1
         if self.n_steps == 0:
             self.done = True
-
+        
         # once all the steps have been completed, calculate the final reward and save any vessels
         if self.done:
             pass
