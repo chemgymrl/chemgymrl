@@ -373,7 +373,7 @@ class ExtractionReward:
 
         return final_reward
 
-    def validate_vessels(self, purity_threshold=0.0):
+    def validate_vessels(self, purity_threshold=0.01):
         '''
         Method to examine each vessel outputted by the Extraction Bench and determine if it passed
         the purity threshold and should be outputted/saved.
