@@ -14,13 +14,19 @@ from gym.envs.registration import register
 
 register(
     id='WurtzExtract-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_v1',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Wurtz_v1',
+    max_episode_steps=100
+)
+
+register(
+    id='WurtzExtract_Ctd-v1',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Wurtz_Ctd_v1',
     max_episode_steps=100
 )
 
 register(
     id='Oil_Water_Extract-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_v2',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Oil_v1',
     max_episode_steps=100
 )
 
