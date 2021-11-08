@@ -305,13 +305,13 @@ class ExtractionReward:
         else:
             try:
                 # get the total amount of material in the vessel
-                materials = list(vessel.get_material_dict().keys())
-                total_material_amount = 0.0
-                for mat in materials:
-                    total_material_amount += vessel.get_material_amount(mat)
+                solutes = list(vessel.get_solute_dict().keys())
+                total_solute_amount = 0.0
+                for sol in solutes:
+                    total_solute_amount += vessel.get_material_amount(mat)
                 
                 # find the ratio of the current desired material to the available desired material
-                reward = material_amount / total_material_amount
+                reward = material_amount / total_solute_amount
 
                 print(
                     "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
@@ -369,7 +369,7 @@ class ExtractionReward:
         if len(self.desired_vessels) == 0:
             final_reward = 0
         else:
-            final_reward = total_reward / len(self.desired_vessels)
+            final_reward = total_reward / (len(self.desired_vessels)**2)
 
         return final_reward
 
