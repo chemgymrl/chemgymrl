@@ -160,7 +160,7 @@ class ExtractBenchEnv(gym.Env):
         # the minimum purity of desired material in relation to total material that a finalized
         # extraction vessel must have to be qualified for use in other processes (the vessel is
         # saved if it exceeds this minimum purity threshold)
-        self.min_purity_threshold = 0.5
+        self.min_purity_threshold = 0.05
 
         self.observation_space = self.extraction.get_observation_space()
         self.action_space = self.extraction.get_action_space()
