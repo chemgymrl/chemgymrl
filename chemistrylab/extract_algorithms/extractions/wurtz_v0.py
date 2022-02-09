@@ -39,7 +39,7 @@ Available Actions for this Extraction Experiment are included below.
 # pylint: disable=wrong-import-position
 
 # import external modules
-import copy
+from copy import deepcopy
 import sys
 import numpy as np
 
@@ -58,14 +58,14 @@ class Extraction:
     ---------------
     `extraction_vessel` : `vessel` (default=`None`)
         A vessel object containing state variables, materials, solutes, and spectral data.
-    `solute` : `str` (default=`None`)
-        The name of the added solute.
+    `solvents` : `str` (default=`None`)
+        The name of the added solvents.
     `target_material` : `str` (default=`None`)
         The name of the required output material designated as reward.
     `nempty_vessels` : `int` (default=`2`)
         The number of empty vessels to add.
-    `solute_volume` : `int` (default=`1000000000`)
-        The amount of `solute` available to add during the extraction.
+    `solvent_volume` : `int` (default=`1000000000`)
+        The amount of `solvent` available to add during the extraction.
     `dt` : `float` (default=`0.01`)
         The default time-step.
     `max_vessel_volume` : `float` (default=`1000.0`)
@@ -87,10 +87,10 @@ class Extraction:
     def __init__(
             self,
             extraction_vessel,
-            solute,
+            solvents,
             target_material,
             n_empty_vessels=2,  # number of empty vessels
-            solute_volume=1000000000,  # the amount of solute available (unlimited)
+            solvent_volume=1000000000,  # the amount of solvent available (unlimited)
             dt=0.05,  # time for each step (time for separation)
             max_vessel_volume=1.0,  # max volume of empty vessels in L
             n_vessel_pixels=100,  # number of pixels for each vessel
@@ -106,13 +106,13 @@ class Extraction:
         self.dt = dt
         self.n_actions = n_actions
         self.max_vessel_volume = max_vessel_volume
-        self.solute_volume = solute_volume
+        self.solvent_volume = solvent_volume
         self.n_empty_vessels = n_empty_vessels
         self.n_total_vessels = n_empty_vessels + 1  # (empty + input)
         self.n_vessel_pixels = n_vessel_pixels
         self.max_valve_speed = max_valve_speed
 
-        self.solute = solute
+        self.solvents = solvents
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
@@ -161,12 +161,9 @@ class Extraction:
         None
         """
 
-        # delete the extraction vessel's solute_dict and copy it into a list of vessels
-        solute_dict = extraction_vessel._solute_dict
-        material_dict = extraction_vessel.get_material_dict()
-        extraction_vessel._solute_dict = {}
-        vessels = [copy.deepcopy(extraction_vessel)]
-
+        # copy initial extraction vessel into a list of vessels
+        vessels = [deepcopy(extraction_vessel)]
+        
         # create all the necessary beakers and add them to the list
         for i in range(self.n_empty_vessels):
             temp_vessel = vessel.Vessel(
@@ -177,65 +174,37 @@ class Extraction:
             )
             vessels.append(temp_vessel)
 
-        # generate a list of external vessels to contain solutes
+        # generate a list of external vessels to contain solvents
         external_vessels = []
-        solvents = ["DiEthylEther", "H2O"]
 
-        for mat in solvents:
-            # generate a vessel to contain the main solute
-            solute_vessel = vessel.Vessel(
-                label='solute_vessel0',
-                v_max=self.solute_volume,
+        for mat in self.solvents:
+            # generate a vessel to contain the main solvent
+            solvent_vessel = vessel.Vessel(
+                label='solvent_vessel0',
+                v_max=self.solvent_volume,
                 n_pixels=self.n_vessel_pixels,
                 settling_switch=False,
                 layer_switch=False,
             )
 
-            # create the material dictionary for the solute vessel
-            solute_material_dict = {}
-            solute_class = convert_to_class(materials=[mat])[0]
-            solute_material_dict[mat] = [solute_class, self.solute_volume]
+            # create the material dictionary for the solvent vessel
+            solvent_material_dict = {}
+            solvent_class = convert_to_class(materials=[mat])[0]
+            solvent_material_dict[mat] = [solvent_class, self.solvent_volume]
 
             # check for overflow
-            solute_material_dict, _, _ = util.check_overflow(
-                material_dict=solute_material_dict,
+            solvent_material_dict, _, _ = util.check_overflow(
+                material_dict=solvent_material_dict,
                 solute_dict={},
-                v_max=solute_vessel.get_max_volume()
+                v_max=solvent_vessel.get_max_volume()
             )
 
             # instruct the vessel to update its material dictionary
-            event = ['update material dict', solute_material_dict]
-            solute_vessel.push_event_to_queue(feedback=[event], dt=0)
+            event = ['update material dict', solvent_material_dict]
+            solvent_vessel.push_event_to_queue(feedback=[event], dt=0)
 
-            # add the main solute vessel to the list of external vessels
-            external_vessels.append(solute_vessel)
-
-        # generate vessels for each solute in the extraction vessel
-        for solute_name in solute_dict:
-            # generate an empty vessel to be filled with a single solute
-            solute_vessel = vessel.Vessel(
-                label='solute_vessel{}'.format(len(external_vessels)),
-                v_max=extraction_vessel.v_max,
-                n_pixels=self.n_vessel_pixels,
-                settling_switch=False,
-                layer_switch=False
-            )
-            solute_material_dict = {}
-            solute_material_dict[solute_name] = material_dict[solute_name]
-
-            # check for overflow
-            solute_material_dict, _, _ = util.check_overflow(
-                material_dict=solute_material_dict,
-                solute_dict={},
-                v_max=solute_vessel.get_max_volume()
-            )
-
-            # instruct the vessel to update its material dictionary
-            event = ['update material dict', solute_material_dict]
-            solute_vessel.push_event_to_queue(feedback=[event], dt=0)
-
-            # add this solute vessel to the list of external vessels
-            external_vessels.append(solute_vessel)
+            # add the main solvent vessel to the list of external vessels
+            external_vessels.append(solvent_vessel)
 
         # generate the state
         state = util.generate_layers_obs(
@@ -293,8 +262,8 @@ class Extraction:
             extract_vessel = vessels[0]
             beaker_1 = vessels[1]
             beaker_2 = vessels[2]
-            solute_vessel1 = ext_vessel[0]
-            solute_vessel2 = ext_vessel[1]
+            solvent_vessel1 = ext_vessel[0]
+            solvent_vessel2 = ext_vessel[1]
 
             # Open Valve (Speed multiplier)
             if do_action == 0:
@@ -360,12 +329,12 @@ class Extraction:
 
             # pour the (first) Solute Vessel into the Extraction Vessel
             if do_action == 5:
-                # determine the volume to pour from the solute vessel into the extraction vessel
-                d_volume = solute_vessel1.get_max_volume() * multiplier
+                # determine the volume to pour from the solvent vessel into the extraction vessel
+                d_volume = solvent_vessel1.get_max_volume() * multiplier
 
-                # push the event to the solute vessel
+                # push the event to the solvent vessel
                 event = ['pour by volume', extract_vessel, d_volume]
-                reward = solute_vessel1.push_event_to_queue(events=[event], dt=self.dt)
+                reward = solvent_vessel1.push_event_to_queue(events=[event], dt=self.dt)
 
                 # push no events to either of the beakers
                 beaker_1.push_event_to_queue(dt=self.dt)
@@ -373,12 +342,12 @@ class Extraction:
 
             # pour the (second) Solute Vessel into the Extraction Vessel
             if do_action == 6:
-                # determine the volume to pour from the solute vessel into the extraction vessel
-                d_volume = solute_vessel2.get_max_volume() * multiplier
+                # determine the volume to pour from the solvent vessel into the extraction vessel
+                d_volume = solvent_vessel2.get_max_volume() * multiplier
 
-                # push the event to the solute vessel
+                # push the event to the solvent vessel
                 event = ['pour by volume', extract_vessel, d_volume]
-                reward = solute_vessel2.push_event_to_queue(events=[event], dt=self.dt)
+                reward = solvent_vessel2.push_event_to_queue(events=[event], dt=self.dt)
 
                 # push no events to either of the beakers
                 beaker_1.push_event_to_queue(dt=self.dt)
@@ -394,6 +363,6 @@ class Extraction:
 
             # redefine the vessels and external_vessels parameters
             vessels = [extract_vessel, beaker_1, beaker_2]
-            ext_vessel = [solute_vessel1, solute_vessel2]
+            ext_vessel = [solvent_vessel1, solvent_vessel2]
 
         return vessels, ext_vessel, reward, done

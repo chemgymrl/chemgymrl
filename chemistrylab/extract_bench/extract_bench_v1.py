@@ -231,7 +231,7 @@ class ExtractWorld_Wurtz_v1(ExtractBenchEnv):
         super(ExtractWorld_Wurtz_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=wurtz_vessel(),
-            solvent="H2O",
+            solvents=["H2O"],
             target_material='dodecane',
             out_vessel_path=os.getcwd()
         )
@@ -248,7 +248,7 @@ class ExtractWorld_Wurtz_Ctd_v1(ExtractBenchEnv):
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=vessel.Vessel(label='temp')
             ),
-            solvent="H2O",
+            solvents=["H2O"],
             target_material='dodecane',
             out_vessel_path=os.getcwd()
         )
