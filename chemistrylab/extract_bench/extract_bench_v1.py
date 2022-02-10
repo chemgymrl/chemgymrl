@@ -94,31 +94,33 @@ def oil_vessel():
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
     # initialize H2O
-    H2O = material.H2O
+    H2O = material.H2O()
 
     # initialize Na
-    Na = material.Na
-    Na().set_charge(1.0)
-    Na().set_solute_flag(True)
-    Na().set_polarity(2.0)
+    Na = material.Na()
+    Na.set_charge(1.0)
+    Na.set_solute_flag(True)
+    Na.set_polarity(2.0)
+    Na.set_phase('l')
 
     # initialize Cl
-    Cl = material.Cl
-    Cl().set_charge(-1.0)
-    Cl().set_solute_flag(True)
-    Cl().set_polarity(2.0)
+    Cl = material.Cl()
+    Cl.set_charge(-1.0)
+    Cl.set_solute_flag(True)
+    Cl.set_polarity(2.0)
+    Cl.set_phase('l')
 
     # material_dict
     material_dict = {
-        H2O().get_name(): [H2O, 30.0, 'mol'],
-        Na().get_name(): [Na, 1.0, 'mol'],
-        Cl().get_name(): [Cl, 1.0, 'mol']
+        H2O.get_name(): [H2O, 30.0, 'mol'],
+        Na.get_name(): [Na, 1.0, 'mol'],
+        Cl.get_name(): [Cl, 1.0, 'mol']
     }
 
     # solute_dict
     solute_dict = {
-        Na().get_name(): {H2O().get_name(): [H2O, 1, 'mol']},
-        Cl().get_name(): {H2O().get_name(): [H2O, 1, 'mol']},
+        Na.get_name(): {H2O.get_name(): [H2O, 1, 'mol']},
+        Cl.get_name(): {H2O.get_name(): [H2O, 1, 'mol']},
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
@@ -166,37 +168,40 @@ def wurtz_vessel():
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
     # initialize H2O
-    H2O = material.H2O
+    H2O = material.H2O()
 
     # initialize Na
-    Na = material.Na
-    Na().set_charge(1.0)
-    Na().set_solute_flag(True)
-    Na().set_polarity(2.0)
+    Na = material.Na()
+    Na.set_charge(1.0)
+    Na.set_solute_flag(True)
+    Na.set_polarity(2.0)
+    Na.set_phase('l')
 
     # initialize Cl
-    Cl = material.Cl
-    Cl().set_charge(-1.0)
-    Cl().set_solute_flag(True)
-    Cl().set_polarity(2.0)
+    Cl = material.Cl()
+    Cl.set_charge(-1.0)
+    Cl.set_solute_flag(True)
+    Cl.set_polarity(2.0)
+    Cl.set_phase('l')
 
     # initialize Dodecane
-    Dodecane = material.Dodecane
-    Dodecane().set_solute_flag(True)
+    Dodecane = material.Dodecane()
+    Dodecane.set_solute_flag(True)
+    Dodecane.set_phase('l')
 
     # material_dict
     material_dict = {
-        H2O().get_name(): [H2O, 30.0, 'mol'],
-        Na().get_name(): [Na, 1.0, 'mol'],
-        Cl().get_name(): [Cl, 1.0, 'mol'],
-        Dodecane().get_name(): [Dodecane, 0.1, 'mol']
+        H2O.get_name(): [H2O, 30.0, 'mol'],
+        Na.get_name(): [Na, 1.0, 'mol'],
+        Cl.get_name(): [Cl, 1.0, 'mol'],
+        Dodecane.get_name(): [Dodecane, 0.1, 'mol']
     }
 
     # solute_dict
     solute_dict = {
-        Na().get_name(): {H2O().get_name(): [H2O, 1.0, 'mol']},
-        Cl().get_name(): {H2O().get_name(): [H2O, 1.0, 'mol']},
-        Dodecane().get_name(): {H2O().get_name(): [H2O, 0.1, 'mol']}
+        Na.get_name(): {H2O.get_name(): [H2O, 1.0, 'mol']},
+        Cl.get_name(): {H2O.get_name(): [H2O, 1.0, 'mol']},
+        Dodecane.get_name(): {H2O.get_name(): [H2O, 0.1, 'mol']}
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
@@ -248,7 +253,7 @@ class ExtractWorld_Wurtz_Ctd_v1(ExtractBenchEnv):
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=vessel.Vessel(label='temp')
             ),
-            solvents=["H2O"],
+            solvents=["H2O", "DiEthylEther"],
             target_material='dodecane',
             out_vessel_path=os.getcwd()
         )

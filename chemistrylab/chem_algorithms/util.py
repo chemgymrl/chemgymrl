@@ -49,28 +49,28 @@ def convert_material_dict_and_solute_dict_to_volume(material_dict,
     total_volume = 0
     for M in material_dict:
         # get the mass (in grams) of the material using its molar mass (in grams/mol)
-        mass = material_dict[M][0]().get_molar_mass() * material_dict[M][1]
+        mass = material_dict[M][0].get_molar_mass() * material_dict[M][1]
 
         if convert_density:
             # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
-            volume = (mass / material_dict[M][0]().get_density(convert_density))*1000
+            volume = (mass / material_dict[M][0].get_density(convert_density))*1000
         else:
             # results in cm^3
-            volume = mass / material_dict[M][0]().get_density(convert_density)
+            volume = mass / material_dict[M][0].get_density(convert_density)
 
         volume_dict[M] = volume
         total_volume += volume
     for mat in solute_dict:
         for sol in solute_dict[mat]:
             # get the mass (in grams) of the material using its molar mass (in grams/mol)
-            mass = solute_dict[mat][sol][0]().get_molar_mass() * solute_dict[mat][sol][1]
+            mass = solute_dict[mat][sol][0].get_molar_mass() * solute_dict[mat][sol][1]
 
             if convert_density:
                 # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
-                volume = (mass / solute_dict[mat][sol][0]().get_density(convert_density)) * 1000
+                volume = (mass / solute_dict[mat][sol][0].get_density(convert_density)) * 1000
             else:
                 # results in cm^3
-                volume = mass / solute_dict[mat][sol][0]().get_density(convert_density)
+                volume = mass / solute_dict[mat][sol][0].get_density(convert_density)
 
             if sol in volume_dict:
                 total_volume += abs(volume - volume_dict[sol])
@@ -79,6 +79,7 @@ def convert_material_dict_and_solute_dict_to_volume(material_dict,
                 volume_dict[sol] = volume
                 total_volume += volume
 
+    print(volume_dict, total_volume)
     return volume_dict, total_volume
 
 
@@ -102,7 +103,7 @@ def organize_material_dict(material_dict):
 def organize_solute_dict(material_dict,
                          solute_dict):
     for M in material_dict:
-        if material_dict[M][0]().is_solvent():  # if the material is solvent add to each solute with 0.0 amount
+        if material_dict[M][0].is_solvent():  # if the material is solvent add to each solute with 0.0 amount
             for Solute in solute_dict:
                 if M not in solute_dict[Solute]:
                     solute_dict[Solute][M] = [material_dict[M][0], 0.0, 'mol']
@@ -171,26 +172,26 @@ def generate_state(vessel_list,
 
         # material_dict:
         for materials in material_dict:
-            index = material_dict[materials][0]().get_index()
-            material_dict_matrix[index, 0] = material_dict[materials][0]().get_density()
-            material_dict_matrix[index, 1] = material_dict[materials][0]().get_polarity()
-            material_dict_matrix[index, 2] = material_dict[materials][0]().get_temperature()
-            material_dict_matrix[index, 3] = material_dict[materials][0]().get_pressure()
+            index = material_dict[materials][0].get_index()
+            material_dict_matrix[index, 0] = material_dict[materials][0].get_density()
+            material_dict_matrix[index, 1] = material_dict[materials][0].get_polarity()
+            material_dict_matrix[index, 2] = material_dict[materials][0].get_temperature()
+            material_dict_matrix[index, 3] = material_dict[materials][0].get_pressure()
             # one hot encoding phase
-            if material_dict[materials][0]().get_phase() == 's':
+            if material_dict[materials][0].get_phase() == 's':
                 material_dict_matrix[index, 4] = 1.0
             else:
                 material_dict_matrix[index, 4] = 0.0
-            if material_dict[materials][0]().get_phase() == 'l':
+            if material_dict[materials][0].get_phase() == 'l':
                 material_dict_matrix[index, 5] = 1.0
             else:
                 material_dict_matrix[index, 5] = 0.0
-            if material_dict[materials][0]().get_phase() == 'g':
+            if material_dict[materials][0].get_phase() == 'g':
                 material_dict_matrix[index, 6] = 1.0
             else:
                 material_dict_matrix[index, 6] = 0.0
-            material_dict_matrix[index, 7] = material_dict[materials][0]().get_charge()
-            material_dict_matrix[index, 8] = material_dict[materials][0]().get_molar_mass()
+            material_dict_matrix[index, 7] = material_dict[materials][0].get_charge()
+            material_dict_matrix[index, 8] = material_dict[materials][0].get_molar_mass()
             material_dict_matrix[index, 9] = material_dict[materials][1]
 
         # solute_dict:

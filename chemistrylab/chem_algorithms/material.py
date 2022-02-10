@@ -204,6 +204,9 @@ class Material:
         elif not flag:
             self._solvent = False
 
+    def set_phase(self, phase):
+        self._phase = phase
+
     def set_charge(self,
                    charge):
         self._charge = charge
