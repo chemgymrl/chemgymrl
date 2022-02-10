@@ -83,8 +83,8 @@ class ExtractBenchEnv(gym.Env):
         The maximal amount of material flowing through the valve in a given time-step.
     `extraction_vessel` : `vessel` (default=`None`)
         A vessel object containing state variables, materials, solutes, and spectral data.
-    `solute` : `str` (default=`""`)
-        The name of the added solute.
+    `solvents` : `list` (default=`[""]`)
+        A list of the names of the added solvents.
     `target_material` : `str` (default=`""`)
         The name of the required output material designated as reward.
 
@@ -106,7 +106,7 @@ class ExtractBenchEnv(gym.Env):
             max_valve_speed=10,
             extraction_vessel=None,
 
-            solute="",
+            solvents=[""],
             target_material="",
             out_vessel_path="",
             extractor=None
@@ -124,7 +124,7 @@ class ExtractBenchEnv(gym.Env):
             n_vessel_pixels=n_vessel_pixels,
             max_valve_speed=max_valve_speed,
             extraction_vessel=extraction_vessel,
-            solute=solute,
+            solvents=solvents,
             target_material=target_material,
             out_vessel_path=out_vessel_path
         )
@@ -135,7 +135,7 @@ class ExtractBenchEnv(gym.Env):
         self.n_vessel_pixels = self.input_parameters["n_vessel_pixels"]
         self.max_valve_speed = self.input_parameters["max_valve_speed"]
         self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
-        self.solute = self.input_parameters["solute"]
+        self.solvents = self.input_parameters["solvents"]
         self.target_material = self.input_parameters["target_material"]
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
@@ -144,7 +144,7 @@ class ExtractBenchEnv(gym.Env):
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
-            solute=self.solute,
+            solvents=self.solvents,
             target_material=self.target_material,
             extractor=self.extractor
         )
@@ -178,7 +178,7 @@ class ExtractBenchEnv(gym.Env):
         n_vessel_pixels=0,
         max_valve_speed=0,
         extraction_vessel=None,
-        solute="",
+        solvents=[""],
         target_material="",
         out_vessel_path=""
     ):
@@ -199,8 +199,8 @@ class ExtractBenchEnv(gym.Env):
             The maximal amount of material flowing through the valve in a given time-step.
         `extraction_vessel` : `vessel` (default=`None`)
             A vessel object containing state variables, materials, solutes, and spectral data.
-        `solute` : `str` (default=`""`)
-            The name of the added solute.
+        `solvents` : `str` (default=`[""]`)
+            A list of the names of the added solvents.
         `target_material` : `str` (default=`""`)
             The name of the required output material designated as reward.
         `out_vessel_path` : `str` (default=`""`)
@@ -261,10 +261,10 @@ class ExtractBenchEnv(gym.Env):
         if not isinstance(extraction_vessel, vessel.Vessel):
             raise TypeError("Invalid `extraction vessel` type.")
 
-        # ensure the added solute parameter is a string
-        if not isinstance(solute, str):
-            print("Invalid `solute` type. The default will be provided.")
-            solute = ""
+        # ensure the added solvents parameter is a string
+        if not isinstance(solvents, list):
+            print("Invalid `solvents` type. The default will be provided.")
+            solvents = [""]
 
         # ensure the target material parameter is a string
         if not isinstance(target_material, str):
@@ -289,7 +289,7 @@ class ExtractBenchEnv(gym.Env):
             "n_vessel_pixels" : n_vessel_pixels,
             "max_valve_speed" : max_valve_speed,
             "extraction_vessel" : extraction_vessel,
-            "solute" : solute,
+            "solvents" : solvents,
             "target_material" : target_material,
             "out_vessel_path" : out_vessel_path
         }
@@ -303,7 +303,7 @@ class ExtractBenchEnv(gym.Env):
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
-            solute=self.solute,
+            solvents=self.solvents,
             target_material=self.target_material,
             extractor=self.extractor
         )
@@ -373,7 +373,7 @@ class ExtractBenchEnv(gym.Env):
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
-            solute=self.solute,
+            solvents=self.solvents,
             target_material=self.target_material,
             extractor=self.extractor
         )
