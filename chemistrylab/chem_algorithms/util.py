@@ -79,7 +79,6 @@ def convert_material_dict_and_solute_dict_to_volume(material_dict,
                 volume_dict[sol] = volume
                 total_volume += volume
 
-    print(volume_dict, total_volume)
     return volume_dict, total_volume
 
 
