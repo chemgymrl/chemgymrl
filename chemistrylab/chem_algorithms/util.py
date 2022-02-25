@@ -60,24 +60,6 @@ def convert_material_dict_and_solute_dict_to_volume(material_dict,
 
         volume_dict[M] = volume
         total_volume += volume
-    for mat in solute_dict:
-        for sol in solute_dict[mat]:
-            # get the mass (in grams) of the material using its molar mass (in grams/mol)
-            mass = solute_dict[mat][sol][0].get_molar_mass() * solute_dict[mat][sol][1]
-
-            if convert_density:
-                # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
-                volume = (mass / solute_dict[mat][sol][0].get_density(convert_density)) * 1000
-            else:
-                # results in cm^3
-                volume = mass / solute_dict[mat][sol][0].get_density(convert_density)
-
-            if sol in volume_dict:
-                total_volume += abs(volume - volume_dict[sol])
-                volume_dict[sol] = max(volume, volume_dict[sol])
-            else:
-                volume_dict[sol] = volume
-                total_volume += volume
 
     return volume_dict, total_volume
 
