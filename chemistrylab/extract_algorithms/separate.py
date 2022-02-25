@@ -20,6 +20,7 @@ import cmocean
 
 ## ---------- ## DEFAULTS ## ---------- ##
 
+'''
 # Labels for plotting and index of arrays
 labels = ['Water', 'Oil', 'Air']
 
@@ -35,9 +36,6 @@ B = np.array([0.0, 0.0, 0.0])
 # Variance of Gaussian peaks
 C = 2.0
 
-# Maximum varience of Gaussian peaks
-Cmix = 2.0
-
 # Density of each phase
 D = np.array([1.0, 0.93, 1.225e-3])
 
@@ -51,20 +49,24 @@ Lpol = np.array([2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0)), 0.0])
 # Polarity of solutes
 Spol = np.array([0.9, 0.1])
 
-# Array for x/height positions
-x = np.linspace(-10.0, 10.0, 1000, endpoint=True, dtype=np.float32)
-
 # Initial time variable such that Gaussians have normalized area
 t0 = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
 
 # Time step
 dt = 0.05
+'''
+
+# Maximum varience of Gaussian peaks
+Cmix = 2.0
+
+# Array for x/height positions
+x = np.linspace(-10.0, 10.0, 1000, endpoint=True, dtype=np.float32)
 
 # Function to map the separation Gaussians to discretized state
-def map_to_state(A, B, C, colors=colors, x=x):
+def map_to_state(A, B, C, colors, x=x):
     # Create a copy of B for temporary changes
     B1 = np.copy(B)
-
+    
     # Array for layers at each time step
     L = np.zeros(100, dtype=np.float32) + colors[-1]
 
@@ -78,7 +80,7 @@ def map_to_state(A, B, C, colors=colors, x=x):
     # Take rounding errors into account
     n[-1] = 0
     n[-1] = L.shape[0] - np.sum(n)
-
+    
     # Loop over each layer pixel
     for l in range(L.shape[0]):
         # Map layer pixel position to x position
@@ -95,7 +97,7 @@ def map_to_state(A, B, C, colors=colors, x=x):
                 P[j] = 0.0
 
                 # Set Gaussian center extremely positive outside of range to avoid placement by default set
-                B1[j] += 100.0
+                B1[j] += 1e9
 
             # Check to see if most negative phase is past due to have all pixels
             elif P[j] < 1e-6 and j == np.argmin(B1 - x[k]):
@@ -134,6 +136,7 @@ def map_to_state(A, B, C, colors=colors, x=x):
                     n[j] -= 1
                     # End loop
                     placed = True
+    
     return L
 
 def mix(A, B, C, D, Spol, Lpol, S, mixing):
