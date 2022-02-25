@@ -236,7 +236,7 @@ class ExtractWorld_Wurtz_v1(ExtractBenchEnv):
         super(ExtractWorld_Wurtz_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=wurtz_vessel(),
-            solvents=["H2O"],
+            solvents=["H2O", "DiEthylEther"],
             target_material='dodecane',
             out_vessel_path=os.getcwd()
         )
