@@ -189,7 +189,7 @@ class Extraction:
 
             # create the material dictionary for the solvent vessel
             solvent_material_dict = {}
-            solvent_class = convert_to_class(materials=[mat])[0]
+            solvent_class = convert_to_class(materials=[mat])[0]()
             solvent_material_dict[mat] = [solvent_class, self.solvent_volume]
 
             # check for overflow

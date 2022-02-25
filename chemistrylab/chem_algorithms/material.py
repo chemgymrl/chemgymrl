@@ -58,7 +58,7 @@ from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 class Material:
     def __init__(self,
                  name="",
-                 density=1.0,  # in g/cm**3
+                 density={'s': 1.0, 'l': 1.0, 'g': 1.0},  # in g/cm**3
                  polarity=0.0,
                  temperature=1.0,  # in K
                  pressure=1.0,  # in kPa
@@ -138,9 +138,9 @@ class Material:
     def get_density(self, convert_to_g_cubic_meter=True):
         # need to convert to g/m^3 in order to get volume in litres
         if convert_to_g_cubic_meter:
-            return self._density * 1000000
+            return self._density[self._phase] * 1000000
         else:
-            return self._density
+            return self._density[self._phase]
 
     def get_polarity(self):
         return self._polarity
@@ -204,6 +204,9 @@ class Material:
         elif not flag:
             self._solvent = False
 
+    def set_phase(self, phase):
+        self._phase = phase
+
     def set_charge(self,
                    charge):
         self._charge = charge
@@ -235,7 +238,7 @@ class Material:
 class Air(Material):
     def __init__(self):
         super().__init__(name='Air',
-                         density=1.225e-3,  # in g/cm^3
+                         density={'s': None, 'l': None, 'g': 1.225e-3},  # in g/cm^3
                          temperature=297,  # in K
                          pressure=1,
                          phase='g',
@@ -249,7 +252,7 @@ class Air(Material):
 class H2O(Material):
     def __init__(self):
         super().__init__(name='H2O',
-                         density=0.997,
+                         density={'s': None, 'l': 0.997, 'g': None},
                          polarity=abs(2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0))),
                          temperature=298,
                          pressure=1,
@@ -269,7 +272,7 @@ class H2O(Material):
 class H(Material):
     def __init__(self):
         super().__init__(name='H',
-                         density=8.9e-5,
+                         density={'s': None, 'l': None, 'g': 8.9e-5},
                          polarity=0,
                          temperature=298,
                          pressure=1,
@@ -285,7 +288,7 @@ class H(Material):
 class H2(Material):
     def __init__(self):
         super().__init__(name='H2',
-                         density=8.9e-5,
+                         density={'s': None, 'l': None, 'g': 8.9e-5},
                          polarity=0,
                          temperature=298,
                          pressure=1,
@@ -302,7 +305,7 @@ class H2(Material):
 class O(Material):
     def __init__(self):
         super().__init__(name='O',
-                         density=1.429e-3,
+                         density={'s': None, 'l': None, 'g': 1.429e-3},
                          polarity=0,
                          temperature=298,
                          pressure=1,
@@ -319,7 +322,7 @@ class O(Material):
 class O2(Material):
     def __init__(self):
         super().__init__(name='O2',
-                         density=1.429e-3,
+                         density={'s': None, 'l': None, 'g': 1.429e-3},
                          polarity=0,
                          temperature=298,
                          pressure=1,
@@ -336,7 +339,7 @@ class O2(Material):
 class O3(Material):
     def __init__(self):
         super().__init__(name='O3',
-                         density=2.144e-3,
+                         density={'s': None, 'l': None, 'g': 2.144e-3},
                          polarity=abs(1 + 2 * -1 * np.cos((116.8 / 2) * (np.pi / 180.0))),
                          temperature=298,
                          pressure=1,
@@ -353,7 +356,7 @@ class O3(Material):
 class C6H14(Material):
     def __init__(self):
         super().__init__(name='C6H14',
-                         density=0.655,
+                         density={'s': None, 'l': 0.655, 'g': None},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -371,7 +374,7 @@ class C6H14(Material):
 class NaCl(Material):
     def __init__(self):
         super().__init__(name='NaCl',
-                         density=2.165,
+                         density={'s': 2.165, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
                          pressure=1,
@@ -392,7 +395,7 @@ class NaCl(Material):
 class Na(Material):
     def __init__(self):
         super().__init__(name='Na',
-                         density=0.968,
+                         density={'s': 0.968, 'l': 0.856, 'g': None},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -413,7 +416,7 @@ class Na(Material):
 class Cl(Material):
     def __init__(self):
         super().__init__(name='Cl',
-                         density=3.214e-3,
+                         density={'s': None, 'l': 1.558, 'g': 3.214e-3},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -433,7 +436,7 @@ class Cl(Material):
 class Cl2(Material):
     def __init__(self):
         super().__init__(name='Cl2',
-                         density=2.898e-3,
+                         density={'s': None, 'l': None, 'g': 2.898e-3},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -450,7 +453,7 @@ class Cl2(Material):
 class LiF(Material):
     def __init__(self):
         super().__init__(name='LiF',
-                         density=2.640,
+                         density={'s': 2.640, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
                          pressure=1,
@@ -467,7 +470,7 @@ class LiF(Material):
 class Li(Material):
     def __init__(self):
         super().__init__(name='Li',
-                         density=0.534,
+                         density={'s': 0.534, 'l': None, 'g': None},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -485,7 +488,7 @@ class Li(Material):
 class F(Material):
     def __init__(self):
         super().__init__(name='F',
-                         density=1.696e-3,
+                         density={'s': None, 'l': None, 'g': 1.696e-3},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -501,7 +504,7 @@ class F(Material):
 class F2(Material):
     def __init__(self):
         super().__init__(name='F2',
-                         density=1.696e-3,
+                         density={'s': None, 'l': None, 'g': 1.696e-3},
                          polarity=0.0,
                          temperature=298,
                          pressure=1,
@@ -518,7 +521,7 @@ class F2(Material):
 class CuSO4(Material):
     def __init__(self):
         super().__init__(name='CuS04',
-                         density=3.6,
+                         density={'s': 3.6, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
                          pressure=1,
@@ -538,7 +541,7 @@ class CuSO4(Material):
 class CuSO4Pentahydrate(Material):
     def __init__(self):
         super().__init__(name='CuS04*5H2O',
-                         density=2.286,
+                         density={'s': 2.286, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
                          pressure=1,
@@ -561,7 +564,7 @@ class Dodecane(Material):
     def __init__(self):
         super().__init__(
             name='dodecane',
-            density=0.75,
+            density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -585,7 +588,7 @@ class OneChlorohexane(Material):
     def __init__(self):
         super().__init__(
             name='1-chlorohexane',
-            density=0.879,
+            density={'s': None, 'l': 0.879, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -609,7 +612,7 @@ class TwoChlorohexane(Material):
     def __init__(self):
         super().__init__(
             name='2-chlorohexane',
-            density=0.87,
+            density={'s': None, 'l': 0.87, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -633,7 +636,7 @@ class ThreeChlorohexane(Material):
     def __init__(self):
         super().__init__(
             name='3-chlorohexane',
-            density=0.9,
+            density={'s': None, 'l': 0.9, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -657,7 +660,7 @@ class FiveMethylundecane(Material):
     def __init__(self):
         super().__init__(
             name='5-methylundecane',
-            density=0.75,
+            density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -679,7 +682,7 @@ class FourEthyldecane(Material):
     def __init__(self):
         super().__init__(
             name='4-ethyldecane',
-            density=0.75,
+            density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -701,7 +704,7 @@ class FiveSixDimethyldecane(Material):
     def __init__(self):
         super().__init__(
             name='5,6-dimethyldecane',
-            density=0.757,
+            density={'s': None, 'l': 0.757, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -723,7 +726,7 @@ class FourEthylFiveMethylnonane(Material):
     def __init__(self):
         super().__init__(
             name='4-ethyl-5-methylnonane',
-            density=0.75,
+            density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -745,7 +748,7 @@ class FourFiveDiethyloctane(Material):
     def __init__(self):
         super().__init__(
             name='4,5-diethyloctane',
-            density=0.768,
+            density={'s': None, 'l': 0.768, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -767,7 +770,7 @@ class Ethoxyethane(Material):
     def __init__(self):
         super().__init__(
             name='ethoxyethane',
-            density=0.713,
+            density={'s': None, 'l': 0.713, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -790,7 +793,7 @@ class EthylAcetate(Material):
     def __init__(self):
         super().__init__(
             name='ethyl acetate',
-            density=0.902,
+            density={'s': None, 'l': 0.902, 'g': None},
             polarity=0.654,
             temperature=298,
             pressure=1,
@@ -813,7 +816,7 @@ class DiEthylEther(Material):
     def __init__(self):
         super().__init__(
             name='diethyl ether',
-            density=0.7134,
+            density={'s': None, 'l': 0.7134, 'g': None},
             polarity=1.3,
             temperature=298,
             pressure=1,
@@ -838,7 +841,7 @@ class MethylRed(Material):
     def __init__(self):
         super().__init__(
             name='methyl red',
-            density=0.902,
+            density={'s': 0.902, 'l': None, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -863,7 +866,7 @@ class HCl(Material):
     def __init__(self):
         super().__init__(
             name='HCl',
-            density=1.48e-3,
+            density={'s': None, 'l': None, 'g': 1.48e-3},
             polarity=0.0,
             temperature=298,
             pressure=1,
