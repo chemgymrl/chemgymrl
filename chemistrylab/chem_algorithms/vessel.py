@@ -854,7 +854,7 @@ class Vessel:
                     volume=d_volume,
                     density=density,
                     molar_mass=molar_mass
-                ) / 1000
+                )
                 
                 # if there is some of this solvent left
                 if self._material_dict[M][1] - d_mole > 1e-6:
