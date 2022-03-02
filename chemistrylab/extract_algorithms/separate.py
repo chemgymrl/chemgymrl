@@ -163,7 +163,9 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
     Scur = np.copy(S)
     # only do the calculation if there are two or more solvent
     if (len(A) < 2):
+        C = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
         return B, C, S, Sts
+
     for i in range(S.shape[0]):
         # Calculate the relative and weighted polarity terms
         Ldif = 0

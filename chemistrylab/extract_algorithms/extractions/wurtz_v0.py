@@ -330,7 +330,7 @@ class Extraction:
             # pour the (first) Solute Vessel into the Extraction Vessel
             if do_action == 5:
                 # determine the volume to pour from the solvent vessel into the extraction vessel
-                d_volume = solvent_vessel1.get_max_volume() * multiplier
+                d_volume = extract_vessel.get_max_volume() * multiplier
 
                 # push the event to the solvent vessel
                 event = ['pour by volume', extract_vessel, d_volume]
@@ -343,7 +343,7 @@ class Extraction:
             # pour the (second) Solute Vessel into the Extraction Vessel
             if do_action == 6:
                 # determine the volume to pour from the solvent vessel into the extraction vessel
-                d_volume = solvent_vessel2.get_max_volume() * multiplier
+                d_volume = extract_vessel.get_max_volume() * multiplier
 
                 # push the event to the solvent vessel
                 event = ['pour by volume', extract_vessel, d_volume]
