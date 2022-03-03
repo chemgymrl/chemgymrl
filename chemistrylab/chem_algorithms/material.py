@@ -136,9 +136,9 @@ class Material:
         return self._name
 
     def get_density(self, convert_to_g_cubic_meter=True):
-        # need to convert to g/m^3 in order to get volume in litres
+        # need to convert to g/dm^3 in order to get volume in litres
         if convert_to_g_cubic_meter:
-            return self._density[self._phase] * 1000000
+            return self._density[self._phase] * 1000
         else:
             return self._density[self._phase]
 
