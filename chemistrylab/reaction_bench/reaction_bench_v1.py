@@ -45,13 +45,16 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=None, # do not include an input vessel
             out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
+            in_hand=[ # initialize the bench with the following materials
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "2-chlorohexane", "Initial": 1},
                 {"Material": "3-chlorohexane", "Initial": 1},
                 {"Material": "Na", "Initial": 1}
             ],
-            solutes=[ # initialize the bench with the following solutes available
+            materials=[ # initialize the bench with the following materials available
+                {"Material": "H2O", "Initial": 50}
+            ],
+            solvents=[ # initialize the bench with the following solvents available
                 {"Material": "H2O", "Initial": 50}
             ],
             n_steps=50,
