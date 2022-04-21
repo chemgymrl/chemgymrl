@@ -121,9 +121,9 @@ class CharacterizationBench:
         mat_dict = vessel.get_material_dict()
 
         if not overlap:
-            params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+            params = [mat_dict[mat][0].get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
         else:
-            params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
+            params = [mat_dict[mat][0].get_spectra_overlap() if mat in mat_dict else None for mat in materials]
         params = convert_inverse_cm_to_nm(params)
         params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         # set the wavelength space
@@ -182,9 +182,9 @@ class CharacterizationBench:
         mat_dict = vessel.get_material_dict()
 
         if not overlap:
-            params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+            params = [mat_dict[mat][0].get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
         else:
-            params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
+            params = [mat_dict[mat][0].get_spectra_overlap() if mat in mat_dict else None for mat in materials]
         params = convert_inverse_cm_to_nm(params)
         params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         # create a list of the spectral peak of each chemical
@@ -226,9 +226,9 @@ class CharacterizationBench:
         mat_dict = vessel.get_material_dict()
 
         if not overlap:
-            params = [mat_dict[mat][0]().get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+            params = [mat_dict[mat][0].get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
         else:
-            params = [mat_dict[mat][0]().get_spectra_overlap() if mat in mat_dict else None for mat in materials]
+            params = [mat_dict[mat][0].get_spectra_overlap() if mat in mat_dict else None for mat in materials]
         params = convert_inverse_cm_to_nm(params)
         params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
         dash_spectra = []
