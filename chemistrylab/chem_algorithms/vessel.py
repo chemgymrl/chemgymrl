@@ -696,7 +696,7 @@ class Vessel:
                     if Solvent in target_solute_dict[Solute]:
                         target_solute_dict[Solute][Solvent][1] += d_mole
                     else:
-                        target_solute_dict[Solute][Solvent] = [convert_to_class([Solvent])[0], d_mole, 'mol']
+                        target_solute_dict[Solute][Solvent] = [convert_to_class([Solvent])[0](), d_mole, 'mol']
 
         # if this vessel has less liquid than calculated amount then everything gets poured out
         else:
@@ -732,7 +732,7 @@ class Vessel:
                     if solvent in target_solute_dict[solute]:
                         target_solute_dict[solute][solvent][1] += d_mole
                     else:
-                        target_solute_dict[solute][solvent] = [convert_to_class([solvent])[0], d_mole, 'mol']
+                        target_solute_dict[solute][solvent] = [convert_to_class([solvent])[0](), d_mole, 'mol']
 
                 # remove the solute from the solute dictionary
                 self._solute_dict.pop(solute)  # pop the solute
@@ -888,7 +888,7 @@ class Vessel:
                             if M in target_solute_dict[Solute]:
                                 target_solute_dict[Solute][M][1] += d_mole
                             else:
-                                target_solute_dict[Solute][M] = [convert_to_class([M])[0], d_mole, 'mol']
+                                target_solute_dict[Solute][M] = [convert_to_class([M])[0](), d_mole, 'mol']
 
                 # if all materials are drained out
                 else:
@@ -921,7 +921,7 @@ class Vessel:
                             if M in target_solute_dict[Solute]:
                                 target_solute_dict[Solute][M][1] += d_mole
                             else:
-                                target_solute_dict[Solute][M] = [convert_to_class([M])[0], d_mole, 'mol']
+                                target_solute_dict[Solute][M] = [convert_to_class([M])[0](), d_mole, 'mol']
 
                             # pop this solvent from the solute
                             self._solute_dict[Solute].pop(M)
