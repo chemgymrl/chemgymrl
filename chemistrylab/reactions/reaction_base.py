@@ -42,7 +42,7 @@ sys.path.append("../../")  # allows the module to access chemistrylab
 
 from chemistrylab.reactions.get_reactions import convert_to_class
 from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
-from chemistrylab.chem_algorithms import vessel
+from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.lab.de import De
 from scipy.integrate import solve_ivp
 
@@ -85,7 +85,7 @@ class _Reaction:
         # materials used and the desired material
         self.reactants = reaction_params["REACTANTS"]
         self.products = reaction_params["PRODUCTS"]
-        self.solutes = reaction_params["SOLUTES"]
+        self.solvents = reaction_params["SOLVENTS"]
         self.desired = reaction_params["DESIRED"]
 
         # initial vessel properties (used in reseting the reaction vessel)
@@ -113,7 +113,7 @@ class _Reaction:
         # specify the full list of materials
         self.materials = []
 
-        for mat in self.reactants + self.products:
+        for mat in self.reactants + self.products + self.solvents:
             if mat not in self.materials:
                 self.materials.append(mat)
 
@@ -123,13 +123,12 @@ class _Reaction:
         # define these parameters initially as they are to be given properly in the reset function
         self.initial_in_hand = np.zeros(len(self.reactants))
         self.cur_in_hand = np.zeros(len(self.reactants))
-        self.initial_solutes = np.zeros(len(self.solutes))
+        self.initial_materials = np.zeros(len(self.materials))
 
         # convert the reactants and products to their class object representations
         self.reactant_classes = convert_to_class(materials=self.reactants)
         self.product_classes = convert_to_class(materials=self.products)
         self.material_classes = convert_to_class(materials=self.materials)
-        self.solute_classes = convert_to_class(materials=self.solutes)
 
         # create the (empty) n array which will contain the molar amounts of materials in use
         self.n = np.zeros(len(self.materials))
@@ -139,10 +138,6 @@ class _Reaction:
 
         # define the maximal number of moles of each chemical allowed at one time
         self.nmax = self.max_mol * np.ones(len(self.materials))
-
-        # define variables to contain the initial materials and solutes available "in hand"
-        self.initial_in_hand = np.zeros(len(self.reactants))
-        self.initial_solutes = np.zeros(len(self.solutes))
 
         # include the available solvers
         self.solvers = {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA'}
@@ -410,10 +405,9 @@ class _Reaction:
         material_dict = vessels._material_dict
 
         # unpack the material dictionary and add all the material amounts to the n array
-        for i, material_name in enumerate(material_dict.keys()):
-            if material_name in self.materials:
-                material_amount = material_dict[material_name][1]
-                self.n[i] = material_amount
+        for i, material_name in enumerate(self.materials):
+            if material_name in material_dict.keys():
+                self.n[i] = material_dict[material_name][1]
 
         # acquire the vessel's temperature property
         temperature = vessels.get_temperature()
@@ -478,16 +472,15 @@ class _Reaction:
             # after the first iteration materials_array should be filled with products as well
             assert set(materials_array).issubset(set(self.materials))
 
-        # ensure that solutes from vessels compatible with reaction
-        solute_dict_vessel = vessels.get_solute_dict()
-        solute_list = []
-        for solute_dict in solute_dict_vessel.values():
-            for key in solute_dict.keys():
-                if key not in solute_list:
-                    solute_list.append(key)
+        # ensure that solvents from vessels compatible with reaction
+        '''mat_dict_vessel = vessels.get_material_dict()
+        solvent_list = []
+        for key in mat_dict_vessel.keys():
+            if key not in solvent_list and not mat_dict_vessel[key][0].is_solute():
+                solvent_list.append(key)
 
-        assert self.solutes == solute_list
-
+        assert self.solvents == solvent_list
+        '''
         # ensure that Tmin are the same
         assert self.Tmin==vessels.Tmin
 
@@ -525,25 +518,17 @@ class _Reaction:
         None
         """
 
-        # tabulate all the materials used and their new values
+        # tabulate all the materials and solutes used and their new values
         new_material_dict = {}
+        new_solute_dict = {}
         for i in range(self.n.shape[0]):
             material_name = self.materials[i]
             material_class = self.material_classes[i]
             amount = self.n[i]
-            new_material_dict[material_name] = [material_class, amount, 'mol']
-
-        # tabulate all the solutes and their values
-        new_solute_dict = {}
-        for mat, mat_class in zip(self.materials, self.material_classes):
-            if mat not in self.solutes and mat_class()._solute:
-                for i in range(self.initial_solutes.shape[0]):
-                    solute_name = self.solutes[i]
-                    solute_class = self.solute_classes[i]
-                    amount = self.initial_solutes[i]
-
-                    # create the new solute dictionary to be appended to a new vessel object
-                    new_solute_dict[mat] = {solute_name: [solute_class, amount, 'mol']}
+            new_material_dict[material_name] = [material_class(), amount, 'mol']
+            if material_class().is_solute():
+                # create the new solute dictionary to be appended to a new vessel object
+                new_solute_dict[material_name] = {material_name: [material_class(), amount, 'mol']}
 
         # create a new vessel and update it with new data
         new_vessel = vessel.Vessel(
@@ -563,7 +548,7 @@ class _Reaction:
 
         return new_vessel
 
-    def reset(self, vessels):
+    def reset(self, vessels, initial_in_hand):
         """
         Method to reset the environment and vessel back to its initial state.
         Empty the initial n array and reset the vessel's thermodynamic properties.
@@ -587,9 +572,14 @@ class _Reaction:
         solute_dict = vessels.get_solute_dict()
 
         # acquire the amounts of reactant materials
-        for i, material_name in enumerate(material_dict.keys()):
+        for i, material in enumerate(initial_in_hand):
+            material_name = material['Material']
             if material_name in self.reactants:
-                self.initial_in_hand[i] = material_dict[material_name][1]
+                self.initial_in_hand[i] = initial_in_hand[i]['Initial']
+
+        for i, material_name in enumerate(self.materials):
+            if material_name in material_dict.keys():
+                self.initial_materials[i] = material_dict[material_name][1]
 
         # acquire the amounts of solute materials
         for i, solute_name in enumerate(solute_dict.keys()):
@@ -612,7 +602,7 @@ class _Reaction:
         self.cur_in_hand = 1.0 * self.initial_in_hand
 
         # set the n array to contain initial values
-        for i, material_amount in enumerate(self.initial_in_hand):
+        for i, material_amount in enumerate(self.initial_materials):
             self.n[i] = material_amount
 
         # reset the vessel parameters to their original values as specified in the reaction file
