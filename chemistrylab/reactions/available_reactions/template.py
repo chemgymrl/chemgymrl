@@ -25,9 +25,9 @@ Included in a reaction file are the following:
 - `PRODUCTS`:
     - A list of all the products involved
     - Ex.: PRODUCTS = ["H2O", "LiO", "F2"]
-- `SOLUTES`:
+- `SOLVENTS`:
     - A list of all the solutes involved (whether they are used or not)
-    - Ex.: SOLUTES = ["H2O", "ethoxyethane"]
+    - Ex.: SOLVENTS = ["H2O", "ethoxyethane"]
 - `DESIRED`:
     - A string indicating the desired material (must be present in either the reactants and/or products lists)
     - Ex.: DESIRED = "LiO"
@@ -68,7 +68,7 @@ REACTION_CLASS = "SPECIFY THE NAME OF THE REACTION CLASS/SET HERE"
 # add the names of the reactants, products, and solutes available to all reactions
 REACTANTS = ["ENTER REACTANTS HERE"]
 PRODUCTS = ["ENTER PRODUCTS HERE"]
-SOLUTES = ["ENTER SOLUTES HERE"]
+SOLVENTS = ["ENTER SOLVENTS HERE"]
 
 # define the desired material
 DESIRED = "ENTER DESIRED MATERIAL HERE"

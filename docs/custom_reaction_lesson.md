@@ -24,7 +24,7 @@ REACTANTS = []
 PRODUCTS = []
 ALL_MATERIALS = REACTANTS + PRODUCTS
 # specify the solute in which the reaction is meant to take place in
-SOLUTES = []
+SOLVENTS = []
 # the desired material out of the reaction
 DESIRED = ""
 ```
@@ -34,7 +34,7 @@ REACTION_CLASS = "NaCl decomp"
 REACTANTS = ['NaCl']
 PRODUCTS = ['Na', 'Cl']
 ALL_MATERIALS = REACTANTS + PRODUCTS
-SOLUTES = ['H2O']
+SOLVENTS = ['H2O']
 DESIRED = 'Na'
 ```
 

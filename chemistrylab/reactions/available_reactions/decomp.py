@@ -31,7 +31,7 @@ PRODUCTS = [
     "Na",
     "Cl"
 ]
-SOLUTES = ["H2O"]
+SOLVENTS = ["H2O"]
 
 # define the desired material
 DESIRED = "Na"
