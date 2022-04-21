@@ -160,7 +160,10 @@ class ReactionReward:
                 desired_material_amount = material_amount
 
         # calculate the reward
-        reward = desired_material_amount/total_material_amount
+        if total_material_amount > 1e-6:
+            reward = desired_material_amount/total_material_amount
+        else:
+            reward = 0
 
         return reward
 
