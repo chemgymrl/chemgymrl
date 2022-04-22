@@ -68,8 +68,9 @@ class ReactionBenchEnv(gym.Env):
             reaction_file_identifier="",
             in_vessel_path=None,
             out_vessel_path=None,
+            in_hand=None,
             materials=None,
-            solutes=None,
+            solvents=None,
             n_steps=50,
             dt=0.01,
             overlap=False
@@ -88,8 +89,8 @@ class ReactionBenchEnv(gym.Env):
             A string indicating the path to a directory where the final output vessel is saved.
         `materials` : `list` (default=`None`)
             A list of dictionaries including initial material names, classes, and amounts.
-        `solutes` : `list` (default=`None`)
-            A list of dictionaries including initial solute names, classes, and amounts.
+        `solvents` : `list` (default=`None`)
+            A list of dictionaries including initial solvent names, classes, and amounts.
         `n_steps` : `int` (default=`50`)
             The number of time steps to be taken during each action.
         `dt` : `float` (default=`0.01`)
@@ -115,8 +116,9 @@ class ReactionBenchEnv(gym.Env):
             reaction_file_identifier=reaction_file_identifier,
             in_vessel_path=in_vessel_path,
             out_vessel_path=out_vessel_path,
+            in_hand=in_hand,
             materials=materials,
-            solutes=solutes,
+            solvents=solvents,
             n_steps=n_steps,
             dt=dt,
             overlap=overlap
@@ -145,18 +147,19 @@ class ReactionBenchEnv(gym.Env):
         self.step_num = 1
 
         # prepare the initial vessel
+        self.initial_in_hand = input_parameters["in_hand"]
         self.initial_materials = input_parameters["materials"]
-        self.initial_solutes = input_parameters["solutes"]
+        self.initial_solvents = input_parameters["solvents"]
         self.vessels = self._prepare_vessel(
             in_vessel_path=self.in_vessel_path,
             materials=input_parameters["materials"],
-            solutes=input_parameters["solutes"]
+            solvents=input_parameters["solvents"]
         )
         # set up a state variable
         self.state = None
 
         # reset the inputted reaction before performing any steps
-        self.reaction.reset(vessels=self.vessels)
+        self.reaction.reset(vessels=self.vessels, initial_in_hand=self.initial_in_hand)
 
         # Defining action and observation space for OpenAI Gym framework
         # shape[0] is the change in amount of each reactant
@@ -212,8 +215,9 @@ class ReactionBenchEnv(gym.Env):
             reaction_file_identifier="",
             in_vessel_path="",
             out_vessel_path="",
+            in_hand=None,
             materials=None,
-            solutes=None,
+            solvents=None,
             n_steps=0,
             dt=0.0,
             overlap=False
@@ -232,8 +236,8 @@ class ReactionBenchEnv(gym.Env):
             A string indicating the path to a directory where the final output vessel is saved.
         `materials` : `list` (default=`None`)
             A list of dictionaries including initial material names, classes, and amounts.
-        `solutes` : `list` (default=`None`)
-            A list of dictionaries including initial solute names, classes, and amounts.
+        `solvents` : `list` (default=`None`)
+            A list of dictionaries including initial solvent names, classes, and amounts.
         `n_steps` : `int` (default=`0`)
             The number of time steps to be taken during each action.
         `dt` : `float` (default=`0.0`)
@@ -290,14 +294,14 @@ class ReactionBenchEnv(gym.Env):
         if not isinstance(materials, list):
             print("Invalid `materials` type. The default will be provided.")
             materials = []
-        if len(materials) == 0:
-            print("Error: The materials list contains no elements.")
+        if len(in_hand) == 0:
+            print("Error: The materials in hand list contains no elements.")
 
-        # ensure the solutes parameter is a non-empty list
-        if not isinstance(solutes, list):
+        # ensure the solvents parameter is a non-empty list
+        if not isinstance(solvents, list):
             print("Invalid `materials` type. The default will be provided.")
-            solutes = []
-        if len(solutes) == 0:
+            solvents = []
+        if len(solvents) == 0:
             print("Error: The materials list contains no elements.")
 
         # ensure the n_steps parameter is a non-zero, non-negative integer
@@ -327,8 +331,9 @@ class ReactionBenchEnv(gym.Env):
             "reaction_file_identifier": reaction_file_identifier,
             "in_vessel_path": in_vessel_path,
             "out_vessel_path": out_vessel_path,
+            "in_hand": in_hand,
             "materials": materials,
-            "solutes": solutes,
+            "solvents": solvents,
             "n_steps": n_steps,
             "dt": dt,
             "overlap": overlap
@@ -418,12 +423,12 @@ class ReactionBenchEnv(gym.Env):
         # iterate through each of the material names, classes, and amounts lists;
         # it is assumed the materials are provided in units of mol
         for i, material in enumerate(material_names):
-            material_dict[material] = [material_classes[i], material_amounts[i], 'mol']
+            material_dict[material] = [material_classes[i](), material_amounts[i], 'mol']
 
         return material_dict
 
     @staticmethod
-    def _prepare_solutes(material_dict=None, solutes=None):
+    def _prepare_solutes(material_dict=None, solvents=None):
         """
         Method to prepare a list of materials into a material dictionary.
         The provided materials are expected to be of the following form:
@@ -437,13 +442,13 @@ class ReactionBenchEnv(gym.Env):
 
         Parameters
         ---------------
-        `solutes` : `list` (default=`None`)
-            A list of dictionaries including initial solute names and amounts.
+        `solvents` : `list` (default=`None`)
+            A list of dictionaries including initial solvent names and amounts.
 
         Returns
         ---------------
-        `solute_dict` : `dict`
-            A dictionary containing all the inputted solutes, class representations, and their molar amounts.
+        `solvent_dict` : `dict`
+            A dictionary containing all the inputted solvents, class representations, and their molar amounts.
 
         Raises
         ---------------
@@ -452,15 +457,15 @@ class ReactionBenchEnv(gym.Env):
 
         solute_dict = {}
         for name, material in material_dict.items():
-            if name not in solute_dict and material[0]()._solute:
+            if name not in solute_dict and material[0]._solute:
                 solute_dict[name] = {}
-                for solvent in solutes:
+                for solvent in solvents:
                     solvent_class = convert_to_class([solvent['Material']])
-                    solute_dict[name][solvent['Material']] = [solvent_class[0], solvent["Initial"], 'mol']
+                    solute_dict[name][solvent['Material']] = [solvent_class[0](), solvent["Initial"], 'mol']
 
         return solute_dict
 
-    def _prepare_vessel(self, in_vessel_path=None, materials=[], solutes=[]):
+    def _prepare_vessel(self, in_vessel_path=None, materials=[], solvents=[]):
         """
         Method to prepare the initial vessel.
 
@@ -470,13 +475,13 @@ class ReactionBenchEnv(gym.Env):
             A string indicating the path to a vessel intended to be loaded into the reaction bench environment.
         `materials` : `list` (default=`None`)
             A list of dictionaries including initial material names and amounts.
-        `solutes` : `list` (default=`None`)
-            A list of dictionaries including initial solute names and amounts.
+        `solvents` : `list` (default=`None`)
+            A list of dictionaries including initial solvent names and amounts.
 
         Returns
         ---------------
         `vessels` : `vessel.Vessel`
-            A vessel object containing materials and solutes to be used in the reaction bench.
+            A vessel object containing materials and solvents to be used in the reaction bench.
 
         Raises
         ---------------
@@ -488,7 +493,7 @@ class ReactionBenchEnv(gym.Env):
             material_dict = self._prepare_materials(materials=materials)
 
             # prepare the solutes that have been provided
-            solute_dict = self._prepare_solutes(material_dict=material_dict, solutes=solutes)
+            solute_dict = self._prepare_solutes(material_dict=material_dict, solvents=solvents)
 
             # add the materials and solutes to an empty vessel
             vessels = vessel.Vessel(
@@ -593,9 +598,9 @@ class ReactionBenchEnv(gym.Env):
 
         # reinitialize the reaction class
         self.vessels = self._prepare_vessel(in_vessel_path=None, materials=self.initial_materials,
-                                            solutes=self.initial_solutes)
+                                            solvents=self.initial_solvents)
 
-        self.vessels = self.reaction.reset(vessels=self.vessels)
+        self.vessels = self.reaction.reset(vessels=self.vessels, initial_in_hand=self.initial_in_hand)
 
         Ti = self.vessels.get_temperature()
         Tmin = self.vessels.get_Tmin()
@@ -691,7 +696,7 @@ class ReactionBenchEnv(gym.Env):
 
         # update the step counter
         self.step_num += 1
-
+        
         return self.state, reward, self.done, {}
 
     def render(self, model='human'):

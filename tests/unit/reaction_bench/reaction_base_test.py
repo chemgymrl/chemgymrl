@@ -77,7 +77,7 @@ class ReactionBaseTestCase(unittest.TestCase):
         # unpacking all variables contained in chloro_wurtz reacton file
         reactants = REACTANTS
         products = PRODUCTS
-        solutes = SOLUTES
+        solvents = SOLVENTS
         desired = DESIRED
         Ti_ = Ti
         Vi_ = Vi
@@ -98,7 +98,7 @@ class ReactionBaseTestCase(unittest.TestCase):
         # checking if the _get_reaction_params method gets the correct values
         self.assertEqual(reactants, reaction_params["REACTANTS"])
         self.assertEqual(products, reaction_params["PRODUCTS"])
-        self.assertEqual(solutes, reaction_params["SOLUTES"])
+        self.assertEqual(solvents, reaction_params["SOLVENTS"])
         self.assertEqual(desired, reaction_params["DESIRED"])
         self.assertEqual(Ti_, reaction_params["Ti"])
         self.assertEqual(Vi_, reaction_params["Vi"])

@@ -34,7 +34,7 @@ PRODUCTS = [
     "CuS04",
     "H2O"
 ]
-SOLUTES = ["H2O"]
+SOLVENTS = ["H2O"]
 
 # define the desired material
 DESIRED = "CuS04"

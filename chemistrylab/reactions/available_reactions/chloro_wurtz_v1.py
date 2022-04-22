@@ -39,7 +39,7 @@ PRODUCTS = [
     "4,5-diethyloctane",
     "NaCl"
 ]
-SOLUTES = ["H2O"]
+SOLVENTS = ["H2O"]
 
 # define the desired material
 DESIRED = "4,5-diethyloctane"

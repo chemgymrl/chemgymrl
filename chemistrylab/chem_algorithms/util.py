@@ -53,7 +53,7 @@ def convert_material_dict_and_solute_dict_to_volume(material_dict,
 
         if convert_density:
             # mass/density results in unit m^3, need to multiply by 1000 to convert to litre
-            volume = (mass / material_dict[M][0].get_density(convert_density))*1000
+            volume = mass / material_dict[M][0].get_density(convert_density)
         else:
             # results in cm^3
             volume = mass / material_dict[M][0].get_density(convert_density)
