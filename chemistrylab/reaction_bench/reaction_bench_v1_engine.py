@@ -136,6 +136,7 @@ class ReactionBenchEnv(gym.Env):
         # initialize the reaction by specifying the reaction file to locate and acquire
         self.reaction = input_parameters["reaction"](
             reaction_file_identifier=input_parameters["reaction_file_identifier"],
+            dt=self.dt,
             overlap=input_parameters["overlap"]
         )
 

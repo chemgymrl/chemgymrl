@@ -51,7 +51,7 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", overlap=False, solver='RK45'):
+    def __init__(self, reaction_file_identifier="", dt=0.01, overlap=False, solver='RK45'):
         """
         Constructor class module for the Reaction class.
 
@@ -99,7 +99,7 @@ class _Reaction:
         self.Vmax = reaction_params["Vmax"]
 
         # thermodynamic increment values (used when performing the reactions)
-        self.dt = reaction_params["dt"]
+        self.dt = dt
         self.dT = reaction_params["dT"]
         self.dV = reaction_params["dV"]
 
