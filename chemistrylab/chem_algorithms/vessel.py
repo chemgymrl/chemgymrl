@@ -901,8 +901,9 @@ class Vessel:
                     else:
                         target_material_dict[M] = [copy.deepcopy(self._material_dict[M][0]), d_mole, 'mol']
 
-                    self._material_dict.pop(M)
-                    self._layers_position_dict.pop(M)
+                    if not self._material_dict[M][0].is_solute():
+                        self._material_dict.pop(M)
+                        self._layers_position_dict.pop(M)
 
                     # update solute_dict for both vessels
                     for Solute in copy.deepcopy(self._solute_dict):
