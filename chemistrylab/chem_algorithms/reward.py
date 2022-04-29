@@ -273,7 +273,7 @@ class ExtractionReward:
         return vessels, desired_material, desired_vessels
 
     @staticmethod
-    def calc_vessel_purity(vessel, desired_material, initial_target_amount):
+    def calc_vessel_purity(vessel, desired_material, initial_target_amount, print_flag):
         '''
         Method to calculate the full reward once the final action has taken place.
 
@@ -316,14 +316,15 @@ class ExtractionReward:
                 # find the ratio of the current desired material to the available desired material
                 reward = material_amount / total_solute_amount
 
-                print(
-                    "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
-                        vessel.label,
-                        "{} %".format(round(reward, 2)),
-                        "{:e}".format(material_amount),
-                        "{:e}".format(initial_target_amount)
+                if print_flag:
+                    print(
+                        "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
+                            vessel.label,
+                            "{} %".format(round(reward*100, 2)),
+                            "{:e}".format(material_amount),
+                            "{:e}".format(initial_target_amount)
+                        )
                     )
-                )
 
             except AssertionError:
                 reward = 0
@@ -364,7 +365,8 @@ class ExtractionReward:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
                 desired_material=self.desired_material,
-                initial_target_amount=self.initial_target_amount
+                initial_target_amount=self.initial_target_amount,
+                print_flag = True
             )
 
         # calculate the final reward by dividing the sum of the purity rewards by the number of
@@ -415,7 +417,8 @@ class ExtractionReward:
             reward = self.calc_vessel_purity(
                 vessel=vessel,
                 desired_material=self.desired_material,
-                initial_target_amount=self.initial_target_amount
+                initial_target_amount=self.initial_target_amount,
+                print_flag = False
             )
 
             # check if the purity reward exceeds the defined threshold
