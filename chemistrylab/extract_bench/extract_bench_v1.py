@@ -168,7 +168,7 @@ def wurtz_vessel():
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
     # initialize H2O
-    H2O = material.H2O()
+    DiEthylEther = material.DiEthylEther()
 
     # initialize Na
     Na = material.Na()
@@ -191,7 +191,7 @@ def wurtz_vessel():
 
     # material_dict
     material_dict = {
-        H2O.get_name(): [H2O, 30.0, 'mol'],
+        DiEthylEther.get_name(): [DiEthylEther, 5.0, 'mol'],
         Na.get_name(): [Na, 1.0, 'mol'],
         Cl.get_name(): [Cl, 1.0, 'mol'],
         Dodecane.get_name(): [Dodecane, 0.1, 'mol']
@@ -199,9 +199,9 @@ def wurtz_vessel():
 
     # solute_dict
     solute_dict = {
-        Na.get_name(): {H2O.get_name(): [H2O, 1.0, 'mol']},
-        Cl.get_name(): {H2O.get_name(): [H2O, 1.0, 'mol']},
-        Dodecane.get_name(): {H2O.get_name(): [H2O, 0.1, 'mol']}
+        Na.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']},
+        Cl.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']},
+        Dodecane.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 0.1, 'mol']}
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
@@ -236,7 +236,7 @@ class ExtractWorld_Wurtz_v1(ExtractBenchEnv):
         super(ExtractWorld_Wurtz_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=wurtz_vessel(),
-            solvents=["H2O", "DiEthylEther"],
+            solvents=["C6H14", "DiEthylEther"],
             target_material='dodecane',
             out_vessel_path=os.getcwd()
         )

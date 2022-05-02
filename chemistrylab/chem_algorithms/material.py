@@ -362,7 +362,7 @@ class C6H14(Material):
                          pressure=1,
                          phase='l',
                          molar_mass=86.175,
-                         color=0.65,
+                         color=0.9,
                          charge=0.0,
                          solvent=True,
                          boiling_point=342.15,
