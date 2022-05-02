@@ -191,10 +191,10 @@ def wurtz_vessel():
 
     # material_dict
     material_dict = {
-        DiEthylEther.get_name(): [DiEthylEther, 5.0, 'mol'],
+        DiEthylEther.get_name(): [DiEthylEther, 4.0, 'mol'],
         Na.get_name(): [Na, 1.0, 'mol'],
         Cl.get_name(): [Cl, 1.0, 'mol'],
-        Dodecane.get_name(): [Dodecane, 0.1, 'mol']
+        Dodecane.get_name(): [Dodecane, 1.0, 'mol']
     }
 
     # solute_dict
