@@ -132,8 +132,6 @@ class De:
         # calculate the changes in concentration
         conc_change = self.get_conc_change(rates)
 
-        # ensure the concentration changes do not exceed limitations
-        conc_change = self.conc_limit(conc_change, conc)
         return conc_change
 
     def get_reaction_constants(self, temp, conc):
@@ -282,6 +280,7 @@ class De:
         for i in range(len(conc_change)):
             for k in range(len(rates)):
                 conc_change[i] += self.conc_coeff_arr[i][k]*rates[k]
+        
         return conc_change
 
     def conc_limit(self, conc_change, conc):
