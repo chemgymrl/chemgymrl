@@ -174,6 +174,7 @@ def wurtz_vessel():
     Na = material.Na()
     Na.set_charge(1.0)
     Na.set_solute_flag(True)
+    Na.set_color(0.0)
     Na.set_polarity(2.0)
     Na.set_phase('l')
 
@@ -181,12 +182,14 @@ def wurtz_vessel():
     Cl = material.Cl()
     Cl.set_charge(-1.0)
     Cl.set_solute_flag(True)
+    Cl.set_color(0.0)
     Cl.set_polarity(2.0)
     Cl.set_phase('l')
 
     # initialize Dodecane
     Dodecane = material.Dodecane()
     Dodecane.set_solute_flag(True)
+    Dodecane.set_color(0.0)
     Dodecane.set_phase('l')
 
     # material_dict
@@ -201,7 +204,7 @@ def wurtz_vessel():
     solute_dict = {
         Na.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']},
         Cl.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']},
-        Dodecane.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 0.1, 'mol']}
+        Dodecane.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']}
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
