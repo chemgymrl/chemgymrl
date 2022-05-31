@@ -842,7 +842,7 @@ class Vessel:
         # M is the solvent that's drained out
         for M in copy.deepcopy(self._material_dict):
             # if the solvent's colour is in color_to_pixel (means it get drained)
-            if self._material_dict[M][0].get_color() in color_to_pixel:
+            if self._material_dict[M][0].get_color() in color_to_pixel and not self._material_dict[M][0].is_solute():
                 # calculate the d_mole of this solvent
                 pixel_count = color_to_pixel[self._material_dict[M][0].get_color()]
                 d_volume = (pixel_count / self.n_pixels) * self.v_max
