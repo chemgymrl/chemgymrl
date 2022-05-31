@@ -148,7 +148,7 @@ def oil_vessel():
 
 def wurtz_vessel():
     """
-    Function to generate an input vessel for the oil and water extraction experiment.
+    Function to generate an input vessel for the wurtz extraction experiment.
 
     Parameters
     ---------------
@@ -167,7 +167,7 @@ def wurtz_vessel():
     # initialize extraction vessel
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
-    # initialize H2O
+    # initialize DiEthylEther
     DiEthylEther = material.DiEthylEther()
 
     # initialize Na
