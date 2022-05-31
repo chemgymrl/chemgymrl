@@ -61,8 +61,10 @@ isolated and we obtain a pure sample.
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
+from copy import deepcopy
 import gym
 import sys
+import numpy as np
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import vessel, util
@@ -98,6 +100,7 @@ class Distillation:
             self,
             boil_vessel,
             target_material,
+            n_vessel_pixels=100,
             n_empty_vessels=2,
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
@@ -115,6 +118,7 @@ class Distillation:
         self.n_actions = n_actions
 
         # vessels
+        self.n_vessel_pixels = n_vessel_pixels
         self.n_empty_vessels = n_empty_vessels
         self.n_total_vessels = n_empty_vessels + 1
         self.max_vessel_volume = max_vessel_volume
@@ -125,6 +129,14 @@ class Distillation:
         # thermodynamic variables
         self.dt = dt
         self.dQ = dQ
+
+    def get_observation_space(self):
+
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels+3), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels+3), dtype=np.float32)
+        observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
+
+        return observation_space
 
     def get_action_space(self):
         '''
@@ -148,7 +160,7 @@ class Distillation:
 
         return action_space
 
-    def reset(self, boil_vessel):
+    def reset(self, init_boil_vessel):
         '''
         Method to reset the environment.
         Parameters
@@ -167,7 +179,7 @@ class Distillation:
         '''
 
         # delete the solute dictionary from the boil vessel
-        boil_vessel._solute_dict = {}
+        boil_vessel = deepcopy(init_boil_vessel)
 
         # set the unit of the boil vessel
         boil_vessel.unit = 'l'
