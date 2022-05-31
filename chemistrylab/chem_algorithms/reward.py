@@ -532,7 +532,7 @@ class DistillationReward:
         return vessels, desired_material, desired_vessels
 
     @staticmethod
-    def calc_vessel_purity(vessel, desired_material):
+    def calc_vessel_purity(vessel, desired_material, print_flag):
         '''
         Method to calculate the purity reward of the current vessel with respect to the other
         materials in the vessel.
@@ -578,10 +578,11 @@ class DistillationReward:
         reward = target_material_amount / total_material_amount
 
         # print the results to the terminal
-        print("Done Reward in {}:".format(label))
-        print("----- Target Material Amount = {} -----".format(target_material_amount))
-        print("----- Total Material Amount = {} -----".format(total_material_amount))
-        print("----- Reward = {} -----".format(reward))
+        if print_flag:
+            print("Done Reward in {}:".format(label))
+            print("----- Target Material Amount = {} -----".format(target_material_amount))
+            print("----- Total Material Amount = {} -----".format(total_material_amount))
+            print("----- Reward = {} -----".format(reward))
 
         return reward
 
@@ -616,7 +617,8 @@ class DistillationReward:
         for vessel in self.desired_vessels:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
-                desired_material=self.desired_material
+                desired_material=self.desired_material,
+                print_flag=True
             )
 
         # divide the sum reward by the number of vessels containing some of the desired material
@@ -665,7 +667,8 @@ class DistillationReward:
             # determine the purity reward of each vessel
             reward = self.calc_vessel_purity(
                 vessel=vessel,
-                desired_material=self.desired_material
+                desired_material=self.desired_material,
+                print_flag=False
             )
 
             # check if the purity reward exceeds the defined threshold
