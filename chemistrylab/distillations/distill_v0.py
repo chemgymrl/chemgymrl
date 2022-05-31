@@ -304,7 +304,7 @@ class Distillation:
                 # pass the fulfilled `done` parameter
                 done = True
 
-                # look through each vessel's material dict looking for the target material
+                # look through each vessel's material dict looking for the target material is done later
                 reward = 0
 
         return vessels, reward, done
