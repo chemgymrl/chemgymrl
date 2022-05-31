@@ -91,7 +91,7 @@ class Extraction:
             target_material,
             n_empty_vessels=2,  # number of empty vessels
             solvent_volume=1000000000,  # the amount of solvent available (unlimited)
-            dt=0.05,  # time for each step (time for separation)
+            dt=0.01,  # time for each step (time for separation)
             max_vessel_volume=1.0,  # max volume of empty vessels in L
             n_vessel_pixels=100,  # number of pixels for each vessel
             max_valve_speed=10,  # maximum draining speed (pixels/step)
