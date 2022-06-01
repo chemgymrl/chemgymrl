@@ -449,7 +449,7 @@ class _Reaction:
         '''
 
         # ensure action is an np.ndarray
-        if not isinstance(action, np.ndarray):
+        if not isinstance(action, np.ndarray) and not isinstance(action, list):
             raise TypeError('Invalid action array. Unable to proceed')
 
         # ensure the vessel class is a class type object
