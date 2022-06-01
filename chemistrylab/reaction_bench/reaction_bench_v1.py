@@ -30,7 +30,7 @@ sys.path.append("../../")
 from chemistrylab.reaction_bench.reaction_bench_v1_engine import ReactionBenchEnv
 from chemistrylab.reactions.reaction_base import _Reaction
 
-class ReactionBenchEnv_0(ReactionBenchEnv):
+class WurtzReact_v1(ReactionBenchEnv):
     '''
     Class object to define an environment available in the reaction bench.
     '''
@@ -40,7 +40,7 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
         Constructor class for the ReactionBenchEnv_0 environment.
         '''
 
-        super(ReactionBenchEnv_0, self).__init__(
+        super(WurtzReact_v1, self).__init__(
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=None, # do not include an input vessel
@@ -52,10 +52,10 @@ class ReactionBenchEnv_0(ReactionBenchEnv):
                 {"Material": "Na", "Initial": 1}
             ],
             materials=[ # initialize the bench with the following materials available
-                {"Material": "H2O", "Initial": 50}
+                {"Material": "diethyl ether", "Initial": 50}
             ],
             solvents=[ # initialize the bench with the following solvents available
-                {"Material": "H2O", "Initial": 50}
+                {"Material": "diethyl ether", "Initial": 50}
             ],
             n_steps=50,
             dt=0.01,

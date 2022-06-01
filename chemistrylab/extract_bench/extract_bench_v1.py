@@ -230,13 +230,13 @@ def wurtz_vessel():
 
     return extraction_vessel
 
-class ExtractWorld_Wurtz_v1(ExtractBenchEnv):
+class WurtzExtract_v1(ExtractBenchEnv):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
     def __init__(self):
-        super(ExtractWorld_Wurtz_v1, self).__init__(
+        super(WurtzExtract_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=wurtz_vessel(),
             solvents=["C6H14", "DiEthylEther"],

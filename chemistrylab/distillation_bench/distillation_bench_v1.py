@@ -145,13 +145,13 @@ def wurtz_vessel():
 
     return extraction_vessel
 
-class DistillWorld_Wurtz_v1(DistillationBenchEnv):
+class WurtzDistill_v1(DistillationBenchEnv):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
     def __init__(self):
-        super(DistillWorld_Wurtz_v1, self).__init__(
+        super(WurtzDistill_v1, self).__init__(
             boil_vessel=wurtz_vessel(),
             target_material="dodecane",
             dQ=1000.0,
