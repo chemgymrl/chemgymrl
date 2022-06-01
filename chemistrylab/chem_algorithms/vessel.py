@@ -1860,15 +1860,8 @@ class Vessel:
         None
         """
 
-        # set up a variable to contain the total pressure
-        max_pressure = 0
-
-        # calculate the total pressure in a vessel using the material dictionary
-        for item in self._material_dict.items():
-            max_pressure += item[1][1] * R * self.Tmax / self.v_min
-
-        # if the vessel contains no material use 1 atm as a baseline (in kPa)
-        max_pressure = 101.325
+        # calculate the total pressure in a vessel
+        max_pressure = 50 * R * self.Tmax / self.v_min
 
         return max_pressure
 
