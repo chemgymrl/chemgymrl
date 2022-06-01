@@ -39,7 +39,7 @@ PRODUCTS = [
     "4,5-diethyloctane",
     "NaCl"
 ]
-SOLVENTS = ["H2O"]
+SOLVENTS = ["DiEthylEther"]
 
 # define the desired material
 DESIRED = "dodecane"
@@ -99,6 +99,6 @@ conc_coeff_arr = np.array(
         [0.0, 0.0, 0.0, 0.0, 1.0, 0.0], # concentration calculation coefficients for 4-ethyl-5-methylnonane
         [0.0, 0.0, 0.0, 0.0, 0.0, 1.0], # concentration calculation coefficients for 4,5-diethyloctane
         [2.0, 2.0, 2.0, 2.0, 2.0, 2.0], # concentration calculation coefficients for NaCl
-        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # concentration calculation for H2O
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # concentration calculation for DiEthylEther
     ]
 )

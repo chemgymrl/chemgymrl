@@ -52,10 +52,10 @@ class WurtzReact_v1(ReactionBenchEnv):
                 {"Material": "Na", "Initial": 1}
             ],
             materials=[ # initialize the bench with the following materials available
-                {"Material": "diethyl ether", "Initial": 50}
+                {"Material": "DiEthylEther", "Initial": 4}
             ],
             solvents=[ # initialize the bench with the following solvents available
-                {"Material": "diethyl ether", "Initial": 50}
+                {"Material": "DiEthylEther", "Initial": 4}
             ],
             n_steps=50,
             dt=0.01,
