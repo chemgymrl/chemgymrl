@@ -408,12 +408,12 @@ class Vessel:
             material_objs = [material_obj for material_obj, __ in material_list]
 
             # acquire the boiling points of each material from the material values list
-            material_bps = [material_obj()._boiling_point for material_obj in material_objs]
+            material_bps = [material_obj._boiling_point for material_obj in material_objs]
 
             # ensure all material boiling points are above the current vessel temperature
             try:
                 if min(material_bps) < self.temperature:
-                    print([(material_obj().get_name(), material_obj()._boiling_point) for material_obj in material_objs])
+                    print([(material_obj.get_name(), material_obj._boiling_point) for material_obj in material_objs])
                     print(min(material_bps))
                     # error for now...
                     exit()
@@ -466,7 +466,7 @@ class Vessel:
             smallest_bp_name = material_names[smallest_bp_index]
             smallest_bp_amount = material_amounts[smallest_bp_index]
             smallest_bp_obj = material_objs[smallest_bp_index]
-            smallest_bp_enth_vap = smallest_bp_obj()._enthalpy_vapor
+            smallest_bp_enth_vap = smallest_bp_obj._enthalpy_vapor
 
             # calculate the heat needed to raise the vessel temperature to the lowest boiling point;
             # use Q = mcT, with c = the mass-weighted specific heat capacities of all materials
@@ -512,9 +512,11 @@ class Vessel:
 
                     # remove the material from the boil vessel's material dictionary
                     del self._material_dict[smallest_bp_name]
-
+                    
                     # add all the material to the beaker's material dictionary
                     out_beaker._material_dict[smallest_bp_name][1] = smallest_bp_amount
+                    out_beaker._layers_position_dict[smallest_bp_name] = self._layers_position_dict[smallest_bp_name]
+                    del self._layers_position_dict[smallest_bp_name]
 
                     # modify the heat_change available
                     heat_available -= heat_to_boil_all
@@ -541,7 +543,7 @@ class Vessel:
                 # calculate the change in vessel temperature if all heat is used
                 vessel_temp_change = heat_available / total_entropy
 
-                print("Raising Boil Vessel Temperature by {}".format(vessel_temp_change))
+                print("Raising Boil Vessel Temperature by {} Kelvin".format(vessel_temp_change))
 
                 # modify the boil vessel's temperature accordingly
                 self._update_temperature(
@@ -762,11 +764,7 @@ class Vessel:
             feedback=[event_1, event_2],
             dt=dt
         )
-        __ = target_vessel.push_event_to_queue(
-            events=None,
-            feedback=None,
-            dt=-100000
-        )
+
         return reward
 
     def _drain_by_pixel(
@@ -842,7 +840,7 @@ class Vessel:
         # M is the solvent that's drained out
         for M in copy.deepcopy(self._material_dict):
             # if the solvent's colour is in color_to_pixel (means it get drained)
-            if self._material_dict[M][0].get_color() in color_to_pixel:
+            if self._material_dict[M][0].get_color() in color_to_pixel and not self._material_dict[M][0].is_solute():
                 # calculate the d_mole of this solvent
                 pixel_count = color_to_pixel[self._material_dict[M][0].get_color()]
                 d_volume = (pixel_count / self.n_pixels) * self.v_max
@@ -1402,7 +1400,7 @@ class Vessel:
 
         # loop over all the materials in the vessel obtaining feedback from updating the temperatures of each material
         for material_obj in self._material_dict.values():
-            feedback = material_obj[0]().update_temperature(
+            feedback = material_obj[0].update_temperature(
                 target_temperature=target_temperature,
                 dt=dt
             )
@@ -1434,9 +1432,9 @@ class Vessel:
         # calculate the total entropy of all the materials in J/K
         total_entropy = 0
         for i, material_amount in enumerate(material_amounts):
-            specific_heat = material_objs[i]()._specific_heat  # in J/g*K
+            specific_heat = material_objs[i]._specific_heat  # in J/g*K
             molar_amount = material_amount  # in mol
-            molar_mass = material_objs[i]()._molar_mass  # in g/mol
+            molar_mass = material_objs[i]._molar_mass  # in g/mol
 
             # calculate the entropy
             material_entropy = specific_heat * molar_amount * molar_mass

@@ -81,6 +81,83 @@ class Distillation_v1(DistillationBenchEnv):
             out_vessel_path=os.getcwd()
         )
 
+def wurtz_vessel():
+    """
+    Function to generate an input vessel for the oil and water extraction experiment.
+
+    Parameters
+    ---------------
+    None
+
+    Returns
+    ---------------
+    `extract_vessel` : `vessel`
+        A vessel object containing state variables, materials, solutes, and spectral data.
+
+    Raises
+    ---------------
+    None
+    """
+
+    # initialize extraction vessel
+    extraction_vessel = vessel.Vessel(label='boil_vessel')
+
+    # initialize C6H14
+    C6H14 = material.C6H14()
+
+    # initialize Dodecane
+    Dodecane = material.Dodecane()
+    Dodecane.set_solute_flag(True)
+    Dodecane.set_color(0.0)
+    Dodecane.set_phase('l')
+
+    # material_dict
+    material_dict = {
+        C6H14.get_name(): [C6H14, 4.0, 'mol'],
+        Dodecane.get_name(): [Dodecane, 1.0, 'mol']
+    }
+
+    # solute_dict
+    solute_dict = {
+        Dodecane.get_name(): {C6H14.get_name(): [C6H14, 1.0, 'mol']}
+    }
+
+    material_dict, solute_dict, _ = util.check_overflow(
+        material_dict=material_dict,
+        solute_dict=solute_dict,
+        v_max=extraction_vessel.get_max_volume()
+    )
+
+    # set events and push them to the queue
+    extraction_vessel.push_event_to_queue(
+        events=None,
+        feedback=[
+            ['update material dict', material_dict],
+            ['update solute dict', solute_dict]
+        ],
+        dt=0
+    )
+    extraction_vessel.push_event_to_queue(
+        events=None,
+        feedback=None,
+        dt=-100000
+    )
+
+    return extraction_vessel
+
+class DistillWorld_Wurtz_v1(DistillationBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        super(DistillWorld_Wurtz_v1, self).__init__(
+            boil_vessel=wurtz_vessel(),
+            target_material="dodecane",
+            dQ=1000.0,
+            out_vessel_path=os.getcwd()
+        )
+
 def boil_vessel():
     """
     Function to generate an input vessel for distillation.

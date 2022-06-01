@@ -17,6 +17,7 @@ along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 import matplotlib.pyplot as plt
 import cmocean
+from math import ceil
 
 ## ---------- ## DEFAULTS ## ---------- ##
 
@@ -75,11 +76,20 @@ def map_to_state(A, B, C, colors, x=x):
 
     # Number of pixels available for each phase
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
-    n = ((A / sum_A) * L.shape[0]).astype(int)
+    n = ((A / sum_A) * L.shape[0])
+    count = 0
+    for i in np.where((n > 1e-8) | (n < 0.5 - 1e-8))[0]:
+        n[i] = ceil(n[i])
+        count += 1
 
-    # Take rounding errors into account
-    n[-1] = 0
-    n[-1] = L.shape[0] - np.sum(n)
+    n = n.astype(int)
+    if np.sum(n[:-1]) > L.shape[0]:
+        for i in range(count):
+            n[n.argmax()] -= 1
+    else:
+        # Take rounding errors into account
+        n[-1] = 0
+        n[-1] = L.shape[0] - np.sum(n)
     
     # Loop over each layer pixel
     for l in range(L.shape[0]):

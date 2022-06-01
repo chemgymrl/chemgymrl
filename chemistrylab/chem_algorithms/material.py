@@ -224,6 +224,9 @@ class Material:
     def set_enthalpy_vapor(self, enthalpy_vapor):
         self._enthalpy_vapor = enthalpy_vapor
 
+    def set_color(self, color):
+        self._color = color
+
     def get_spectra_overlap(self):
         return self.spectra_overlap
 
@@ -570,7 +573,7 @@ class Dodecane(Material):
             pressure=1,
             phase='l',
             molar_mass=170.34,
-            color=0.05,
+            color=0.15,
             charge=0.0,
             boiling_point=489.5,
             melting_point=263.6,

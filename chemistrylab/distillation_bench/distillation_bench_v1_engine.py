@@ -32,6 +32,7 @@ import numpy as np
 import os
 import pickle
 import sys
+from copy import deepcopy
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import util, vessel
@@ -61,6 +62,7 @@ class DistillationBenchEnv(gym.Env):
             self,
             n_steps=100,
             boil_vessel=None,
+            n_vessel_pixels=100,
             target_material=None,
             dQ=0.0,
             out_vessel_path=None
@@ -73,6 +75,7 @@ class DistillationBenchEnv(gym.Env):
         input_parameters = self._validate_parameters(
             n_steps=n_steps,
             boil_vessel=boil_vessel,
+            n_vessel_pixels=n_vessel_pixels,
             target_material=target_material,
             dQ=dQ,
             out_vessel_path=out_vessel_path
@@ -84,6 +87,8 @@ class DistillationBenchEnv(gym.Env):
         self.target_material = input_parameters["target_material"]
         self.dQ = input_parameters["dQ"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
+
+        self.ni_steps = deepcopy(self.n_steps)
 
         # call the distillation class
         self.distillation = distill_v0.Distillation(
@@ -97,6 +102,7 @@ class DistillationBenchEnv(gym.Env):
         self.state = None
 
         # set up action spaces
+        self.observation_space = self.distillation.get_observation_space()
         self.action_space = self.distillation.get_action_space()
 
         # set up the done boolean
@@ -113,7 +119,7 @@ class DistillationBenchEnv(gym.Env):
         self.min_purity_threshold = 0.5
 
     @staticmethod
-    def _validate_parameters(n_steps=None, boil_vessel=None, target_material=None, dQ=0.0, out_vessel_path=None):
+    def _validate_parameters(n_steps=None, boil_vessel=None, n_vessel_pixels=100, target_material=None, dQ=0.0, out_vessel_path=None):
         '''
         Checks and validates the input parameters submitted to the distillation bench.
         Parameters
@@ -161,6 +167,11 @@ class DistillationBenchEnv(gym.Env):
         # ensure that the boil vessel is properly labelled
         boil_vessel.label = "boil_vessel"
 
+        # ensure that the number of pixels is given as an integer
+        if not isinstance(n_vessel_pixels, int):
+            print("Invalid 'Number of Pixels' type. The default will be provided.")
+            n_vessel_pixels = 100
+
         # ensure that the target material is given as a string
         if not isinstance(target_material, str):
             print("Invalid 'Target Material' type. The default will be provided.")
@@ -203,6 +214,7 @@ class DistillationBenchEnv(gym.Env):
         input_parameters = {
             "n_steps" : n_steps,
             "boil_vessel" : boil_vessel,
+            "n_vessel_pixels" : n_vessel_pixels,
             "target_material" : target_material,
             "dQ" : dQ,
             "out_vessel_path" : out_vessel_path
@@ -266,55 +278,41 @@ class DistillationBenchEnv(gym.Env):
 
         # define the state variable using information from each available vessel
         # state[i] = array describing the ith vessel
-        # state[i][0] = vessel name
-        # state[i][1] = temperature
-        # state[i][2] = volume
-        # state[i][3] = pressure
-        # state[i][4:] = array containing the materials in the ith vessel
-
+        # state[i][:n_vessel_pixels] = vessel layers
+        # state[i][n_vessel_pixels] = temperature
+        # state[i][n_vessel_pixels+1] = volume
+        # state[i][n_vessel_pixels+2] = pressure
+        
         # set up the base state variable
-        base_state = [[] for __ in enumerate(self.vessels)]
+        self.state = np.zeros((len(self.vessels), self.distillation.n_vessel_pixels+3), dtype=np.float32)
+
+        self.state[:, :self.distillation.n_vessel_pixels] = util.generate_layers_obs(
+            self.vessels,
+            max_n_vessel=self.distillation.n_total_vessels,
+            n_vessel_pixels=self.distillation.n_vessel_pixels
+        )
 
         # iterate through each available vessel
         for i, vessel in enumerate(self.vessels):
-            # get the vessel name
-            vessel_name = vessel.label
-            base_state[i].append(vessel_name)
-
             # set up the temperature
             Tmin = vessel.get_Tmin()
             Tmax = vessel.get_Tmax()
             temp = vessel.get_temperature()
             normalized_temp = (temp - Tmin) / (Tmax - Tmin)
-            base_state[i].append(normalized_temp)
+            self.state[i, self.distillation.n_vessel_pixels] = normalized_temp
 
             # set up the volume
             Vmin = vessel.get_min_volume()
             Vmax = vessel.get_max_volume()
             volume = vessel.get_volume()
             normalized_volume = (volume - Vmin) / (Vmax - Vmin)
-            base_state[i].append(normalized_volume)
+            self.state[i, self.distillation.n_vessel_pixels+1] = normalized_volume
 
             # set up the pressure
             Pmax = vessel.get_pmax()
             total_pressure = vessel.get_pressure()
             normalized_pressure = total_pressure / Pmax
-            base_state[i].append(normalized_pressure)
-
-            # set up each set of material properties as separate packages (as lists)
-            # each list has three elements: [material_name, material_class, material_amount]
-            material_packages = []
-            for j in range(len( list(vessel._material_dict))):
-                material_name = list(vessel._material_dict.items())[j][0]
-                material_class = list(vessel._material_dict.items())[j][1][0]
-                material_amount = list(vessel._material_dict.items())[j][1][1]
-                material_package = [material_name, material_class, material_amount]
-                material_packages.append(material_package)
-            for material_package in material_packages:
-                base_state[i].append(material_package)
-
-        # convert the base state to a numpy array to be accessible for all methods
-        self.state = np.array(base_state, dtype=object)
+            self.state[i, self.distillation.n_vessel_pixels+2] = normalized_pressure
 
     def reset(self):
         '''
@@ -333,11 +331,12 @@ class DistillationBenchEnv(gym.Env):
 
         # reset the done and plotting parameters to initial values
         self.done = False
+        self.n_steps = deepcopy(self.ni_steps)
         self._first_render = True
 
         # acquire the initial vessels from the distillation class
         vessels = self.distillation.reset(
-            boil_vessel=self.boil_vessel
+            init_boil_vessel=self.boil_vessel
         )
 
         # re-define the existing vessels
