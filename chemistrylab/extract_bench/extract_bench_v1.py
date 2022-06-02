@@ -35,7 +35,7 @@ import sys
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms import material, util, vessel
 from chemistrylab.extract_bench.extract_bench_v1_engine import ExtractBenchEnv
-
+from chemistrylab.reactions.reaction_base import _Reaction
 
 def get_extract_vessel(vessel_path=None, extract_vessel=None):
     """
@@ -146,7 +146,7 @@ def oil_vessel():
 
     return extraction_vessel
 
-def wurtz_vessel():
+def wurtz_vessel(add_mat=""):
     """
     Function to generate an input vessel for the wurtz extraction experiment.
 
@@ -186,25 +186,36 @@ def wurtz_vessel():
     Cl.set_polarity(2.0)
     Cl.set_phase('l')
 
-    # initialize Dodecane
-    Dodecane = material.Dodecane()
-    Dodecane.set_solute_flag(True)
-    Dodecane.set_color(0.0)
-    Dodecane.set_phase('l')
+    # initialize material
+    products = {'dodecane': material.Dodecane,
+        '5-methylundecane': material.FiveMethylundecane,
+        '4-ethyldecane': material.FourEthyldecane,
+        '5,6-dimethyldecane': material.FiveSixDimethyldecane,
+        '4-ethyl-5-methylnonane': material.FourEthylFiveMethylnonane,
+        '4,5-diethyloctane': material.FourFiveDiethyloctane
+    }
+    try:
+        add_material = products[add_mat]()
+    except KeyError:
+        add_material = products['dodecane']()
+    
+    add_material.set_solute_flag(True)
+    add_material.set_color(0.0)
+    add_material.set_phase('l')
 
     # material_dict
     material_dict = {
         DiEthylEther.get_name(): [DiEthylEther, 4.0, 'mol'],
         Na.get_name(): [Na, 1.0, 'mol'],
         Cl.get_name(): [Cl, 1.0, 'mol'],
-        Dodecane.get_name(): [Dodecane, 1.0, 'mol']
+        add_material.get_name(): [add_material, 1.0, 'mol']
     }
 
     # solute_dict
     solute_dict = {
         Na.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']},
         Cl.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']},
-        Dodecane.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']}
+        add_material.get_name(): {DiEthylEther.get_name(): [DiEthylEther, 1.0, 'mol']}
     }
 
     material_dict, solute_dict, _ = util.check_overflow(
@@ -238,9 +249,28 @@ class WurtzExtract_v1(ExtractBenchEnv):
     def __init__(self):
         super(WurtzExtract_v1, self).__init__(
             extraction='wurtz',
-            extraction_vessel=wurtz_vessel(),
-            solvents=["C6H14", "DiEthylEther"],
+            extraction_vessel=wurtz_vessel('dodecane'),
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
             target_material='dodecane',
+            solvents=["C6H14", "DiEthylEther"],
+            out_vessel_path=os.getcwd()
+        )
+
+class GeneralWurtzExtract_v1(ExtractBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self, target_material, in_vessel_path=None):
+        super(GeneralWurtzExtract_v1, self).__init__(
+            extraction='wurtz',
+            extraction_vessel=wurtz_vessel(target_material),
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=in_vessel_path,
+            solvents=["C6H14", "DiEthylEther"],
+            target_material=target_material,
             out_vessel_path=os.getcwd()
         )
 

@@ -41,9 +41,6 @@ PRODUCTS = [
 ]
 SOLVENTS = ["DiEthylEther"]
 
-# define the desired material
-DESIRED = "dodecane"
-
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin
 Vi = 1 # in Litres

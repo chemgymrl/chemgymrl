@@ -54,6 +54,7 @@ from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
 from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red, extraction_0
 from chemistrylab.extract_algorithms import separate
+from chemistrylab.reactions.reaction_base import _Reaction
 
 # a dictionary of available extractions
 extraction_dict = {
@@ -105,7 +106,9 @@ class ExtractBenchEnv(gym.Env):
             n_vessel_pixels=100,
             max_valve_speed=10,
             extraction_vessel=None,
-
+            reaction=_Reaction,
+            reaction_file_identifier="",
+            in_vessel_path=None,
             solvents=[""],
             target_material="",
             out_vessel_path="",
@@ -124,9 +127,17 @@ class ExtractBenchEnv(gym.Env):
             n_vessel_pixels=n_vessel_pixels,
             max_valve_speed=max_valve_speed,
             extraction_vessel=extraction_vessel,
+            reaction=reaction,
+            reaction_file_identifier=reaction_file_identifier,
+            in_vessel_path=in_vessel_path,
             solvents=solvents,
             target_material=target_material,
             out_vessel_path=out_vessel_path
+        )
+
+        self.reaction = self.input_parameters["reaction"](
+            reaction_file_identifier=self.input_parameters["reaction_file_identifier"],
+            target_material=target_material,
         )
 
         # set the validated input parameters
@@ -134,7 +145,11 @@ class ExtractBenchEnv(gym.Env):
         self.dt = self.input_parameters["dt"]
         self.n_vessel_pixels = self.input_parameters["n_vessel_pixels"]
         self.max_valve_speed = self.input_parameters["max_valve_speed"]
-        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+        self.extraction_vessel = self._prepare_vessel(
+            in_vessel_path=self.input_parameters["in_vessel_path"],
+            default_vessel=copy.deepcopy(self.input_parameters["extraction_vessel"])
+        )
+        copy.deepcopy(self.input_parameters["extraction_vessel"])
         self.solvents = self.input_parameters["solvents"]
         self.target_material = self.input_parameters["target_material"]
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
@@ -162,7 +177,7 @@ class ExtractBenchEnv(gym.Env):
         # saved if it exceeds this minimum purity threshold)
         self.min_purity_threshold = 0.05
 
-        self.observation_space = self.extraction.get_observation_space()
+        self.observation_space = self.extraction.get_observation_space(self.reaction.products)
         self.action_space = self.extraction.get_action_space()
         self.done = False
         self._first_render = True
@@ -178,6 +193,9 @@ class ExtractBenchEnv(gym.Env):
         n_vessel_pixels=0,
         max_valve_speed=0,
         extraction_vessel=None,
+        reaction=None,
+        reaction_file_identifier="",
+        in_vessel_path="",
         solvents=[""],
         target_material="",
         out_vessel_path=""
@@ -261,6 +279,18 @@ class ExtractBenchEnv(gym.Env):
         if not isinstance(extraction_vessel, vessel.Vessel):
             raise TypeError("Invalid `extraction vessel` type.")
 
+        # ensure the reaction class is a class type object
+        if not isinstance(reaction, type):
+            raise TypeError("Invalid `Reaction Class` type. Unable to Proceed.")
+
+        # ensure the reaction file identifier is a string a points to a legitimate file
+        if not isinstance(reaction_file_identifier, str):
+            raise TypeError("Invalid `Reaction File Parameter` type. Unable to Proceed.")
+
+        # ensure the reaction file identifier is a string a points to a legitimate file
+        if not isinstance(in_vessel_path, str) and not (in_vessel_path is None):
+            raise TypeError("Invalid `Vessel Path Parameter` type. Unable to Proceed.")
+
         # ensure the added solvents parameter is a string
         if not isinstance(solvents, list):
             print("Invalid `solvents` type. The default will be provided.")
@@ -289,12 +319,47 @@ class ExtractBenchEnv(gym.Env):
             "n_vessel_pixels" : n_vessel_pixels,
             "max_valve_speed" : max_valve_speed,
             "extraction_vessel" : extraction_vessel,
+            "reaction" : reaction,
+            "reaction_file_identifier" : reaction_file_identifier,
+            "in_vessel_path" : in_vessel_path,
             "solvents" : solvents,
             "target_material" : target_material,
             "out_vessel_path" : out_vessel_path
         }
 
         return input_parameters
+
+    def _prepare_vessel(self, in_vessel_path=None, default_vessel=None):
+        """
+        Method to prepare the initial vessel.
+
+        Parameters
+        ---------------
+        `in_vessel_path` : `str` (default=`None`)
+            A string indicating the path to a vessel intended to be loaded into the reaction bench environment.
+        `materials` : `list` (default=`None`)
+            A list of dictionaries including initial material names and amounts.
+        `solvents` : `list` (default=`None`)
+            A list of dictionaries including initial solvent names and amounts.
+
+        Returns
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel object containing materials and solvents to be used in the reaction bench.
+
+        Raises
+        ---------------
+        None
+        """
+        # initialize vessels by providing a empty default vessel or loading an existing saved vessel
+        if in_vessel_path is None:
+            vessels = copy.deepcopy(default_vessel)
+
+        else:
+            with open(in_vessel_path, 'rb') as handle:
+                vessels = pickle.load(handle)
+
+        return vessels
 
     def update_vessel(self, vessel):
         self.extraction_vessel = vessel
@@ -379,7 +444,8 @@ class ExtractBenchEnv(gym.Env):
         )
 
         self.vessels, self.external_vessels, self.state = self.extraction.reset(
-            extraction_vessel=self.extraction_vessel
+            extraction_vessel=self.extraction_vessel,
+            targets=self.reaction.products
         )
 
         return self.state
