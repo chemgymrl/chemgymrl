@@ -149,7 +149,6 @@ class ExtractBenchEnv(gym.Env):
             in_vessel_path=self.input_parameters["in_vessel_path"],
             default_vessel=copy.deepcopy(self.input_parameters["extraction_vessel"])
         )
-        copy.deepcopy(self.input_parameters["extraction_vessel"])
         self.solvents = self.input_parameters["solvents"]
         self.target_material = self.input_parameters["target_material"]
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
