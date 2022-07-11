@@ -71,6 +71,7 @@ class ReactionBenchEnv(gym.Env):
             in_hand=None,
             materials=None,
             solvents=None,
+            target_material="",
             n_steps=50,
             dt=0.01,
             overlap=False
@@ -137,6 +138,7 @@ class ReactionBenchEnv(gym.Env):
         self.reaction = input_parameters["reaction"](
             reaction_file_identifier=input_parameters["reaction_file_identifier"],
             dt=self.dt,
+            target_material=target_material,
             overlap=input_parameters["overlap"]
         )
 
@@ -189,11 +191,11 @@ class ReactionBenchEnv(gym.Env):
         # initial_in_hand.shape[0] indicates the amount of each reactant
         # absorb.shape[0] indicates the numerous spectral signatures from get_spectra
         obs_low = np.zeros(
-            self.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0],
+            self.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0] + len(self.reaction.products),
             dtype=np.float32
         )
         obs_high = np.ones(
-            self.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0],
+            self.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0] + len(self.reaction.products),
             dtype=np.float32
         )
         self.observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
@@ -539,7 +541,8 @@ class ReactionBenchEnv(gym.Env):
         state = np.zeros(
             4 +  # time T V P
             len(self.reaction.reactants) +  # reactants
-            absorb.shape[0],  # spectra
+            absorb.shape[0] +  # spectra
+            len(self.reaction.products),  # product labels
             dtype=np.float32
         )
 
@@ -568,6 +571,9 @@ class ReactionBenchEnv(gym.Env):
             state[i + 4] = self.reaction.n[i] / self.reaction.nmax[i]
         for i in range(absorb.shape[0]):
             state[i + self.reaction.initial_in_hand.shape[0] + 4] = absorb[i]
+
+        targ_ind = self.reaction.products.index(self.reaction.desired)
+        state[4 + self.reaction.initial_in_hand.shape[0] + absorb.shape[0] + targ_ind] = 1
 
         self.state = state
 

@@ -116,9 +116,9 @@ class Extraction:
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
-    def get_observation_space(self):
-        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+    def get_observation_space(self, targets):
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels + len(targets)), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels + len(targets)), dtype=np.float32)
         observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
         return observation_space
 
@@ -141,7 +141,7 @@ class Extraction:
 
         return action_space
 
-    def reset(self, extraction_vessel):
+    def reset(self, extraction_vessel, targets):
         """
         Method to reset the environment.
         Parameters
@@ -206,12 +206,18 @@ class Extraction:
             # add the main solvent vessel to the list of external vessels
             external_vessels.append(solvent_vessel)
 
+        state = np.zeros((self.n_total_vessels, self.n_vessel_pixels + len(targets)), dtype=np.float32)
+
         # generate the state
-        state = util.generate_layers_obs(
+        state[:, :self.n_vessel_pixels] = util.generate_layers_obs(
             vessel_list=vessels,
             max_n_vessel=self.n_total_vessels,
             n_vessel_pixels=self.n_vessel_pixels
         )
+
+        targ_ind = targets.index(self.target_material)
+        state[:, self.n_vessel_pixels + targ_ind] += 1
+
 
         return vessels, external_vessels, state
 

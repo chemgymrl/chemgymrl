@@ -38,6 +38,8 @@ sys.path.append("../../")
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import DistillationReward
 from chemistrylab.distillations import distill_v0
+from chemistrylab.reactions.reaction_base import _Reaction
+
 
 class DistillationBenchEnv(gym.Env):
     '''
@@ -63,6 +65,9 @@ class DistillationBenchEnv(gym.Env):
             n_steps=100,
             boil_vessel=None,
             n_vessel_pixels=100,
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=None,
             target_material=None,
             dQ=0.0,
             out_vessel_path=None
@@ -76,14 +81,25 @@ class DistillationBenchEnv(gym.Env):
             n_steps=n_steps,
             boil_vessel=boil_vessel,
             n_vessel_pixels=n_vessel_pixels,
+            reaction=reaction,
+            reaction_file_identifier=reaction_file_identifier,
+            in_vessel_path=in_vessel_path,
             target_material=target_material,
             dQ=dQ,
             out_vessel_path=out_vessel_path
         )
 
+        self.reaction = input_parameters["reaction"](
+            reaction_file_identifier=input_parameters["reaction_file_identifier"],
+            target_material=target_material,
+        )
+
         # set the input parameters
         self.n_steps = input_parameters["n_steps"]
-        self.boil_vessel = input_parameters["boil_vessel"]
+        self.boil_vessel = self._prepare_vessel(
+            in_vessel_path=input_parameters["in_vessel_path"],
+            default_vessel=deepcopy(input_parameters["boil_vessel"])
+        )
         self.target_material = input_parameters["target_material"]
         self.dQ = input_parameters["dQ"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
@@ -119,7 +135,7 @@ class DistillationBenchEnv(gym.Env):
         self.min_purity_threshold = 0.5
 
     @staticmethod
-    def _validate_parameters(n_steps=None, boil_vessel=None, n_vessel_pixels=100, target_material=None, dQ=0.0, out_vessel_path=None):
+    def _validate_parameters(n_steps=None, boil_vessel=None, n_vessel_pixels=100, reaction=None, reaction_file_identifier="", in_vessel_path=None, target_material=None, dQ=0.0, out_vessel_path=None):
         '''
         Checks and validates the input parameters submitted to the distillation bench.
         Parameters
@@ -171,19 +187,22 @@ class DistillationBenchEnv(gym.Env):
         if not isinstance(n_vessel_pixels, int):
             print("Invalid 'Number of Pixels' type. The default will be provided.")
             n_vessel_pixels = 100
+        
+        # ensure the reaction class is a class type object
+        if not isinstance(reaction, type):
+            raise TypeError("Invalid `Reaction Class` type. Unable to Proceed.")
+
+        # ensure the reaction file identifier is a string a points to a legitimate file
+        if not isinstance(reaction_file_identifier, str):
+            raise TypeError("Invalid `Reaction File Parameter` type. Unable to Proceed.")
+
+        # ensure the reaction file identifier is a string a points to a legitimate file
+        if not isinstance(in_vessel_path, str) and not (in_vessel_path is None):
+            raise TypeError("Invalid `Reaction File Parameter` type. Unable to Proceed.")
 
         # ensure that the target material is given as a string
         if not isinstance(target_material, str):
             print("Invalid 'Target Material' type. The default will be provided.")
-            target_material = ""
-
-        # check that the target material is present in the boil vessel
-        if not target_material in boil_vessel._material_dict.keys():
-            print(
-                "The target material, {}, is not present in the boil vessel's material dictionary.".format(
-                    target_material
-                )
-            )
             target_material = ""
 
         # ensure that the maximal heat increment parameter is a float or an int value
@@ -215,12 +234,47 @@ class DistillationBenchEnv(gym.Env):
             "n_steps" : n_steps,
             "boil_vessel" : boil_vessel,
             "n_vessel_pixels" : n_vessel_pixels,
+            "reaction" : reaction,
+            "reaction_file_identifier" : reaction_file_identifier,
+            "in_vessel_path" : in_vessel_path,
             "target_material" : target_material,
             "dQ" : dQ,
             "out_vessel_path" : out_vessel_path
         }
 
         return input_parameters
+
+    def _prepare_vessel(self, in_vessel_path=None, default_vessel=None):
+        """
+        Method to prepare the initial vessel.
+
+        Parameters
+        ---------------
+        `in_vessel_path` : `str` (default=`None`)
+            A string indicating the path to a vessel intended to be loaded into the reaction bench environment.
+        `materials` : `list` (default=`None`)
+            A list of dictionaries including initial material names and amounts.
+        `solvents` : `list` (default=`None`)
+            A list of dictionaries including initial solvent names and amounts.
+
+        Returns
+        ---------------
+        `vessels` : `vessel.Vessel`
+            A vessel object containing materials and solvents to be used in the reaction bench.
+
+        Raises
+        ---------------
+        None
+        """
+        # initialize vessels by providing a empty default vessel or loading an existing saved vessel
+        if in_vessel_path is None:
+            vessels = deepcopy(default_vessel)
+
+        else:
+            with open(in_vessel_path, 'rb') as handle:
+                vessels = pickle.load(handle)
+
+        return vessels
 
     def update_vessel(self, vessel):
         self.boil_vessel = vessel
@@ -284,7 +338,7 @@ class DistillationBenchEnv(gym.Env):
         # state[i][n_vessel_pixels+2] = pressure
         
         # set up the base state variable
-        self.state = np.zeros((len(self.vessels), self.distillation.n_vessel_pixels+3), dtype=np.float32)
+        self.state = np.zeros((len(self.vessels), self.distillation.n_vessel_pixels+3+len(self.reaction.products)), dtype=np.float32)
 
         self.state[:, :self.distillation.n_vessel_pixels] = util.generate_layers_obs(
             self.vessels,
@@ -313,6 +367,9 @@ class DistillationBenchEnv(gym.Env):
             total_pressure = vessel.get_pressure()
             normalized_pressure = total_pressure / Pmax
             self.state[i, self.distillation.n_vessel_pixels+2] = normalized_pressure
+
+        targ_ind = self.reaction.products.index(self.target_material)
+        self.state[:, self.distillation.n_vessel_pixels+3+targ_ind] += 1
 
     def reset(self):
         '''

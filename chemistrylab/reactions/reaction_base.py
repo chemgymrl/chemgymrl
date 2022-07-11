@@ -51,7 +51,7 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", dt=0.01, overlap=False, solver='RK45'):
+    def __init__(self, reaction_file_identifier="", target_material="", dt=0.01, overlap=False, solver='RK45'):
         """
         Constructor class module for the Reaction class.
 
@@ -86,7 +86,7 @@ class _Reaction:
         self.reactants = reaction_params["REACTANTS"]
         self.products = reaction_params["PRODUCTS"]
         self.solvents = reaction_params["SOLVENTS"]
-        self.desired = reaction_params["DESIRED"]
+        self.desired = target_material
 
         # initial vessel properties (used in reseting the reaction vessel)
         self.Ti = reaction_params["Ti"]
@@ -449,7 +449,7 @@ class _Reaction:
         '''
 
         # ensure action is an np.ndarray
-        if not isinstance(action, np.ndarray):
+        if not isinstance(action, np.ndarray) and not isinstance(action, list):
             raise TypeError('Invalid action array. Unable to proceed')
 
         # ensure the vessel class is a class type object
