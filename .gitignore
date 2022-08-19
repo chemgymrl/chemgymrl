@@ -6,3 +6,5 @@
 
 *.swp
 chemistrygym.egg-info/*
+wandb/*
+runs/*
