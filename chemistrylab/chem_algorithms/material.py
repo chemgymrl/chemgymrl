@@ -836,6 +836,209 @@ class DiEthylEther(Material):
             index=29
         )
 
+class A(Material):
+    def __init__(self):
+        super().__init__(
+            name='A',
+            density={'s': None, 'l': 0.75, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0.15,
+            charge=0.0,
+            boiling_point=489.5,
+            melting_point=263.6,
+            solute=True,
+            specific_heat=2.3889,  # in J/g*K
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_dodecane,
+            spectra_no_overlap=spec.S_dodecane,
+            index=30
+        )
+
+class B(Material):
+    def __init__(self):
+        super().__init__(
+            name='B',
+            density={'s': None, 'l': 0.879, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=120.62,
+            color=0.1,
+            charge=0.0,
+            boiling_point=408.2,
+            melting_point=179.2,
+            solute=False,
+            specific_heat=1.5408,
+            enthalpy_fusion=15490.0,
+            enthalpy_vapor=42800.0,
+            spectra_overlap=spec.S_1_chlorohexane,
+            spectra_no_overlap=spec.S_1_chlorohexane,
+            index=31
+        )
+
+
+class C(Material):
+    def __init__(self):
+        super().__init__(
+            name='C',
+            density={'s': None, 'l': 0.87, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=120.62,
+            color=0.15,
+            charge=0.0,
+            boiling_point=395.2,
+            melting_point=308.3,
+            solute=False,
+            specific_heat=1.5408,
+            enthalpy_fusion=11970.0,
+            enthalpy_vapor=43820.0,
+            spectra_overlap=spec.S_2_chlorohexane,
+            spectra_no_overlap=spec.S_2_chlorohexane,
+            index=32
+        )
+
+
+class D(Material):
+    def __init__(self):
+        super().__init__(
+            name='D',
+            density={'s': None, 'l': 0.9, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=120.62,
+            color=0.2,
+            charge=0.0,
+            boiling_point=396.2,
+            melting_point=308.3,
+            solute=False,
+            specific_heat=1.5408,
+            enthalpy_fusion=11970.0,
+            enthalpy_vapor=32950.0,
+            spectra_overlap=spec.S_3_chlorohexane,
+            spectra_no_overlap=spec.S_3_chlorohexane,
+            index=33
+        )
+
+
+class E(Material):
+    def __init__(self):
+        super().__init__(
+            name='E',
+            density={'s': None, 'l': 0.75, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0.25,
+            charge=0.0,
+            boiling_point=481.1,
+            melting_point=255.2,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
+            index=34
+        )
+
+
+class F(Material):
+    def __init__(self):
+        super().__init__(
+            name='F',
+            density={'s': None, 'l': 0.75, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0.3,
+            charge=0.0,
+            boiling_point=480.1,
+            melting_point=254.2,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
+            index=35
+        )
+
+
+class G(Material):
+    def __init__(self):
+        super().__init__(
+            name='G',
+            density={'s': None, 'l': 0.757, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0.35,
+            charge=0.0,
+            boiling_point=474.2,
+            melting_point=222.4,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
+            index=36
+        )
+
+
+class H(Material):
+    def __init__(self):
+        super().__init__(
+            name='H',
+            density={'s': None, 'l': 0.75, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0.4,
+            charge=0.0,
+            boiling_point=476.3,
+            melting_point=224.5,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
+            index=37
+        )
+
+
+class I(Material):
+    def __init__(self):
+        super().__init__(
+            name='I',
+            density={'s': None, 'l': 0.768, 'g': None},
+            polarity=0.0,
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=170.34,
+            color=0.45,
+            charge=0.0,
+            boiling_point=470.2,
+            melting_point=222.4,
+            solute=False,
+            specific_heat=2.3889,
+            enthalpy_fusion=19790.0,
+            enthalpy_vapor=41530.0,
+            index=38
+        )
 
 ##------Indicators------##
 

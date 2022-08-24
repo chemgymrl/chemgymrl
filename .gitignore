@@ -8,3 +8,5 @@
 chemistrygym.egg-info/*
 wandb/*
 runs/*
+RL_tests/runs/*
+RL_tests/wandb/*

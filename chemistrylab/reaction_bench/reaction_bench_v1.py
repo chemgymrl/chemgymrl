@@ -68,7 +68,7 @@ class GeneralWurtzReact_v1(ReactionBenchEnv):
     Class object to define an environment available in the reaction bench.
     '''
 
-    def __init__(self, target_material, in_vessel_path=None):
+    def __init__(self, target_material="", in_vessel_path=None):
         '''
         Constructor class for the ReactionBenchEnv_0 environment.
         '''
@@ -91,7 +91,41 @@ class GeneralWurtzReact_v1(ReactionBenchEnv):
                 {"Material": "DiEthylEther", "Initial": 4}
             ],
             target_material=target_material,
-            n_steps=50,
+            n_steps=20,
+            dt=0.01,
+            overlap=False
+        )
+
+class FictReact_v1(ReactionBenchEnv):
+    '''
+    Class object to define an environment available in the reaction bench.
+    '''
+
+    def __init__(self, target_material="", avoid_material="E", in_vessel_path=None):
+        '''
+        Constructor class for the ReactionBenchEnv environment.
+        '''
+
+        super(FictReact_v1, self).__init__(
+            reaction=_Reaction,
+            reaction_file_identifier="fict_react",
+            in_vessel_path=in_vessel_path, # do not include an input vessel
+            out_vessel_path=os.getcwd(), # include an output vessel directory
+            in_hand=[ # initialize the bench with the following materials
+                {"Material": "A", "Initial": 1},
+                {"Material": "B", "Initial": 1},
+                {"Material": "C", "Initial": 1},
+                {"Material": "D", "Initial": 3}
+            ],
+            materials=[ # initialize the bench with the following materials available
+                {"Material": "H2O", "Initial": 30}
+            ],
+            solvents=[ # initialize the bench with the following solvents available
+                {"Material": "H2O", "Initial": 30}
+            ],
+            target_material=target_material,
+            avoid_material=avoid_material,
+            n_steps=20,
             dt=0.01,
             overlap=False
         )
