@@ -61,6 +61,11 @@ register(
 )
 
 register(
+    id='FictReact-v2',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:FictReact_v2'
+)
+
+register(
     id='DecompReact-v0',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
     max_episode_steps=100

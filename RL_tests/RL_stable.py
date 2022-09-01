@@ -11,9 +11,9 @@ config = {
     "policy_type": "MlpPolicy",
     "policy_name": "PPO_React",
     "run_name": "FictReact-PPO",
-    "total_timesteps": 5000,
-    "log_int": 1,
-    "env_name": "FictReact-v1",
+    "total_timesteps": 100000,
+    "log_int": 5,
+    "env_name": "FictReact-v2",
     "policy_kwargs": dict(net_arch=[32, 32])
 }
 
@@ -33,7 +33,7 @@ def make_env():
     return env
 
 env = DummyVecEnv([make_env])
-model = config["rl_alg"](config["policy_type"], env, n_steps=128, n_epochs=5, policy_kwargs=config["policy_kwargs"], verbose=1, tensorboard_log=f"runs/{run.id}")
+model = config["rl_alg"](config["policy_type"], env, policy_kwargs=config["policy_kwargs"], verbose=1, tensorboard_log=f"runs/{run.id}")
 model.learn(
     total_timesteps=config["total_timesteps"],
     log_interval=config["log_int"],
