@@ -218,7 +218,6 @@ class Extraction:
         targ_ind = targets.index(self.target_material)
         state[:, self.n_vessel_pixels + targ_ind] += 1
 
-
         return vessels, external_vessels, state
 
     def perform_action(self, vessels, ext_vessel, action):

@@ -491,13 +491,18 @@ class ExtractBenchEnv(gym.Env):
         self.vessels = vessels
         self.external_vessels = ext_vessels
         self.done = done
-        
-        # determine the state after performing the action
-        self.state = util.generate_layers_obs(
-            self.vessels,
+
+        state = np.zeros((self.extraction.n_total_vessels, self.n_vessel_pixels + len(self.reaction.products)), dtype=np.float32)
+
+        # generate the state
+        state[:, :self.n_vessel_pixels] = util.generate_layers_obs(
+            vessel_list=self.vessels,
             max_n_vessel=self.extraction.n_total_vessels,
             n_vessel_pixels=self.n_vessel_pixels
         )
+
+        targ_ind = self.reaction.products.index(self.target_material)
+        state[:, self.n_vessel_pixels + targ_ind] += 1
 
         # document the most recent step and determine if future steps are necessary
         self.n_steps -= 1
