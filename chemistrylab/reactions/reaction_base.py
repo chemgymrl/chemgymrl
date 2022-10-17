@@ -51,7 +51,7 @@ R = 8.314462619
 
 class _Reaction:
 
-    def __init__(self, reaction_file_identifier="", target_material="", dt=0.01, overlap=False, solver='RK45'):
+    def __init__(self, reaction_file_identifier="", target_material="", avoid_material="", dt=0.01, overlap=False, solver='RK45'):
         """
         Constructor class module for the Reaction class.
 
@@ -86,7 +86,13 @@ class _Reaction:
         self.reactants = reaction_params["REACTANTS"]
         self.products = reaction_params["PRODUCTS"]
         self.solvents = reaction_params["SOLVENTS"]
-        self.desired = target_material
+        self.target = target_material
+        self.undesired = avoid_material
+        if self.target == "":
+            r = np.random.randint(0, len(self.products))
+            self.desired = self.products[r]
+        else:
+            self.desired = self.target
 
         # initial vessel properties (used in reseting the reaction vessel)
         self.Ti = reaction_params["Ti"]
@@ -566,6 +572,12 @@ class _Reaction:
         ---------------
         None
         """
+
+        if self.target == "":
+            r = np.random.randint(0, len(self.products))
+            self.desired = self.products[r]
+        else:
+            self.desired = self.target
 
         # open the provided vessel to get the material and solute dictionaries
         material_dict = vessels.get_material_dict()

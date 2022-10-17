@@ -77,18 +77,20 @@ class ReactionReward:
     def __init__(
         self,
         vessel=None,
-        desired_material=""
+        desired_material="",
+        undesired_material=""
     ):
         '''
         Constructor class for `ReactionReward` environment.
         '''
 
-        self.vessel, self.desired_material = self._check_parameters(
+        self.vessel, self.desired_material, self.undesired_material = self._check_parameters(
             vessel=vessel,
-            desired_material=desired_material
+            desired_material=desired_material,
+            undesired_material=undesired_material
         )
 
-    def _check_parameters(self, vessel=None, desired_material=""):
+    def _check_parameters(self, vessel=None, desired_material="", undesired_material=""):
         '''
         Method to validate the inputted parameters. The desired material must be a string object
         and present in the vessel's `material_dict`. The vessel must be a vessel object and
@@ -132,9 +134,23 @@ class ReactionReward:
         ]):
             print("Desired material not found in input vessel.")
 
-        return vessel, desired_material
+        # ensure the undesired material is represented by a string
+        if not isinstance(desired_material, str):
+            print("Invalid Parameter Type: `desired_material` must be a string.")
+            desired_material = ""
 
-    def calc_reward(self):
+        # check that the inputted vessel has the desired material
+        if undesired_material=="":
+            pass
+        elif any([
+                not desired_material,
+                desired_material not in all_materials
+        ]):
+            print("Undesired material not found in input vessel.")
+
+        return vessel, desired_material, undesired_material
+
+    def calc_reward(self, done):
         '''
         Method to calculate the reward accumulated from completing the Reaction Bench. The reward
         is calculated using the purity of the desired material in the outputted vessel object. The
@@ -144,6 +160,7 @@ class ReactionReward:
 
         # create variables to contain the material amounts
         desired_material_amount = 0
+        undesired_material_amount = 0
         total_material_amount = 0
 
         # unpack the vessel's material dictionary
@@ -158,10 +175,12 @@ class ReactionReward:
             # if so, set the amount of desired material produced
             if material == self.desired_material:
                 desired_material_amount = material_amount
+            elif material == self.undesired_material:
+                undesired_material_amount = material_amount
 
         # calculate the reward
-        if total_material_amount > 1e-6:
-            reward = desired_material_amount/total_material_amount
+        if total_material_amount > 1e-6 and done:
+            reward = (desired_material_amount - undesired_material_amount) #/ total_material_amount
         else:
             reward = 0
 

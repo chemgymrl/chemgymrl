@@ -39,6 +39,7 @@ Class to initialize reaction vessels, prepare the reaction base environment, and
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
+from copy import deepcopy
 import numpy as np
 import gym
 import gym.spaces
@@ -72,6 +73,7 @@ class ReactionBenchEnv(gym.Env):
             materials=None,
             solvents=None,
             target_material="",
+            avoid_material="",
             n_steps=50,
             dt=0.01,
             overlap=False
@@ -132,6 +134,7 @@ class ReactionBenchEnv(gym.Env):
         self.out_vessel_path = input_parameters["out_vessel_path"]
 
         self.n_steps = input_parameters["n_steps"]  # Time steps per action
+        self.max_steps = deepcopy(self.n_steps)
         self.dt = input_parameters["dt"]  # Time step of reaction (s)
 
         # initialize the reaction by specifying the reaction file to locate and acquire
@@ -139,6 +142,7 @@ class ReactionBenchEnv(gym.Env):
             reaction_file_identifier=input_parameters["reaction_file_identifier"],
             dt=self.dt,
             target_material=target_material,
+            avoid_material=avoid_material,
             overlap=input_parameters["overlap"]
         )
 
@@ -601,6 +605,7 @@ class ReactionBenchEnv(gym.Env):
 
         # reset the modifiable state variables
         self.t = 0.0
+        self.n_steps = deepcopy(self.max_steps)
         self.step_num = 1
 
         # reinitialize the reaction class
@@ -688,11 +693,16 @@ class ReactionBenchEnv(gym.Env):
 
         self._update_state()
 
+        self.n_steps -= 1
+        if self.n_steps == 0:
+            self.done = True
+
         # calculate the reward for this step
         reward = ReactionReward(
             vessel=self.vessels,
-            desired_material=self.reaction.desired
-        ).calc_reward()
+            desired_material=self.reaction.desired,
+            undesired_material=self.reaction.undesired
+        ).calc_reward(done=self.done)
 
         # ---------- ADD ---------- #
         # add option to save or print intermediary vessel
