@@ -504,6 +504,8 @@ class ExtractBenchEnv(gym.Env):
         targ_ind = self.reaction.products.index(self.target_material)
         state[:, self.n_vessel_pixels + targ_ind] += 1
 
+        self.state = copy.deepcopy(state)
+
         # document the most recent step and determine if future steps are necessary
         self.n_steps -= 1
         if self.n_steps == 0:
@@ -611,7 +613,7 @@ class ExtractBenchEnv(gym.Env):
 
         Ls = np.reshape(
             np.array(
-                [x[2] for x in self.state]
+                self.state[:, :self.n_vessel_pixels]
             ),
             (
                 self.extraction.n_total_vessels,
