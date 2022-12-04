@@ -134,6 +134,9 @@ class Material:
     # functions to access material's properties
     def get_name(self):
         return self._name
+    def __repr__(self):
+        #This helps when printing material and solute dictionaries
+        return self._name
 
     def get_density(self, convert_to_g_cubic_meter=True):
         # need to convert to g/dm^3 in order to get volume in litres

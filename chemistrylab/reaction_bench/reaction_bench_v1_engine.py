@@ -741,7 +741,7 @@ class ReactionBenchEnv(gym.Env):
         else:
             print("Incorrect Render Model: {}".format(model))
 
-    def human_render(self, model='plot'):
+    def human_render(self, model='plot',redraw=True):
         """
         Method to plot thermodynamic variables and spectral data.
         Plots a minimal amount of data for a 'surface-level'
@@ -786,8 +786,8 @@ class ReactionBenchEnv(gym.Env):
         # call render function in reaction base
         self.reaction.plot_human_render(self._first_render, wave_data_dict, self.plot_data_state)
 
-        if self._first_render:
-            self._first_render = False
+        #if self._first_render:
+        self._first_render = redraw
 
     def full_render(self, model='plot'):
         """
