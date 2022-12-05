@@ -269,7 +269,8 @@ class Extraction:
             beaker_2 = vessels[2]
             solvent_vessel1 = ext_vessel[0]
             solvent_vessel2 = ext_vessel[1]
-
+            
+            print(do_action,multiplier)
             # Open Valve (Speed multiplier)
             if do_action == 0:
                 # calculate the number of pixels being drained

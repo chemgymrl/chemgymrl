@@ -134,7 +134,7 @@ class ExtractBenchEnv(gym.Env):
             target_material=target_material,
             out_vessel_path=out_vessel_path
         )
-
+        print("HI")
         self.reaction = self.input_parameters["reaction"](
             reaction_file_identifier=self.input_parameters["reaction_file_identifier"],
             target_material=target_material,
@@ -299,7 +299,9 @@ class ExtractBenchEnv(gym.Env):
         if not isinstance(target_material, str):
             print("Invalid `desired` type. The default will be provided.")
             target_material = ""
-
+        
+        
+        print(out_vessel_path,"PATH")
         # ensure the output vessel parameter points to a legitimate directory
         if not isinstance(out_vessel_path, str):
             print("The provided output vessel path is invalid. The default will be provided.")
@@ -307,7 +309,7 @@ class ExtractBenchEnv(gym.Env):
         elif os.path.isdir(out_vessel_path):
             pass
         else:
-            print("The provided output vessel path is invalid. The default will be provided.")
+            print("The provided output vessel path is invalid. The default will be provided. KS")
             out_vessel_path = os.getcwd()
 
         # collect the input parameters in a labelled dictionary
@@ -563,7 +565,7 @@ class ExtractBenchEnv(gym.Env):
         if model == 'human':
             self.human_render()
 
-    def human_render(self, mode='plot'):
+    def human_render(self, mode='plot',redraw=True):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -676,7 +678,7 @@ class ExtractBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
-                self._first_render = False
+                self._first_render = redraw
 
         # if the plot has already been rendered, update the plot
         else:
