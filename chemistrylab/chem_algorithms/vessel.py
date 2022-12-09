@@ -1188,6 +1188,7 @@ class Vessel:
         for M in self._layers_position_dict:
             if M == 'Air':  # skip Air for now
                 continue
+
             self._layers_position_dict[M] = new_layers_position[layers_counter]
             if self._solute_dict:
                 layers_counter += 1
