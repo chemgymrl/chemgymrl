@@ -192,7 +192,8 @@ def wurtz_vessel(add_mat=""):
         '4-ethyldecane': material.FourEthyldecane,
         '5,6-dimethyldecane': material.FiveSixDimethyldecane,
         '4-ethyl-5-methylnonane': material.FourEthylFiveMethylnonane,
-        '4,5-diethyloctane': material.FourFiveDiethyloctane
+        '4,5-diethyloctane': material.FourFiveDiethyloctane,
+        'NaCl': material.NaCl
     }
     try:
         add_material = products[add_mat]()
@@ -252,6 +253,7 @@ class WurtzExtract_v1(ExtractBenchEnv):
             extraction_vessel=wurtz_vessel('dodecane'),
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            n_steps=50,
             target_material='dodecane',
             solvents=["C6H14", "DiEthylEther"],
             out_vessel_path=os.getcwd()

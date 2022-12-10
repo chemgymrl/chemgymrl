@@ -386,14 +386,14 @@ class ExtractionReward:
                 desired_material=self.desired_material,
                 initial_target_amount=self.initial_target_amount,
                 print_flag = True
-            )
+            ) * vessel._material_dict[self.desired_material][1]
 
         # calculate the final reward by dividing the sum of the purity rewards by the number of
         # vessels containing at least some of the desired material
         if len(self.desired_vessels) == 0:
             final_reward = 0
         else:
-            final_reward = total_reward / (len(self.desired_vessels)**2)
+            final_reward = total_reward
 
         return final_reward
 

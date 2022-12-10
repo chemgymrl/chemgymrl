@@ -18,6 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cmocean
 from math import ceil
+from copy import deepcopy
 
 ## ---------- ## DEFAULTS ## ---------- ##
 
@@ -162,12 +163,14 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
 
     t += mixing
 
+    # Reset layer positions to 0 and mix 
     # Update shift of Gaussian peaks
+    B *= 0
     for i in range(B.shape[0]):
         for j in range(0, i):
-            B[j] -= (D[j] - D[i]) * mixing
+            B[j] -= (D[j] - D[i]) * (t - tmix)
         for j in range(i+1, B.shape[0]):
-            B[j] -= (D[j] - D[i]) * mixing
+            B[j] -= (D[j] - D[i]) * (t - tmix)
 
     Sts = np.zeros(S.shape)
     Scur = np.copy(S)
@@ -215,124 +218,11 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
 
         if abs(t - mixing - tmix) > 1e-9:
             S[i] = Sts[i] + 0.5 * ((1 - abs(mixing) / mixing) * (S[i] - St0) * (t - tmix) / (t - mixing - tmix) + (1 + abs(mixing) / mixing) * (S[i] - St0))
-            #S[i] = Scur[i]
         else:
             S[i] = Sts[i]
-            #S[i] = Scur[i]
 
     # Update the varience of each Gaussian peak
     C = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
 
     return B, C, S, Sts
 
-'''
-# Array for Gaussians at each time step
-Ps = np.zeros((100, A.shape[0], x.shape[0]), dtype=np.float32)
-
-# Array for layers at each time step
-Ls = np.zeros((Ps.shape[0], 100), dtype=np.float32) + colors[-1]
-
-# Array for solutes at each time step
-Ss = np.zeros((Ps.shape[0], S.shape[0], S.shape[1]), dtype=np.float32) + colors[-1]
-Sts = np.zeros((Ps.shape[0], S.shape[0], S.shape[1]), dtype=np.float32) + colors[-1]
-
-B, C, S, St = mix(A[:-1], B, C, D, Spol, Lpol, S, 0.0)
-
-# Loop over each time step for positive dt
-for i in range(Ps.shape[0]//2):
-    # Initialize time variable such that Gaussians have normalized area
-    t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
-
-    # Loop over each x position
-    for j in range(Ps.shape[1]):
-        # Loop over each phase
-        for k in range(Ps.shape[2]):
-            # Calculate the value of the Gaussian for that phase and x position
-            Ps[i, j, k] = A[j] * np.exp(-1.0 * (((x[k] - B[j]) / (2.0 * C)) ** 2) + t)
-
-    Ls[i] = map_to_state(A, B, C, x)
-    B, C, S, St = mix(A[:-1], B, C, D, Spol, Lpol, S, dt)
-    Ss[i] = np.copy(S)
-    Sts[i] = np.copy(St)
-
-S = np.array([[0.75, 0.25], [0.05, 0.95]])
-
-# Loop over each time step for negative dt
-for i in range(Ps.shape[0]//2):
-    # Initialize time variable such that Gaussians have normalized area
-    t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
-
-    # Loop over each x position
-    for j in range(Ps.shape[1]):
-        # Loop over each phase
-        for k in range(Ps.shape[2]):
-            # Calculate the value of the Gaussian for that phase and x position
-            Ps[i, j, k] = A[j] * np.exp(-1.0 * (((x[k] - B[j]) / (2.0 * C)) ** 2) + t)
-
-    Ls[i] = map_to_state(A, B, C, x)
-    B, C, S, St = mix(A[:-1], B, C, D, Spol, Lpol, S, -1.0*dt)
-    Ss[i] = np.copy(S)
-    Sts[i] = np.copy(St)
-
-for i in range(Ps.shape[0]//2, Ps.shape[0]):
-    # Initialize time variable such that Gaussians have normalized area
-    t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
-
-    # Loop over each x position
-    for j in range(Ps.shape[1]):
-        # Loop over each phase
-        for k in range(Ps.shape[2]):
-            # Calculate the value of the Gaussian for that phase and x position
-            Ps[i, j, k] = A[j] * np.exp(-1.0 * (((x[k] - B[j]) / (2.0 * C)) ** 2) + t)
-
-    Ls[i] = map_to_state(A, B, C, x)
-    B, C, S, St = mix(A[:-1], B, C, D, Spol, Lpol, S, dt)
-    Ss[i] = np.copy(S)
-    Sts[i] = np.copy(St)
-
-B, C, S, St = mix(A[:-1], B, C, D, Spol, Lpol, S, -1.0*dt)
-
-Ls = np.reshape(Ls, (Ls.shape[0], Ls.shape[1], 1))
-
-# Plot Gaussian peaks and phase layers for each time step
-for i in range(Ps.shape[0]):
-    fig, ax = plt.subplots(1, 3, figsize=(18, 6), gridspec_kw={'width_ratios': [4, 4, 1]})
-    for j in range(Ps.shape[1]):
-        ax[0].plot(x, Ps[i, j], label=labels[j])
-    ax[0].set_xlim([x[0], x[-1]])
-    ax[0].set_ylim([0, 1])
-    ax[0].set_xlabel('Separation')
-    ax[0].legend()
-    ax[1].bar([0, 1, 2, 3], Ss[i].flatten())
-    ax[1].set_xticks([0, 1, 2, 3])
-    ax[1].set_xticklabels(['S1 Water', 'S1 Oil', 'S2 Water', 'S2 Oil'])
-    ax[1].set_ylim([0, 1])
-    mappable = ax[2].pcolormesh(Ls[i], vmin=0, vmax=1, cmap=cmocean.cm.delta)
-    ax[2].set_xticks([])
-    ax[2].set_ylabel('Height')
-    fig.colorbar(mappable)
-    plt.savefig('./figures/ex_%.3i.png' % (i), dpi=256)
-    plt.close()
-
-x = np.linspace(0, 1, Ss.shape[0])
-labels1 = ['1', '2']
-labels2 = ['Water', 'Oil', 'Other']
-colour = ['b', 'r', 'g', 'k', 'c', 'm']
-k = 0
-
-plt.figure()
-for i in range(Ss.shape[1]):
-    for j in range(Ss.shape[2]):
-        plt.plot(x, Ss[:, i, j], c=colour[k], label=labels1[i] + ' ' + labels2[j])
-        plt.plot(x, Sts[:, i, j], c=colour[k], ls='--', lw=2.0, label=labels1[i] + ' ' + labels2[j] + ' True')
-        k += 1
-
-plt.xlim([0, 1])
-plt.ylim([0, 1])
-plt.xlabel('Mixing Time')
-plt.ylabel('Amount of Solute')
-plt.xticks([0, 0.5, 1], ['Settled', 'Mixed', 'Settled'])
-plt.legend()
-plt.show()
-plt.close()
-'''

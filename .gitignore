@@ -5,9 +5,12 @@
 *.mp4
 
 *.swp
-chemistrygym.egg-info/*
-wandb/*
-runs/*
-RL_tests/runs/*
-RL_tests/wandb/*
-models/*
+chemistrygym.egg-info/
+wandb/
+runs/
+RL_tests/runs/
+RL_tests/wandb/
+RL_tests/models/
+models/
+*.pickle
+RL_tests/*.zip

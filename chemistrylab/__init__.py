@@ -13,9 +13,13 @@ from gym.envs.registration import register
 ############################ ExtractBench ####################################
 
 register(
+    id='GenWurtzExtract-v1',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v1',
+)
+
+register(
     id='WurtzExtract-v1',
     entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1',
-    max_episode_steps=100
 )
 
 register(
