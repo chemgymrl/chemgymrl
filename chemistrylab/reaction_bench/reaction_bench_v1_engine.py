@@ -382,7 +382,7 @@ class ReactionBenchEnv(gym.Env):
         self.vessels = new_vessel
 
         # modify the vessel appropriately and reset the reaction environment
-        self.vessels = self.reaction.reset(self.vessels)
+        self.vessels = self.reaction.reset(self.vessels, self.initial_in_hand)
 
     @staticmethod
     def _prepare_materials(materials=[]):

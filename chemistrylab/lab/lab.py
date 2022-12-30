@@ -237,7 +237,7 @@ class Lab(gym.Env, ABC):
             self.shelf.return_vessel_to_shelf(vessel=rtn_vessel)
         return total_reward, np.array([])
 
-    def step(self, action: [list, np.array]):
+    def step(self, action: list or np.array):
         """
         This function takes in an agents command and deconstructs the command and runs the appropriate environment with
         the specified bench, environment, vessel, and agent
