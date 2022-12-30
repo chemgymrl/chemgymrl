@@ -812,8 +812,8 @@ class ReactionBenchEnv(gym.Env):
         wave_min = self.char_bench.params['spectra']['range_ir'][0]
 
         # define the length of the spectral data array and the array itself
-        spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0]
-        absorb = self.state[4 + self.reaction.initial_in_hand.shape[0]:]
+        spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0] - len(self.reaction.products)
+        absorb = self.state[4 + self.reaction.initial_in_hand.shape[0]:-1*len(self.reaction.products)]
 
         # set a space for all spectral data to exist in
         wave = np.linspace(
@@ -842,16 +842,6 @@ class ReactionBenchEnv(gym.Env):
             self.n_steps,
             self.vessels,
             self.step_num
-        )
-
-        # get the spectral data peak and dashed spectral lines
-        peak = self.char_bench.get_spectra_peak(
-            self.vessels,
-            materials=self.reaction.materials
-        )
-        dash_spectra = self.char_bench.get_dash_line_spectra(
-            self.vessels,
-            materials=self.reaction.materials
         )
 
         # The first render is required to initialize the figure
