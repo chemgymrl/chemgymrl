@@ -764,6 +764,11 @@ class Vessel:
             feedback=[event_1, event_2],
             dt=dt
         )
+        __ = target_vessel.push_event_to_queue(
+            events=None,
+            feedback=None,
+            dt=-100000
+        )
 
         return reward
 
