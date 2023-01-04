@@ -14,7 +14,6 @@ The agent operating on this bench will experiment using solutes in different sce
 
 The input to the extraction bench is initialized in the `extraction_bench_v1.py` file.
 
-![extraction bench input](../tutorial_figures/extraction/extraction_bench_input.png)
 ```
 class WurtzExtract_v1(ExtractBenchEnv):
     """
