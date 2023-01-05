@@ -17,7 +17,7 @@ Much like bench agents, the lab manager is also learning how to best perform tas
 The lab manager's input are the three main environments that it will be working with, mainly the reaction, extraction,
 and distillation environments. This is made available and specified under `lab.py`.
 
-```
+```python
 class Lab(gym.Env, ABC):
     """
     The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals
@@ -45,7 +45,7 @@ The lab manager's output will be messages from the environment that it is curren
 depend on the action that is being performed. The lab manager itself does not have any specific outputs. We can, 
 however, use lab manager to access the extraction environment and get outputs from that.
 
-```
+```commandline
 >>> python manager.py
 Index: Action
 0: load vessel from pickle

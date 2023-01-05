@@ -16,7 +16,7 @@ When the agent performs enough positive actions and is satisfied with the amount
 
 The input to the reaction bench is initialized in the `reaction_bench_v1.py` file. 
 
-```
+```python
 class WurtzReact_v1(ReactionBenchEnv):
     '''
     Class object to define an environment available in the reaction bench.

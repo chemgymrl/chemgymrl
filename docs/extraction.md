@@ -14,7 +14,7 @@ The agent operating on this bench will experiment using solutes in different sce
 
 The input to the extraction bench is initialized in the `extraction_bench_v1.py` file.
 
-```
+```python
 class WurtzExtract_v1(ExtractBenchEnv):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.

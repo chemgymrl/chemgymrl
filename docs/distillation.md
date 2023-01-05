@@ -14,7 +14,7 @@ An agent tasked to operate on this bench must control the heat energy added to t
 
 The input to the extraction bench is initialized in the `distillation_bench_v1.py` file.
 
-```
+```python
 class WurtzDistill_v1(DistillationBenchEnv):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.

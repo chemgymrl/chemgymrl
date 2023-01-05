@@ -17,7 +17,7 @@ In observing the state of the vessel, the agent or lab manager operating this be
 The input to the characterization bench is a vessel, and a desired analysis technique to perform on the vessel. These are 
 passed in as parameters the analyze method is called.
 
-```
+```python
 def analyze(self, vessel, analysis, overlap=False):
         """
         Constructor class method to pass thermodynamic variables to class methods.
@@ -46,7 +46,7 @@ The output to the characterization bench will depend on the analysis technique c
 characterization bench is called to perform an absorption spectra analysis, it will return a spectral graph back to the 
 agent. This output is an array filled spectral signatures.
 
-```
+```python
 array([5.00000007e-02, 3.88000011e-01, 5.02251148e-01, 1.09714296e-04,
        4.81336862e-01, 4.81336862e-01, 4.81336862e-01, 4.44010586e-01,
        5.13693636e-19, 7.02555729e-17, 7.03501986e-15, 5.15772321e-13,
