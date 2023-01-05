@@ -14,7 +14,24 @@ An agent tasked to operate on this bench must control the heat energy added to t
 
 The input to the extraction bench is initialized in the `distillation_bench_v1.py` file.
 
-![distillation bench input](../tutorial_figures/distillation/distillation_bench_input.PNG)
+```
+class WurtzDistill_v1(DistillationBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        super(WurtzDistill_v1, self).__init__(
+            boil_vessel=wurtz_vessel('dodecane'),
+            n_vessel_pixels=100,
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=None,
+            target_material="dodecane",
+            dQ=1000.0,
+            out_vessel_path=os.getcwd()
+        )
+```
 
 Here we pass the boiling vessel, which is typically the pickle file produced by the extraction bench. Like in the other 
 engines we also pass the target material. Additionally, we pass in a dQ value which is the maximal change in heat 
