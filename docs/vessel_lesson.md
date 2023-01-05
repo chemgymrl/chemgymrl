@@ -75,9 +75,6 @@ Function Name|Description
 'mix'|Shake vessel of let vessel settle
 'update_layer'|Update self vessel's layer representation
 
-
-
-
 ```python
 vessel_1 = vessel.Vessel(label='vessel_1')
 vessel_2 = vessel.Vessel(label='vessel_2')
@@ -93,13 +90,14 @@ vessel_1.push_event_to_queue(events=None, feedback=[event_1, event_2, event_3], 
 
 To visualize what we are doing above, we have several graphs:
 
-Here we have a graph of the separation between the oil and the water when we initially add them to our vessel
+Here we have a graph of the separation between the oil and the water when we initially add them to our vessel:
 
 ![added oil and water](../tutorial_figures/vessel/vessel_1.png)
 
-Here we have the solution after we drain some of it (notice that the top of the vessel is now air):
+Here we have the solution after we allow it to settle (notice that the top of the vessel is now air):
 
 ![drained oil and water](../tutorial_figures/vessel/vessel_2.png)
+
 ### The Workflow
   
   1. Agent chooses an action from the action space of an environment.
@@ -113,6 +111,3 @@ Here we have the solution after we drain some of it (notice that the top of the 
   9. The the _merge_event_queue() is called on _feedback_queue, which merge the events in the feedback_queue to generate a merged_queue and add default event into it, then empty the _feedback_queue
   10. Then the merged_queue will be executed and new feedback is collected and added to _feedback_queue, which will be executed with the next action. 
 
-```python
-
-```
