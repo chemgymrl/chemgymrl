@@ -40,13 +40,22 @@ of the output vessel.
 
 ## Output
 
-The extraction bench plots data about the extraction being performed by the agent. Unlike reaction bench, in extraction 
-there is only the human render mode.
+Once the extraction bench is ran and the render function is called, plots will appear showing data about the extraction 
+being performed by the agent. There are two main plot modes:
 
-![extraction output](../tutorial_figures/extraction/human_render_extraction.png)
+- Human Render
+    - Plots the solvent contents of each vessel. The human render plots a minimal amount of data and provides a 
+    'surface-level' understanding of the information portrayed.
+    - Sequential pixels corresponding to the same solvent constitute a single layer.
+  
+![human render output](tutorial_figures/reaction/human_render_extraction.png)
 
-The output plot shows the solvent contents of each vessel, where each pixel corresponds to a solvent. Sequential pixels
-corresponding to the same solvent constitute a single layer.
+- Full Render
+    -  Plots the solvent contents of each vessel, the amount of each solute in each solvent, and the level of separation
+    between the solvent layers. The full render plots a significant amount of data for a more in-depth understanding of
+    the information portrayed.        
+
+![full render output](tutorial_figures/reaction/full_render_extraction.png)
 
 Like reaction bench the extraction bench also outputs a pickle file once the extraction process is completed. The
 default name for this file is `extract_vessel_{i}` where i ranges from 0 to the total number of validated vessels.
