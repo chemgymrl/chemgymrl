@@ -51,7 +51,7 @@ being performed by the agent. There are two main plot modes:
 ![human render output](tutorial_figures/reaction/human_render_extraction.png)
 
 - Full Render
-    -  Plots the solvent contents of each vessel, the amount of each solute in each solvent, and the level of separation
+    - Plots the solvent contents of each vessel, the amount of each solute in each solvent, and the level of separation
     between the solvent layers. The full render plots a significant amount of data for a more in-depth understanding of
     the information portrayed.        
 
