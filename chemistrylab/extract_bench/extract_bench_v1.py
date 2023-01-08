@@ -302,6 +302,7 @@ class ExtractWorld_Oil_v1(ExtractBenchEnv):
     def __init__(self):
         super(ExtractWorld_Oil_v1, self).__init__(
             extraction='water_oil',
+            reaction_file_identifier = "water_oil_v1",
             extraction_vessel=oil_vessel(),
             target_material='Na'
         )

@@ -33,14 +33,14 @@ MethylRed = material.MethylRed
 EthylAcetate = material.EthylAcetate
 
 # material_dict
-material_dict = {H2O().get_name(): [H2O, 27.7],
-                 H().get_name(): [H, 2.5e-4],
-                 Cl().get_name(): [Cl, 2.5e-4],
-                 MethylRed().get_name(): [MethylRed, 9.28e-4],
+material_dict = {H2O().get_name(): [H2O(), 27.7],
+                 H().get_name(): [H(), 2.5e-4],
+                 Cl().get_name(): [Cl(), 2.5e-4],
+                 MethylRed().get_name(): [MethylRed(), 9.28e-4],
                  }
-solute_dict = {H().get_name(): {H2O().get_name(): [H2O, 27.7, 'mol']},
-               Cl().get_name(): {H2O().get_name(): [H2O, 27.7, 'mol']},
-               MethylRed().get_name(): {H2O().get_name(): [H2O, 500, 'ml']},
+solute_dict = {H().get_name(): {H2O().get_name(): [H2O(), 27.7, 'mol']},
+               Cl().get_name(): {H2O().get_name(): [H2O(), 27.7, 'mol']},
+               MethylRed().get_name(): {H2O().get_name(): [H2O(), 500, 'ml']},
                }
 
 material_dict, solute_dict, _ = util.check_overflow(material_dict=material_dict,
@@ -61,6 +61,7 @@ class ExtractWorld_MethylRed(ExtractBenchEnv):
         super(ExtractWorld_MethylRed, self).__init__(
             extraction='extraction_0',
             extraction_vessel=extraction_vessel,
+            reaction_file_identifier = "methyl_red",
             target_material='methyl red',
             extractor=EthylAcetate
         )

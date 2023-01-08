@@ -58,7 +58,8 @@ class Extraction:
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
-    def get_observation_space(self):
+    def get_observation_space(self,targets):
+        #added targets but they aren't used yet -KS
         obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
         obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
         observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
@@ -87,7 +88,8 @@ class Extraction:
 
         return action_space
 
-    def reset(self, extraction_vessel):
+    def reset(self, extraction_vessel,targets):
+        #added targets but they aren't used yet -KS
         '''
         generate empty vessels
         '''
@@ -113,7 +115,7 @@ class Extraction:
 
         ethyl = material.EthylAcetate
 
-        ethyl_vessel_material_dict = {ethyl().get_name(): [ethyl, self.ethyl_volume]}
+        ethyl_vessel_material_dict = {ethyl().get_name(): [ethyl(), self.ethyl_volume]}
 
         ethyl_vessel_material_dict, _, _ = util.check_overflow(
             material_dict=ethyl_vessel_material_dict,
