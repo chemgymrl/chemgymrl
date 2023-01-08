@@ -58,7 +58,8 @@ class Extraction:
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
 
-    def get_observation_space(self):
+    def get_observation_space(self,targets):
+        #added targets as parameter but it is unused at the moment -KS
         obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
         obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
         observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
@@ -86,7 +87,9 @@ class Extraction:
 
         return action_space
 
-    def reset(self, extraction_vessel):
+    def reset(self, extraction_vessel,targets):
+        #added targets as parameter but it is unused at the moment -KS
+
         '''
         generate empty vessels
         '''
@@ -112,7 +115,8 @@ class Extraction:
 
         oil_vessel_material_dict = {}
         C6H14 = material.C6H14
-        oil_vessel_material_dict[C6H14().get_name()] = [C6H14, self.oil_volume]
+        #updated this line as materials need to be initialized now -KS
+        oil_vessel_material_dict[C6H14().get_name()] = [C6H14(), self.oil_volume]
         oil_vessel_material_dict, _, _ = util.check_overflow(
             material_dict=oil_vessel_material_dict,
             solute_dict={},

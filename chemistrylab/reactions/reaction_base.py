@@ -203,6 +203,8 @@ class _Reaction:
                 os.path.join(r_files_dir, r_file)
             )
         ]
+        
+        print(reaction_files)
 
         # clip the files to omit their extensions (all available reaction files are `.py` files)
         reaction_files_no_ext = [r_file.split(".")[0] for r_file in reaction_files]
@@ -214,6 +216,8 @@ class _Reaction:
                 reaction_file + ".py"  # re-add the extension
             )
         else:
+            if reaction_file=="":print("Empty filename")
+            print("File:",reaction_file)
             raise IOError("ERROR: Requested Reaction File Not Found in Directory!")
 
         return output_reaction_file

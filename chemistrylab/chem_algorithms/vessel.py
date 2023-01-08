@@ -186,6 +186,14 @@ class Vessel:
             return table
         else:
             return table[table.Amount>0]
+    def get_solute_table(self):
+        
+        table = pd.DataFrame.from_dict(self._solute_dict, orient="index")
+        renamedic = {str(h) : "[Solvent # Unit]" for h in table.columns}
+        table.insert(loc=0, column='Solute', value=table.index)
+        table.index=np.arange(len(table.index))
+        table.rename(columns=renamedic, inplace = True)
+        return table
         
     def push_event_to_queue(
             self,

@@ -134,7 +134,8 @@ class ExtractBenchEnv(gym.Env):
             target_material=target_material,
             out_vessel_path=out_vessel_path
         )
-        print("HI")
+        print("Target Material:",target_material)
+        print(self.input_parameters["reaction"])
         self.reaction = self.input_parameters["reaction"](
             reaction_file_identifier=self.input_parameters["reaction_file_identifier"],
             target_material=target_material,

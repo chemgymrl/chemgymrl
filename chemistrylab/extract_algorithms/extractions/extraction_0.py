@@ -59,11 +59,13 @@ class Extraction:
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
         self.extractor = extractor
 
-    # def get_observation_space(self):
-    #     obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
-    #     return observation_space
+    def get_observation_space(self,targets):
+        #uncommented te function
+        #added targets as parameter but it is unused at the moment -KS
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
+        observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
+        return observation_space
 
     def get_action_space(self):
         '''
@@ -88,7 +90,8 @@ class Extraction:
 
         return action_space
 
-    def reset(self, extraction_vessel):
+    def reset(self, extraction_vessel,targets):
+        #added targets as parameter but it is unused at the moment -KS
         '''
         generate empty vessels
         '''
@@ -114,7 +117,7 @@ class Extraction:
 
         extractor = self.extractor
 
-        extractor_vessel_material_dict = {extractor().get_name(): [extractor, self.extractor_volume]}
+        extractor_vessel_material_dict = {extractor().get_name(): [extractor(), self.extractor_volume]}
 
         extractor_vessel_material_dict, _, _ = util.check_overflow(
             material_dict=extractor_vessel_material_dict,
