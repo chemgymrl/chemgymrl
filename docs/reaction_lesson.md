@@ -10,12 +10,6 @@ The reaction bench environment is meant to as it sounds simulate a reaction, in 
 
 Below is just some simple code that loads our desired environment
 
-
-```python
-%matplotlib inline
-```
-
-
 ```python
 import sys
 sys.path.append('../')
@@ -38,7 +32,10 @@ Firtst let's load up the environment, I highly recommend you look at the source 
 reaction, it should help provide insight into how this all works. Further the lesson on creating a custom reaction
 environment will also help give insight into the reaction mechanics. If you run the cell below you will see a graph appear that looks something like this:
 
-![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_command_0.png)
+```commandline
+--------------------
+Temperature: 
+```
 
 ![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_0.png)
 
@@ -56,6 +53,7 @@ for it to try and optimize the reaction pathway.
 
 The reaction we are using is as follows:
 
+![image](../tutorial_figures/wurtz_reaction.png)
 2 1-chlorohexane + 2 Na --> dodecane + 2 NaCl
 
 This reaction is performed in an aqueous state with ethoxyethane as the solvent.
@@ -108,7 +106,7 @@ action vector of:
 |-------------|--------|----------------|----------------|----------------|-----|
 | 1         | 1/2    | 1            | 0            | 0            | 1 |
 
-![image of reaction](https://image1.masterfile.com/getImage/NjQwLTAzMjU4NDA1ZW4uMDAwMDAwMDA=ANb9FF/640-03258405en_Masterfile.jpg)
+![image of reaction](../sample_figures/reaction.jpg)
 
 Then at every next step we are going to keep the solvent volume constant and increase the temperature
 
@@ -116,7 +114,7 @@ Then at every next step we are going to keep the solvent volume constant and inc
 |-------------|--------|----------------|----------------|----------------|-----|
 | 1         | 1/2    | 0            | 0            | 0            | 0 |
 
-![heating up vessel](https://media.sciencephoto.com/image/c0150431/800wm)
+![heating up vessel](../sample_figures/heating.jpg)
 
 To see this in action simply run the following code cell:
 

@@ -77,7 +77,7 @@ register(
 
 register(
     id='WurtzReact-v2',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:WurtzReact_v2',
     max_episode_steps=100
 )
 
