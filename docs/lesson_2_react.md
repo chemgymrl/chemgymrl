@@ -15,7 +15,7 @@ In this lesson we will try to get a high reward in the reaction of the form abov
 
 We will try to get the desired material: 4,5-diethyloctane
 
-In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions directory. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v1`. The main difference between this lesson and lesson 1 is that the target material is 4,5-diethyloctane instead of dodecane.
+In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions directory. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v2`. The main difference between this lesson and lesson 1 is that the target material is 4,5-diethyloctane instead of dodecane.
 
 From lesson 1 we know that our action space is a 6 element vector represented by:
 
