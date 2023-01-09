@@ -211,11 +211,14 @@ class ReactionBenchEnv_1(ReactionBenchEnv):
             reaction_file_identifier="decomp",
             in_vessel_path=None, # do not include an input vessel
             out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
-                {"Material": "NaCl", "Initial": 0.001},
+            in_hand=[ # initialize the bench with the following materials
+                {"Material": "NaCl", "Initial": 1},
             ],
-            solutes=[ # initialize the bench with the following solutes available
-                {"Material": "H2O", "Initial": 0.001}
+            materials=[ # initialize the bench with the following materials
+                {"Material": "H2O", "Initial": 30},
+            ],
+            solvents=[ # initialize the bench with the following solutes available
+                {"Material": "H2O", "Initial": 30}
             ],
             n_steps=50,
             dt=0.01,
