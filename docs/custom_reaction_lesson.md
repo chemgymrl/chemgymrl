@@ -128,7 +128,9 @@ env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
 ```
 ```
-#[..., 'DecompReact-v0', ...]
+[..., 'DecompReact-v0', ...]
 ```
 
 Here we can see that our environment has been added!
+
+For additional examples, please check out the other reaction files already created.
