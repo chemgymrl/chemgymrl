@@ -121,7 +121,7 @@ class DistillationBenchEnv(gym.Env):
         self.state = None
 
         # set up action spaces
-        self.observation_space = self.distillation.get_observation_space()
+        self.observation_space = self.distillation.get_observation_space(self.reaction.products)
         self.action_space = self.distillation.get_action_space()
 
         # set up the done boolean

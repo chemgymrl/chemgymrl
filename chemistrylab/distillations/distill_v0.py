@@ -130,10 +130,10 @@ class Distillation:
         self.dt = dt
         self.dQ = dQ
 
-    def get_observation_space(self):
+    def get_observation_space(self, targets):
 
-        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels+3), dtype=np.float32)
-        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels+3), dtype=np.float32)
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels+3+len(targets)), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels+3+len(targets)), dtype=np.float32)
         observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
 
         return observation_space
