@@ -302,6 +302,8 @@ class ExtractWorld_Oil_v1(ExtractBenchEnv):
     def __init__(self):
         super(ExtractWorld_Oil_v1, self).__init__(
             extraction='water_oil',
+            reaction_file_identifier="decomp",
+            solvents=["C6H14", "H2O"],
             extraction_vessel=oil_vessel(),
             target_material='Na'
         )

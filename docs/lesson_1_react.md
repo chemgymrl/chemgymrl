@@ -32,20 +32,21 @@ assert len(action_set) == env.action_space.shape[0]
 
 First let's load up the environment, I highly recommend you look at the source code for the reaction bench and
 reaction, it should help provide insight into how this all works. Further the lesson on creating a custom reaction
-environment will also help give insight into the reaction mechanics. If you run the cell below you will see a graph appear that looks something like this:
+environment will also help give insight into the reaction mechanics.
 
 ```commandline
 --------------------
 Temperature: 
 ```
 
-![graph](../tutorial_figures/reaction-lesson-1/wurtz_overlap_0.png)
-
+If you run the cell below you will see a graph appear that looks something like this:
 
 ```python
 env.reset()
 env.render(mode=render_mode)
 ```
+
+![graph](tutorial_figures/reaction-lesson-1/wurtz_lesson_0.png)
 
 Understanding the graph above is important to understanding how the agent will have to understand the environment.
 On the left we can see the absorbance spectra of the materials in our reaction vessel, and on the right we have
@@ -55,10 +56,10 @@ for it to try and optimize the reaction pathway.
 
 The reaction we are using is as follows:
 
-![image](../tutorial_figures/wurtz_reaction.png)
+![image](tutorial_figures/wurtz_reaction.png)
 2 1-chlorohexane + 2 Na --> dodecane + 2 NaCl
 
-This reaction is performed in an aqueous state with ethoxyethane as the solvent.
+This reaction is performed in an aqueous state with diethylether as the solvent.
 
 With all that out of the way let's focus our attention to the action space. For this reaction environemnt our action
 space is represented by a 6 element vector. 
@@ -108,7 +109,7 @@ action vector of:
 |-------------|--------|----------------|----------------|----------------|-----|
 | 1         | 1/2    | 1            | 0            | 0            | 1 |
 
-![image of reaction](../sample_figures/reaction.jpg)
+![image of reaction](sample_figures/reaction.jpg)
 
 Then at every next step we are going to keep the solvent volume constant and increase the temperature
 
@@ -116,7 +117,7 @@ Then at every next step we are going to keep the solvent volume constant and inc
 |-------------|--------|----------------|----------------|----------------|-----|
 | 1         | 1/2    | 0            | 0            | 0            | 0 |
 
-![heating up vessel](../sample_figures/heating.jpg)
+![heating up vessel](sample_figures/heating.jpg)
 
 To see this in action simply run the following code cell:
 
