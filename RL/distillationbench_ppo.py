@@ -31,8 +31,7 @@ print(env_ids)
 
 
 log_dir = "./tmp_distillationppo/"
-select_env = int(input(f"Enter a number to choose which environment you want to run (0 - {len(env_ids) - 1}): \n"))
-env = gym.make(env_ids[select_env])
+env = gym.make('WurtzDistill-v1')
 env = Monitor(env, log_dir, allow_early_resets=True)
 
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait','Done']

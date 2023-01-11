@@ -163,7 +163,7 @@ class WurtzDistill_v1(DistillationBenchEnv):
 
     def __init__(self):
         super(WurtzDistill_v1, self).__init__(
-            boil_vessel=wurtz_vessel(),
+            boil_vessel=wurtz_vessel('dodecane'),
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
