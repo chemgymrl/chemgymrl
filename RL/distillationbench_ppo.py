@@ -15,14 +15,11 @@ import pandas as pd
 
 import chemistrylab
 
-from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.common import make_vec_env
-from stable_baselines import PPO2
+from stable_baselines3 import PPO
 
-from stable_baselines.common.callbacks import BaseCallback
-from stable_baselines import results_plotter
-from stable_baselines.bench import Monitor
-from stable_baselines.results_plotter import load_results, ts2xy
+from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.results_plotter import load_results, ts2xy
 
 
 all_envs = envs.registry.all()
@@ -38,7 +35,7 @@ action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait','D
 
 print("The action space is", env.action_space)
 
-model = PPO2(MlpPolicy, env, verbose=1, seed = 100)
+model = PPO("MlpPolicy", env, verbose=1, seed = 100)
 
 os.makedirs(log_dir, exist_ok=True)
 total_episodes_list = []
