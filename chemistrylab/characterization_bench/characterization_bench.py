@@ -137,23 +137,21 @@ class CharacterizationBench:
             if item is not None:
                 for j in range(item.shape[0]):
                     for k in range(x.shape[0]):
-                        amount = C[i]/sum(C)
-                        height = item[j, 0]
                         decay_rate = np.exp(
                             -0.5 * (
-                                (x[k] - params[i][j, 1]) / params[i][j, 2]
+                                (x[k] - item[j, 1]) / item[j, 2]
                             ) ** 2.0
                         )
                         if decay_rate < 1e-30:
                             decay_rate = 0
-                        absorb[k] += amount * height * decay_rate
+                        absorb[k] += C[i] * item[j, 0] * decay_rate
 
         # absorption must be between 0 and 1
         absorb = np.clip(absorb, 0.0, 1.0)
 
         return absorb
 
-    def get_spectra_peak(self, vessel, materials=None, overlap=True):
+    def get_spectra_peak(self, vessel, wave_min, wave_max, materials=None, overlap=True):
         """
         Method to populate a list with the spectral peak of each chemical.
 
@@ -192,7 +190,7 @@ class CharacterizationBench:
         for i, material in enumerate(materials):
             if params[i] is not None:
                 spectra_peak.append([
-                    params[i][:, 1] * 600 + 200,
+                    params[i][:, 1] * (wave_max - wave_min) + wave_min,
                     C[i] * params[i][:, 0],
                     material
                 ])
@@ -241,14 +239,12 @@ class CharacterizationBench:
                 each_absorb = np.zeros(x.shape[0], dtype=np.float32)
                 for j in range(item.shape[0]):
                     for k in range(x.shape[0]):
-                        amount = C[i]
-                        height = item[j, 0]
                         decay_rate = np.exp(
                             -0.5 * (
-                                (x[k] - params[i][j, 1]) / params[i][j, 2]
+                                (x[k] - item[j, 1]) / item[j, 2]
                             ) ** 2.0
                         )
-                        each_absorb += amount * height * decay_rate
+                        each_absorb[k] += C[i] * item[j, 0] * decay_rate
                 dash_spectra.append(each_absorb)
 
         return dash_spectra

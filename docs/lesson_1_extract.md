@@ -1,9 +1,10 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
 ## Extraction Bench: Lesson 1
-#### Using a non-polar solute to extract a solute from water
 
 Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/extraction_lesson.ipynb) to the jupyter notebook, please use it at your pleasure.
+
+#### Using a non-polar solute to extract a solute from water
 
 In this tutorial, I am going to walk you through how our extraction environment works and hopefully give some insight into how an
 RL agent might interact with the environment. In this extraction, we are going to be using oil to extract sodium and
@@ -46,7 +47,7 @@ action_set = ['Draining from ExV to Beaker1', 'Mix ExV', "Mix B1", "Mix B2", "Po
 
 So start by running the code cell below you should see a series of graphs like these appear:
 
-![graph](../tutorial_figures/extraction-lesson-1/oil_and_water_0.png)
+![graph](tutorial_figures/extraction-lesson-1/oil_and_water_0.png)
 
 
 ```python

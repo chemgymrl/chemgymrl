@@ -4,13 +4,14 @@
 
 For this tutorial, we are going to be creating a very simple reaction 
 
+![image](tutorial_figures/decomp_reaction.png)
 NaCl<sub>aq</sub> ->  Na<sup>+</sup><sub>aq</sub> + Cl<sup>-</sup><sub>aq</sub>
 
 To start with creating an environment for this reaction we first have to create a reaction file that simulates
 the mechanics of this decomposition. </br></br> In the directory ```chemistrylab/reactions/available_reactions```
 
 For this case, we will create a new reaction file from the reaction template file ```template_reaction.py```,
-and let's name it ```nacl_decomp.py```.
+and let's name it ```decomp.py```.
 
 The first change we have to make is to the list of reactants, products, and solutes located at line 42
 
@@ -63,7 +64,8 @@ lastly we need to define which reactions are creating a material or using it up:
 ```python
 conc_coeff_arr = np.array([[-1], # concentration for NaCl
                            [1], # concentration for Na
-                           [1]  # concentration for Cl
+                           [1],  # concentration for Cl
+                           [0] # concentration for H2O
                            ])
 ```
 
@@ -88,7 +90,7 @@ class ReactionBenchEnv_1(ReactionBenchEnv):
 
         super(ReactionBenchEnv_1, self).__init__(
             reaction=_Reaction,
-            reaction_file_identifier="nacl_decomp",
+            reaction_file_identifier="decomp",
             in_vessel_path=None, # do not include an input vessel
             out_vessel_path=os.getcwd(), # include an output vessel directory
             materials=[ # initialize the bench with the following materials
@@ -110,7 +112,7 @@ water. This takes us to the final step which is registering the environment with
 
 ```python
 register(
-    id='DecompReactLesson-v1',
+    id='DecompReact-v0',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
     max_episode_steps=20
 )
@@ -126,7 +128,9 @@ env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
 print(env_ids)
 ```
 ```
-#[..., 'DecompReactLesson-v1', ...]
+[..., 'DecompReact-v0', ...]
 ```
 
 Here we can see that our environment has been added!
+
+For additional examples, please check out the other reaction files already created.

@@ -558,6 +558,12 @@ class Vessel:
                 # reduce the available heat energy to 0
                 heat_available = 0
 
+        __ = out_beaker.push_event_to_queue(
+                events=None,
+                feedback=None,
+                dt=dt
+            )
+
         return 0
 
     def open_lid(self):
@@ -763,6 +769,11 @@ class Vessel:
             events=None,
             feedback=[event_1, event_2],
             dt=dt
+        )
+        __ = target_vessel.push_event_to_queue(
+            events=None,
+            feedback=None,
+            dt=-100000
         )
 
         return reward

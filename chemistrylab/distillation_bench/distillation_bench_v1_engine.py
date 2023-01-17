@@ -33,10 +33,12 @@ import os
 import pickle
 import sys
 from copy import deepcopy
+import cmocean
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import DistillationReward
+from chemistrylab.extract_algorithms import separate
 from chemistrylab.distillations import distill_v0
 from chemistrylab.reactions.reaction_base import _Reaction
 
@@ -69,7 +71,7 @@ class DistillationBenchEnv(gym.Env):
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=None,
             target_material=None,
-            dQ=0.0,
+            dQ=10.0,
             out_vessel_path=None
     ):
         '''
@@ -100,6 +102,7 @@ class DistillationBenchEnv(gym.Env):
             in_vessel_path=input_parameters["in_vessel_path"],
             default_vessel=deepcopy(input_parameters["boil_vessel"])
         )
+        self.n_vessel_pixels = input_parameters["n_vessel_pixels"]
         self.target_material = input_parameters["target_material"]
         self.dQ = input_parameters["dQ"]
         self.out_vessel_path = input_parameters["out_vessel_path"]
@@ -118,7 +121,7 @@ class DistillationBenchEnv(gym.Env):
         self.state = None
 
         # set up action spaces
-        self.observation_space = self.distillation.get_observation_space()
+        self.observation_space = self.distillation.get_observation_space(self.reaction.products)
         self.action_space = self.distillation.get_action_space()
 
         # set up the done boolean
@@ -473,128 +476,312 @@ class DistillationBenchEnv(gym.Env):
 
         return self.state, reward, self.done, {}
 
-    def render(self, model):
+    def render(self, mode='human'):
         '''
         Select a render mode to display pertinent information.
+
         Parameters
         ---------------
         `model` : `str` (default=`human`)
             The name of the render mode to use.
+
         Returns
         ---------------
         None
+
         Raises
         ---------------
         None
         '''
 
-        if model == 'human':
+        if mode == 'human':
             self.human_render()
+        elif mode == 'full':
+            self.full_render()
 
-    def human_render(self):
+    def human_render(self, mode='plot'):
         '''
-        Method to render a series of graphs to illustrate operations on vessels.
+        Render the pertinent information in a minimal style for the user to visualize and process.
+
+        Parameters
+        ---------------
+        `mode` : `str` (default=`plot`)
+            The type of rendering to use.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
         '''
 
-        # obtain all vessels
-        vessels = self.vessels
+        # create a list containing an array for each vessel in `self.vessels`
+        position_separate = []
+        for vessel_obj in self.vessels:
+            position, __ = vessel_obj.get_position_and_variance()
 
-        # separate the beakers from the boil vessel
-        beakers = []
-        for vessel_obj in vessels:
-            if "beaker" in vessel_obj.label:
-                beakers.append(vessel_obj)
+            # append an array of shape: (# of layers in vessel, # of points in the spectral plot)
+            position_separate.append(
+                np.zeros((len(position), separate.x.shape[0]), dtype=np.float32)
+            )
 
-        # there is only one boil vessel
-        boil_vessel = [vessel_obj for vessel_obj in vessels if vessel_obj not in beakers][0]
+        # iterate through each array and populate them with gaussian data for each material layer
+        for i, arr in enumerate(position_separate):
+            position, var = self.vessels[i].get_position_and_variance(dict_or_list='dict')
+            t = -1.0 * np.log(var * np.sqrt(2.0 * np.pi))
+            j = 0
 
+            for layer in position:
+                # Loop over each layer
+                mat_vol = self.vessels[i].get_material_volume(layer)
+
+                for k in range(arr.shape[1]):
+                    # Calculate the value of the Gaussian for that phase and x position
+                    exponential = np.exp(
+                        -1.0 * (((separate.x[k] - position[layer]) / (2.0 * var)) ** 2) + t
+                    )
+
+                    # populate the array
+                    arr[j, k] = mat_vol * exponential
+                j += 1
+
+        Ls = np.reshape(
+            np.array(
+                self.state[:, :self.n_vessel_pixels]
+            ),
+            (
+                self.distillation.n_total_vessels,
+                self.distillation.n_vessel_pixels,
+                1
+            )
+        )
+
+        num_list = [self.state[i, self.distillation.n_vessel_pixels],
+                    self.state[i, self.distillation.n_vessel_pixels+1],
+                    self.state[i, self.distillation.n_vessel_pixels+2]
+                    ]
+
+        label_list = ['T', 'V', 'P']
+
+        # set parameters and plotting for the first rendering
         if self._first_render:
+            # close all existing plots and enable interactive mode
             plt.close('all')
             plt.ion()
 
-            num_columns = max(len(beakers), 2)
+            # define a set of three subplots
             self._plot_fig, self._plot_axs = plt.subplots(
-                2, # number of rows
-                num_columns, # number of columns
-                figsize=(18, 9)
+                2,
+                self.distillation.n_total_vessels,
+                figsize=(12, 6)
             )
 
-            # create a subplot for the boil vessel at position (0, 0)
-            self._plot_bar1 = self._plot_axs[0, 0].bar(
-                [name[0:5] for name in boil_vessel._material_dict.keys()],
-                [value[1] for value in boil_vessel._material_dict.values()],
-                color='red'
-            )
-            self._plot_axs[0, 0].set_title("Boil Vessel")
-            self._plot_axs[0, 0].set_ylabel("Molar Amount")
+            # extract each array of plotting data, determine the plot colour, and add the plot
+            for i, arr in enumerate(position_separate):
+                # define the mixing visualization graphic rendered beside the current subplot
+                __ = self._plot_axs[0, i].pcolormesh(
+                    Ls[i],
+                    vmin=0,
+                    vmax=1,
+                    cmap=cmocean.cm.delta
+                )
 
-            # create a subplot for the vessel temperatures at position (0, 1)
-            self._plot_bar2 = self._plot_axs[0, 1].bar(
-                [vessel_obj.label for vessel_obj in vessels],
-                [vessel_obj.temperature for vessel_obj in vessels],
-                color='orange'
-            )
-            self._plot_axs[0, 1].set_title("Vessel Temperatures")
-            self._plot_axs[0, 1].set_ylabel('Temperature (in K)')
+                # set plotting parameters for the mixing graphic
+                self._plot_axs[0, i].set_xticks([])
+                self._plot_axs[0, i].set_ylabel('Height')
 
-            # create subplots in the second row for each beaker
-            self._beaker_plots = []
-            for i, beaker_obj in enumerate(beakers):
-                material_names = [name[0:5] for name in beaker_obj._material_dict.keys()]
-                material_amounts = [value[1] for value in beaker_obj._material_dict.values()]
+                # define visualization of vessel observation properties
+                __ = self._plot_axs[1, i].bar(
+                range(len(num_list)),
+                num_list,
+                tick_label=label_list,
+                )[0]
+                self._plot_axs[1, i].set_ylim([0, 1])
 
-                beaker_plot = self._plot_axs[1, i].bar(material_names, material_amounts, color='blue')
-                self._plot_axs[1, i].set_title(beaker_obj.label)
-                self._plot_axs[1, i].set_ylabel("Molar Amount")
+                # draw the canvas and render the subplot
+                self._plot_fig.canvas.draw()
+                plt.show()
 
-                self._beaker_plots.append(beaker_plot)
+                self._first_render = False
 
-            # draw the graph and show it
-            self._plot_fig.canvas.draw()
-            plt.show()
-
-            self._first_render = False
-
-        # if the plot has already been rendered, simply add the new data to it
+        # if the plot has already been rendered, update the plot
         else:
-            # clear the plot to be updated with new data
-            self._plot_axs[0, 0].clear()
+            # iterate through each array
+            for i, arr in enumerate(position_separate):                
+                # define the layer mixture graphic beside the current subplot
+                __ = self._plot_axs[0, i].pcolormesh(
+                    Ls[i],
+                    vmin=0,
+                    vmax=1,
+                    cmap=cmocean.cm.delta
+                )
 
-            # reset the boil vessel plot with new vessel data
-            __ = self._plot_axs[0, 0].bar(
-                [name[0:5] for name in boil_vessel._material_dict.keys()],
-                [value[1] for value in boil_vessel._material_dict.values()],
-                color='red'
+                self._plot_axs[1, i].cla()
+                # define visualization of vessel observation properties
+                __ = self._plot_axs[1, i].bar(
+                    range(len(num_list)),
+                    num_list,
+                    tick_label=label_list,
+                )[0]
+                self._plot_axs[1, i].set_ylim([0, 1])
+
+                # draw the subplot on the existing canvas
+                self._plot_fig.canvas.draw()
+                # plt.show() # adding this causes the plot to be unresponsive when updating
+
+                self._first_render = False
+
+    def full_render(self, mode='plot'):
+        '''
+        Render the pertinent information in a minimal style for the user to visualize and process.
+
+        Parameters
+        ---------------
+        `mode` : `str` (default=`plot`)
+            The type of rendering to use.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # create a list containing an array for each vessel in `self.vessels`
+        position_separate = []
+        for vessel_obj in self.vessels:
+            position, __ = vessel_obj.get_position_and_variance()
+
+            # append an array of shape: (# of layers in vessel, # of points in the spectral plot)
+            position_separate.append(
+                np.zeros((len(position), separate.x.shape[0]), dtype=np.float32)
             )
-            self._plot_axs[0, 0].set_title("Boil Vessel")
-            self._plot_axs[0, 0].set_ylabel("Molar Amount")
 
-            # clear the plot to be updated with new data
-            self._plot_axs[0, 1].clear()
+        # iterate through each array and populate them with gaussian data for each material layer
+        for i, arr in enumerate(position_separate):
+            position, var = self.vessels[i].get_position_and_variance(dict_or_list='dict')
+            t = -1.0 * np.log(var * np.sqrt(2.0 * np.pi))
+            j = 0
 
-            # reset the vessel temperature plot with new data
-            __ = self._plot_axs[0, 1].bar(
-                [vessel_obj.label for vessel_obj in vessels],
-                [vessel_obj.temperature for vessel_obj in vessels],
-                color='orange'
+            for layer in position:
+                # Loop over each layer
+                mat_vol = self.vessels[i].get_material_volume(layer)
+
+                for k in range(arr.shape[1]):
+                    # Calculate the value of the Gaussian for that phase and x position
+                    exponential = np.exp(
+                        -1.0 * (((separate.x[k] - position[layer]) / (2.0 * var)) ** 2) + t
+                    )
+
+                    # populate the array
+                    arr[j, k] = mat_vol * exponential
+                j += 1
+
+        Ls = np.reshape(
+            np.array(
+                self.state[:, :self.n_vessel_pixels]
+            ),
+            (
+                self.distillation.n_total_vessels,
+                self.distillation.n_vessel_pixels,
+                1
             )
-            self._plot_axs[0, 1].set_title("Vessel Temperatures")
-            self._plot_axs[0, 1].set_ylabel('Temperature (in K)')
+        )
 
-            # reset the data in each beaker plot
-            for i, beaker_plot in enumerate(self._beaker_plots):
-                # clear the plot to be updated with new data
-                self._plot_axs[1, i].clear()
+        num_list = [self.state[i, self.distillation.n_vessel_pixels],
+                    self.state[i, self.distillation.n_vessel_pixels+1],
+                    self.state[i, self.distillation.n_vessel_pixels+2]
+                    ]
 
-                material_names = [name[0:5] for name in beakers[i]._material_dict.keys()]
-                material_amounts = [value[1] for value in beakers[i]._material_dict.values()]
+        label_list = ['T', 'V', 'P']
 
-                beaker_plot = self._plot_axs[1, i].bar(material_names, material_amounts, color='blue')
-                self._plot_axs[1, i].set_title(beakers[i].label)
-                self._plot_axs[1, i].set_ylabel("Molar Amount")
+        # set parameters and plotting for the first rendering
+        if self._first_render:
+            # close all existing plots and enable interactive mode
+            plt.close('all')
+            plt.ion()
 
-                self._beaker_plots[i] = beaker_plot
+            # define a set of three subplots
+            self._plot_fig, self._plot_axs = plt.subplots(
+                3,
+                self.distillation.n_total_vessels,
+                figsize=(12, 6)
+            )
 
-            # draw on the existing graph
-            self._plot_fig.canvas.draw()
-            plt.pause(0.000001)
+            # extract each array of plotting data, determine the plot colour, and add the plot
+            for i, arr in enumerate(position_separate):
+                # define the mixing visualization graphic rendered beside the current subplot
+                __ = self._plot_axs[0, i].pcolormesh(
+                    Ls[i],
+                    vmin=0,
+                    vmax=1,
+                    cmap=cmocean.cm.delta
+                )
+
+                # set plotting parameters for the mixing graphic
+                self._plot_axs[0, i].set_xticks([])
+                self._plot_axs[0, i].set_ylabel('Height')
+
+                # define visualization of vessel observation properties
+                __ = self._plot_axs[1, i].bar(
+                range(len(num_list)),
+                num_list,
+                tick_label=label_list,
+                )[0]
+                self._plot_axs[1, i].set_ylim([0, 1])
+
+                count = 0
+                material_dict = self.vessels[i].get_material_dict()
+                for mat in material_dict.keys():
+                    count += 1
+                    self._plot_axs[2, i].bar(count, material_dict[mat][1])
+
+                self._plot_axs[2, i].set_xticks(range(1, count+1))
+                self._plot_axs[2, i].set_xticklabels(material_dict.keys())
+
+                # draw the canvas and render the subplot
+                self._plot_fig.canvas.draw()
+                plt.show()
+
+                self._first_render = False
+
+        # if the plot has already been rendered, update the plot
+        else:
+            # iterate through each array
+            for i, arr in enumerate(position_separate):                
+                # define the layer mixture graphic beside the current subplot
+                __ = self._plot_axs[0, i].pcolormesh(
+                    Ls[i],
+                    vmin=0,
+                    vmax=1,
+                    cmap=cmocean.cm.delta
+                )
+
+                self._plot_axs[1, i].cla()
+                # define visualization of vessel observation properties
+                __ = self._plot_axs[1, i].bar(
+                    range(len(num_list)),
+                    num_list,
+                    tick_label=label_list,
+                )[0]
+                self._plot_axs[1, i].set_ylim([0, 1])
+
+                self._plot_axs[2, i].cla()
+                count = 0
+                material_dict = self.vessels[i].get_material_dict()
+                for mat in material_dict.keys():
+                    count += 1
+                    self._plot_axs[2, i].bar(count, material_dict[mat][1])
+
+                self._plot_axs[2, i].set_xticks(range(1, count+1))
+                self._plot_axs[2, i].set_xticklabels(material_dict.keys())
+
+                # draw the subplot on the existing canvas
+                self._plot_fig.canvas.draw()
+                # plt.show() # adding this causes the plot to be unresponsive when updating
+
+                self._first_render = False
