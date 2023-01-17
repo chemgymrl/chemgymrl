@@ -7,16 +7,13 @@ import gym
 import chemistrylab
 import numpy as np
 from gym import envs
-from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.common import make_vec_env
-from stable_baselines import PPO2
+from stable_baselines3 import PPO
 import matplotlib
 matplotlib.use('pdf')
 import matplotlib.pyplot as plt
-from stable_baselines.common.callbacks import BaseCallback
-from stable_baselines import results_plotter
-from stable_baselines.bench import Monitor
-from stable_baselines.results_plotter import load_results, ts2xy
+from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.results_plotter import load_results, ts2xy
 
 
 all_envs = envs.registry.all()
@@ -34,7 +31,7 @@ env = Monitor(env, log_dir, allow_early_resets=True)
 
 print("The action space is", env.action_space)
 
-model = PPO2(MlpPolicy, env, verbose=1, seed = 100)
+model = PPO("MlpPolicy", env, verbose=1, seed = 100)
 
 
 os.makedirs(log_dir, exist_ok=True)
