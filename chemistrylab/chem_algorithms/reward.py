@@ -319,7 +319,13 @@ class ExtractionReward:
         '''
 
         # acquire the amount of desired material from the `vessel` parameter
-        material_amount = vessel.get_material_amount(desired_material)
+        material_amounts = []
+        dis_mats = vessel._material_dict[desired_material][0].dissolve()
+        for mat_obj in dis_mats:
+            mat_name = mat_obj.get_name()
+            material_amounts.append(vessel.get_material_amount(mat_name) / (dis_mats.count(mat_obj) ** 2))
+
+        material_amount = min(material_amounts)
 
         # set a negative reward if no desired material was made available to the Extraction Bench
         if abs(material_amount - 0) < 1e-6:
