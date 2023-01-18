@@ -300,7 +300,7 @@ class WurtzExtractCtd_v1(ExtractBenchEnv):
     """
 
     def __init__(self):
-        super(WurtzExtract_v1, self).__init__(
+        super(WurtzExtractCtd_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
