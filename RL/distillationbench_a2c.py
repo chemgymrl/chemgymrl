@@ -33,6 +33,7 @@ env = Monitor(env, log_dir, allow_early_resets=True)
 
 action_set = ['Add/Remove Heat', 'Pour BV into B1', 'Pour B1 into B2', 'Wait','Done']
 
+print("The observation space is", env.observation_space)
 print("The action space is", env.action_space)
 
 model = A2C("MlpPolicy", env, verbose=1, seed = 100)

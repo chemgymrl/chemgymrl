@@ -430,7 +430,7 @@ class Vessel:
                 air_molar_amount = self.get_pressure() * self.get_volume() / (R * self.get_temperature())
 
                 # acquire the material class representation of Air
-                air_mat_class = material.Air
+                air_mat_class = material.Air()
 
                 # calculate the specific heat and entropy and temp change for a vessel of only air (in J/K)
                 total_entropy = self._calculate_entropy(
