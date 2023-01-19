@@ -72,7 +72,7 @@ Method used to train Machine Learning models to make optimal decisions.
 
 #### Solute
 
-The component that is not present in excess in the solution.
+The component that is dissolved in the solution.
 
 #### Solvent
 

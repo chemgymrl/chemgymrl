@@ -14,7 +14,24 @@ An agent tasked to operate on this bench must control the heat energy added to t
 
 The input to the extraction bench is initialized in the `distillation_bench_v1.py` file.
 
-![distillation bench input](../tutorial_figures/distillation/distillation_bench_input.PNG)
+```python
+class WurtzDistill_v1(DistillationBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        super(WurtzDistill_v1, self).__init__(
+            boil_vessel=wurtz_vessel('dodecane'),
+            n_vessel_pixels=100,
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=None,
+            target_material="dodecane",
+            dQ=1000.0,
+            out_vessel_path=os.getcwd()
+        )
+```
 
 Here we pass the boiling vessel, which is typically the pickle file produced by the extraction bench. Like in the other 
 engines we also pass the target material. Additionally, we pass in a dQ value which is the maximal change in heat 
@@ -25,10 +42,21 @@ energy and the path which the output vessel will be located in.
 Like extraction, the distillation bench only has human render mode which renders a series of graphs illustrating the 
 operations on the vessels. 
 
-![distillation output](../tutorial_figures/distillation/human_render_distillation.png)
+Once the extraction bench is ran and the render function is called, plots will appear showing data about the extraction 
+being performed by the agent. There are two main plot modes:
 
-The top right graph shows the temperatures of the boiling vessel, beaker_0 and beaker_1. The other graphs plot the molar
-amounts of each material in the vessel or beaker.
+- Human Render
+    - Plots the solvent contents of each vessel with some thermodynamic information. The human render plots a minimal
+    amount of data and provides a 'surface-level' understanding of the information portrayed.
+    - Sequential pixels corresponding to the same solvent constitute a single layer.
+
+![human render output](tutorial_figures/reaction/human_render_distillation.png)
+
+- Full Render
+    -  Plots the solvent contents of each vessel, some thermodynamic information, the amount of each material in each vessel.
+    The full render plots a significant amount of data for a more in-depth understanding of the information portrayed.
+
+![full render output](tutorial_figures/reaction/full_render_distillation.png)
 
 Like the other benches, distillation also saves the vessel once the distillation process is completed. The default name 
 for the pickle file is 'distillation_vessel_{i}' where i ranges from 0 to the total number of validated vessels.

@@ -545,7 +545,7 @@ class ExtractBenchEnv(gym.Env):
 
         return self.state, reward, self.done, {}
 
-    def render(self, model='human'):
+    def render(self, mode='human'):
         '''
         Select a render mode to display pertinent information.
 
@@ -563,8 +563,10 @@ class ExtractBenchEnv(gym.Env):
         None
         '''
 
-        if model == 'human':
+        if mode == 'human':
             self.human_render()
+        elif mode == 'full':
+            self.full_render()
 
     def human_render(self, mode='plot',redraw=True):
         '''
@@ -633,10 +635,123 @@ class ExtractBenchEnv(gym.Env):
 
             # define a set of three subplots
             self._plot_fig, self._plot_axs = plt.subplots(
+                1,
                 self.extraction.n_total_vessels,
-                2,
+                figsize=(12, 6)
+            )
+
+            # extract each array of plotting data, determine the plot colour, and add the plot
+            for i, arr in enumerate(position_separate):
+                # define the mixing visualization graphic rendered beside the current subplot
+                __ = self._plot_axs[i].pcolormesh(
+                    Ls[i],
+                    vmin=0,
+                    vmax=1,
+                    cmap=cmocean.cm.delta
+                )
+
+                # set plotting parameters for the mixing graphic
+                self._plot_axs[i].set_xticks([])
+                self._plot_axs[i].set_ylabel('Height')
+                # self._plot_axs[i, 1].colorbar(mappable)
+
+                # draw the canvas and render the subplot
+                self._plot_fig.canvas.draw()
+                plt.show()
+
+                self._first_render = False
+
+        # if the plot has already been rendered, update the plot
+        else:
+            # iterate through each array
+            for i, arr in enumerate(position_separate):                
+                # define the layer mixture graphic beside the current subplot
+                __ = self._plot_axs[i].pcolormesh(
+                    Ls[i],
+                    vmin=0,
+                    vmax=1,
+                    cmap=cmocean.cm.delta
+                )
+
+                # self._plot_axs[i, 1].colorbar(mappable)
+
+                # draw the subplot on the existing canvas
+                self._plot_fig.canvas.draw()
+                # plt.show() # adding this causes the plot to be unresponsive when updating
+
+                self._first_render = False
+
+    def full_render(self, mode='plot'):
+        '''
+        Render the pertinent information in a minimal style for the user to visualize and process.
+
+        Parameters
+        ---------------
+        `mode` : `str` (default=`plot`)
+            The type of rendering to use.
+
+        Returns
+        ---------------
+        None
+
+        Raises
+        ---------------
+        None
+        '''
+
+        # create a list containing an array for each vessel in `self.vessels`
+        position_separate = []
+        for vessel_obj in self.vessels:
+            position, __ = vessel_obj.get_position_and_variance()
+
+            # append an array of shape: (# of layers in vessel, # of points in the spectral plot)
+            position_separate.append(
+                np.zeros((len(position), separate.x.shape[0]), dtype=np.float32)
+            )
+
+        # iterate through each array and populate them with gaussian data for each material layer
+        for i, arr in enumerate(position_separate):
+            position, var = self.vessels[i].get_position_and_variance(dict_or_list='dict')
+            t = -1.0 * np.log(var * np.sqrt(2.0 * np.pi))
+            j = 0
+
+            for layer in position:
+                # Loop over each layer
+                mat_vol = self.vessels[i].get_material_volume(layer)
+
+                for k in range(arr.shape[1]):
+                    # Calculate the value of the Gaussian for that phase and x position
+                    exponential = np.exp(
+                        -1.0 * (((separate.x[k] - position[layer]) / (2.0 * var)) ** 2) + t
+                    )
+
+                    # populate the array
+                    arr[j, k] = mat_vol * exponential
+                j += 1
+
+        Ls = np.reshape(
+            np.array(
+                self.state[:, :self.n_vessel_pixels]
+            ),
+            (
+                self.extraction.n_total_vessels,
+                self.extraction.n_vessel_pixels,
+                1
+            )
+        )
+
+        # set parameters and plotting for the first rendering
+        if self._first_render:
+            # close all existing plots and enable interactive mode
+            plt.close('all')
+            plt.ion()
+
+            # define a set of three subplots
+            self._plot_fig, self._plot_axs = plt.subplots(
+                self.extraction.n_total_vessels,
+                3,
                 figsize=(12, 6),
-                gridspec_kw={'width_ratios': [3, 1]}
+                gridspec_kw={'width_ratios': [2, 1, 1]}
             )
 
             # extract each array of plotting data, determine the plot colour, and add the plot
@@ -673,7 +788,21 @@ class ExtractBenchEnv(gym.Env):
                 # set plotting parameters for the mixing graphic
                 self._plot_axs[i, 1].set_xticks([])
                 self._plot_axs[i, 1].set_ylabel('Height')
-                # self._plot_axs[i, 1].colorbar(mappable)
+
+                count = 0
+                xticks = []
+                solute_dict = self.vessels[i].get_solute_dict()
+                for solute in solute_dict.keys():
+                    for c1, solvent in enumerate(solute_dict[solute].keys()):
+                        count += 1
+                        color = self.vessels[i].get_material_color(solvent)
+                        color = cmocean.cm.delta(color)
+                        self._plot_axs[i, 2].bar(count, solute_dict[solute][solvent][1], color=color)
+
+                    xticks.append(count - c1/2)
+
+                self._plot_axs[i, 2].set_xticks(xticks)
+                self._plot_axs[i, 2].set_xticklabels(solute_dict.keys())
 
                 # draw the canvas and render the subplot
                 self._plot_fig.canvas.draw()
@@ -717,10 +846,23 @@ class ExtractBenchEnv(gym.Env):
                     cmap=cmocean.cm.delta
                 )
 
-                # self._plot_axs[i, 1].colorbar(mappable)
+                self._plot_axs[i, 2].clear()
+                count = 0
+                xticks = []
+                solute_dict = self.vessels[i].get_solute_dict()
+                for solute in solute_dict.keys():
+                    for c1, solvent in enumerate(solute_dict[solute].keys()):
+                        count += 1
+                        color = self.vessels[i].get_material_color(solvent)
+                        color = cmocean.cm.delta(color)
+                        self._plot_axs[i, 2].bar(count, solute_dict[solute][solvent][1], color=color)
+
+                    xticks.append(count - c1/2)
+
+                self._plot_axs[i, 2].set_xticks(xticks)
+                self._plot_axs[i, 2].set_xticklabels(solute_dict.keys())
 
                 # draw the subplot on the existing canvas
                 self._plot_fig.canvas.draw()
-                # plt.show() # adding this causes the plot to be unresponsive when updating
-
+                
                 self._first_render = False

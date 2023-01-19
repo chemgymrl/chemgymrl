@@ -1,4 +1,4 @@
-'''
+"""
 This file is part of ChemGymRL.
 
 ChemGymRL is free software: you can redistribute it and/or modify
@@ -15,13 +15,13 @@ You should have received a copy of the GNU General Public License
 along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 
 File to specify the parameters required to instruct reaction_base.py to perform the
-decomposition reaction
-'''
+chloro-wurtz reactions
+"""
 
 import numpy as np
 
 # name the reaction class
-REACTION_CLASS = "decomp reaction"
+REACTION_CLASS = "decomp reactions"
 
 # add the names of the reactants, products, and solutes available to all reactions
 REACTANTS = [
@@ -32,9 +32,6 @@ PRODUCTS = [
     "Cl"
 ]
 SOLVENTS = ["H2O"]
-
-# define the desired material
-DESIRED = "Na"
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin
@@ -51,11 +48,11 @@ dV = 0.005
 
 
 # add the arrays containing rate calculation parameters; these include:
-    # the activation energies for each reaction (1x1 array)
-    # the stoichiometric coefficients (1x1 array)
+    # the activation energies for each reaction (6x1 array)
+    # the stoichiometric coefficients (6x4 array)
 activ_energy_arr = np.array(
     [
-        [8.0] # activation energy
+        8.0 # activation energy for reaction 0
     ]
 )
 
@@ -73,5 +70,6 @@ conc_coeff_arr = np.array(
         [-1.0], # concentration calculation coefficients for NaCl
         [1.0], # concentration calculation coefficients for Na
         [1.0], # concentration calculation coefficients for Cl
+        [0.0] # concentration calculation coefficients for H2O
     ]
 )

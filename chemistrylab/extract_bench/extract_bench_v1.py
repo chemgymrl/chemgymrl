@@ -192,7 +192,8 @@ def wurtz_vessel(add_mat=""):
         '4-ethyldecane': material.FourEthyldecane,
         '5,6-dimethyldecane': material.FiveSixDimethyldecane,
         '4-ethyl-5-methylnonane': material.FourEthylFiveMethylnonane,
-        '4,5-diethyloctane': material.FourFiveDiethyloctane
+        '4,5-diethyloctane': material.FourFiveDiethyloctane,
+        'NaCl': material.NaCl
     }
     try:
         add_material = products[add_mat]()
@@ -252,6 +253,7 @@ class WurtzExtract_v1(ExtractBenchEnv):
             extraction_vessel=wurtz_vessel('dodecane'),
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            n_steps=50,
             target_material='dodecane',
             solvents=["C6H14", "DiEthylEther"],
             out_vessel_path=os.getcwd()
@@ -269,39 +271,45 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=in_vessel_path,
+            n_steps=50,
             solvents=["C6H14", "DiEthylEther"],
             target_material=target_material,
             out_vessel_path=os.getcwd()
         )
 
-class ExtractWorld_Wurtz_Ctd_v1(ExtractBenchEnv):
+class WurtzExtractCtd_v1(ExtractBenchEnv):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
     def __init__(self):
-        super(ExtractWorld_Wurtz_Ctd_v1, self).__init__(
+        super(WurtzExtract_v1, self).__init__(
             extraction='wurtz',
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=vessel.Vessel(label='temp')
             ),
-            solvents=["H2O", "DiEthylEther"],
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            n_steps=50,
             target_material='dodecane',
+            solvents=["C6H14", "DiEthylEther"],
             out_vessel_path=os.getcwd()
         )
 
-
-class ExtractWorld_Oil_v1(ExtractBenchEnv):
+class WaterOilExtract_v1(ExtractBenchEnv):
     """
     Class to define an environment which performs a water-oil extraction on materials in a vessel.
     """
 
     def __init__(self):
-        print(oil_vessel())
-        super(ExtractWorld_Oil_v1, self).__init__(
+        super(WaterOilExtract_v1, self).__init__(
             extraction='water_oil',
-            reaction_file_identifier = "water_oil_v1",
+            reaction=_Reaction,
+            reaction_file_identifier="decomp",
+            solvents=["C6H14", "H2O"],
             extraction_vessel=oil_vessel(),
-            target_material='Na'
+            n_steps=50,
+            target_material='Na',
+            out_vessel_path=os.getcwd()
         )
