@@ -127,14 +127,10 @@ import sys
 import os
 import numpy as np
 
+ALGO={"PPO2":PPO2,"A2C":A2C}
 
 
 if __name__=="__main__":
-    
-
-
-
-    ALGO={"PPO2":PPO2,"A2C":A2C}
 
 
     #get options
@@ -160,7 +156,7 @@ if __name__=="__main__":
     old_stdout = sys.stdout
     log_file = open(op.dir+"/output.log","w")
     sys.stdout = log_file
-        
+    
     #make the environment
     env = gym.make(op.environment)
     print("The action space is", env.action_space)
