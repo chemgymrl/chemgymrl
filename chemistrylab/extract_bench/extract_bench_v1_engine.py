@@ -52,7 +52,7 @@ import copy
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
-from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, extraction_0
+from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1
 from chemistrylab.extract_algorithms import separate
 from chemistrylab.reactions.reaction_base import _Reaction
 
@@ -61,7 +61,6 @@ extraction_dict = {
     'water_oil': water_oil_v1,
     "wurtz": wurtz_v0,
     'lesson_1': lesson_1,
-    'extraction_0': extraction_0,
 }
 
 
