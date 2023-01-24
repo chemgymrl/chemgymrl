@@ -430,7 +430,7 @@ class Vessel:
                 air_molar_amount = self.get_pressure() * self.get_volume() / (R * self.get_temperature())
 
                 # acquire the material class representation of Air
-                air_mat_class = material.Air
+                air_mat_class = material.Air()
 
                 # calculate the specific heat and entropy and temp change for a vessel of only air (in J/K)
                 total_entropy = self._calculate_entropy(
@@ -509,6 +509,27 @@ class Vessel:
                 # if enough heat is available, boil off all of the material
                 if heat_to_boil_all < heat_available:
                     print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
+
+                    prep_dict = {}
+                    if self._material_dict[smallest_bp_name][0].is_solvent():
+                        solute_dict = self.get_solute_dict()
+                        for solute in solute_dict:
+                            if smallest_bp_name in solute_dict[solute]:
+                                if len(solute_dict[solute]) == 1:
+                                    self._material_dict[solute][0] = self._material_dict[solute][0].__class__()
+                                    self._material_dict[solute][0].set_solute_flag(False)
+                                    self._layers_position_dict[solute] = 0.0
+                                    prep_dict[solute] = solute_dict[solute][smallest_bp_name]
+                                    del self._solute_dict[solute]
+
+                                else:
+                                    solute_total_amount = self._material_dict[solute]
+                                    for solvent in solute_dict:
+                                        self._solute_dict[solute][solvent] += self._solute_dict[solute][smallest_bp_name] * self._solute_dict[solute][solvent] / (solute_total_amount - self._solute_dict[solute][smallest_bp_name])
+
+                                    del self._solute_dict[solute][smallest_bp_name]
+
+                    # add method for precipitating out solutes
 
                     # remove the material from the boil vessel's material dictionary
                     del self._material_dict[smallest_bp_name]
