@@ -253,31 +253,3 @@ class ReactionBenchEnv_2(ReactionBenchEnv):
             overlap=False
         )
 
-class ReactionBenchEnv_ODE_Test(ReactionBenchEnv):
-    '''
-    Class object to define an environment available in the reaction bench.
-    '''
-
-    def __init__(self):
-        '''
-        Constructor class for the ReactionBenchEnv_1 environment.
-        '''
-
-        super(ReactionBenchEnv_ODE_Test, self).__init__(
-            reaction=_Reaction,
-            reaction_file_identifier="ode_check",
-            in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
-                {"Material": "Na", "Initial": 1},
-                {"Material": "Cl", "Initial": 1},
-                {"Material": "NaCl", "Initial": 1}
-            ],
-            solutes=[ # initialize the bench with the following solutes available
-                {"Material": "H2O", "Initial": 50}
-            ],
-            n_steps=50,
-            dt=0.01,
-            overlap=False
-        )
-

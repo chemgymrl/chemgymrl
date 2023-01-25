@@ -52,7 +52,7 @@ import copy
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
-from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red, extraction_0
+from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1
 from chemistrylab.extract_algorithms import separate
 from chemistrylab.reactions.reaction_base import _Reaction
 
@@ -61,8 +61,6 @@ extraction_dict = {
     'water_oil': water_oil_v1,
     "wurtz": wurtz_v0,
     'lesson_1': lesson_1,
-    'methyl_red': methyl_red,
-    'extraction_0': extraction_0,
 }
 
 
@@ -155,6 +153,7 @@ class ExtractBenchEnv(gym.Env):
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
         self.extraction_name = self.input_parameters["extraction"]
+        self.original_extraction_vessel = self.input_parameters["extraction_vessel"]
         self.extraction = extraction_dict[self.extraction_name].Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
@@ -434,7 +433,7 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
 
-        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+        self.extraction_vessel = copy.deepcopy(self.original_extraction_vessel)
 
         self.extraction = extraction_dict[self.extraction_name].Extraction(
             extraction_vessel=self.extraction_vessel,

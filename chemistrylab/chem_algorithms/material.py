@@ -129,7 +129,20 @@ class Material:
         # should be able to return how this material is dissolved
         # for NaCl this should at least return Na(charge=1) and Cl(charge=-1)
         # for the rest, like how Na and Cl dissolve in solvent, can be handled by the vessel's dissolve function
-        pass
+        dis_mat = self.__class__()
+        dis_mat.set_solute_flag(True)
+        dis_mat.set_color(0.0)
+        dis_mat.set_phase('l')
+
+        return [dis_mat]
+
+    def precipitate(self):
+        # should be able to return how this material precipitates
+        # for Na this should at least return Cl (requirements) & NaCl (results)
+        prep_mat = self.__class__()
+        prep_mat.set_solute_flag(False)
+
+        return [[[{prep_mat: 1}], prep_mat]]
 
     # functions to access material's properties
     def get_name(self):
@@ -380,7 +393,7 @@ class C6H14(Material):
 class NaCl(Material):
     def __init__(self):
         super().__init__(name='NaCl',
-                         density={'s': 2.165, 'l': None, 'g': None},
+                         density={'s': 2.165, 'l': 2.165, 'g': None},
                          polarity=1.5,
                          temperature=298,
                          pressure=1,
@@ -396,6 +409,22 @@ class NaCl(Material):
                          index=8
                          )
 
+    def dissolve(self):
+        dis_Na = Na()
+        dis_Na.set_charge(1.0)
+        dis_Na.set_solute_flag(True)
+        dis_Na.set_color(0.0)
+        dis_Na.set_polarity(2.0)
+        dis_Na.set_phase('l')
+
+        dis_Cl = Cl()
+        dis_Cl.set_charge(-1.0)
+        dis_Cl.set_solute_flag(True)
+        dis_Cl.set_color(0.0)
+        dis_Cl.set_polarity(2.0)
+        dis_Cl.set_phase('l')
+
+        return [{dis_Na: 1}, {dis_Cl: 1}]
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
@@ -416,6 +445,25 @@ class Na(Material):
                          enthalpy_vapor=97700.0,
                          index=9
                          )
+
+    def precipitate(self):
+        prep_Na = Na()
+        prep_Na.set_charge(1.0)
+        prep_Na.set_solute_flag(True)
+        prep_Na.set_color(0.0)
+        prep_Na.set_polarity(2.0)
+        prep_Na.set_phase('l')
+
+        prep_Cl = Cl()
+        prep_Cl.set_charge(-1.0)
+        prep_Cl.set_solute_flag(True)
+        prep_Cl.set_color(0.0)
+        prep_Cl.set_polarity(2.0)
+        prep_Cl.set_phase('l')
+
+        prep_NaCl = NaCl()
+
+        return [[[{prep_Na: 1}, {prep_Cl: 1}], prep_NaCl]]
 
 
 # Note: Cl is very unstable when not an aqueous ion
@@ -438,6 +486,24 @@ class Cl(Material):
                          index=10
                          )
 
+    def precipitate(self):
+        prep_Na = Na()
+        prep_Na.set_charge(1.0)
+        prep_Na.set_solute_flag(True)
+        prep_Na.set_color(0.0)
+        prep_Na.set_polarity(2.0)
+        prep_Na.set_phase('l')
+
+        prep_Cl = Cl()
+        prep_Cl.set_charge(-1.0)
+        prep_Cl.set_solute_flag(True)
+        prep_Cl.set_color(0.0)
+        prep_Cl.set_polarity(2.0)
+        prep_Cl.set_phase('l')
+
+        prep_NaCl = NaCl()
+
+        return [[[prep_Na, prep_Cl], [prep_NaCl]]]
 
 class Cl2(Material):
     def __init__(self):
