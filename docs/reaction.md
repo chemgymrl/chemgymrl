@@ -16,7 +16,40 @@ When the agent performs enough positive actions and is satisfied with the amount
 
 The input to the reaction bench is initialized in the `reaction_bench_v1.py` file. 
 
-![reaction bench input](../tutorial_figures/reaction/reaction_bench_input.png)
+```python
+class WurtzReact_v1(ReactionBenchEnv):
+    '''
+    Class object to define an environment available in the reaction bench.
+    '''
+
+    def __init__(self):
+        '''
+        Constructor class for the ReactionBenchEnv_0 environment.
+        '''
+
+        super(WurtzReact_v1, self).__init__(
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=None, # do not include an input vessel
+            out_vessel_path=os.getcwd(), # include an output vessel directory
+            in_hand=[ # initialize the bench with the following materials
+                {"Material": "1-chlorohexane", "Initial": 1},
+                {"Material": "2-chlorohexane", "Initial": 1},
+                {"Material": "3-chlorohexane", "Initial": 1},
+                {"Material": "Na", "Initial": 1}
+            ],
+            materials=[ # initialize the bench with the following materials available
+                {"Material": "DiEthylEther", "Initial": 4}
+            ],
+            solvents=[ # initialize the bench with the following solvents available
+                {"Material": "DiEthylEther", "Initial": 4}
+            ],
+            target_material="dodecane",
+            n_steps=50,
+            dt=0.01,
+            overlap=False
+        )
+```
 
 In here we pass parameters such as the materials and solutes needed for the experiment, the path to an input vessel 
 (if we're including one), the output vessel path, the number of time steps to be taken during each action, the amount

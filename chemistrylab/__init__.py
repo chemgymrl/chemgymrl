@@ -23,26 +23,14 @@ register(
 )
 
 register(
-    id='WurtzExtract_Ctd-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Wurtz_Ctd_v1',
+    id='WurtzExtractCtd-v1',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtractCtd_v1',
     max_episode_steps=100
 )
 
 register(
-    id='Oil_Water_Extract-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Oil_v1',
-    max_episode_steps=100
-)
-
-register(
-    id='MethylRed_Extract-v1',
-    entry_point='chemistrylab.extract_bench.methyl_red:ExtractWorld_MethylRed',
-    max_episode_steps=100
-)
-
-register(
-    id='MethylRed_Extract-v2',
-    entry_point='chemistrylab.extract_bench.extraction_0:ExtractWorld_MethylRed',
+    id='WaterOilExtract-v1',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:WaterOilExtract_v1',
     max_episode_steps=100
 )
 
@@ -77,13 +65,7 @@ register(
 
 register(
     id='WurtzReact-v2',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',
-    max_episode_steps=100
-)
-
-register(
-    id='ODETestReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_ODE_Test',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:WurtzReact_v2',
     max_episode_steps=100
 )
 

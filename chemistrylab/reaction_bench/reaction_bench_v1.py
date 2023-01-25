@@ -63,6 +63,39 @@ class WurtzReact_v1(ReactionBenchEnv):
             overlap=False
         )
 
+class WurtzReact_v2(ReactionBenchEnv):
+    '''
+    Class object to define an environment available in the reaction bench.
+    '''
+
+    def __init__(self):
+        '''
+        Constructor class for the ReactionBenchEnv_0 environment.
+        '''
+
+        super(WurtzReact_v2, self).__init__(
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=None, # do not include an input vessel
+            out_vessel_path=os.getcwd(), # include an output vessel directory
+            in_hand=[ # initialize the bench with the following materials
+                {"Material": "1-chlorohexane", "Initial": 1},
+                {"Material": "2-chlorohexane", "Initial": 1},
+                {"Material": "3-chlorohexane", "Initial": 1},
+                {"Material": "Na", "Initial": 1}
+            ],
+            materials=[ # initialize the bench with the following materials available
+                {"Material": "DiEthylEther", "Initial": 4}
+            ],
+            solvents=[ # initialize the bench with the following solvents available
+                {"Material": "DiEthylEther", "Initial": 4}
+            ],
+            target_material="4,5-diethyloctane",
+            n_steps=50,
+            dt=0.01,
+            overlap=False
+        )
+
 class GeneralWurtzReact_v1(ReactionBenchEnv):
     '''
     Class object to define an environment available in the reaction bench.
@@ -178,11 +211,14 @@ class ReactionBenchEnv_1(ReactionBenchEnv):
             reaction_file_identifier="decomp",
             in_vessel_path=None, # do not include an input vessel
             out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
-                {"Material": "NaCl", "Initial": 0.001},
+            in_hand=[ # initialize the bench with the following materials
+                {"Material": "NaCl", "Initial": 1},
             ],
-            solutes=[ # initialize the bench with the following solutes available
-                {"Material": "H2O", "Initial": 0.001}
+            materials=[ # initialize the bench with the following materials
+                {"Material": "H2O", "Initial": 30},
+            ],
+            solvents=[ # initialize the bench with the following solutes available
+                {"Material": "H2O", "Initial": 30}
             ],
             n_steps=50,
             dt=0.01,
@@ -211,63 +247,6 @@ class ReactionBenchEnv_2(ReactionBenchEnv):
             ],
             solutes=[ # initialize the bench with the following solutes available
                 {"Material": "H2O", "Initial": 0.001}
-            ],
-            n_steps=50,
-            dt=0.01,
-            overlap=False
-        )
-
-class ReactionBenchEnv_3(ReactionBenchEnv):
-    '''
-    Class object to define an environment available in the reaction bench.
-    '''
-
-    def __init__(self):
-        '''
-        Constructor class for the ReactionBenchEnv_0 environment.
-        '''
-
-        super(ReactionBenchEnv_3, self).__init__(
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz_v1",
-            in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
-                {"Material": "1-chlorohexane", "Initial": 1},
-                {"Material": "2-chlorohexane", "Initial": 1},
-                {"Material": "3-chlorohexane", "Initial": 1},
-                {"Material": "Na", "Initial": 1}
-            ],
-            solutes=[ # initialize the bench with the following solutes available
-                {"Material": "H2O", "Initial": 50}
-            ],
-            n_steps=50,
-            dt=0.01,
-            overlap=False
-        )
-
-class ReactionBenchEnv_ODE_Test(ReactionBenchEnv):
-    '''
-    Class object to define an environment available in the reaction bench.
-    '''
-
-    def __init__(self):
-        '''
-        Constructor class for the ReactionBenchEnv_1 environment.
-        '''
-
-        super(ReactionBenchEnv_ODE_Test, self).__init__(
-            reaction=_Reaction,
-            reaction_file_identifier="ode_check",
-            in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
-                {"Material": "Na", "Initial": 1},
-                {"Material": "Cl", "Initial": 1},
-                {"Material": "NaCl", "Initial": 1}
-            ],
-            solutes=[ # initialize the bench with the following solutes available
-                {"Material": "H2O", "Initial": 50}
             ],
             n_steps=50,
             dt=0.01,

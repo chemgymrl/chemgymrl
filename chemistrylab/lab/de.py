@@ -122,6 +122,8 @@ class De:
         ---------------
         None
         """
+        # force concentrations to be non-negative
+        conc = np.clip(conc, 0, None)
 
         # calculate all the reaction rate constants
         k = self.get_reaction_constants(temp, conc)
