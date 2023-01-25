@@ -113,7 +113,6 @@ class ExtractBenchEnv(gym.Env):
         self.input_parameters = self._validate_parameters(
             n_steps=n_steps,
             dt=dt,
-            extraction=extraction,
             n_vessel_pixels=n_vessel_pixels,
             max_valve_speed=max_valve_speed,
             extraction_vessel=extraction_vessel,
@@ -143,7 +142,6 @@ class ExtractBenchEnv(gym.Env):
         self.target_material = self.input_parameters["target_material"]
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
-        self.extraction_name = self.input_parameters["extraction"]
         self.original_extraction_vessel = self.input_parameters["extraction_vessel"]
         self.extraction = Extraction(
             extraction_vessel=self.extraction_vessel,
