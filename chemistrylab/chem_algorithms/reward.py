@@ -321,7 +321,7 @@ class ExtractionReward:
 
         # acquire the amount of desired material from the `vessel` parameter
         material_amounts = []
-        desired_material_class = convert_to_class(materials=desired_material)[0]
+        desired_material_class = convert_to_class(materials=[desired_material])[0]()
         dis_mats = desired_material_class.dissolve()
         dis_mats_names = []
         for mat_obj in dis_mats:

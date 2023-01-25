@@ -26,7 +26,7 @@ import numpy as np
 class TestCharacterizationBench(TestCase):
     def test_analyze(self):
         char_bench = CharacterizationBench()
-        vessel = Vessel("test", materials={'Na': [material.Na, 1, 'mol']})
+        vessel = Vessel("test", materials={'Na': [material.Na(), 1, 'mol']})
         analysis = char_bench.analyze(vessel, 'spectra')
         self.assertEqual(len(analysis[0]), 200)
 

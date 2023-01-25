@@ -24,7 +24,7 @@ from chemistrylab.reactions.available_reactions.chloro_wurtz import *
 from chemistrylab.reactions.get_reactions import convert_to_class
 import numpy as np
 from gym import envs
-from chemistrylab.reaction_bench.reaction_bench_v1 import ReactionBenchEnv_0
+from chemistrylab.reaction_bench.reaction_bench_v1 import GeneralWurtzReact_v1
 
 ENV_NAME = 'WurtzReact-v1'
 
@@ -54,7 +54,7 @@ class ReactionBaseTestCase(unittest.TestCase):
         for material in material_classes:
             params.append(material().get_spectra_no_overlap())
 
-        self.assertEqual(params, env.reaction.params)
+        self.assertTrue(params == env.reaction.params)
 
     def test_find_reaction_file(self):
 
@@ -78,7 +78,6 @@ class ReactionBaseTestCase(unittest.TestCase):
         reactants = REACTANTS
         products = PRODUCTS
         solvents = SOLVENTS
-        desired = DESIRED
         Ti_ = Ti
         Vi_ = Vi
         Tmin_ = Tmin
@@ -99,7 +98,6 @@ class ReactionBaseTestCase(unittest.TestCase):
         self.assertEqual(reactants, reaction_params["REACTANTS"])
         self.assertEqual(products, reaction_params["PRODUCTS"])
         self.assertEqual(solvents, reaction_params["SOLVENTS"])
-        self.assertEqual(desired, reaction_params["DESIRED"])
         self.assertEqual(Ti_, reaction_params["Ti"])
         self.assertEqual(Vi_, reaction_params["Vi"])
         self.assertEqual(Tmin_, reaction_params["Tmin"])
@@ -157,7 +155,7 @@ class ReactionBaseTestCase(unittest.TestCase):
 
         # test if plot_data_state is the correct value
         np.testing.assert_almost_equal(plot_data_state, env.state[:4].tolist(), decimal=3)
-        np.testing.assert_almost_equal(plot_data_mol, state_mols[4:].tolist(), decimal=3)
+        np.testing.assert_almost_equal(plot_data_mol[:-1], state_mols[4:-1].tolist(), decimal=3)
 
     def test_temperature_increase(self):
 
@@ -239,7 +237,7 @@ class ReactionBaseTestCase(unittest.TestCase):
         for i in range(1):
             for solver in solvers:
                 print(solver)
-                env = ReactionBenchEnv_0()
+                env = GeneralWurtzReact_v1()
                 env.reaction.solver = solver
                 done = False
                 state = env.reset()

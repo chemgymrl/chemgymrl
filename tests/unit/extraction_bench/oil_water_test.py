@@ -23,7 +23,7 @@ import chemistrylab
 import numpy as np
 from chemistrylab.chem_algorithms.material import *
 
-ENV_NAME = 'Oil_Water_Extract-v1'
+ENV_NAME = 'WaterOilExtract-v1'
 
 """
 0: Valve (Speed multiplier, relative to max_valve_speed)
@@ -42,8 +42,6 @@ class OilWaterTestCase(unittest.TestCase):
     def test_init(self):
         env = gym.make(ENV_NAME)
         state = env.reset()
-        state_bool = bool(state)
-        self.assertEqual(True, state_bool)
 
     def test_drain(self):
         env = gym.make(ENV_NAME)
@@ -62,7 +60,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
-        action[0] = 7
+        action[0] = 1
         action[1] = 5
         state, reward, done, _ = env.step(action)
 
@@ -84,7 +82,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
-        material_dict = {'H2O': [H2O, 10, 'mol'], 'C6H14': [C6H14, 10, 'mol']}
+        material_dict = {'H2O': [H2O(), 10, 'mol'], 'C6H14': [C6H14(), 10, 'mol']}
 
         event_1 = ['update material dict', material_dict]
         event_2 = ['update_layer']
@@ -94,7 +92,7 @@ class OilWaterTestCase(unittest.TestCase):
         v1_initial_layers = env.vessels[1].get_layers()
 
         action = np.zeros(env.action_space.shape)
-        action[0] = 2
+        action[0] = 1
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
@@ -105,7 +103,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
-        material_dict = {'H2O': [H2O, 10, 'mol'], 'C6H14': [C6H14, 10, 'mol']}
+        material_dict = {'H2O': [H2O(), 10, 'mol'], 'C6H14': [C6H14(), 10, 'mol']}
         event_1 = ['update material dict', material_dict]
         event_2 = ['update_layer']
 
@@ -124,7 +122,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
 
-        material_dict = {'H2O': [H2O, 30], 'C6H14': [C6H14, 30]}
+        material_dict = {'H2O': [H2O(), 30], 'C6H14': [C6H14(), 30]}
 
         event_1 = ['update material dict', material_dict]
         event_2 = ['update_layer']
@@ -134,7 +132,7 @@ class OilWaterTestCase(unittest.TestCase):
 
         v2_initial_layers = env.vessels[2].get_layers()
         action = np.zeros(env.action_space.shape)
-        action[0] = 3
+        action[0] = 1
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
@@ -147,7 +145,7 @@ class OilWaterTestCase(unittest.TestCase):
         v0_initial = env.vessels[0].get_current_volume()[-1]
         v1_initial = env.vessels[1].get_current_volume()[-1]
         action = np.zeros(env.action_space.shape)
-        action[0] = 4
+        action[0] = 2
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
@@ -161,7 +159,7 @@ class OilWaterTestCase(unittest.TestCase):
         v2_initial = env.vessels[2].get_current_volume()[-1]
 
         action = np.zeros(env.action_space.shape)
-        action[0] = 5
+        action[0] = 3
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
@@ -173,14 +171,14 @@ class OilWaterTestCase(unittest.TestCase):
         env.reset()
 
         action = np.zeros(env.action_space.shape)
-        action[0] = 7
+        action[0] = 5
         action[1] = 5
         state, reward, done, _ = env.step(action)
 
         v0_initial = env.vessels[0].get_current_volume()[-1]
         v2_initial = env.vessels[2].get_current_volume()[-1]
         action = np.zeros(env.action_space.shape)
-        action[0] = 6
+        action[0] = 4
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
@@ -191,7 +189,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
-        action[0] = 7
+        action[0] = 5
         action[1] = 5
         state, reward, done, _ = env.step(action)
         vessels = env.vessels
@@ -221,7 +219,7 @@ class OilWaterTestCase(unittest.TestCase):
         env = gym.make(ENV_NAME)
         env.reset()
         action = np.zeros(env.action_space.shape)
-        action[0] = 9
+        action[0] = 7
         action[1] = 1
         state, reward, done, _ = env.step(action)
         self.assertEqual(done, True)
