@@ -255,7 +255,6 @@ class WurtzExtract_v1(ExtractBenchEnv):
 
     def __init__(self):
         super(WurtzExtract_v1, self).__init__(
-            extraction='wurtz',
             extraction_vessel=wurtz_vessel('dodecane')[0],
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
@@ -275,7 +274,6 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
         extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
 
         super(GeneralWurtzExtract_v1, self).__init__(
-            extraction='wurtz',
             extraction_vessel=extract_vessel,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
@@ -301,7 +299,6 @@ class WurtzExtractCtd_v1(ExtractBenchEnv):
 
     def __init__(self):
         super(WurtzExtractCtd_v1, self).__init__(
-            extraction='wurtz',
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=vessel.Vessel(label='temp')
@@ -321,7 +318,6 @@ class WaterOilExtract_v1(ExtractBenchEnv):
 
     def __init__(self):
         super(WaterOilExtract_v1, self).__init__(
-            extraction='water_oil',
             reaction=_Reaction,
             reaction_file_identifier="decomp",
             solvents=["C6H14", "H2O"],
