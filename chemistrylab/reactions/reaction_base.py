@@ -204,7 +204,6 @@ class _Reaction:
             )
         ]
         
-        print(reaction_files)
 
         # clip the files to omit their extensions (all available reaction files are `.py` files)
         reaction_files_no_ext = [r_file.split(".")[0] for r_file in reaction_files]

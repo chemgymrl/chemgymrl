@@ -1,3 +1,36 @@
+"""
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
+Module to perform rollout of RL agent on a gym. Options are handled with the Opt() class.
+
+Usage from a command line works as follows:
+>>python RLTest.py <Folder> <option1 name>=<option1 value> <option2 name>=<option2 value>. . .
+
+Example call:
+>>python RLTest.py WRH algorithm=WRH steps=500
+
+:title: RLTest.py
+
+:author: Kyle Sprague
+
+:history: 22-01-2023
+"""
+
+
+
 from RLTrain import *
 import pandas as pd
 print(ALGO)
@@ -5,8 +38,22 @@ print(ALGO)
 
 
 class WurtzReactHeuristic():
-  def predict(s):
-    t = np.argmax(s[-7:])
+  """
+  Heuristic policy for the Wurtz Reaction bench.
+  
+  The predict function is implemented the same as in a stable baselines policy, so
+  you should be able to use this heuristic policy in place of an RL algorithm.
+  
+  """
+  def predict(observation):
+    """
+    Get an action from an observation based off of heurstics
+    
+    :param observation: (np.ndarray) the input observation
+
+    :return: (np.ndarray, []) the model's action and an empty array (for baselines compatability)
+    """
+    t = np.argmax(observation[-7:])
     #targs = {0: "dodecane", 1: "5-methylundecane", 2: "4-ethyldecane", 3: "5,6-dimethyldecane", 4: "4-ethyl-5-methylnonane", 5: "4,5-diethyloctane", 6: "NaCl"}
     actions=np.array([
     [1,0,1,0,0,1],#dodecane
@@ -17,7 +64,7 @@ class WurtzReactHeuristic():
     [1,0,0,0,1,1],#4,5-diethyloctane
     [1,0,1,1,1,1],#NaCl
     ],dtype=np.float32)
-    return actions[t],{}
+    return actions[t],[]
 
 
 HEURISTICS = {"WRH":WurtzReactHeuristic}

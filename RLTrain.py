@@ -1,3 +1,35 @@
+"""
+This file is part of ChemGymRL.
+
+ChemGymRL is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ChemGymRL is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
+
+Module to train an RL agent on a gym. Options are handled with the Opt() class.
+
+Usage from a command line works as follows:
+>>python RLTrain.py <option1 name>=<option1 value> <option2 name>=<option2 value>. . .
+
+Example call:
+>>python RLTrain.py steps=20000 algorithm=A2C
+
+:title: RLTrain.py
+
+:author: Kyle Sprague
+
+:history: 22-01-2023
+"""
+
+
 class Opt:
     """
     Description of these options:
