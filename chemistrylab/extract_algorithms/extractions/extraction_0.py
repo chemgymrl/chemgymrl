@@ -59,11 +59,13 @@ class Extraction:
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
         self.extractor = extractor
 
-    # def get_observation_space(self):
-    #     obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels), dtype=np.float32)
-    #     observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
-    #     return observation_space
+    def get_observation_space(self,targets):
+        #uncommented te function
+        #added targets as parameter (increases size of the obs space) -KS
+        obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels+len(targets)), dtype=np.float32)
+        obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels+len(targets)), dtype=np.float32)
+        observation_space = gym.spaces.Box(obs_low, obs_high, dtype=np.float32)
+        return observation_space
 
     def get_action_space(self):
         '''
@@ -88,7 +90,8 @@ class Extraction:
 
         return action_space
 
-    def reset(self, extraction_vessel):
+    def reset(self, extraction_vessel,targets):
+        #added targets as parameter (used for the observation) -KS
         '''
         generate empty vessels
         '''
@@ -112,9 +115,9 @@ class Extraction:
             layer_switch=False,
         )
 
-        extractor = self.extractor
+        extractor = self.extractor()
 
-        extractor_vessel_material_dict = {extractor().get_name(): [extractor, self.extractor_volume]}
+        extractor_vessel_material_dict = {extractor.get_name(): [extractor, self.extractor_volume]}
 
         extractor_vessel_material_dict, _, _ = util.check_overflow(
             material_dict=extractor_vessel_material_dict,
@@ -124,7 +127,18 @@ class Extraction:
         event = ['update material dict', extractor_vessel_material_dict]
         extractor_vessel.push_event_to_queue(feedback=[event], dt=0)
 
-        state = util.generate_state(vessels, max_n_vessel=self.n_total_vessels)
+        #state = util.generate_state(vessels, max_n_vessel=self.n_total_vessels)
+        state = np.zeros((self.n_total_vessels, self.n_vessel_pixels + len(targets)), dtype=np.float32)
+
+        # generate the part of the state indep of your trarget
+        state[:, :self.n_vessel_pixels] = util.generate_layers_obs(
+            vessel_list=vessels,
+            max_n_vessel=self.n_total_vessels,
+            n_vessel_pixels=self.n_vessel_pixels
+        )
+        #add in info about your target
+        targ_ind = targets.index(self.target_material)
+        state[:, self.n_vessel_pixels + targ_ind] += 1
 
         return vessels, extractor_vessel, state
 
