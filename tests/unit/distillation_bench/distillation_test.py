@@ -74,7 +74,7 @@ class DistillationTestCase(unittest.TestCase):
         action = np.array([0, 1000])
         env.step(action)
 
-        final_temp = env.boil_vessel.temperature
+        final_temp = env.vessels[0].temperature
 
         self.assertLess(initial_temp, final_temp)
 
@@ -83,7 +83,7 @@ class DistillationTestCase(unittest.TestCase):
         env.reset()
 
         # gets material dict of bv before the pour
-        bv_material_dict_before = env.boil_vessel.get_material_dict()
+        bv_material_dict_before = env.vessels[0].get_material_dict()
 
         # material list of bv before the pour
         # conversion to list is needed to compare with b1
@@ -103,7 +103,7 @@ class DistillationTestCase(unittest.TestCase):
             b1_material_list.append(env.vessels[1]._material_dict[key][1])
 
         # env.boil_vessel._material_dict should be empty
-        self.assertFalse(env.boil_vessel._material_dict)
+        self.assertFalse(env.vessels[0]._material_dict)
 
         # beaker 1 should have the same material dict as boiling vessel before the pour
         self.assertEqual(bv_material_list_before, b1_material_list)

@@ -50,11 +50,8 @@ class ReactionBaseTestCase(unittest.TestCase):
         material_classes = convert_to_class(materials=REACTANTS+PRODUCTS)
 
         # define parameters for generating spectra
-        params = []
-        for material in material_classes:
-            params.append(material().get_spectra_no_overlap())
-
-        self.assertTrue(params == env.reaction.params)
+        for i, material in enumerate(material_classes):
+            self.assertTrue(np.array(material().get_spectra_no_overlap() == env.reaction.params[i]).all())
 
     def test_find_reaction_file(self):
 

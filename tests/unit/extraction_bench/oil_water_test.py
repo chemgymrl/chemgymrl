@@ -49,6 +49,7 @@ class OilWaterTestCase(unittest.TestCase):
         v0_initial = env.vessels[0].get_current_volume()[-1]
         v1_initial = env.vessels[1].get_current_volume()[-1]
         action = np.zeros(env.action_space.shape)
+        state, reward, done, _ = env.step(action)
         action[0] = 0
         action[1] = 1
         state, reward, done, _ = env.step(action)

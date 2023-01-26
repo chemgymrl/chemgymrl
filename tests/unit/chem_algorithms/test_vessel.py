@@ -55,6 +55,7 @@ class TestVessel(TestCase):
         initial_volume = 0
         initial_volume += vessel.get_current_volume()[1]
         vessel2 = Vessel('test_2')
+        vessel.push_event_to_queue(events=None, dt=1)
         event = ['drain by pixel', vessel2, 10]
         vessel.push_event_to_queue(events=[event], dt=1)
         final_volume = 0

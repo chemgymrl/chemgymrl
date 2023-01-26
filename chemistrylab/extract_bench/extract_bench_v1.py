@@ -104,6 +104,7 @@ def oil_vessel():
     Na.set_solute_flag(True)
     Na.set_polarity(2.0)
     Na.set_phase('l')
+    Na._boiling_point = material.NaCl()._boiling_point
 
     # initialize Cl
     Cl = material.Cl()
@@ -111,6 +112,7 @@ def oil_vessel():
     Cl.set_solute_flag(True)
     Cl.set_polarity(2.0)
     Cl.set_phase('l')
+    Cl._boiling_point = material.NaCl()._boiling_point
 
     # material_dict
     material_dict = {
@@ -179,6 +181,7 @@ def wurtz_vessel(add_mat=""):
     Na.set_color(0.0)
     Na.set_polarity(2.0)
     Na.set_phase('l')
+    Na._boiling_point = material.NaCl()._boiling_point
 
     # initialize Cl
     Cl = material.Cl()
@@ -187,6 +190,7 @@ def wurtz_vessel(add_mat=""):
     Cl.set_color(0.0)
     Cl.set_polarity(2.0)
     Cl.set_phase('l')
+    Cl._boiling_point = material.NaCl()._boiling_point
 
     # initialize material
     products = {'dodecane': material.Dodecane,
