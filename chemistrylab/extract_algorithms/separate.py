@@ -138,7 +138,7 @@ def map_to_state(A, B, C, colors, x=x):
             while not placed:
                 j += 1
                 if j == P.shape[0]:
-                    print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------{}'.format(p, Psum, P, r))                
+                    print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------'.format(p, Psum, P, r))                
                 p += P[j]
                 # If random number is less than relative probability for that phase
                 if r - p / Psum < 1e-6:
