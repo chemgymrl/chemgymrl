@@ -70,9 +70,6 @@ REACTANTS = ["ENTER REACTANTS HERE"]
 PRODUCTS = ["ENTER PRODUCTS HERE"]
 SOLVENTS = ["ENTER SOLVENTS HERE"]
 
-# define the desired material
-DESIRED = "ENTER DESIRED MATERIAL HERE"
-
 # add the initial thermodynamic values
 Ti = 0.0 # in Kelvin
 Vi = 0.0 # in Litres
