@@ -267,7 +267,7 @@ class Vessel:
 
             # if action is wait
             if event[0] == 'wait':
-                reward += action(self, parameter=event[1:], dt=dt)
+                reward += action(parameter=event[1:], dt=dt)
             else:
                 # call the function corresponding to the event
                 reward += action(parameter=event[1:], dt=dt)
