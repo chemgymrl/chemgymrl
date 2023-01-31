@@ -160,7 +160,7 @@ class Vessel:
 
         # event dict holding all the event functions
         self._event_dict = {
-            'temperature change': self._update_temperature,
+            'update temperature': self._update_temperature,
             'pour by volume': self._pour_by_volume,
             'drain by pixel': self._drain_by_pixel,
             'update material dict': self._update_material_dict,
@@ -1190,7 +1190,10 @@ class Vessel:
                     if self._solute_dict:
                         # fill in solute_amount
                         for Solute in self._solute_dict:
-                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][1])
+                            if M in self._solute_dict[Solute]:
+                                solute_amount[solute_counter].append(self._solute_dict[Solute][M][1])
+                            else:
+                                solute_amount[solute_counter].append(0)
                             solute_counter += 1
                     else:
                         solute_amount[0].append(0.0)
@@ -2168,7 +2171,7 @@ class Vessel:
 
             # event dict holding all the event functions
             self._event_dict = {
-                'temperature change': self._update_temperature,
+                'update temperature': self._update_temperature,
                 'pour by volume': self._pour_by_volume,
                 'drain by pixel': self._drain_by_pixel,
                 'update material dict': self._update_material_dict,

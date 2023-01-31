@@ -547,6 +547,14 @@ class _Reaction:
         # create a event to reset material's position and variance in target vessel
         # push event to target vessel
         __ = vessels.push_event_to_queue(
+            feedback=[['update temperature', temperature, False]],
+            dt=0
+        )
+        vessels.set_volume(volume, override=True)
+
+        # create a event to reset material's position and variance in target vessel
+        # push event to target vessel
+        __ = vessels.push_event_to_queue(
             events=None,
             dt=0
         )
