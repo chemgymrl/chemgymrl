@@ -445,13 +445,15 @@ class DistillationBenchEnv(gym.Env):
             action=action
         )
 
-        if len(self.vessels[0]._material_dict) > 0:
+        self.precipitation.update_materials(self.vessels[0].get_material_dict())
+
+        if self.vessels[0].get_total_material_amount() > 1e-12:
             prep_action = np.zeros(len(self.precipitation.reactants)+2)
             prep_action[0:2] += 0.5
             self.vessels[0] = self.precipitation.perform_action(
                 vessels=self.vessels[0],
                 action=prep_action,
-                n_steps=50,
+                n_steps=1,
                 t=0
             )
 

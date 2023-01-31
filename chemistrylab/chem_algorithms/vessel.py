@@ -396,12 +396,13 @@ class Vessel:
 
             # iterate through the material dictionary values for the remaining material parameters
             material_list = []
-            for value in list(self._material_dict.values()):
+            for mat in self._material_dict:
                 # we only require the first 2 items (the material class and the material amount)
-                necessary_values = value[:2]
+                necessary_values = self._material_dict[mat][:2]
 
-                # add the necessary material values to a list for further dissection
-                material_list.append(necessary_values)
+                if necessary_values[1] > 1e-12:
+                    # add the necessary material values to a list for further dissection
+                    material_list.append(necessary_values)
 
             # acquire the amounts of each material from the material values list
             material_amounts = [amount for __, amount in material_list]
@@ -532,7 +533,11 @@ class Vessel:
                     del self._material_dict[smallest_bp_name]
                     
                     # add all the material to the beaker's material dictionary
-                    out_beaker._material_dict[smallest_bp_name][1] = smallest_bp_amount
+                    if smallest_bp_name in out_beaker._material_dict:
+                        out_beaker._material_dict[smallest_bp_name][1] += smallest_bp_amount
+                    else:
+                        out_beaker._material_dict[smallest_bp_name][1] = smallest_bp_amount
+
                     out_beaker._layers_position_dict[smallest_bp_name] = self._layers_position_dict[smallest_bp_name]
                     del self._layers_position_dict[smallest_bp_name]
 
@@ -552,6 +557,7 @@ class Vessel:
 
                     # add the boiled material to the beaker's material dictionary
                     out_beaker._material_dict[smallest_bp_name][1] += boiled_material
+                    out_beaker._layers_position_dict[smallest_bp_name] = 0.0
 
                     # reduce the available heat energy to 0
                     heat_available = 0
@@ -1525,6 +1531,29 @@ class Vessel:
         return C
 
     # functions to access private properties
+    def get_total_material_amount(self):
+        """
+        Method to get the total amount of materials in the material dictionary.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `amount` : `np.float32`
+            The amount of all materials present.
+
+        Raises
+        ---------------
+        None
+        """
+
+        materials = list(self._material_dict.keys())
+        amount = np.sum(self.get_material_amount(materials))
+
+        return amount
+
     def get_material_amount(
             self,
             material_name=None

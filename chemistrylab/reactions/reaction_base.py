@@ -110,11 +110,12 @@ class _Reaction:
         self.dV = reaction_params["dV"]
 
         # the arrays used in dictating how reaction calculations are performed
+        self.pre_exp_arr = reaction_params["pre_exp_arr"]
         self.activ_energy_arr = reaction_params["activ_energy_arr"]
         self.stoich_coeff_arr = reaction_params["stoich_coeff_arr"]
         self.conc_coeff_arr = reaction_params["conc_coeff_arr"]
 
-        self.de = De(self.stoich_coeff_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
+        self.de = De(self.stoich_coeff_arr, self.pre_exp_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
 
         # specify the full list of materials
         self.materials = []
@@ -598,11 +599,6 @@ class _Reaction:
             if material_name in material_dict.keys():
                 self.initial_materials[i] = material_dict[material_name][1]
 
-        # acquire the amounts of solute materials
-        for i, solute_name in enumerate(solute_dict.keys()):
-            if solute_name in self.materials:
-                self.initial_solutes[i] = solute_dict[solute_name][1]
-
         vessels = vessel.Vessel(
             'react_vessel',
             materials=material_dict,
@@ -637,9 +633,9 @@ class _Reaction:
 
         for i in range(self.n.shape[0]):
             if self.materials[i] in material_dict:
-                self.n = material_dict[self.materials][1]
+                self.n[i] = material_dict[self.materials[i]][1]
             else:
-                self.n = 0
+                self.n[i] = 0
 
     def update(self, conc, temp, volume, t, dt, n_steps):
         """
@@ -668,7 +664,6 @@ class _Reaction:
         ---------------
         None
         """
-
         # set the intended vessel temperature in the differential equation module
         self.de.temp = temp
         # implement the differential equation solver
