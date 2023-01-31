@@ -70,12 +70,15 @@ REACTANTS = [
     "NaCl",
     "Na",
     "Cl",
-    "H2O"]
+    "H2O",
+    "C6H14"]
 PRODUCTS = [
     "NaCl",
     "Na",
     "Cl"]
-SOLVENTS = ["H2O"]
+SOLVENTS = [
+    "H2O",
+    "C6H14"]
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin
@@ -96,13 +99,15 @@ dV = 0.005
 activ_energy_arr = np.array(
     [
         8.0, # activation energy for reaction 0
-        1.0, # activation energy for reaction 1
+        8.0, # activation energy for reaction 1
+        1.0, # activation energy for reaction 2
     ]
 )
 stoich_coeff_arr = np.array(
     [
-        [1.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 0
-        [0.0, 1.0, 1.0, 0.0] # stoichiometric coefficients for reaction 1
+        [1.0, 0.0, 0.0, 1.0, 0.0], # stoichiometric coefficients for reaction 0
+        [1.0, 0.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 1
+        [0.0, 1.0, 1.0, 0.0, 0.0] # stoichiometric coefficients for reaction 2
     ]
 )
 
@@ -110,9 +115,10 @@ stoich_coeff_arr = np.array(
 # this will be an lxn array for the l involved materials and n occurring reactions
 conc_coeff_arr = np.array(
     [
-        [-1.0, 1.0], # concentration calculation coefficients for NaCl
-        [1.0, -1.0], # concentration calculation coefficients for Na
-        [1.0, -1.0], # concentration calculation coefficients for Cl
-        [0.0, 0.0], # concentration calculation coefficients for H2O
+        [-1.0, -1.0, 1.0], # concentration calculation coefficients for NaCl
+        [1.0, 1.0, -1.0], # concentration calculation coefficients for Na
+        [1.0, 1.0, -1.0], # concentration calculation coefficients for Cl
+        [0.0, 0.0, 0.0], # concentration calculation coefficients for H2O
+        [0.0, 0.0, 0.0], # concentration calculation coefficients for C6H14
     ]
 )

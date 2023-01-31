@@ -307,4 +307,4 @@ class Distillation:
                 # look through each vessel's material dict looking for the target material is done later
                 reward = 0
 
-        return vessels, reward, done
+        return [boil_vessel, beaker_1, beaker_2], reward, done

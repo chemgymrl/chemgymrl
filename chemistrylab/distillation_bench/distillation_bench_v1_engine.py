@@ -69,6 +69,7 @@ class DistillationBenchEnv(gym.Env):
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             in_vessel_path=None,
             target_material=None,
             dQ=10.0,
@@ -85,6 +86,7 @@ class DistillationBenchEnv(gym.Env):
             n_vessel_pixels=n_vessel_pixels,
             reaction=reaction,
             reaction_file_identifier=reaction_file_identifier,
+            precipitation_file_identifier=precipitation_file_identifier,
             in_vessel_path=in_vessel_path,
             target_material=target_material,
             dQ=dQ,
@@ -93,6 +95,10 @@ class DistillationBenchEnv(gym.Env):
 
         self.reaction = input_parameters["reaction"](
             reaction_file_identifier=input_parameters["reaction_file_identifier"],
+            target_material=target_material,
+        )
+        self.precipitation = input_parameters["reaction"](
+            reaction_file_identifier=input_parameters["precipitation_file_identifier"],
             target_material=target_material,
         )
 
@@ -138,7 +144,7 @@ class DistillationBenchEnv(gym.Env):
         self.min_purity_threshold = 0.5
 
     @staticmethod
-    def _validate_parameters(n_steps=None, boil_vessel=None, n_vessel_pixels=100, reaction=None, reaction_file_identifier="", in_vessel_path=None, target_material=None, dQ=0.0, out_vessel_path=None):
+    def _validate_parameters(n_steps=None, boil_vessel=None, n_vessel_pixels=100, reaction=None, reaction_file_identifier="", precipitation_file_identifier="", in_vessel_path=None, target_material=None, dQ=0.0, out_vessel_path=None):
         '''
         Checks and validates the input parameters submitted to the distillation bench.
         Parameters
@@ -199,6 +205,10 @@ class DistillationBenchEnv(gym.Env):
         if not isinstance(reaction_file_identifier, str):
             raise TypeError("Invalid `Reaction File Parameter` type. Unable to Proceed.")
 
+        # ensure the precipitation file identifier is a string a points to a legitimate file
+        if not isinstance(precipitation_file_identifier, str):
+            raise TypeError("Invalid `Precipitation File Parameter` type. Unable to Proceed.")
+
         # ensure the reaction file identifier is a string a points to a legitimate file
         if not isinstance(in_vessel_path, str) and not (in_vessel_path is None):
             raise TypeError("Invalid `Reaction File Parameter` type. Unable to Proceed.")
@@ -239,6 +249,7 @@ class DistillationBenchEnv(gym.Env):
             "n_vessel_pixels" : n_vessel_pixels,
             "reaction" : reaction,
             "reaction_file_identifier" : reaction_file_identifier,
+            "precipitation_file_identifier" : precipitation_file_identifier, 
             "in_vessel_path" : in_vessel_path,
             "target_material" : target_material,
             "dQ" : dQ,
@@ -395,12 +406,10 @@ class DistillationBenchEnv(gym.Env):
         self._first_render = True
 
         # acquire the initial vessels from the distillation class
-        vessels = self.distillation.reset(
+        self.vessels = self.distillation.reset(
             init_boil_vessel=self.boil_vessel
         )
-
-        # re-define the existing vessels
-        self.vessels = vessels
+        self.vessels[0] = self.precipitation.reset(vessels=self.vessels[0])
 
         # update the state variables
         self._update_state()
@@ -430,19 +439,21 @@ class DistillationBenchEnv(gym.Env):
         None
         '''
 
-        # obtain the necessary variables
-        vessels = self.vessels
-        done = self.done
-
         # perform the action and update the vessels, interim reward, and done variables
-        vessels, reward, done = self.distillation.perform_action(
-            vessels=vessels,
+        self.vessels, reward, self.done = self.distillation.perform_action(
+            vessels=self.vessels,
             action=action
         )
 
-        # redefine the global variables
-        self.vessels = vessels
-        self.done = done
+        if len(self.vessels[0]._material_dict) > 0:
+            prep_action = np.zeros(len(self.precipitation.reactants)+2)
+            prep_action[0:2] += 0.5
+            self.vessels[0] = self.precipitation.perform_action(
+                vessels=self.vessels[0],
+                action=prep_action,
+                n_steps=50,
+                t=0
+            )
 
         # update the state variable
         self._update_state()

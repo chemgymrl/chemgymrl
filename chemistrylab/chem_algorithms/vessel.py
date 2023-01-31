@@ -414,11 +414,8 @@ class Vessel:
 
             # ensure all material boiling points are above the current vessel temperature
             try:
-                if min(material_bps) < self.temperature:
-                    print([(material_obj.get_name(), material_obj._boiling_point) for material_obj in material_objs])
-                    print(min(material_bps))
-                    # error for now...
-                    exit()
+                min(material_bps) < self.temperature
+
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
             # contains no materials) no further operations will contribute to the distillation of materials
             except ValueError:
@@ -485,11 +482,11 @@ class Vessel:
 
             # if enough heat is available, modify the vessel temp and boil off the material
             if heat_to_lowest_bp < heat_available:
-                print("Raising Boil Vessel Temperature by {} Kelvin".format(temp_change_needed))
+                print("Raising Boil Vessel Temperature by {} Kelvin".format(np.max([temp_change_needed, 0.0])))
 
                 # change the vessel temperature to the lowest boiling point
                 self._update_temperature(
-                    parameter=[lowest_bp, False],
+                    parameter=[np.max([lowest_bp, self.current_temp]), False],
                     dt=self.default_dt
                 )
 
@@ -499,7 +496,7 @@ class Vessel:
 
                 # modify the amount of heat available by subtracting the amount of heat we needed to raise the vessel
                 # temperature to the lowest boiling point
-                heat_available -= heat_to_lowest_bp
+                heat_available -= abs(heat_to_lowest_bp)
 
                 # calculate the amount of heat needed to boil off all of the material
                 heat_to_boil_all = smallest_bp_amount * smallest_bp_enth_vap
@@ -512,7 +509,6 @@ class Vessel:
                 if heat_to_boil_all < heat_available:
                     print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
 
-                    prep_dict = {}
                     if self._material_dict[smallest_bp_name][0].is_solvent():
                         solute_dict = self.get_solute_dict()
                         for solute in solute_dict:
@@ -521,13 +517,12 @@ class Vessel:
                                     self._material_dict[solute][0] = self._material_dict[solute][0].__class__()
                                     self._material_dict[solute][0].set_solute_flag(False)
                                     self._layers_position_dict[solute] = 0.0
-                                    prep_dict[solute] = solute_dict[solute][smallest_bp_name]
                                     del self._solute_dict[solute]
 
                                 else:
-                                    solute_total_amount = self._material_dict[solute]
-                                    for solvent in solute_dict:
-                                        self._solute_dict[solute][solvent] += self._solute_dict[solute][smallest_bp_name] * self._solute_dict[solute][solvent] / (solute_total_amount - self._solute_dict[solute][smallest_bp_name])
+                                    solute_total_amount = self._material_dict[solute][1]
+                                    for solvent in self._solute_dict[solute]:
+                                        self._solute_dict[solute][solvent][1] += self._solute_dict[solute][smallest_bp_name][1] * self._solute_dict[solute][solvent][1] / (solute_total_amount - self._solute_dict[solute][smallest_bp_name][1])
 
                                     del self._solute_dict[solute][smallest_bp_name]
 
@@ -1078,7 +1073,6 @@ class Vessel:
         ---------------
         None
         """
-
         new_material_dict = util.convert_material_dict_units(parameter[0])
 
         self._material_dict = util.organize_material_dict(new_material_dict)
