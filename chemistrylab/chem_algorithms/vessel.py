@@ -178,6 +178,8 @@ class Vessel:
         self.height_to_diamater = 3/2 # default height to diameter ratio
         self.dimensions = self.get_vessel_dimensions() # returns a tuple (max_height, radius)
 
+        self.push_event_to_queue(events=None, dt=0)
+
     def push_event_to_queue(
             self,
             events=None,  # a list of event tuples(['event', parameters])

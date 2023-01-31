@@ -134,7 +134,7 @@ class Material:
         dis_mat.set_color(0.0)
         dis_mat.set_phase('l')
 
-        return [dis_mat]
+        return {dis_mat: 1}
 
     def precipitate(self):
         # should be able to return how this material precipitates
@@ -421,7 +421,7 @@ class NaCl(Material):
         dis_Cl.set_polarity(2.0)
         dis_Cl.set_phase('l')
 
-        return [{dis_Na: 1}, {dis_Cl: 1}]
+        return {dis_Na: 1, dis_Cl: 1}
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
