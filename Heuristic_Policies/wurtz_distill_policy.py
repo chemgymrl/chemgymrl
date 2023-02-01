@@ -40,5 +40,5 @@ for i in range(5):
         R1[t] += r
         step += 1
 
-print((R0 / c0).sum(), R0 / c0)
-print((R1 / c1).sum(), R1 / c1)
+print((R0 / c0).mean(), R0 / c0)
+print((R1 / c1).mean(), R1 / c1)
