@@ -28,7 +28,7 @@ Runs the QATest script on all registered chemgym environments
 import os
 import sys
 
-sys.path.append('./chemistrylab')
+sys.path.append('../chemistrylab')
 import gym
 import chemistrylab
 import numpy as np

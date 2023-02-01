@@ -58,8 +58,18 @@ dV = 0.005
 
 
 # add the arrays containing rate calculation parameters; these include:
-    # the activation energies for each reaction (6x1 array)
-    # the stoichiometric coefficients (6x4 array)
+    # the pre-exponentional factors for each reaction (5x1 array)
+    # the activation energies for each reaction (5x1 array)
+    # the stoichiometric coefficients (5x7 array)
+pre_exp_arr = np.array(
+    [
+        5.0, # pre-exp factor for reaction 0
+        1.0, # pre-exp factor for reaction 1
+        1.0, # pre-exp factor for reaction 2
+        1.0, # pre-exp factor for reaction 3
+        1.0 # pre-exp factor for reaction 4
+    ]
+)
 activ_energy_arr = np.array(
     [
         1.0, # activation energy for reaction 0
@@ -85,14 +95,14 @@ stoich_coeff_arr = np.array(
 # this will be an 9x5 array for the 9 involved materials and 5 occurring reactions
 conc_coeff_arr = 10*np.array(
     [ #  r0    r1    r2   r3   r4
-        [-5.0, -1.0, 0.0, 0.0, 0.0], # concentration calculation coefficients for A
-        [-5.0, 0.0, -1.0, 0.0, 0.0], # concentration calculation coefficients for B
-        [-5.0, 0.0, 0.0, -1.0, 0.0], # concentration calculation coefficients for C
+        [-1.0, -1.0, 0.0, 0.0, 0.0], # concentration calculation coefficients for A
+        [-1.0, 0.0, -1.0, 0.0, 0.0], # concentration calculation coefficients for B
+        [-1.0, 0.0, 0.0, -1.0, 0.0], # concentration calculation coefficients for C
         [0.0, -1.0, -1.0, -1.0, 0.0], # concentration calculation coefficients for D
         [0.0, 1.0, 0.0, 0.0, -1.0], # concentration calculation coefficients for F
         [0.0, 0.0, 1.0, 0.0, -1.0], # concentration calculation coefficients for G
         [0.0, 0.0, 0.0, 1.0, -1.0], # concentration calculation coefficients for H
-        [5.0, 0.0, 0.0, 0.0, 0.0], # concentration calculation coefficients for E
+        [1.0, 0.0, 0.0, 0.0, 0.0], # concentration calculation coefficients for E
         [0.0, 0.0, 0.0, 0.0, 1.0], # concentration calculation coefficients for I
         [0.0, 0.0, 0.0, 0.0, 0.0] # concentration calculation coefficients for H2O
     ]

@@ -87,7 +87,7 @@ class Distillation:
     `max_vessel_volume` : `float` (default=`1000.0`)
         The maximal volume of an added vessel.
     `n_actions` : `int` (default=`8`)
-        The number of actions included in this extraction experiment.
+        The number of actions included in this distillation experiment.
     Returns
     ---------------
     None
@@ -105,7 +105,7 @@ class Distillation:
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
             max_vessel_volume=1.0, # maximal volume of empty vessels
-            n_actions=5 # number of available actions
+            n_actions=10 # number of available actions
     ):
         '''
         Constructor class for the Distillation class
@@ -156,7 +156,7 @@ class Distillation:
         # actions have two values:
         #   action[0] is the index of the action to perform
         #   action[1] is a multiplier for how much to do of that action
-        action_space = gym.spaces.MultiDiscrete([self.n_actions, 10])
+        action_space = gym.spaces.MultiDiscrete([5, self.n_actions])
 
         return action_space
 
@@ -234,21 +234,22 @@ class Distillation:
         do_action = int(action[0])
         multiplier = int(action[1])
 
+        # obtain the necessary vessels
+        boil_vessel = vessels[0]
+        beaker_1 = vessels[1]
+        beaker_2 = vessels[2]
+
         # if the multiplier is 0, only actions 0 (heat change), 3 (wait), 4 (done) can be performed
         if all([multiplier == 0, do_action not in [0, 3 ,4]]):
             for vessel_obj in vessels:
                 __ = vessel_obj.push_event_to_queue(dt=self.dt)
                 reward = 0
         else:
-            # obtain the necessary vessels
-            boil_vessel = vessels[0]
-            beaker_1 = vessels[1]
-            beaker_2 = vessels[2]
 
             # Add/Remove Heat (Heat multiplier)
             if do_action == 0:
                 # calculate the amount of heat being added/removed
-                multiplier = 2 * (multiplier/10 - 0.5)
+                multiplier = 2 * (multiplier/self.n_actions - 0.5)
                 heat_change = multiplier * self.dQ
 
                 # add the event to perform the heat change
@@ -263,7 +264,7 @@ class Distillation:
             # pour the Boil Vessel into Beaker 1
             if do_action == 1:
                 # determine the volume to pour
-                d_volume = boil_vessel.get_max_volume() * multiplier/10
+                d_volume = boil_vessel.get_max_volume() * multiplier/self.n_actions
 
                 # push the event to the boil vessel
                 event = ['pour by volume', beaker_1, d_volume]
@@ -275,7 +276,7 @@ class Distillation:
             # Pour Beaker 1 into Beaker 2
             if do_action == 2:
                 # determine the volume to pour
-                d_volume = beaker_1.get_max_volume() * multiplier/10
+                d_volume = beaker_1.get_max_volume() * multiplier/self.n_actions
 
                 # push the event to the first beaker
                 event = ['pour by volume', beaker_2, d_volume]
@@ -307,4 +308,4 @@ class Distillation:
                 # look through each vessel's material dict looking for the target material is done later
                 reward = 0
 
-        return vessels, reward, done
+        return [boil_vessel, beaker_1, beaker_2], reward, done

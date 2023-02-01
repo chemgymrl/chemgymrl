@@ -27,7 +27,7 @@ class TestVessel(TestCase):
     def test__update_temperature(self):
         vessel = Vessel("test")
         initial_temp = vessel.get_temperature()
-        event = ['temperature change', 400, True]
+        event = ['update temperature', 400, True]
         vessel.push_event_to_queue(feedback=[event], dt=0)
         self.assertEqual(vessel.get_temperature(), 400)
 

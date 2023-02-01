@@ -77,6 +77,9 @@ class Distillation_v1(DistillationBenchEnv):
                 vessel_path=os.path.join(os.getcwd(), "test_extract_vessel.pickle"),
                 in_vessel=boil_vessel()
             ),
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             target_material="dodecane",
             dQ=1000.0,
             out_vessel_path=os.getcwd()
@@ -112,7 +115,8 @@ def wurtz_vessel(add_mat):
         '4-ethyldecane': material.FourEthyldecane,
         '5,6-dimethyldecane': material.FiveSixDimethyldecane,
         '4-ethyl-5-methylnonane': material.FourEthylFiveMethylnonane,
-        '4,5-diethyloctane': material.FourFiveDiethyloctane
+        '4,5-diethyloctane': material.FourFiveDiethyloctane,
+        'NaCl': material.NaCl
     }
     try:
         add_material = products[add_mat]()
@@ -167,6 +171,7 @@ class WurtzDistill_v1(DistillationBenchEnv):
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             in_vessel_path=None,
             target_material="dodecane",
             dQ=1000.0,
@@ -184,6 +189,7 @@ class GeneralWurtzDistill_v1(DistillationBenchEnv):
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             in_vessel_path=in_vessel_path,
             target_material=target_material,
             dQ=1000.0,

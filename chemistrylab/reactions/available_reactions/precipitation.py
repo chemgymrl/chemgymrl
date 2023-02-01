@@ -63,49 +63,59 @@ Included in a reaction file are the following:
 import numpy as np
 
 # name the reaction class
-REACTION_CLASS = "SPECIFY THE NAME OF THE REACTION CLASS/SET HERE"
+REACTION_CLASS = "precipitation reactions"
 
 # add the names of the reactants, products, and solutes available to all reactions
-REACTANTS = ["ENTER REACTANTS HERE"]
-PRODUCTS = ["ENTER PRODUCTS HERE"]
-SOLVENTS = ["ENTER SOLVENTS HERE"]
+REACTANTS = [
+    "NaCl",
+    "Na",
+    "Cl",
+    "H2O",
+    "C6H14"]
+PRODUCTS = [
+    "NaCl",
+    "Na",
+    "Cl"]
+SOLVENTS = [
+    "H2O",
+    "C6H14"]
 
 # add the initial thermodynamic values
-Ti = 0.0 # in Kelvin
-Vi = 0.0 # in Litres
+Ti = 297.0 # in Kelvin
+Vi = 1 # in Litres
 
-# sample additional vessel parameters
-dt = 0.0
-Tmin = 0.0
-Tmax = 0.0
-dT = 0.0
-Vmin = 0.0
-Vmax = 0.0
-dV = 0.0
+# additional vessel parameters
+dt = 0.01
+Tmin = 250.0
+Tmax = 500.0
+dT = 50.0
+Vmin = 0.001
+Vmax = 2
+dV = 0.005
 
 # add the arrays containing rate calculation parameters; these include:
-    # the pre-exponentional factors for each reaction (nx1 array)
-    # the activation energies for each reaction (nx1 array)
-    # the stoichiometric coefficients (nxm array)
+    # the pre-exponentional factors for each reaction (3x1 array)
+    # the activation energies for each reaction (3x1 array)
+    # the stoichiometric coefficients (3x5 array)
 pre_exp_arr = np.array(
     [
-        1.0, # pre-exp factor for reaction 0
-        1.0, # pre-exp factor for reaction 1
-        1.0 # pre-exp factor for reaction 2
+        1e4, # pre-exp factor for reaction 0
+        1e4, # pre-exp factor for reaction 1
+        1e4 # pre-exp factor for reaction 2
     ]
 )
 activ_energy_arr = np.array(
     [
-        0.0, # activation energy for reaction 0
-        0.0, # activation energy for reaction 1
-        0.0 # activation energy for reaction 2
+        1.0, # activation energy for reaction 0
+        1.0, # activation energy for reaction 1
+        1.0, # activation energy for reaction 2
     ]
 )
 stoich_coeff_arr = np.array(
     [
-        [0.0], # stoichiometric coefficients for reaction 0
-        [0.0], # stoichiometric coefficients for reaction 1
-        [0.0] # stoichiometric coefficients for reaction 2
+        [1.0, 0.0, 0.0, 1.0, 0.0], # stoichiometric coefficients for reaction 0
+        [1.0, 0.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 1
+        [0.0, 1.0, 1.0, 0.0, 0.0] # stoichiometric coefficients for reaction 2
     ]
 )
 
@@ -113,8 +123,10 @@ stoich_coeff_arr = np.array(
 # this will be an lxn array for the l involved materials and n occurring reactions
 conc_coeff_arr = np.array(
     [
-        [0.0], # concentration calculation coefficients for material 0
-        [0.0], # concentration calculation coefficients for material 1
-        [0.0] # concentration calculation coefficients for material 2
+        [-1.0, -1.0, 1.0], # concentration calculation coefficients for NaCl
+        [1.0, 1.0, -1.0], # concentration calculation coefficients for Na
+        [1.0, 1.0, -1.0], # concentration calculation coefficients for Cl
+        [0.0, 0.0, 0.0], # concentration calculation coefficients for H2O
+        [0.0, 0.0, 0.0], # concentration calculation coefficients for C6H14
     ]
 )

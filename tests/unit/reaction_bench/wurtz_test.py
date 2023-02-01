@@ -48,7 +48,7 @@ class DecompositionTestCase(unittest.TestCase):
         action[0] = 1 / 2
         action[1] = 1
         env.step(action)
-        desired_volume = env.reaction.Vi + env.reaction.dV
+        desired_volume = min(env.reaction.Vi + env.reaction.dV, env.vessels.v_max)
         actual_volume = env.vessels.get_volume()
         self.assertAlmostEqual(desired_volume, actual_volume, places=6)
 
