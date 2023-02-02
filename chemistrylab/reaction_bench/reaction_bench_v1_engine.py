@@ -195,11 +195,11 @@ class ReactionBenchEnv(gym.Env):
         # initial_in_hand.shape[0] indicates the amount of each reactant
         # absorb.shape[0] indicates the numerous spectral signatures from get_spectra
         obs_low = np.zeros(
-            self.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0] + len(self.reaction.products),
+            self.reaction.initial_in_hand.shape[0] + 3 + absorb.shape[0] + len(self.reaction.products),
             dtype=np.float32
         )
         obs_high = np.ones(
-            self.reaction.initial_in_hand.shape[0] + 4 + absorb.shape[0] + len(self.reaction.products),
+            self.reaction.initial_in_hand.shape[0] + 3 + absorb.shape[0] + len(self.reaction.products),
             dtype=np.float32
         )
         self.observation_space = gym.spaces.Box(low=obs_low, high=obs_high)
@@ -543,7 +543,7 @@ class ReactionBenchEnv(gym.Env):
 
         # create an array to contain all state variables
         state = np.zeros(
-            4 +  # time T V P
+            3 +  # T V P
             len(self.reaction.reactants) +  # reactants
             absorb.shape[0] +  # spectra
             len(self.reaction.products),  # product labels
@@ -552,32 +552,29 @@ class ReactionBenchEnv(gym.Env):
 
         # populate the state array with updated state variables
 
-        # state[0] = time
-        state[0] = self.t / self.tmax
-
-        # state[1] = temperature
+        # state[0] = temperature
         Tmin = self.vessels.get_Tmin()
         Tmax = self.vessels.get_Tmax()
-        state[1] = (T - Tmin) / (Tmax - Tmin)
+        state[0] = (T - Tmin) / (Tmax - Tmin)
 
-        # state[2] = volume
+        # state[1] = volume
         Vmin = self.vessels.get_min_volume()
         Vmax = self.vessels.get_max_volume()
-        state[2] = (V - Vmin) / (Vmax - Vmin)
+        state[1] = (V - Vmin) / (Vmax - Vmin)
 
-        # state[3] = pressure
+        # state[2] = pressure
         total_pressure = self.vessels.get_pressure()
         Pmax = self.vessels.get_pmax()
-        state[3] = total_pressure / Pmax
+        state[2] = total_pressure / Pmax
 
         # remaining state variables pertain to reactant amounts and spectra
         for i in range(self.reaction.initial_in_hand.shape[0]):
-            state[i + 4] = self.reaction.n[i] / self.reaction.nmax[i]
+            state[i + 3] = self.reaction.n[i] / self.reaction.nmax[i]
         for i in range(absorb.shape[0]):
-            state[i + self.reaction.initial_in_hand.shape[0] + 4] = absorb[i]
+            state[i + self.reaction.initial_in_hand.shape[0] + 3] = absorb[i]
 
         targ_ind = self.reaction.products.index(self.reaction.desired)
-        state[4 + self.reaction.initial_in_hand.shape[0] + absorb.shape[0] + targ_ind] = 1
+        state[3 + self.reaction.initial_in_hand.shape[0] + absorb.shape[0] + targ_ind] = 1
 
         self.state = state
 
@@ -812,8 +809,8 @@ class ReactionBenchEnv(gym.Env):
         wave_min = self.char_bench.params['spectra']['range_ir'][0]
 
         # define the length of the spectral data array and the array itself
-        spectra_len = self.state.shape[0] - 4 - self.reaction.initial_in_hand.shape[0] - len(self.reaction.products)
-        absorb = self.state[4 + self.reaction.initial_in_hand.shape[0]:-1*len(self.reaction.products)]
+        spectra_len = self.state.shape[0] - 3 - self.reaction.initial_in_hand.shape[0] - len(self.reaction.products)
+        absorb = self.state[3 + self.reaction.initial_in_hand.shape[0]:-1*len(self.reaction.products)]
 
         # set a space for all spectral data to exist in
         wave = np.linspace(
