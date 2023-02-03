@@ -100,7 +100,8 @@ def radar_factory(num_vars, frame='circle'):
 
 
 def make_radar(theta,axs,info):
-    spoke_labels = info.pop(0)
+    spoke_labels = info[0]
+    info = info[1:]
     N = len(spoke_labels)
     
     colors = ['b', 'r', 'g', 'm', 'y']
