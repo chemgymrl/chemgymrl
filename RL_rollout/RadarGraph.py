@@ -99,15 +99,15 @@ def radar_factory(num_vars, frame='circle'):
 
 
 
-def make_radar(theta,axs,info):
+def make_radar(theta,axs,info,colors = ['b', 'r', 'g', 'm', 'y'],gridlines=[0.2, 0.4, 0.6, 0.8]):
     spoke_labels = info[0]
     info = info[1:]
     N = len(spoke_labels)
     
-    colors = ['b', 'r', 'g', 'm', 'y']
+    
     # Plot the four cases from the example data on separate axes
     for ax, (title, case_data) in zip(axs.flat, info):
-        ax.set_rgrids([0.2, 0.4, 0.6, 0.8])
+        ax.set_rgrids(gridlines)
         ax.set_title(title, weight='bold', size='medium', position=(0.5, 1.1),
                      horizontalalignment='center', verticalalignment='center')
         for d, color in zip(case_data, colors):
