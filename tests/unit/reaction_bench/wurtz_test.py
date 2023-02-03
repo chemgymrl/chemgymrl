@@ -24,7 +24,7 @@ import numpy as np
 
 ENV_NAME = 'WurtzReact-v1'
 
-class DecompositionTestCase(unittest.TestCase):
+class WurtzTestCase(unittest.TestCase):
     def test_init(self):
         env = gym.make(ENV_NAME)
         state = env.reset()

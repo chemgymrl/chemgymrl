@@ -647,8 +647,6 @@ class Dodecane(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_dodecane,
-            spectra_no_overlap=spec.S_dodecane,
             index=16
         )
 
@@ -920,8 +918,8 @@ class A(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_dodecane,
-            spectra_no_overlap=spec.S_dodecane,
+            spectra_overlap=spec.S_A,
+            spectra_no_overlap=spec.S_A,
             index=30
         )
 
@@ -943,8 +941,8 @@ class B(Material):
             specific_heat=1.5408,
             enthalpy_fusion=15490.0,
             enthalpy_vapor=42800.0,
-            spectra_overlap=spec.S_1_chlorohexane,
-            spectra_no_overlap=spec.S_1_chlorohexane,
+            spectra_overlap=spec.S_B,
+            spectra_no_overlap=spec.S_B,
             index=31
         )
 
@@ -967,8 +965,8 @@ class C(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=43820.0,
-            spectra_overlap=spec.S_2_chlorohexane,
-            spectra_no_overlap=spec.S_2_chlorohexane,
+            spectra_overlap=spec.S_C,
+            spectra_no_overlap=spec.S_C,
             index=32
         )
 
@@ -991,8 +989,8 @@ class D(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=32950.0,
-            spectra_overlap=spec.S_3_chlorohexane,
-            spectra_no_overlap=spec.S_3_chlorohexane,
+            spectra_overlap=spec.S_D,
+            spectra_no_overlap=spec.S_D,
             index=33
         )
 
@@ -1015,6 +1013,8 @@ class E(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_E,
+            spectra_no_overlap=spec.S_E,
             index=34
         )
 
@@ -1037,6 +1037,8 @@ class F(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_F,
+            spectra_no_overlap=spec.S_F,
             index=35
         )
 
@@ -1059,6 +1061,8 @@ class G(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_G,
+            spectra_no_overlap=spec.S_G,
             index=36
         )
 
@@ -1081,6 +1085,8 @@ class H(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_H,
+            spectra_no_overlap=spec.S_H,
             index=37
         )
 
@@ -1103,6 +1109,8 @@ class I(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_I,
+            spectra_no_overlap=spec.S_I,
             index=38
         )
 

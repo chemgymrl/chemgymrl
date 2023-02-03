@@ -142,17 +142,17 @@ class ReactionBaseTestCase(unittest.TestCase):
 
         # getting state array for amount of mols pertaining to each material
         state_mols = np.zeros(
-            4 +  # time T V P
+            3 +  # T V P
             len(env.reaction.materials),
             dtype=np.float32
         )
         materials = REACTANTS + PRODUCTS
         for i in range(len(materials)):
-            state_mols[i + 4] = env.reaction.n[i]
+            state_mols[i + 3] = env.reaction.n[i]
 
         # test if plot_data_state is the correct value
-        np.testing.assert_almost_equal(plot_data_state, env.state[:4].tolist(), decimal=3)
-        np.testing.assert_almost_equal(plot_data_mol[:-1], state_mols[4:-1].tolist(), decimal=3)
+        np.testing.assert_almost_equal(plot_data_state[1:], env.state[:3].tolist(), decimal=3)
+        np.testing.assert_almost_equal(plot_data_mol[:-1], state_mols[3:-1].tolist(), decimal=3)
 
     def test_temperature_increase(self):
 
