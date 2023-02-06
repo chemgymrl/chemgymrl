@@ -26,8 +26,6 @@ PRODUCTS = []
 ALL_MATERIALS = REACTANTS + PRODUCTS
 # specify the solute in which the reaction is meant to take place in
 SOLVENTS = []
-# the desired material out of the reaction
-DESIRED = ""
 ```
 we change the above to the following:
 ```python
@@ -36,15 +34,18 @@ REACTANTS = ['NaCl']
 PRODUCTS = ['Na', 'Cl']
 ALL_MATERIALS = REACTANTS + PRODUCTS
 SOLVENTS = ['H2O']
-DESIRED = 'Na'
 ```
 
 In this case, we are letting the reaction file know what reagents we are using and the desired product so that we can
 easily track and display their concentrations.
 
-Now we need to establish a few arrays that we use to calculate the change in concentration. The first array that we
-require is a n_reactions x 1 array which represents the activation energy of each reaction, in this case, we only have 1
+Now we need to establish a few arrays that we use to calculate the change in concentration. The first arrays that we
+require are two n_reactions x 1 array which represents the pre-exponential coefficients and activation energy of each reaction, in this case, we only have 1
 reaction:
+
+```python
+pre_exp_arr = np.array([1.0])
+```
 
 ```python
 activ_energy_arr = np.array([1.0])

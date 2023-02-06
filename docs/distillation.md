@@ -26,6 +26,7 @@ class WurtzDistill_v1(DistillationBenchEnv):
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             in_vessel_path=None,
             target_material="dodecane",
             dQ=1000.0,
@@ -33,16 +34,15 @@ class WurtzDistill_v1(DistillationBenchEnv):
         )
 ```
 
-Here we pass the boiling vessel, which is typically the pickle file produced by the extraction bench. Like in the other 
-engines we also pass the target material. Additionally, we pass in a dQ value which is the maximal change in heat 
-energy and the path which the output vessel will be located in.
+Here we pass the boiling vessel, or a path to the pickle file produced by a previous bench. We provide a reaction
+file which identifies the possible targets we are interested in. We also provide a precipitation file which is a
+reaction file specifically for describing how various materials dissolve and precipitate out of solution. Like in
+the other benches, we also pass the target material. Additionally, we pass in a dQ value which is the maximal change
+in heat energy and the path which the output vessel will be located in.
 
 ## Output
 
-Like extraction, the distillation bench only has human render mode which renders a series of graphs illustrating the 
-operations on the vessels. 
-
-Once the extraction bench is ran and the render function is called, plots will appear showing data about the extraction 
+Once the distillation bench is reset and the render function is called, plots will appear showing data about the distillation 
 being performed by the agent. There are two main plot modes:
 
 - Human Render
