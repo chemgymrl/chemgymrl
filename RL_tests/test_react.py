@@ -1,38 +1,23 @@
 import gym
 import numpy as np
 import chemistrylab
-from chemistrylab.reaction_bench.reaction_bench_v1 import FictReact_v1, FictReact_v2
-import time
+from stable_baselines3 import PPO
 
-env = FictReact_v2(target_material="I")
-s = env.reset()
-'''
-for i in range(5):
-    s, r, d, _ = env.step([1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0])
+env = gym.make("FictReact-v2")
 
-for i in range(15):
-    s, r, d, _ = env.step([1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0])
+model = PPO.load("PPO_React.zip")
 
-print("Heuristic")
-print("E: " + str(env.vessels._material_dict["E"][1]))
-print("I: " + str(env.vessels._material_dict["I"][1]))
-print(r)
-print("")
-'''
+R = np.zeros(4, dtype=np.float32)
+c = np.zeros(4, dtype=np.int32)
 
-re = 0
-count = 0
-tic = time.time()
-for ep in range(100):
-    count += 1
+for i in range(50):
     s = env.reset()
-    for i in range(20):
-        s, r, d, _ = env.step(env.action_space.sample())
-    re += r
-    toc = time.time()
-    print("Time " + str(ep+1) + ": " + str((toc - tic)/count))
+    t = np.argmax(s[-4:])
+    c[t] += 1
+    done = False
+    while not done:
+        a, _s = model.predict(s, deterministic=True)
+        s, r, done, _ = env.step(a)
+        R[t] += r
 
-print("\nRandom")
-print("E: " + str(env.vessels._material_dict["E"][1]))
-print("I: " + str(env.vessels._material_dict["I"][1]))
-print(re/100)
+print((R / c).mean(), R / c)
