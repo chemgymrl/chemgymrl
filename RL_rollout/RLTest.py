@@ -89,7 +89,7 @@ class WurtzDistillHeuristic(Heuristic):
         return [0,9],[]
 
 
-HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic}
+HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic}
 
 
 if __name__=="__main__":
