@@ -51,6 +51,7 @@ import sys
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import material
+from chemistrylab.reactions.get_reactions import convert_to_class
 
 # ---------- # REACTION BENCH # ---------- #
 
@@ -319,7 +320,21 @@ class ExtractionReward:
         '''
 
         # acquire the amount of desired material from the `vessel` parameter
-        material_amount = vessel.get_material_amount(desired_material)
+        material_amounts = []
+        desired_material_class = convert_to_class(materials=[desired_material])[0]()
+        dis_mats = desired_material_class.dissolve()
+        dis_mats_names = []
+        for mat_obj in dis_mats:
+            mat_name = mat_obj.get_name()
+            dis_mats_names.append(mat_name)
+            material_amounts.append(vessel.get_material_amount(mat_name) / dis_mats[mat_obj])
+
+        if all(item in dis_mats_names for item in vessel._material_dict):
+            material_amount = min(material_amounts)
+        else:
+            material_amount = 0
+
+        material_amount += vessel.get_material_amount(desired_material)
 
         # set a negative reward if no desired material was made available to the Extraction Bench
         if abs(material_amount - 0) < 1e-6:

@@ -160,7 +160,7 @@ class Vessel:
 
         # event dict holding all the event functions
         self._event_dict = {
-            'temperature change': self._update_temperature,
+            'update temperature': self._update_temperature,
             'pour by volume': self._pour_by_volume,
             'drain by pixel': self._drain_by_pixel,
             'update material dict': self._update_material_dict,
@@ -177,6 +177,8 @@ class Vessel:
         self.thickness = 1e-3 # beaker is 1mm thick
         self.height_to_diamater = 3/2 # default height to diameter ratio
         self.dimensions = self.get_vessel_dimensions() # returns a tuple (max_height, radius)
+
+        self.push_event_to_queue(events=None, dt=0)
 
     def push_event_to_queue(
             self,
@@ -265,7 +267,7 @@ class Vessel:
 
             # if action is wait
             if event[0] == 'wait':
-                reward += action(self, parameter=event[1:], dt=dt)
+                reward += action(parameter=event[1:], dt=dt)
             else:
                 # call the function corresponding to the event
                 reward += action(parameter=event[1:], dt=dt)
@@ -394,12 +396,13 @@ class Vessel:
 
             # iterate through the material dictionary values for the remaining material parameters
             material_list = []
-            for value in list(self._material_dict.values()):
+            for mat in self._material_dict:
                 # we only require the first 2 items (the material class and the material amount)
-                necessary_values = value[:2]
+                necessary_values = self._material_dict[mat][:2]
 
-                # add the necessary material values to a list for further dissection
-                material_list.append(necessary_values)
+                if necessary_values[1] > 1e-12:
+                    # add the necessary material values to a list for further dissection
+                    material_list.append(necessary_values)
 
             # acquire the amounts of each material from the material values list
             material_amounts = [amount for __, amount in material_list]
@@ -412,11 +415,8 @@ class Vessel:
 
             # ensure all material boiling points are above the current vessel temperature
             try:
-                if min(material_bps) < self.temperature:
-                    print([(material_obj.get_name(), material_obj._boiling_point) for material_obj in material_objs])
-                    print(min(material_bps))
-                    # error for now...
-                    exit()
+                min(material_bps) < self.temperature
+
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
             # contains no materials) no further operations will contribute to the distillation of materials
             except ValueError:
@@ -483,11 +483,11 @@ class Vessel:
 
             # if enough heat is available, modify the vessel temp and boil off the material
             if heat_to_lowest_bp < heat_available:
-                print("Raising Boil Vessel Temperature by {} Kelvin".format(temp_change_needed))
+                print("Raising Boil Vessel Temperature by {} Kelvin".format(np.max([temp_change_needed, 0.0])))
 
                 # change the vessel temperature to the lowest boiling point
                 self._update_temperature(
-                    parameter=[lowest_bp, False],
+                    parameter=[np.max([lowest_bp, self.current_temp]), False],
                     dt=self.default_dt
                 )
 
@@ -497,7 +497,7 @@ class Vessel:
 
                 # modify the amount of heat available by subtracting the amount of heat we needed to raise the vessel
                 # temperature to the lowest boiling point
-                heat_available -= heat_to_lowest_bp
+                heat_available -= abs(heat_to_lowest_bp)
 
                 # calculate the amount of heat needed to boil off all of the material
                 heat_to_boil_all = smallest_bp_amount * smallest_bp_enth_vap
@@ -510,11 +510,34 @@ class Vessel:
                 if heat_to_boil_all < heat_available:
                     print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
 
+                    if self._material_dict[smallest_bp_name][0].is_solvent():
+                        solute_dict = self.get_solute_dict()
+                        for solute in solute_dict:
+                            if smallest_bp_name in solute_dict[solute]:
+                                if len(solute_dict[solute]) == 1:
+                                    self._material_dict[solute][0] = self._material_dict[solute][0].__class__()
+                                    self._material_dict[solute][0].set_solute_flag(False)
+                                    self._layers_position_dict[solute] = 0.0
+                                    del self._solute_dict[solute]
+
+                                else:
+                                    solute_total_amount = self._material_dict[solute][1]
+                                    for solvent in self._solute_dict[solute]:
+                                        self._solute_dict[solute][solvent][1] += self._solute_dict[solute][smallest_bp_name][1] * self._solute_dict[solute][solvent][1] / (solute_total_amount - self._solute_dict[solute][smallest_bp_name][1])
+
+                                    del self._solute_dict[solute][smallest_bp_name]
+
+                    # add method for precipitating out solutes
+
                     # remove the material from the boil vessel's material dictionary
                     del self._material_dict[smallest_bp_name]
                     
                     # add all the material to the beaker's material dictionary
-                    out_beaker._material_dict[smallest_bp_name][1] = smallest_bp_amount
+                    if smallest_bp_name in out_beaker._material_dict:
+                        out_beaker._material_dict[smallest_bp_name][1] += smallest_bp_amount
+                    else:
+                        out_beaker._material_dict[smallest_bp_name][1] = smallest_bp_amount
+
                     out_beaker._layers_position_dict[smallest_bp_name] = self._layers_position_dict[smallest_bp_name]
                     del self._layers_position_dict[smallest_bp_name]
 
@@ -534,6 +557,7 @@ class Vessel:
 
                     # add the boiled material to the beaker's material dictionary
                     out_beaker._material_dict[smallest_bp_name][1] += boiled_material
+                    out_beaker._layers_position_dict[smallest_bp_name] = 0.0
 
                     # reduce the available heat energy to 0
                     heat_available = 0
@@ -1055,7 +1079,6 @@ class Vessel:
         ---------------
         None
         """
-
         new_material_dict = util.convert_material_dict_units(parameter[0])
 
         self._material_dict = util.organize_material_dict(new_material_dict)
@@ -1167,7 +1190,10 @@ class Vessel:
                     if self._solute_dict:
                         # fill in solute_amount
                         for Solute in self._solute_dict:
-                            solute_amount[solute_counter].append(self._solute_dict[Solute][M][1])
+                            if M in self._solute_dict[Solute]:
+                                solute_amount[solute_counter].append(self._solute_dict[Solute][M][1])
+                            else:
+                                solute_amount[solute_counter].append(0)
                             solute_counter += 1
                     else:
                         solute_amount[0].append(0.0)
@@ -1508,6 +1534,29 @@ class Vessel:
         return C
 
     # functions to access private properties
+    def get_total_material_amount(self):
+        """
+        Method to get the total amount of materials in the material dictionary.
+
+        Parameters
+        ---------------
+        None
+
+        Returns
+        ---------------
+        `amount` : `np.float32`
+            The amount of all materials present.
+
+        Raises
+        ---------------
+        None
+        """
+
+        materials = list(self._material_dict.keys())
+        amount = np.sum(self.get_material_amount(materials))
+
+        return amount
+
     def get_material_amount(
             self,
             material_name=None
@@ -2122,7 +2171,7 @@ class Vessel:
 
             # event dict holding all the event functions
             self._event_dict = {
-                'temperature change': self._update_temperature,
+                'update temperature': self._update_temperature,
                 'pour by volume': self._pour_by_volume,
                 'drain by pixel': self._drain_by_pixel,
                 'update material dict': self._update_material_dict,

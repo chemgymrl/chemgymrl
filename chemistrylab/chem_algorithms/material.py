@@ -129,7 +129,20 @@ class Material:
         # should be able to return how this material is dissolved
         # for NaCl this should at least return Na(charge=1) and Cl(charge=-1)
         # for the rest, like how Na and Cl dissolve in solvent, can be handled by the vessel's dissolve function
-        pass
+        dis_mat = self.__class__()
+        dis_mat.set_solute_flag(True)
+        dis_mat.set_color(0.0)
+        dis_mat.set_phase('l')
+
+        return {dis_mat: 1}
+
+    def precipitate(self):
+        # should be able to return how this material precipitates
+        # for Na this should at least return Cl (requirements) & NaCl (results)
+        prep_mat = self.__class__()
+        prep_mat.set_solute_flag(False)
+
+        return [[[{prep_mat: 1}], prep_mat]]
 
     # functions to access material's properties
     def get_name(self):
@@ -377,7 +390,7 @@ class C6H14(Material):
 class NaCl(Material):
     def __init__(self):
         super().__init__(name='NaCl',
-                         density={'s': 2.165, 'l': None, 'g': None},
+                         density={'s': 2.165, 'l': 2.165, 'g': None},
                          polarity=1.5,
                          temperature=298,
                          pressure=1,
@@ -393,6 +406,22 @@ class NaCl(Material):
                          index=8
                          )
 
+    def dissolve(self):
+        dis_Na = Na()
+        dis_Na.set_charge(1.0)
+        dis_Na.set_solute_flag(True)
+        dis_Na.set_color(0.0)
+        dis_Na.set_polarity(2.0)
+        dis_Na.set_phase('l')
+
+        dis_Cl = Cl()
+        dis_Cl.set_charge(-1.0)
+        dis_Cl.set_solute_flag(True)
+        dis_Cl.set_color(0.0)
+        dis_Cl.set_polarity(2.0)
+        dis_Cl.set_phase('l')
+
+        return {dis_Na: 1, dis_Cl: 1}
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
@@ -414,27 +443,64 @@ class Na(Material):
                          index=9
                          )
 
+    def precipitate(self):
+        prep_Na = Na()
+        prep_Na.set_charge(1.0)
+        prep_Na.set_solute_flag(True)
+        prep_Na.set_color(0.0)
+        prep_Na.set_polarity(2.0)
+        prep_Na.set_phase('l')
+
+        prep_Cl = Cl()
+        prep_Cl.set_charge(-1.0)
+        prep_Cl.set_solute_flag(True)
+        prep_Cl.set_color(0.0)
+        prep_Cl.set_polarity(2.0)
+        prep_Cl.set_phase('l')
+
+        prep_NaCl = NaCl()
+
+        return [[[{prep_Na: 1}, {prep_Cl: 1}], prep_NaCl]]
+
 
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
     def __init__(self):
         super().__init__(name='Cl',
                          density={'s': None, 'l': 1.558, 'g': 3.214e-3},
-                         polarity=0.0,
+                         polarity=2.0,
                          temperature=298,
                          pressure=1,
-                         phase='g',
+                         phase='l',
                          solute=True,
                          molar_mass=35.453,
                          color=0.8,
-                         charge=0.0,
-                         boiling_point=239.11,
+                         charge=-1.0,
+                         boiling_point=1156.0,
                          specific_heat=0.48,
                          enthalpy_fusion=3200.0,
                          enthalpy_vapor=10200.0,
                          index=10
                          )
 
+    def precipitate(self):
+        prep_Na = Na()
+        prep_Na.set_charge(1.0)
+        prep_Na.set_solute_flag(True)
+        prep_Na.set_color(0.0)
+        prep_Na.set_polarity(2.0)
+        prep_Na.set_phase('l')
+
+        prep_Cl = Cl()
+        prep_Cl.set_charge(-1.0)
+        prep_Cl.set_solute_flag(True)
+        prep_Cl.set_color(0.0)
+        prep_Cl.set_polarity(2.0)
+        prep_Cl.set_phase('l')
+
+        prep_NaCl = NaCl()
+
+        return [[[prep_Na, prep_Cl], [prep_NaCl]]]
 
 class Cl2(Material):
     def __init__(self):
@@ -581,8 +647,6 @@ class Dodecane(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_dodecane,
-            spectra_no_overlap=spec.S_dodecane,
             index=16
         )
 
@@ -854,8 +918,8 @@ class A(Material):
             specific_heat=2.3889,  # in J/g*K
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
-            spectra_overlap=spec.S_dodecane,
-            spectra_no_overlap=spec.S_dodecane,
+            spectra_overlap=spec.S_A,
+            spectra_no_overlap=spec.S_A,
             index=30
         )
 
@@ -877,8 +941,8 @@ class B(Material):
             specific_heat=1.5408,
             enthalpy_fusion=15490.0,
             enthalpy_vapor=42800.0,
-            spectra_overlap=spec.S_1_chlorohexane,
-            spectra_no_overlap=spec.S_1_chlorohexane,
+            spectra_overlap=spec.S_B,
+            spectra_no_overlap=spec.S_B,
             index=31
         )
 
@@ -901,8 +965,8 @@ class C(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=43820.0,
-            spectra_overlap=spec.S_2_chlorohexane,
-            spectra_no_overlap=spec.S_2_chlorohexane,
+            spectra_overlap=spec.S_C,
+            spectra_no_overlap=spec.S_C,
             index=32
         )
 
@@ -925,8 +989,8 @@ class D(Material):
             specific_heat=1.5408,
             enthalpy_fusion=11970.0,
             enthalpy_vapor=32950.0,
-            spectra_overlap=spec.S_3_chlorohexane,
-            spectra_no_overlap=spec.S_3_chlorohexane,
+            spectra_overlap=spec.S_D,
+            spectra_no_overlap=spec.S_D,
             index=33
         )
 
@@ -949,6 +1013,8 @@ class E(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_E,
+            spectra_no_overlap=spec.S_E,
             index=34
         )
 
@@ -971,6 +1037,8 @@ class F(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_F,
+            spectra_no_overlap=spec.S_F,
             index=35
         )
 
@@ -993,6 +1061,8 @@ class G(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_G,
+            spectra_no_overlap=spec.S_G,
             index=36
         )
 
@@ -1015,6 +1085,8 @@ class H(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_H,
+            spectra_no_overlap=spec.S_H,
             index=37
         )
 
@@ -1037,6 +1109,8 @@ class I(Material):
             specific_heat=2.3889,
             enthalpy_fusion=19790.0,
             enthalpy_vapor=41530.0,
+            spectra_overlap=spec.S_I,
+            spectra_no_overlap=spec.S_I,
             index=38
         )
 

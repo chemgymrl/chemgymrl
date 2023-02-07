@@ -73,6 +73,7 @@ def map_to_state(A, B, C, colors, x=x):
     L = np.zeros(100, dtype=np.float32) + colors[-1]
 
     # Initialize time variable such that Gaussians have normalized area
+    C = np.max([C, 1e-10])
     t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
 
     # Number of pixels available for each phase
@@ -137,7 +138,7 @@ def map_to_state(A, B, C, colors, x=x):
             while not placed:
                 j += 1
                 if j == P.shape[0]:
-                    print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------'.format(p, Psum, P, r))
+                    print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------'.format(p, Psum, P, r))                
                 p += P[j]
                 # If random number is less than relative probability for that phase
                 if r - p / Psum < 1e-6:
@@ -152,6 +153,7 @@ def map_to_state(A, B, C, colors, x=x):
 
 def mix(A, B, C, D, Spol, Lpol, S, mixing):
     # Initialize time variable such that Gaussians have normalized area
+    C = np.max([C, 1e-10])
     t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
 
     # Time of fully mixed solution

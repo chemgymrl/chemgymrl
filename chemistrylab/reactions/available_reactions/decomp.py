@@ -48,8 +48,14 @@ dV = 0.005
 
 
 # add the arrays containing rate calculation parameters; these include:
-    # the activation energies for each reaction (6x1 array)
-    # the stoichiometric coefficients (6x4 array)
+    # the pre-exponentional factors for each reaction (1x1 array)
+    # the activation energies for each reaction (1x1 array)
+    # the stoichiometric coefficients (1x1 array)
+pre_exp_arr = np.array(
+    [
+        1.0, # pre-exp factor for reaction 0
+    ]
+)
 activ_energy_arr = np.array(
     [
         8.0 # activation energy for reaction 0

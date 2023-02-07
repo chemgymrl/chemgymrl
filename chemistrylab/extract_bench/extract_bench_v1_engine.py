@@ -52,19 +52,9 @@ import copy
 sys.path.append("../../") # access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.chem_algorithms.reward import ExtractionReward
-from chemistrylab.extract_algorithms.extractions import water_oil_v1, wurtz_v0, lesson_1, methyl_red, extraction_0
+from chemistrylab.extract_algorithms.extractions.extraction import Extraction
 from chemistrylab.extract_algorithms import separate
 from chemistrylab.reactions.reaction_base import _Reaction
-
-# a dictionary of available extractions
-extraction_dict = {
-    'water_oil': water_oil_v1,
-    "wurtz": wurtz_v0,
-    'lesson_1': lesson_1,
-    'methyl_red': methyl_red,
-    'extraction_0': extraction_0,
-}
-
 
 class ExtractBenchEnv(gym.Env):
     '''
@@ -123,7 +113,6 @@ class ExtractBenchEnv(gym.Env):
         self.input_parameters = self._validate_parameters(
             n_steps=n_steps,
             dt=dt,
-            extraction=extraction,
             n_vessel_pixels=n_vessel_pixels,
             max_valve_speed=max_valve_speed,
             extraction_vessel=extraction_vessel,
@@ -153,8 +142,8 @@ class ExtractBenchEnv(gym.Env):
         self.target_material = self.input_parameters["target_material"]
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
-        self.extraction_name = self.input_parameters["extraction"]
-        self.extraction = extraction_dict[self.extraction_name].Extraction(
+        self.original_extraction_vessel = self.input_parameters["extraction_vessel"]
+        self.extraction = Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -188,7 +177,6 @@ class ExtractBenchEnv(gym.Env):
     def _validate_parameters(
         n_steps=0,
         dt=0.0,
-        extraction="",
         n_vessel_pixels=0,
         max_valve_speed=0,
         extraction_vessel=None,
@@ -251,13 +239,6 @@ class ExtractBenchEnv(gym.Env):
             print("Invalid 'Default Timestep' type. The default will be provided.")
             dt = 1.0
 
-        # ensure the extraction parameter is a string indicating a valid extraction
-        if any([
-                not isinstance(extraction, str),
-                extraction not in extraction_dict.keys()
-        ]):
-            raise TypeError("Invalid 'extraction' given.")
-
         # ensure the n_vessel_pixels parameter is a non-zero, non-negative integer
         if any([
                 not isinstance(n_vessel_pixels, int),
@@ -314,7 +295,6 @@ class ExtractBenchEnv(gym.Env):
         input_parameters = {
             "n_steps" : n_steps,
             "dt" : dt,
-            "extraction" : extraction,
             "n_vessel_pixels" : n_vessel_pixels,
             "max_valve_speed" : max_valve_speed,
             "extraction_vessel" : extraction_vessel,
@@ -363,7 +343,7 @@ class ExtractBenchEnv(gym.Env):
     def update_vessel(self, vessel):
         self.extraction_vessel = vessel
         self.vessels[0] = self.extraction_vessel
-        self.extraction = extraction_dict[self.extraction_name].Extraction(
+        self.extraction = Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -431,9 +411,9 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
 
-        self.extraction_vessel = copy.deepcopy(self.input_parameters["extraction_vessel"])
+        self.extraction_vessel = copy.deepcopy(self.original_extraction_vessel)
 
-        self.extraction = extraction_dict[self.extraction_name].Extraction(
+        self.extraction = Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,

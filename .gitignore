@@ -14,3 +14,4 @@ RL_tests/models/
 models/
 *.pickle
 RL_tests/*.zip
+*.log

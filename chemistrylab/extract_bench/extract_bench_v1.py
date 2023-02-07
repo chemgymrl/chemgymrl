@@ -30,6 +30,8 @@ Module to access and execute the ExtractWorld Engine
 import os
 import pickle
 import sys
+from random import choice
+from copy import deepcopy
 
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
@@ -102,6 +104,7 @@ def oil_vessel():
     Na.set_solute_flag(True)
     Na.set_polarity(2.0)
     Na.set_phase('l')
+    Na._boiling_point = material.NaCl()._boiling_point
 
     # initialize Cl
     Cl = material.Cl()
@@ -109,6 +112,7 @@ def oil_vessel():
     Cl.set_solute_flag(True)
     Cl.set_polarity(2.0)
     Cl.set_phase('l')
+    Cl._boiling_point = material.NaCl()._boiling_point
 
     # material_dict
     material_dict = {
@@ -177,6 +181,7 @@ def wurtz_vessel(add_mat=""):
     Na.set_color(0.0)
     Na.set_polarity(2.0)
     Na.set_phase('l')
+    Na._boiling_point = material.NaCl()._boiling_point
 
     # initialize Cl
     Cl = material.Cl()
@@ -185,6 +190,7 @@ def wurtz_vessel(add_mat=""):
     Cl.set_color(0.0)
     Cl.set_polarity(2.0)
     Cl.set_phase('l')
+    Cl._boiling_point = material.NaCl()._boiling_point
 
     # initialize material
     products = {'dodecane': material.Dodecane,
@@ -196,7 +202,11 @@ def wurtz_vessel(add_mat=""):
         'NaCl': material.NaCl
     }
     try:
+        if add_mat == "":
+            add_mat = choice(list(products.keys()))
+        
         add_material = products[add_mat]()
+    
     except KeyError:
         add_material = products['dodecane']()
     
@@ -240,7 +250,7 @@ def wurtz_vessel(add_mat=""):
         dt=-100000
     )
 
-    return extraction_vessel
+    return extraction_vessel, add_mat
 
 class WurtzExtract_v1(ExtractBenchEnv):
     """
@@ -249,8 +259,7 @@ class WurtzExtract_v1(ExtractBenchEnv):
 
     def __init__(self):
         super(WurtzExtract_v1, self).__init__(
-            extraction='wurtz',
-            extraction_vessel=wurtz_vessel('dodecane'),
+            extraction_vessel=wurtz_vessel('dodecane')[0],
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             n_steps=50,
@@ -264,18 +273,28 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
-    def __init__(self, target_material, in_vessel_path=None):
+    def __init__(self, target_material="", in_vessel_path=None):
+        self.original_target_material = target_material
+        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
+
         super(GeneralWurtzExtract_v1, self).__init__(
-            extraction='wurtz',
-            extraction_vessel=wurtz_vessel(target_material),
+            extraction_vessel=extract_vessel,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=in_vessel_path,
             n_steps=50,
             solvents=["C6H14", "DiEthylEther"],
-            target_material=target_material,
+            target_material=target_mat,
             out_vessel_path=os.getcwd()
         )
+
+    def reset(self):
+        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
+        self.original_extraction_vessel = deepcopy(extract_vessel)
+        self.target_material = target_mat
+
+        return super(GeneralWurtzExtract_v1, self).reset()
+
 
 class WurtzExtractCtd_v1(ExtractBenchEnv):
     """
@@ -283,8 +302,7 @@ class WurtzExtractCtd_v1(ExtractBenchEnv):
     """
 
     def __init__(self):
-        super(WurtzExtract_v1, self).__init__(
-            extraction='wurtz',
+        super(WurtzExtractCtd_v1, self).__init__(
             extraction_vessel=get_extract_vessel(
                 vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
                 extract_vessel=vessel.Vessel(label='temp')
@@ -304,7 +322,6 @@ class WaterOilExtract_v1(ExtractBenchEnv):
 
     def __init__(self):
         super(WaterOilExtract_v1, self).__init__(
-            extraction='water_oil',
             reaction=_Reaction,
             reaction_file_identifier="decomp",
             solvents=["C6H14", "H2O"],

@@ -110,11 +110,12 @@ class _Reaction:
         self.dV = reaction_params["dV"]
 
         # the arrays used in dictating how reaction calculations are performed
+        self.pre_exp_arr = reaction_params["pre_exp_arr"]
         self.activ_energy_arr = reaction_params["activ_energy_arr"]
         self.stoich_coeff_arr = reaction_params["stoich_coeff_arr"]
         self.conc_coeff_arr = reaction_params["conc_coeff_arr"]
 
-        self.de = De(self.stoich_coeff_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
+        self.de = De(self.stoich_coeff_arr, self.pre_exp_arr, self.activ_energy_arr, self.conc_coeff_arr, len(self.reactants))
 
         # specify the full list of materials
         self.materials = []
@@ -423,7 +424,7 @@ class _Reaction:
 
         return temperature, volume
 
-    def perform_compatibility_check(self, action, vessels, n_steps, step_num):
+    def perform_compatibility_check(self, action, vessels, n_steps):
         '''
         Method to ensure vessel and action being supplied from reaction bench is compatible
         with perform_action method.
@@ -471,12 +472,6 @@ class _Reaction:
         materials_array = []
         for reactant in materials_dict_vessel:
             materials_array.append(reactant)
-        if step_num == 1:
-            # in the first iteration materials_array will only be filled with reactants (no products)
-            assert self.reactants.sort() == materials_array.sort()
-        else:
-            # after the first iteration materials_array should be filled with products as well
-            assert set(materials_array).issubset(set(self.materials))
 
         # ensure that solvents from vessels compatible with reaction
         '''mat_dict_vessel = vessels.get_material_dict()
@@ -502,7 +497,7 @@ class _Reaction:
         # ensure that dt are the same
         assert self.dt == vessels.default_dt
 
-    def update_vessel(self, temperature, volume):
+    def update_vessel(self, vessels, temperature, volume):
         """
         Method to update the provided vessel object with materials from the reaction base
         and new thermodynamic variables.
@@ -525,36 +520,51 @@ class _Reaction:
         """
 
         # tabulate all the materials and solutes used and their new values
-        new_material_dict = {}
-        new_solute_dict = {}
+        new_material_dict = vessels.get_material_dict()
+        new_solute_dict = vessels.get_solute_dict()
         for i in range(self.n.shape[0]):
             material_name = self.materials[i]
-            material_class = self.material_classes[i]
             amount = self.n[i]
-            new_material_dict[material_name] = [material_class(), amount, 'mol']
-            if material_class().is_solute():
+            try:
+                new_material_dict[material_name] = [new_material_dict[material_name][0], amount, 'mol']
+            except KeyError:
+                new_material_dict[material_name] = [self.material_classes[i](), amount, 'mol']
+            if new_material_dict[material_name][0].is_solute():
                 # create the new solute dictionary to be appended to a new vessel object
-                new_solute_dict[material_name] = {material_name: [material_class(), amount, 'mol']}
+                solute_change_amount = new_material_dict[material_name][1] - vessels.get_material_amount(material_name)
+                try:
+                    for solvent in new_solute_dict[material_name]:
+                        if vessels._material_dict[material_name][1] > 1e-12:
+                            new_solute_dict[material_name][solvent][1] += solute_change_amount * vessels._solute_dict[material_name][solvent][1] / vessels._material_dict[material_name][1]
+                except KeyError:
+                    new_solute_dict[material_name] = {solvent: [convert_to_class(materials=[solvent])[0](), solute_change_amount/len(self.solvents), 'mol'] for solvent in self.solvents}
 
-        # create a new vessel and update it with new data
-        new_vessel = vessel.Vessel(
-            'react_vessel',
-            temperature=self.Ti,
-            v_max=self.Vmax,
-            v_min=self.Vmin,
-            Tmax=self.Tmax,
-            Tmin=self.Tmin,
-            default_dt=self.dt
+        # update target vessel's material amount
+        vessels._material_dict = new_material_dict
+
+        # update target vessel's solute dict
+        vessels._solute_dict = new_solute_dict
+
+        # create a event to reset material's position and variance in target vessel
+        # push event to target vessel
+        __ = vessels.push_event_to_queue(
+            feedback=[['update temperature', temperature, False]],
+            dt=0
         )
-        new_vessel.temperature = temperature
-        new_vessel.volume = volume
-        new_vessel._material_dict = new_material_dict
-        new_vessel._solute_dict = new_solute_dict
-        new_vessel.pressure = new_vessel.get_pressure()
+        vessels.set_volume(volume, override=True)
 
-        return new_vessel
+        # create a event to reset material's position and variance in target vessel
+        # push event to target vessel
+        __ = vessels.push_event_to_queue(
+            events=None,
+            dt=0
+        )
 
-    def reset(self, vessels, initial_in_hand):
+        vessels.pressure = vessels.get_pressure()
+
+        return vessels
+
+    def reset(self, vessels, initial_in_hand=None):
         """
         Method to reset the environment and vessel back to its initial state.
         Empty the initial n array and reset the vessel's thermodynamic properties.
@@ -579,6 +589,11 @@ class _Reaction:
         else:
             self.desired = self.target
 
+        if initial_in_hand == None:
+            initial_in_hand = []
+            for material in self.reactants:
+                initial_in_hand.append({"Material": material, "Initial": 0})
+
         # open the provided vessel to get the material and solute dictionaries
         material_dict = vessels.get_material_dict()
         solute_dict = vessels.get_solute_dict()
@@ -592,11 +607,6 @@ class _Reaction:
         for i, material_name in enumerate(self.materials):
             if material_name in material_dict.keys():
                 self.initial_materials[i] = material_dict[material_name][1]
-
-        # acquire the amounts of solute materials
-        for i, solute_name in enumerate(solute_dict.keys()):
-            if solute_name in self.solutes:
-                self.initial_solutes[i] = solute_dict[solute_name][1]
 
         vessels = vessel.Vessel(
             'react_vessel',
@@ -628,6 +638,14 @@ class _Reaction:
 
         return vessels
 
+    def update_materials(self, material_dict):
+
+        for i in range(self.n.shape[0]):
+            if self.materials[i] in material_dict:
+                self.n[i] = material_dict[self.materials[i]][1]
+            else:
+                self.n[i] = 0
+
     def update(self, conc, temp, volume, t, dt, n_steps):
         """
         Method to update the environment.
@@ -655,7 +673,6 @@ class _Reaction:
         ---------------
         None
         """
-
         # set the intended vessel temperature in the differential equation module
         self.de.temp = temp
         # implement the differential equation solver
@@ -676,7 +693,7 @@ class _Reaction:
             if amount < self.threshold:
                 self.n[i] = 0
 
-    def perform_action(self, action, vessels: vessel.Vessel, t, n_steps, step_num):
+    def perform_action(self, action, vessels: vessel.Vessel, t, n_steps):
         """
         Update the environment with processes defined in `action`.
 
@@ -704,8 +721,7 @@ class _Reaction:
         self.perform_compatibility_check(
             action=action,
             vessels=vessels,
-            n_steps=n_steps,
-            step_num=step_num
+            n_steps=n_steps
         )
 
         # deconstruct the action
@@ -763,7 +779,7 @@ class _Reaction:
             )
 
         # create a new reaction vessel containing the final materials
-        vessels = self.update_vessel(temperature, volume)
+        vessels = self.update_vessel(vessels, temperature, volume)
 
         return vessels
 

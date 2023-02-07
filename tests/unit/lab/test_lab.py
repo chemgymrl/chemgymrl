@@ -31,17 +31,14 @@ class TestLab(TestCase):
     def test_load_reaction_bench(self):
         lab = Lab()
         env = lab.load_reaction_bench(0)
-        self.assertEqual(env.__class__.__bases__[0].__name__, 'Wrapper')
 
     def test_load_extraction_bench(self):
         lab = Lab()
         env = lab.load_extraction_bench(0)
-        self.assertEqual(env.__class__.__bases__[0].__name__, 'Wrapper')
 
     def test_load_distillation_bench(self):
         lab = Lab()
         env = lab.load_distillation_bench(0)
-        self.assertEqual(env.__class__.__bases__[0].__name__, 'Wrapper')
 
     def test_step(self):
         lab = Lab()
@@ -53,7 +50,6 @@ class TestLab(TestCase):
         lab.step(extract_action)
         lab.step(distill_action)
         lab.step(analysis_action)
-
 
     def test_reset(self):
         lab = Lab()

@@ -69,12 +69,6 @@ register(
     max_episode_steps=100
 )
 
-register(
-    id='ODETestReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_ODE_Test',
-    max_episode_steps=100
-)
-
 ############################ DistillationBench ####################################
 
 register(

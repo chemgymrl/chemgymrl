@@ -77,6 +77,9 @@ class Distillation_v1(DistillationBenchEnv):
                 vessel_path=os.path.join(os.getcwd(), "test_extract_vessel.pickle"),
                 in_vessel=boil_vessel()
             ),
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             target_material="dodecane",
             dQ=1000.0,
             out_vessel_path=os.getcwd()
@@ -112,7 +115,8 @@ def wurtz_vessel(add_mat):
         '4-ethyldecane': material.FourEthyldecane,
         '5,6-dimethyldecane': material.FiveSixDimethyldecane,
         '4-ethyl-5-methylnonane': material.FourEthylFiveMethylnonane,
-        '4,5-diethyloctane': material.FourFiveDiethyloctane
+        '4,5-diethyloctane': material.FourFiveDiethyloctane,
+        'NaCl': material.NaCl
     }
     try:
         add_material = products[add_mat]()
@@ -167,6 +171,7 @@ class WurtzDistill_v1(DistillationBenchEnv):
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             in_vessel_path=None,
             target_material="dodecane",
             dQ=1000.0,
@@ -184,6 +189,7 @@ class GeneralWurtzDistill_v1(DistillationBenchEnv):
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
+            precipitation_file_identifier="precipitation",
             in_vessel_path=in_vessel_path,
             target_material=target_material,
             dQ=1000.0,
@@ -212,33 +218,33 @@ def boil_vessel():
     boil_vessel = vessel.Vessel(label='boil_vessel')
 
     # initialize materials
-    OneChlorohexane = material.OneChlorohexane
-    TwoChlorohexane = material.TwoChlorohexane
-    ThreeChlorohexane = material.ThreeChlorohexane
-    Na = material.Na
-    Dodecane = material.Dodecane
-    FiveMethylundecane = material.FiveMethylundecane
-    FourEthyldecane = material.FourEthyldecane
-    FiveSixDimethyldecane = material.FiveSixDimethyldecane
-    FourEthylFiveMethylnonane = material.FourEthylFiveMethylnonane
-    FourFiveDiethyloctane = material.FourFiveDiethyloctane
-    NaCl = material.NaCl
-    H2O = material.H2O
+    OneChlorohexane = material.OneChlorohexane()
+    TwoChlorohexane = material.TwoChlorohexane()
+    ThreeChlorohexane = material.ThreeChlorohexane()
+    Na = material.Na()
+    Dodecane = material.Dodecane()
+    FiveMethylundecane = material.FiveMethylundecane()
+    FourEthyldecane = material.FourEthyldecane()
+    FiveSixDimethyldecane = material.FiveSixDimethyldecane()
+    FourEthylFiveMethylnonane = material.FourEthylFiveMethylnonane()
+    FourFiveDiethyloctane = material.FourFiveDiethyloctane()
+    NaCl = material.NaCl()
+    H2O = material.H2O()
 
     # material_dict
     material_dict = {
-        OneChlorohexane().get_name(): [OneChlorohexane, 0.62100387, 'mol'],
-        TwoChlorohexane().get_name(): [TwoChlorohexane, 0.71239483, 'mol'],
-        ThreeChlorohexane().get_name(): [ThreeChlorohexane, 0.6086047, 'mol'],
-        Na().get_name(): [Na, 0.028975502, 'mol'],
-        Dodecane().get_name(): [Dodecane, 0.10860507, 'mol'],
-        FiveMethylundecane().get_name(): [FiveMethylundecane, 0.07481375, 'mol'],
-        FourEthyldecane().get_name(): [FourEthyldecane, 0.08697271, 'mol'],
-        FiveSixDimethyldecane().get_name(): [FiveSixDimethyldecane, 0.07173399, 'mol'],
-        FourEthylFiveMethylnonane().get_name(): [FourEthylFiveMethylnonane, 0.069323435, 'mol'],
-        FourFiveDiethyloctane().get_name(): [FourFiveDiethyloctane, 0.07406321, 'mol'],
-        NaCl().get_name(): [NaCl, 0.9710248, 'mol'],
-        H2O().get_name(): [H2O, 0.2767138495698029, 'mol']
+        OneChlorohexane.get_name(): [OneChlorohexane, 0.62100387, 'mol'],
+        TwoChlorohexane.get_name(): [TwoChlorohexane, 0.71239483, 'mol'],
+        ThreeChlorohexane.get_name(): [ThreeChlorohexane, 0.6086047, 'mol'],
+        Na.get_name(): [Na, 0.028975502, 'mol'],
+        Dodecane.get_name(): [Dodecane, 0.10860507, 'mol'],
+        FiveMethylundecane.get_name(): [FiveMethylundecane, 0.07481375, 'mol'],
+        FourEthyldecane.get_name(): [FourEthyldecane, 0.08697271, 'mol'],
+        FiveSixDimethyldecane.get_name(): [FiveSixDimethyldecane, 0.07173399, 'mol'],
+        FourEthylFiveMethylnonane.get_name(): [FourEthylFiveMethylnonane, 0.069323435, 'mol'],
+        FourFiveDiethyloctane.get_name(): [FourFiveDiethyloctane, 0.07406321, 'mol'],
+        NaCl.get_name(): [NaCl, 0.9710248, 'mol'],
+        H2O.get_name(): [H2O, 0.2767138495698029, 'mol']
     }
 
     # solute_dict
