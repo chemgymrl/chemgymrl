@@ -83,6 +83,10 @@ class FictReact2Heuristic(Heuristic):
         [1,0,0,0,0,1,1],#F+G -> I
         ],dtype=np.float32)
         return actions[t],[]
+    
+class WurtzDistillHeuristic(Heuristic):
+    def predict(observation):
+        return [0,9],[]
 
 
 HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic}

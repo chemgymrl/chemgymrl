@@ -111,7 +111,7 @@ def make_radar(theta,axs,info,colors = ['b', 'r', 'g', 'm', 'y'],gridlines=[0.2,
         ax.set_title(title, weight='bold', size='medium', position=(0.5, 1.1),
                      horizontalalignment='center', verticalalignment='center')
         for d, color in zip(case_data, colors):
-            ax.plot(theta, d, color=color)
+            ax.plot(theta, d, color=color,alpha=0.85)
             ax.fill(theta, d, facecolor=color, alpha=0.25, label='_nolegend_')
         ax.set_varlabels(spoke_labels)
     
