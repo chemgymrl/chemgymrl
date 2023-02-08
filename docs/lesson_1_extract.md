@@ -23,56 +23,26 @@ from gym import envs
 all_envs = envs.registry.all()
 env_ids = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
 print(env_ids)
-env = gym.make('Oil_Water_Extract-v1')
+env = gym.make('WaterOilExtract-v1')
 render_mode = "human"
-action_set = ['Draining from ExV to Beaker1', 'Mix ExV', "Mix B1", "Mix B2", "Pour from B1 to ExV", "Pour from B1 to B2",
-              'Pour from ExV to B2', 'Add oil, pour from Oil Vessel to ExV', 'wait', 'Done']
+action_set = ['Draining from ExV to Beaker1', 'Mix ExV', 'Pour from B1 to ExV', 'Pour from B1 to B2',
+              'Pour from ExV to B2', 'Add oil', 'Add water', 'Done']
 
 ```
 
-    ['WurtzExtract-v1', 'Oil_Water_Extract-v1', 'MethylRed_Extract-v1', 'MethylRed_Extract-v2']
-    {'H2O': 542.0762286860582}
-    542.0762286860582
-    1000.0
-    -------extraction_vessel: update material dict (feedback_event)-------
-    -------extraction_vessel: update solute dict (feedback_event)-------
-    -------extraction_vessel: fully mix (feedback_event)-------
-    -------extraction_vessel: mix (feedback_event)-------
-    {'H2O': 542.0762286860582}
-    542.0762286860582
-    -------extraction_vessel: update_layer (feedback_event)-------
-    {'H2O': 542.0762286860582}
-    542.0762286860582
-
+```commandline
+    ['GenWurtzExtract-v1', 'WurtzExtract-v1', 'WurtzExtractCtd-v1', 'WaterOilExtract-v1']
+```
 
 So start by running the code cell below you should see a series of graphs like these appear:
 
-![graph](tutorial_figures/extraction-lesson-1/oil_and_water_0.png)
+![graph](tutorial_figures/extraction-lesson-1/water_oil.png)
 
 
 ```python
 state = env.reset()
 env.render(mode=render_mode)
 ```
-
-    {'C6H14': 131564885496.1832}
-    131564885496.1832
-    1000000000
-    -------oil_vessel: update material dict (feedback_event)-------
-    {'H2O': 542.0762286860582}
-    542.0762286860582
-    {'H2O': 542.0762286860582}
-    542.0762286860582
-    {}
-    0
-    {}
-    0
-
-
-
-    
-![png](../tutorial_figures/extraction-lesson-1/output_3_1.png)
-    
 
 
 These graphs show the contents of each of our containers and the level of separation between the materials. The graphs
