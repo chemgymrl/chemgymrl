@@ -46,7 +46,7 @@ class Heuristic():
   you should be able to use this heuristic policy in place of an RL algorithm.
   
   """
-  def predict(observation):
+  def predict(self,observation):
     """
     Get an action from an observation based off of heurstics
     
@@ -57,7 +57,7 @@ class Heuristic():
     raise NotImplementedError
 
 class WurtzReactHeuristic(Heuristic):
-    def predict(observation):
+    def predict(self,observation):
         t = np.argmax(observation[-7:])
         #targs = {0: "dodecane", 1: "5-methylundecane", 2: "4-ethyldecane", 3: "5,6-dimethyldecane", 4: "4-ethyl-5-methylnonane", 5: "4,5-diethyloctane", 6: "NaCl"}
         actions=np.array([
@@ -72,7 +72,7 @@ class WurtzReactHeuristic(Heuristic):
         return actions[t],[]
     
 class FictReact2Heuristic(Heuristic):
-    def predict(observation):
+    def predict(self,observation):
         t = np.argmax(observation[-4:])
         #targs = [E F G I]
         actions=np.array([
@@ -85,11 +85,37 @@ class FictReact2Heuristic(Heuristic):
         return actions[t],[]
     
 class WurtzDistillHeuristic(Heuristic):
-    def predict(observation):
-        return [0,9],[]
+    def predict(self,observation):
+        return np.array([0,9]),[]
+    
+class WurtzExtractHeuristic(Heuristic):
+    def _pred(self,obs):
+        marker=obs[1].mean()
+        #Mixing phase
+        if marker > 0.61:
+            #Adding in the C6H14
+            if obs[0].mean()<0.3:
+                return [5,1]
+            else:
+                #Pouring phase start
+                self.count=1
+                return [0,1]
+        #Pouring Phase
+        elif marker>0.35:
+            #wait for Na to float up
+            if self.count<40:
+                self.count+=1
+                return [0,0]
+            #pour more contents
+            return [0,2]
+        #done mixing and pouring
+        else:
+            return [7,1]
+    def predict(self,obs):
+        return np.array(self._pred(obs)),[]
 
 
-HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic}
+HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic}
 
 
 if __name__=="__main__":
@@ -109,7 +135,7 @@ if __name__=="__main__":
     
     #choose algorithm
     if op.algorithm in HEURISTICS:
-        model = HEURISTICS[op.algorithm]
+        model = HEURISTICS[op.algorithm]()
     else:
         #Load the model
         model = ALGO[op.algorithm].load(sys.argv[1]+"/model")
