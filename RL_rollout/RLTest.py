@@ -86,8 +86,11 @@ class FictReact2Heuristic(Heuristic):
     
 class WurtzDistillHeuristic(Heuristic):
     def predict(self,observation):
+        #check if the C6H14 is still in the beaker
         if observation[0].mean()>0.56:
+            #If so raise the temperature
             return np.array([0,9]),[]
+        #If not then end the experiment
         else:
             return np.array([4,4]),[]
     
