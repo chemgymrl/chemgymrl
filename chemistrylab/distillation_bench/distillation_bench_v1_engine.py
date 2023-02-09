@@ -229,18 +229,19 @@ class DistillationBenchEnv(gym.Env):
             # ensure the heat increment is a float value
             dQ = float(dQ)
 
-        # ensure that the output vessel path parameter is provided as a string
-        if not isinstance(out_vessel_path, str):
-            print("Invalid 'Output Vessel Path' type. The default will be provided.")
-            out_vessel_path = os.getcwd()
+        if not out_vessel_path is None:
+            # ensure that the output vessel path parameter is provided as a string
+            if not isinstance(out_vessel_path, str):
+                print("Invalid 'Output Vessel Path' type. The default will be provided.")
+                out_vessel_path = os.getcwd()
 
-        # validate that the output vessel path given exists and is reachable
-        if not os.path.isdir(out_vessel_path):
-            print(
-                "The given output vessel path parameter is invalid. "
-                "The default parameter is given instead."
-            )
-            out_vessel_path = os.getcwd()
+            # validate that the output vessel path given exists and is reachable
+            if not os.path.isdir(out_vessel_path):
+                print(
+                    "The given output vessel path parameter is invalid. "
+                    "The default parameter is given instead."
+                )
+                out_vessel_path = os.getcwd()
 
         # collect the input parameters into a labelled list
         input_parameters = {
@@ -315,7 +316,8 @@ class DistillationBenchEnv(gym.Env):
         ---------------
         None
         '''
-
+        if self.out_vessel_path is None:
+            return
         # specify a file to save the distillation vessel
         file_directory = self.out_vessel_path
         filename = "{}.pickle".format(vessel_rootname)
@@ -414,6 +416,16 @@ class DistillationBenchEnv(gym.Env):
         # update the state variables
         self._update_state()
 
+        
+        # initialize the distillation reward class
+        d_reward = DistillationReward(
+                vessels=self.vessels,
+                desired_material=self.target_material
+        )
+        # before the first step, calculate the initial reward
+        self.initial_reward = d_reward.calc_reward()
+        
+        
         return self.state
 
     def step(self, action):
@@ -471,8 +483,8 @@ class DistillationBenchEnv(gym.Env):
                 desired_material=self.target_material
             )
 
-            # after the last step, calculate the final reward
-            reward = d_reward.calc_reward()
+            # after the last step, calculate the final reward (subtract the initial reward so no improvement means zero reward)
+            reward = d_reward.calc_reward() - self.initial_reward
 
             # obtain a list of the vessels that contain the desired
             # material and obey the minimum purity requirements

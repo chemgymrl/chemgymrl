@@ -249,7 +249,7 @@ class Distillation:
             # Add/Remove Heat (Heat multiplier)
             if do_action == 0:
                 # calculate the amount of heat being added/removed
-                multiplier = 2 * (multiplier/self.n_actions - 0.5)
+                multiplier = 2 * (multiplier/(self.n_actions-1) - 0.5)
                 heat_change = multiplier * self.dQ
 
                 # add the event to perform the heat change
