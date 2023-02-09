@@ -521,9 +521,14 @@ class Vessel:
                                     del self._solute_dict[solute]
 
                                 else:
+                                    #_solute_dict[solute][solvent][1] should sum (over solvents) to solute_total_amount
                                     solute_total_amount = self._material_dict[solute][1]
-                                    for solvent in self._solute_dict[solute]:
-                                        self._solute_dict[solute][solvent][1] += self._solute_dict[solute][smallest_bp_name][1] * self._solute_dict[solute][solvent][1] / (solute_total_amount - self._solute_dict[solute][smallest_bp_name][1])
+                                    #If there is no solute than rescaling would be 0/0 (but the limit goes to 0)
+                                    if solute_total_amount>0:
+                                        rescaling = self._solute_dict[solute][smallest_bp_name][1]/(solute_total_amount - self._solute_dict[solute][smallest_bp_name][1])
+                                        # Increase amount dissolved in other solvents to maintain the sum when removing smallest_bp_name
+                                        for solvent in self._solute_dict[solute]:
+                                            self._solute_dict[solute][solvent][1] += self._solute_dict[solute][solvent][1]*rescaling
 
                                     del self._solute_dict[solute][smallest_bp_name]
 
