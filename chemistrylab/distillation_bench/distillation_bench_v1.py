@@ -174,8 +174,8 @@ class WurtzDistill_v1(DistillationBenchEnv):
             precipitation_file_identifier="precipitation",
             in_vessel_path=None,
             target_material="dodecane",
-            dQ=1000.0,
-            out_vessel_path=os.getcwd()
+            dQ=30000.0,
+            out_vessel_path=None#os.getcwd()
         )
 
 class GeneralWurtzDistill_v1(DistillationBenchEnv):

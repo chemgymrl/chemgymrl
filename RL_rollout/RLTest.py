@@ -86,7 +86,10 @@ class FictReact2Heuristic(Heuristic):
     
 class WurtzDistillHeuristic(Heuristic):
     def predict(self,observation):
-        return np.array([0,9]),[]
+        if observation[0].mean()>0.56:
+            return np.array([0,9]),[]
+        else:
+            return np.array([4,4]),[]
     
 class WurtzExtractHeuristic(Heuristic):
     def _pred(self,obs):
