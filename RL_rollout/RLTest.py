@@ -38,15 +38,15 @@ print(ALGO)
 
 
 
-class WurtzReactHeuristic():
+class Heuristic():
   """
-  Heuristic policy for the Wurtz Reaction bench.
+  Heuristic policy for a chemgymrl bench.
   
   The predict function is implemented the same as in a stable baselines policy, so
   you should be able to use this heuristic policy in place of an RL algorithm.
   
   """
-  def predict(observation):
+  def predict(self,observation):
     """
     Get an action from an observation based off of heurstics
     
@@ -54,21 +54,71 @@ class WurtzReactHeuristic():
 
     :return: (np.ndarray, []) the model's action and an empty array (for baselines compatability)
     """
-    t = np.argmax(observation[-7:])
-    #targs = {0: "dodecane", 1: "5-methylundecane", 2: "4-ethyldecane", 3: "5,6-dimethyldecane", 4: "4-ethyl-5-methylnonane", 5: "4,5-diethyloctane", 6: "NaCl"}
-    actions=np.array([
-    [1,0,1,0,0,1],#dodecane
-    [1,0,1,1,0,1],#5-methylundecane
-    [1,0,1,0,1,1],#4-ethyldecane
-    [1,0,0,1,0,1],#5,6-dimethyldecane
-    [1,0,0,1,1,1],#4-ethyl-5-methylnonane
-    [1,0,0,0,1,1],#4,5-diethyloctane
-    [1,0,1,1,1,1],#NaCl
-    ],dtype=np.float32)
-    return actions[t],[]
+    raise NotImplementedError
+
+class WurtzReactHeuristic(Heuristic):
+    def predict(self,observation):
+        t = np.argmax(observation[-7:])
+        #targs = {0: "dodecane", 1: "5-methylundecane", 2: "4-ethyldecane", 3: "5,6-dimethyldecane", 4: "4-ethyl-5-methylnonane", 5: "4,5-diethyloctane", 6: "NaCl"}
+        actions=np.array([
+        [1,0,1,0,0,1],#dodecane
+        [1,0,1,1,0,1],#5-methylundecane
+        [1,0,1,0,1,1],#4-ethyldecane
+        [1,0,0,1,0,1],#5,6-dimethyldecane
+        [1,0,0,1,1,1],#4-ethyl-5-methylnonane
+        [1,0,0,0,1,1],#4,5-diethyloctane
+        [1,0,1,1,1,1],#NaCl
+        ],dtype=np.float32)
+        return actions[t],[]
+    
+class FictReact2Heuristic(Heuristic):
+    def predict(self,observation):
+        t = np.argmax(observation[-4:])
+        #targs = [E F G I]
+        actions=np.array([
+        #T V A B D F G
+        [1,0,1,1,0,0,0],#A+B -> E
+        [1,0,1,0,1,1,1],#A+D -> F
+        [1,0,0,1,1,0,1],#B+D -> G
+        [1,0,0,0,0,1,1],#F+G -> I
+        ],dtype=np.float32)
+        return actions[t],[]
+    
+class WurtzDistillHeuristic(Heuristic):
+    def predict(self,observation):
+        if observation[0].mean()>0.56:
+            return np.array([0,9]),[]
+        else:
+            return np.array([4,4]),[]
+    
+class WurtzExtractHeuristic(Heuristic):
+    def _pred(self,obs):
+        marker=obs[1].mean()
+        #Mixing phase
+        if marker > 0.61:
+            #Adding in the C6H14
+            if obs[0].mean()<0.3:
+                return [5,1]
+            else:
+                #Pouring phase start
+                self.count=1
+                return [0,1]
+        #Pouring Phase
+        elif marker>0.35:
+            #wait for Na to float up
+            if self.count<40:
+                self.count+=1
+                return [0,0]
+            #pour more contents
+            return [0,2]
+        #done mixing and pouring
+        else:
+            return [7,1]
+    def predict(self,obs):
+        return np.array(self._pred(obs)),[]
 
 
-HEURISTICS = {"WRH":WurtzReactHeuristic}
+HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic}
 
 
 if __name__=="__main__":
@@ -88,7 +138,7 @@ if __name__=="__main__":
     
     #choose algorithm
     if op.algorithm in HEURISTICS:
-        model = HEURISTICS[op.algorithm]
+        model = HEURISTICS[op.algorithm]()
     else:
         #Load the model
         model = ALGO[op.algorithm].load(sys.argv[1]+"/model")

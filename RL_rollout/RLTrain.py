@@ -131,7 +131,7 @@ class Opt:
 
 
 
-from stable_baselines3 import DQN, PPO, A2C
+from stable_baselines3 import DQN, PPO, A2C, SAC
 from stable_baselines3.common.monitor import Monitor
 #from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 import gym
@@ -143,7 +143,7 @@ import chemistrylab
 
 
 
-ALGO={"PPO":PPO,"A2C":A2C}
+ALGO={"PPO":PPO,"A2C":A2C,"SAC":SAC,"DQN":DQN}
 
 
 if __name__=="__main__":
@@ -184,10 +184,12 @@ if __name__=="__main__":
     #initialize model
     model = ALGO[op.algorithm](op.policy, env, verbose=1, seed = op.seed)
     #train the model
-    model.learn(
-    total_timesteps=op.steps,
-    log_interval=100,
-    )
+    try:
+        model.learn(
+        total_timesteps=op.steps,
+        log_interval=100,
+        )
+    except Exception as e: print(e)
     
     model.save(op.dir+"\\model")
 
