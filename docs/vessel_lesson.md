@@ -92,11 +92,11 @@ To visualize what we are doing above, we have several graphs:
 
 Here we have a graph of the separation between the oil and the water when we initially add them to our vessel:
 
-![added oil and water](../tutorial_figures/vessel/vessel_1.png)
+![added oil and water](tutorial_figures/vessel/vessel_1.png)
 
 Here we have the solution after we allow it to settle (notice that the top of the vessel is now air):
 
-![drained oil and water](../tutorial_figures/vessel/vessel_2.png)
+![drained oil and water](tutorial_figures/vessel/vessel_2.png)
 
 ### The Workflow
   

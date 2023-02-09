@@ -1229,7 +1229,7 @@ class Vessel:
             self._layers_position_dict[M] = new_layers_position[layers_counter]
             if self._solute_dict:
                 layers_counter += 1
-                if self._material_dict[M][0].is_solvent():
+                if self._material_dict[M][0].is_solvent() and M in self._solute_dict[Solute]:
                     solute_counter = 0  # count position for solute in new_solute_amount
                     for Solute in self._solute_dict:
                         solute_amount = new_solute_amount[solute_counter][solvent_counter]

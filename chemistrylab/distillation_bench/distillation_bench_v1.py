@@ -219,15 +219,27 @@ def boil_vessel():
 
     # initialize materials
     OneChlorohexane = material.OneChlorohexane()
+    OneChlorohexane.set_solute_flag(True)
     TwoChlorohexane = material.TwoChlorohexane()
+    TwoChlorohexane.set_solute_flag(True)
     ThreeChlorohexane = material.ThreeChlorohexane()
+    ThreeChlorohexane.set_solute_flag(True)
     Na = material.Na()
+    Na.set_solute_flag(True)
+    Cl = material.Cl()
+    Cl.set_solute_flag(True)
     Dodecane = material.Dodecane()
+    Dodecane.set_solute_flag(True)
     FiveMethylundecane = material.FiveMethylundecane()
+    FiveMethylundecane.set_solute_flag(True)
     FourEthyldecane = material.FourEthyldecane()
+    FourEthyldecane.set_solute_flag(True)
     FiveSixDimethyldecane = material.FiveSixDimethyldecane()
+    FiveSixDimethyldecane.set_solute_flag(True)
     FourEthylFiveMethylnonane = material.FourEthylFiveMethylnonane()
+    FourEthylFiveMethylnonane.set_solute_flag(True)
     FourFiveDiethyloctane = material.FourFiveDiethyloctane()
+    FourFiveDiethyloctane.set_solute_flag(True)
     NaCl = material.NaCl()
     H2O = material.H2O()
 
@@ -237,6 +249,7 @@ def boil_vessel():
         TwoChlorohexane.get_name(): [TwoChlorohexane, 0.71239483, 'mol'],
         ThreeChlorohexane.get_name(): [ThreeChlorohexane, 0.6086047, 'mol'],
         Na.get_name(): [Na, 0.028975502, 'mol'],
+        Cl.get_name(): [Cl, 0.028975502, 'mol'],
         Dodecane.get_name(): [Dodecane, 0.10860507, 'mol'],
         FiveMethylundecane.get_name(): [FiveMethylundecane, 0.07481375, 'mol'],
         FourEthyldecane.get_name(): [FourEthyldecane, 0.08697271, 'mol'],
@@ -244,11 +257,22 @@ def boil_vessel():
         FourEthylFiveMethylnonane.get_name(): [FourEthylFiveMethylnonane, 0.069323435, 'mol'],
         FourFiveDiethyloctane.get_name(): [FourFiveDiethyloctane, 0.07406321, 'mol'],
         NaCl.get_name(): [NaCl, 0.9710248, 'mol'],
-        H2O.get_name(): [H2O, 0.2767138495698029, 'mol']
+        H2O.get_name(): [H2O, 30.0, 'mol']
     }
 
     # solute_dict
     solute_dict = {
+        OneChlorohexane.get_name(): {H2O.get_name(): [H2O, 0.62100387, 'mol']},
+        TwoChlorohexane.get_name(): {H2O.get_name(): [H2O, 0.71239483, 'mol']},
+        ThreeChlorohexane.get_name(): {H2O.get_name(): [H2O, 0.6086047, 'mol']},
+        Na.get_name(): {H2O.get_name(): [H2O, 0.028975502, 'mol']},
+        Cl.get_name(): {H2O.get_name(): [H2O, 0.028975502, 'mol']},
+        Dodecane.get_name(): {H2O.get_name(): [H2O, 0.10860507, 'mol']},
+        FiveMethylundecane.get_name(): {H2O.get_name(): [H2O, 0.07481375, 'mol']},
+        FourEthyldecane.get_name(): {H2O.get_name(): [H2O, 0.08697271, 'mol']},
+        FiveSixDimethyldecane.get_name(): {H2O.get_name(): [H2O, 0.07173399, 'mol']},
+        FourEthylFiveMethylnonane.get_name(): {H2O.get_name(): [H2O, 0.069323435, 'mol']},
+        FourFiveDiethyloctane.get_name(): {H2O.get_name(): [H2O, 0.07406321, 'mol']}
     }
 
     material_dict, solute_dict, _ = util.check_overflow(

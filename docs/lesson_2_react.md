@@ -158,7 +158,7 @@ while not done:
     # print(state)
 
     # render the plot
-    env.render(mode=render_mode)
+    env.render(mode=render_mode, nb=True)
     # sleep(2)
 
     # increment one step
@@ -174,7 +174,7 @@ while not done:
 
 Notice that we get a high total reward. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
-![subplot](../tutorial_figures/reaction-lesson-2/subplots.png)
+![subplot](tutorial_figures/reaction-lesson-2/subplots.png)
 
 This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
 

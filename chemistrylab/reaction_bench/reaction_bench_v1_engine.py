@@ -713,7 +713,7 @@ class ReactionBenchEnv(gym.Env):
         
         return self.state, reward, self.done, {}
 
-    def render(self, mode='human'):
+    def render(self, mode='human', nb=False):
         """
         Method to specify the type of plot rendering.
 
@@ -732,13 +732,13 @@ class ReactionBenchEnv(gym.Env):
         """
 
         if mode == 'human':
-            self.human_render()
+            self.human_render(nb)
         elif mode == 'full':
-            self.full_render()
+            self.full_render(nb)
         else:
-            print("Incorrect Render Model: {}".format(mode))
+            print("Incorrect Render Mode: {}".format(mode))
 
-    def human_render(self):
+    def human_render(self, nb=False):
         """
         Method to plot thermodynamic variables and spectral data.
         Plots a minimal amount of data for a 'surface-level'
@@ -783,10 +783,10 @@ class ReactionBenchEnv(gym.Env):
         # call render function in reaction base
         self.reaction.plot_human_render(self._first_render, wave_data_dict, self.plot_data_state)
 
-        if self._first_render:
+        if not nb:
             self._first_render = False
 
-    def full_render(self):
+    def full_render(self, nb=False):
         """
         Method to plot thermodynamic variables and spectral data.
         Plots a significant amount of data for a more in-depth
@@ -842,5 +842,5 @@ class ReactionBenchEnv(gym.Env):
         )
 
         # The first render is required to initialize the figure
-        if self._first_render:
+        if not nb:
             self._first_render = False
