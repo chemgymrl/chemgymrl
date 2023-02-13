@@ -197,7 +197,8 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
 
         # Calculate the ideal amount of solute i in each phase
         # Check conditions that this adds to Ssum
-        St = (Ssum * A / np.sum(A)) * (np.exp(tmix - t) + c * (1 - np.exp(tmix - t)) * (1 - (abs(Spol[i] - Lpol) / Ldif)))
+        t_scale = 200
+        St = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t)) + c * (1 - np.exp(t_scale*(tmix - t))) * (1 - (abs(Spol[i] - Lpol) / Ldif)))
         Sts[i] = np.copy(St)
 
     # Update amount of solute i in each phase
@@ -216,7 +217,7 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
         c = 1 / (1 - (Ldif0) / (np.sum(A) * Ldif))
 
         # Calculate the ideal amount of solute i in each phase for the previous time step
-        St0 = (Ssum * A / np.sum(A)) * (np.exp(tmix - t + mixing) + c * (1 - np.exp(tmix - t + mixing)) * (1 - (abs(Spol[i] - Lpol) / Ldif)))
+        St0 = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t + mixing)) + c * (1 - np.exp(t_scale*(tmix - t + mixing))) * (1 - (abs(Spol[i] - Lpol) / Ldif)))
 
         if abs(t - mixing - tmix) > 1e-9:
             S[i] = Sts[i] + 0.5 * ((1 - abs(mixing) / mixing) * (S[i] - St0) * (t - tmix) / (t - mixing - tmix) + (1 + abs(mixing) / mixing) * (S[i] - St0))

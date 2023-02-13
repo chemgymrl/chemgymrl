@@ -8,21 +8,25 @@ def random_policy(env):
 
 def coded_policy(step):
     actions = [[5, 1],
+               [1, 4],
                [0, 0],
                [0, 0],
                [0, 4],
                [0, 4],
                [0, 4],
                [0, 4],
+               [0, 1],
                [4, 4],
-               [2, 4]
+               [2, 4],
+               [0, 0]
     ]
-    if step <= 25:
+    
+    if step <= 24:
         return actions[step % len(actions)]
     else:
         return [7, 0]
 
-env = gym.make("WurtzExtract-v1")
+env = gym.make("GenWurtzExtract-v1")
 
 R0 = np.zeros(7, dtype=np.float32)
 R1 = np.zeros(7, dtype=np.float32)
