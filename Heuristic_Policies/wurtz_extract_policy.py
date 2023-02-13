@@ -8,16 +8,20 @@ def random_policy(env):
 
 def coded_policy(step):
     actions = [[5, 1],
+               [1, 4],
                [0, 0],
                [0, 0],
                [0, 4],
                [0, 4],
                [0, 4],
                [0, 4],
+               [0, 1],
                [4, 4],
-               [2, 4]
+               [2, 4],
+               [0, 0]
     ]
-    if step <= 25:
+    
+    if step <= 24:
         return actions[step % len(actions)]
     else:
         return [7, 0]
