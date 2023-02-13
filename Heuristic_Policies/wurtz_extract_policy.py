@@ -26,7 +26,7 @@ def coded_policy(step):
     else:
         return [7, 0]
 
-env = gym.make("WurtzExtract-v1")
+env = gym.make("GenWurtzExtract-v1")
 
 R0 = np.zeros(7, dtype=np.float32)
 R1 = np.zeros(7, dtype=np.float32)
