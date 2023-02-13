@@ -117,7 +117,7 @@ class Opt:
             A plain text json file
         """
         with open(fn,"w") as f:
-            json.dump(self.__dict__, f)
+            json.dump(self.__dict__, f,indent = 4)
             
     def load(self,fn):
         """Saves  options stored in json format

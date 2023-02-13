@@ -71,7 +71,7 @@ class WurtzReactHeuristic(Heuristic):
         ],dtype=np.float32)
         return actions[t],[]
     
-class FictReact2Heuristic(Heuristic):
+class FictReact2Heuristic():
     def predict(self,observation):
         t = np.argmax(observation[-4:])
         #targs = [E F G I]
@@ -82,7 +82,15 @@ class FictReact2Heuristic(Heuristic):
         [1,0,0,1,1,0,1],#B+D -> G
         [1,0,0,0,0,1,1],#F+G -> I
         ],dtype=np.float32)
-        return actions[t],[]
+        #making I is a special case
+        if t==3:
+            marker=observation[:100].mean()
+            if marker>0.061 or marker<0.01:
+                return actions[1],[]# make F
+            else:
+                return actions[2],[]# make G
+        else: 
+            return actions[t],[]
     
 class WurtzDistillHeuristic(Heuristic):
     def predict(self,observation):
