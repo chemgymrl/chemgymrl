@@ -426,6 +426,13 @@ class ExtractBenchEnv(gym.Env):
             extraction_vessel=self.extraction_vessel,
             targets=self.reaction.products
         )
+        
+        
+        self.initial_reward = ExtractionReward(
+                vessels=self.vessels,
+                desired_material=self.target_material,
+                initial_target_amount=self.initial_target_amount
+            ).calc_reward()
 
         return self.state
 
@@ -510,7 +517,7 @@ class ExtractBenchEnv(gym.Env):
                 vessels=self.vessels,
                 desired_material=self.target_material,
                 initial_target_amount=self.initial_target_amount
-            ).calc_reward()
+            ).calc_reward() - self.initial_reward
 
             # save each validated vessel as pickle files
             for i, vessel in enumerate(valid_vessels):
