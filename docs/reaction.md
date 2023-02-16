@@ -45,6 +45,7 @@ class WurtzReact_v1(ReactionBenchEnv):
                 {"Material": "DiEthylEther", "Initial": 4}
             ],
             target_material="dodecane",
+            avoid_material="",
             n_steps=50,
             dt=0.01,
             overlap=False
@@ -58,9 +59,10 @@ of time taken in each time step, and an indication to show if spectral plots sho
 We also pass in the reaction file identifier which is the name of the reaction file located in the 
 `../available_reactions` directory. This file includes important values that the engine will use to simulate the 
 reaction. It contains information on the reactants, products, and solutes available to the reaction. It defines the 
-desired material which an agent will be rewarded for if it picks the actions that produces the said material. It also 
-contains all the thermodynamic values and vessel parameters. Lastly it includes arrays for the activation energy, 
-stoichiometric coefficients, and concentration calculation coefficients. 
+desired material which an agent will be rewarded for if it picks the actions that produces the said material. Additionally,
+it defines an undesired material (or a material to be avoided), which an agent will be penalized if it picks teh actions
+that produce said material. It also contains all the thermodynamic values and vessel parameters. Lastly it includes arrays
+for the activation energy, stoichiometric coefficients, and concentration calculation coefficients. 
 
 ## Output
 

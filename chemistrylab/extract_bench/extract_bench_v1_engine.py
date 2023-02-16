@@ -522,7 +522,7 @@ class ExtractBenchEnv(gym.Env):
 
         return self.state, reward, self.done, {}
 
-    def render(self, mode='human'):
+    def render(self, mode='human', nb=False):
         '''
         Select a render mode to display pertinent information.
 
@@ -541,11 +541,11 @@ class ExtractBenchEnv(gym.Env):
         '''
 
         if mode == 'human':
-            self.human_render()
+            self.human_render(nb)
         elif mode == 'full':
-            self.full_render()
+            self.full_render(nb)
 
-    def human_render(self, mode='plot'):
+    def human_render(self, nb=False):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -636,6 +636,7 @@ class ExtractBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
+            if not nb:
                 self._first_render = False
 
         # if the plot has already been rendered, update the plot
@@ -658,7 +659,7 @@ class ExtractBenchEnv(gym.Env):
 
                 self._first_render = False
 
-    def full_render(self, mode='plot'):
+    def full_render(self, nb=False):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -785,6 +786,7 @@ class ExtractBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
+            if not nb:
                 self._first_render = False
 
         # if the plot has already been rendered, update the plot

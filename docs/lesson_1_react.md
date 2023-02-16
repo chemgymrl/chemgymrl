@@ -43,7 +43,7 @@ If you run the cell below you will see a graph appear that looks something like 
 
 ```python
 env.reset()
-env.render(mode=render_mode)
+env.render(mode=render_mode, nb=True)
 ```
 
 ![graph](tutorial_figures/reaction-lesson-1/wurtz_lesson_0.png)
@@ -84,7 +84,7 @@ state = env.reset()
 total_reward = 0
 while not done:
     # print(state)
-    env.render(mode=render_mode)
+    env.render(mode=render_mode, nb=True)
     action = np.zeros(env.action_space.shape[0])
     print('--------------------')
     for i, a in enumerate(action_set):
@@ -130,7 +130,7 @@ round = 0
 
 while not done:
     # print(state)
-    env.render(mode=render_mode)
+    env.render(mode=render_mode, nb=True)
     action = np.zeros(env.action_space.shape[0])
     if round == 0:
         action[0] = 1
