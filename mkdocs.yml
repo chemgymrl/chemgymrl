@@ -6,7 +6,7 @@ theme: readthedocs
 
 repo_url: https://github.com/chemgymrl/chemgymrl
 
-edit_url: edit/main/docs/
+edit_uri: edit/main/docs/
 
 nav:
 - Home: index.md
