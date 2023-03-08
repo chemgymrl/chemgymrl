@@ -77,22 +77,37 @@ register(
     max_episode_steps=100
 )
 
-register(
-    id='GenWurtzDistill-v1',
-    entry_point='chemistrylab.distillation_bench.distillation_bench_v1:GeneralWurtzDistill_v1',
-    max_episode_steps=100
-)
-
-register(
-    id='Distillation-v1',
-    entry_point='chemistrylab.distillation_bench.distillation_bench_v1:Distillation_v1',
-    max_episode_steps=100
-)
-
 ############################ LabManager ####################################
 
 register(
     id='LabManager-v0',
     entry_point='chemistrylab.manager.manager_v1:LabManager',
     max_episode_steps=100
+)
+
+######################## Discretized ######################################
+
+register(
+    id='DiscreteGenWurtzExtract-v1',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v1',exclude=4)
+)
+
+register(
+    id='DiscreteWurtzExtract-v1',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1',exclude=4)
+)
+
+register(
+    id='DiscreteWurtzDistill-v1',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.distillation_bench.distillation_bench_v1:WurtzDistill_v1',exclude=9),
+    max_episode_steps=100
+)
+
+register(
+    id='DiscreteGenWurtzReact-v1',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.reaction_bench.reaction_bench_v1:GeneralWurtzReact_v1',null_act=(0.5,0.5,0,0,0,0))
 )
