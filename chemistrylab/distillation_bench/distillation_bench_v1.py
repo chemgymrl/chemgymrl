@@ -27,6 +27,8 @@ Distillation Bench Environment
 import os
 import pickle
 import sys
+from copy import deepcopy
+from random import choice
 
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
@@ -104,7 +106,7 @@ def wurtz_vessel(add_mat):
     """
 
     # initialize extraction vessel
-    extraction_vessel = vessel.Vessel(label='boil_vessel')
+    boil_vessel = vessel.Vessel(label='boil_vessel')
 
     # initialize C6H14
     C6H14 = material.C6H14()
@@ -118,10 +120,16 @@ def wurtz_vessel(add_mat):
         '4,5-diethyloctane': material.FourFiveDiethyloctane,
         'NaCl': material.NaCl
     }
+
     try:
+        if add_mat == "":
+            add_mat = choice(list(products.keys()))
+        
         add_material = products[add_mat]()
+    
     except KeyError:
         add_material = products['dodecane']()
+    
     add_material.set_solute_flag(True)
     add_material.set_color(0.0)
     add_material.set_phase('l')
@@ -140,11 +148,11 @@ def wurtz_vessel(add_mat):
     material_dict, solute_dict, _ = util.check_overflow(
         material_dict=material_dict,
         solute_dict=solute_dict,
-        v_max=extraction_vessel.get_max_volume()
+        v_max=boil_vessel.get_max_volume()
     )
 
     # set events and push them to the queue
-    extraction_vessel.push_event_to_queue(
+    boil_vessel.push_event_to_queue(
         events=None,
         feedback=[
             ['update material dict', material_dict],
@@ -152,13 +160,13 @@ def wurtz_vessel(add_mat):
         ],
         dt=0
     )
-    extraction_vessel.push_event_to_queue(
+    boil_vessel.push_event_to_queue(
         events=None,
         feedback=None,
         dt=-100000
     )
 
-    return extraction_vessel
+    return boil_vessel, add_mat
 
 class WurtzDistill_v1(DistillationBenchEnv):
     """
@@ -167,7 +175,7 @@ class WurtzDistill_v1(DistillationBenchEnv):
 
     def __init__(self):
         super(WurtzDistill_v1, self).__init__(
-            boil_vessel=wurtz_vessel('dodecane'),
+            boil_vessel=wurtz_vessel('dodecane')[0],
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
@@ -183,18 +191,28 @@ class GeneralWurtzDistill_v1(DistillationBenchEnv):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
-    def __init__(self, target_material, in_vessel_path=None):
+    def __init__(self, target_material="", in_vessel_path=None):
+        self.original_target_material = target_material
+        distill_vessel, target_mat = wurtz_vessel(self.original_target_material)
+
         super(GeneralWurtzDistill_v1, self).__init__(
-            boil_vessel=wurtz_vessel(target_material),
+            boil_vessel=distill_vessel,
             n_vessel_pixels=100,
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             precipitation_file_identifier="precipitation",
             in_vessel_path=in_vessel_path,
-            target_material=target_material,
+            target_material=target_mat,
             dQ=1000.0,
             out_vessel_path=os.getcwd()
         )
+
+    def reset(self):
+        distill_vessel, target_mat = wurtz_vessel(self.original_target_material)
+        self.original_boil_vessel = deepcopy(distill_vessel)
+        self.target_material = target_mat
+
+        return super(GeneralWurtzDistill_v1, self).reset()
 
 def boil_vessel():
     """
