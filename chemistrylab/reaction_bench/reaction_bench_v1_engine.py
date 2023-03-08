@@ -288,14 +288,16 @@ class ReactionBenchEnv(gym.Env):
                 in_vessel_path = None
 
         # ensure the output vessel parameter points to a legitimate directory
-        if not isinstance(out_vessel_path, str):
-            print("The provided output vessel path is invalid. The default will be provided.")
-            out_vessel_path = os.getcwd()
-        elif os.path.isdir(out_vessel_path):
-            pass
-        else:
-            print("The provided output vessel path is invalid. The default will be provided.")
-            out_vessel_path = os.getcwd()
+        if out_vessel_path is not None:
+            # ensure the output vessel parameter points to a legitimate directory
+            if not isinstance(out_vessel_path, str):
+                print("The provided output vessel path is invalid. The default will be provided.")
+                out_vessel_path = os.getcwd()
+            elif os.path.isdir(out_vessel_path):
+                pass
+            else:
+                print("The provided output vessel path is invalid. The default will be provided. KS")
+                out_vessel_path = os.getcwd()
 
         # ensure the materials parameter is a non-empty list
         if not isinstance(materials, list):
@@ -705,8 +707,8 @@ class ReactionBenchEnv(gym.Env):
         # add option to save or print intermediary vessel
 
         # save the vessel when the final step is complete
-        if any([self.done, self.step_num == 20]):
-            self.vessels.save_vessel('reaction_vessel')
+        if any([self.done, self.step_num == 20]) and self.out_vessel_path is not None:
+            self.vessels.save_vessel(self.out_vessel_path+'/reaction_vessel')
 
         # update the step counter
         self.step_num += 1
