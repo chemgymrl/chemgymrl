@@ -265,7 +265,7 @@ class WurtzExtract_v1(ExtractBenchEnv):
             n_steps=50,
             target_material='dodecane',
             solvents=["C6H14", "DiEthylEther"],
-            out_vessel_path=os.getcwd()
+            out_vessel_path=None
         )
 
 class GeneralWurtzExtract_v1(ExtractBenchEnv):
@@ -285,7 +285,7 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
             n_steps=50,
             solvents=["C6H14", "DiEthylEther"],
             target_material=target_mat,
-            out_vessel_path=os.getcwd()
+            out_vessel_path=None
         )
 
     def reset(self):
@@ -312,7 +312,7 @@ class WurtzExtractCtd_v1(ExtractBenchEnv):
             n_steps=50,
             target_material='dodecane',
             solvents=["C6H14", "DiEthylEther"],
-            out_vessel_path=os.getcwd()
+            out_vessel_path=None
         )
 
 class WaterOilExtract_v1(ExtractBenchEnv):
@@ -328,5 +328,5 @@ class WaterOilExtract_v1(ExtractBenchEnv):
             extraction_vessel=oil_vessel(),
             n_steps=50,
             target_material='Na',
-            out_vessel_path=os.getcwd()
+            out_vessel_path=None
         )

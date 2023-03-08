@@ -42,8 +42,12 @@ class Opt:
     steps (int) -- Number of training steps
     dir (str) -- Output directory, set to <DEFAULT> for a generated folder name
     seed (int) -- random seed for the run
+    best_episodes (int) -- how many best performing episodes to keep in the Experience Replay
+    best_ratio (float) -- The ratio of samples obtained from looking at only the best performing episodes
     """
-    DEFAULTS={"policy":"MlpPolicy","algorithm":"PPO","environment":"WurtzReact-v1","steps": 500,"dir":"<DEFAULT>","seed":None}
+    DEFAULTS=dict(policy="MlpPolicy",algorithm="PPO",environment="WurtzReact-v1",
+                  steps= 51200,dir="<DEFAULT>",n_steps=256,n_envs=1,seed=None)
+                 #best_episodes=200,best_ratio=0.2)
     def __init__(self,**kwargs):
         self.__dict__.update(Opt.DEFAULTS)
         self.__dict__.update(kwargs)
@@ -131,8 +135,12 @@ class Opt:
 
 
 
-from stable_baselines3 import DQN, PPO, A2C, SAC
+
+from stable_baselines3 import DQN, PPO, A2C, SAC, TD3
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
+from stable_baselines3.common.env_util import make_vec_env
 #from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 import gym
 #from wandb.integration.sb3 import WandbCallback
@@ -140,10 +148,36 @@ import gym
 import sys
 sys.path.append('../')
 import chemistrylab
+import numpy as np
+from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
+from stable_baselines3.common.on_policy_algorithm import OnPolicyAlgorithm
+from datetime import datetime
+
+
+def get_interp_fn(vals):
+    """My custom learning rate vs step curve"""
+    n=len(vals)-1
+    def func(progress_remaining: float) -> float:
+        i0=(1-progress_remaining)*n
+        i=int(i0)
+        di=i0-i
+        if i==n:
+            return vals[i]
+        return vals[i]*(1-di)+vals[i+1]*di
+    return func
+
+vals=np.array([1.0]+[0.05]*6+[0.005*a for a in range(10,0,-2)]+[0.01]*2+[0.005]*3)
+#vals=np.array([1.0]+[0.05]*6+[0.005*a for a in range(10,0,-2)]+[0.001]*5)
+#vals=np.array([1.0]+[0.05]*6+[0.005*a for a in range(10,0,-2)]+[0.001]*5+[0.0005]*12+[0.0001]*4)
 
 
 
-ALGO={"PPO":PPO,"A2C":A2C,"SAC":SAC,"DQN":DQN}
+schedule = get_interp_fn(vals)
+
+
+
+
+ALGO={"PPO":PPO,"A2C":A2C,"SAC":SAC,"DQN":DQN,"TD3":TD3}
 
 
 if __name__=="__main__":
@@ -157,7 +191,9 @@ if __name__=="__main__":
     print(op)
     
     if op.dir=="<DEFAULT>":
-        op.dir=op.algorithm+"_"+op.environment
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y--%H-%M-%S")
+        op.dir="MODELS\\"+op.environment+"\\"+op.algorithm+"\\"+dt_string
     
     
     #Set up output directory
@@ -177,19 +213,109 @@ if __name__=="__main__":
     print("The action space is", env.action_space)
     print("The observation space is", env.observation_space)
     
-    #set up environment monitor
-    env = Monitor(env, op.dir, allow_early_resets=True)
- 
-    
-    #initialize model
-    model = ALGO[op.algorithm](op.policy, env, verbose=1, seed = op.seed)
-    #train the model
-    try:
-        model.learn(
-        total_timesteps=op.steps,
-        log_interval=100,
+    if op.n_envs==1:
+        #set up environment monitor
+        def f():
+            return Monitor(env, op.dir, allow_early_resets=True)
+
+        env = DummyVecEnv([f])
+        
+    else:
+        env = make_vec_env(
+            env_id=op.environment,
+            n_envs=op.n_envs,
+            monitor_dir=op.dir,
+            vec_env_cls=SubprocVecEnv,
         )
-    except Exception as e: print(e)
+    
+    model_class = ALGO[op.algorithm]
+    
+    is_on_policy = issubclass(model_class,OnPolicyAlgorithm)
+    
+    if op.n_steps>0:
+        #initialize model
+        if is_on_policy:
+            model = model_class(op.policy, env, verbose=1, seed = op.seed,n_steps=op.n_steps)
+        else:
+            
+            if op.algorithm in ["DQN","DoubleDQN"]:
+                
+                #Set DQN schedule to explore less later on
+                model = model_class(op.policy, env, verbose=1, seed = op.seed,train_freq=op.n_steps,gradient_steps=op.n_steps,
+                                   exploration_fraction=0.3,exploration_final_eps=0.01)
+            
+            else:
+                model = model_class(op.policy, env, verbose=1, seed = op.seed,train_freq=op.n_steps, gradient_steps=op.n_steps)
+            
+    else:
+        model = model_class(op.policy, env, verbose=1, seed = op.seed)
+    #Set up More advanced Training if I want it:
+    
+    
+    #Keep track of the best episode return
+    max_return=-1e10
+    
+    try:
+        if op.n_steps>0:
+            _, callback = model._setup_learn(total_timesteps=op.steps*op.n_envs)
+            epoch=op.steps//op.n_steps
+            all_eps_rewards=[]
+            best_return = -1e10
+
+            for i in range(epoch):
+                #collect experience
+
+                if is_on_policy:
+                    rollout = model.collect_rollouts(
+                        env=env,
+                        rollout_buffer=model.rollout_buffer,
+                        n_rollout_steps=op.n_steps,
+                        callback=callback
+                    )
+                    
+                    print(model.rollout_buffer.observations.shape)
+                    
+                else:
+                    #collect experience
+                    rollout = model.collect_rollouts(
+                        env=env,
+                        train_freq=model.train_freq,
+                        action_noise=model.action_noise,
+                        callback=callback,
+                        learning_starts=model.learning_starts,
+                        replay_buffer=model.replay_buffer,
+                    )
+
+
+                    rate=model.__dict__.get("exploration_rate",None)
+                        
+                    print("BEST:",max_return,"| Explore: ",rate)
+
+                #log info on returns
+                returns = np.array([ep_info["r"] for ep_info in model.ep_info_buffer])
+                #recalculate the max return (new episodes are going to be in the returns array)
+                max_return=max(max_return,np.max(returns))
+                #Only look at the last 100 returns to see if this is a best policy
+                returns=returns[-100:]
+                print("Mean Return:",returns.mean(),"| nsamples:",returns.shape,"| Progress:",i,"/",epoch)
+                all_eps_rewards+=[returns.mean()]
+                
+                if returns.mean()>best_return:
+                    best_return = returns.mean()
+                    model.save(op.dir+"\\best_model")
+                    print("Saving New best Model. . .")
+                sys.stdout.flush()
+                
+                #This is done AFTER best_model is saved to make sure it didn't get worse from training
+                #Update the network using the experience
+                if is_on_policy:
+                    model.train()
+                else:                                        
+                    model.train(gradient_steps=op.n_steps,batch_size=400*op.n_envs)
+        else:
+            model.learn(total_timesteps=op.steps)
+            
+    except Exception as e: print(e);1/0
     
     model.save(op.dir+"\\model")
 

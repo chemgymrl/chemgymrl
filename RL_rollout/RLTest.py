@@ -85,9 +85,14 @@ class FictReact2Heuristic():
         #making I is a special case
         if t==3:
             marker=observation[:100].mean()
-            if marker>0.061 or marker<0.01:
-                return actions[1],[]# make F
+            if marker<0.01:
+                #dump in a little bit of A so it's all used up
+                return np.array([1,0,0.4,0,1,1,1]),[]# make F
+            elif marker>0.045:
+                #Just keep the temps up
+                return np.array([0.9,0,0,0,0,0,0]),[]
             else:
+                #Dump in some B
                 return actions[2],[]# make G
         else: 
             return actions[t],[]
@@ -140,20 +145,24 @@ if __name__=="__main__":
     #Load settings from a file but if no setting exist the user may be specifying a heuristic policy
     try:
         op.load(sys.argv[1]+"/settings.json")
-        print(op)
+        
     except:
         os.makedirs(sys.argv[1], exist_ok=True)
     
     #Allow user to change settings (like steps)
     op.apply(sys.argv[1:])
-    
+    print(op)
     #choose algorithm
     if op.algorithm in HEURISTICS:
         model = HEURISTICS[op.algorithm]()
-    else:
+    elif not "--best" in sys.argv:
         #Load the model
         model = ALGO[op.algorithm].load(sys.argv[1]+"/model")
-        print(model)
+        print("Last:",model)
+    else:
+        model = ALGO[op.algorithm].load(sys.argv[1]+"/best_model")
+        print("Best:",model)
+        
     
     
     #make the environment
@@ -183,8 +192,10 @@ if __name__=="__main__":
             
     table = pd.DataFrame.from_dict(rollout, orient="columns")#,columns = ["S","A","R","S","D","I"])
     
-    table.to_pickle(sys.argv[1]+"/rollout")
-    
+    if not "--best" in sys.argv:
+        table.to_pickle(sys.argv[1]+"/rollout")
+    else:
+        table.to_pickle(sys.argv[1]+"/best_rollout")
     #read with pd.read_pickle(file_name)
     print(table)
     print("Done")
