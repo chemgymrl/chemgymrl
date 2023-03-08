@@ -287,9 +287,9 @@ if __name__=="__main__":
                     )
 
 
-                    rate=model.__dict__.get("exploration_rate",None)
+                rate=model.__dict__.get("exploration_rate",None)
                         
-                    print("BEST:",max_return,"| Explore: ",rate)
+                print("BEST:",max_return,"| Explore: ",rate)
 
                 #log info on returns
                 returns = np.array([ep_info["r"] for ep_info in model.ep_info_buffer])
