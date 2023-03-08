@@ -51,12 +51,14 @@ First, let's take a look at all the environments registered to each bench:
 lab.reactions
 ```
 
-
-
-
-    ['WurtzReact-v1', 'DecompReact-v0']
-
-
+```commandline
+['WurtzReact-v1',
+ 'GenWurtzReact-v1',
+ 'FictReact-v1',
+ 'FictReact-v2',
+ 'DecompReact-v0',
+ 'WurtzReact-v2']
+```
 
 
 ```python
@@ -64,15 +66,12 @@ lab.reactions
 lab.extractions
 ```
 
-
-
-
-    ['WurtzExtract-v1',
-     'Oil_Water_Extract-v1',
-     'MethylRed_Extract-v1',
-     'MethylRed_Extract-v2']
-
-
+```commandline
+['GenWurtzExtract-v1',
+ 'WurtzExtract-v1',
+ 'WurtzExtractCtd-v1',
+ 'WaterOilExtract-v1']
+```
 
 
 ```python
@@ -80,11 +79,9 @@ lab.extractions
 lab.distillations
 ```
 
-
-
-
-    ['Distillation-v0']
-
+```commandline
+['WurtzDistill-v1', 'GenWurtzDistill-v1', 'Distillation-v1']
+```
 
 
 Now that we know what environments are registered let's take a look at the available agents:

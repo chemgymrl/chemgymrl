@@ -101,5 +101,3 @@ array([5.00000007e-02, 3.88000011e-01, 5.02251148e-01, 1.09714296e-04,
        0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
        , dtype=float32)
 ```
-
-Note the figure above only shows a snippet of the values returned, in reality the array is much larger.

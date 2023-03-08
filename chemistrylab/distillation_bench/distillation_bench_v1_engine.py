@@ -501,7 +501,7 @@ class DistillationBenchEnv(gym.Env):
 
         return self.state, reward, self.done, {}
 
-    def render(self, mode='human'):
+    def render(self, mode='human', nb=False):
         '''
         Select a render mode to display pertinent information.
 
@@ -520,11 +520,11 @@ class DistillationBenchEnv(gym.Env):
         '''
 
         if mode == 'human':
-            self.human_render()
+            self.human_render(nb)
         elif mode == 'full':
-            self.full_render()
+            self.full_render(nb)
 
-    def human_render(self, mode='plot'):
+    def human_render(self, nb=False):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -583,10 +583,8 @@ class DistillationBenchEnv(gym.Env):
             )
         )
 
-        num_list = [self.state[i, self.distillation.n_vessel_pixels],
-                    self.state[i, self.distillation.n_vessel_pixels+1],
-                    self.state[i, self.distillation.n_vessel_pixels+2]
-                    ]
+        num_list = self.state[:, self.distillation.n_vessel_pixels:self.distillation.n_vessel_pixels+3]
+
 
         label_list = ['T', 'V', 'P']
 
@@ -620,7 +618,7 @@ class DistillationBenchEnv(gym.Env):
                 # define visualization of vessel observation properties
                 __ = self._plot_axs[1, i].bar(
                 range(len(num_list)),
-                num_list,
+                num_list[i],
                 tick_label=label_list,
                 )[0]
                 self._plot_axs[1, i].set_ylim([0, 1])
@@ -629,6 +627,7 @@ class DistillationBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
+            if not nb:
                 self._first_render = False
 
         # if the plot has already been rendered, update the plot
@@ -647,7 +646,7 @@ class DistillationBenchEnv(gym.Env):
                 # define visualization of vessel observation properties
                 __ = self._plot_axs[1, i].bar(
                     range(len(num_list)),
-                    num_list,
+                    num_list[i],
                     tick_label=label_list,
                 )[0]
                 self._plot_axs[1, i].set_ylim([0, 1])
@@ -658,7 +657,7 @@ class DistillationBenchEnv(gym.Env):
 
                 self._first_render = False
 
-    def full_render(self, mode='plot'):
+    def full_render(self, nb=False):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -717,10 +716,7 @@ class DistillationBenchEnv(gym.Env):
             )
         )
 
-        num_list = [self.state[i, self.distillation.n_vessel_pixels],
-                    self.state[i, self.distillation.n_vessel_pixels+1],
-                    self.state[i, self.distillation.n_vessel_pixels+2]
-                    ]
+        num_list = self.state[:, self.distillation.n_vessel_pixels:self.distillation.n_vessel_pixels+3]
 
         label_list = ['T', 'V', 'P']
 
@@ -754,7 +750,7 @@ class DistillationBenchEnv(gym.Env):
                 # define visualization of vessel observation properties
                 __ = self._plot_axs[1, i].bar(
                 range(len(num_list)),
-                num_list,
+                num_list[i],
                 tick_label=label_list,
                 )[0]
                 self._plot_axs[1, i].set_ylim([0, 1])
@@ -772,6 +768,7 @@ class DistillationBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
+            if not nb:
                 self._first_render = False
 
         # if the plot has already been rendered, update the plot
@@ -790,7 +787,7 @@ class DistillationBenchEnv(gym.Env):
                 # define visualization of vessel observation properties
                 __ = self._plot_axs[1, i].bar(
                     range(len(num_list)),
-                    num_list,
+                    num_list[i],
                     tick_label=label_list,
                 )[0]
                 self._plot_axs[1, i].set_ylim([0, 1])
