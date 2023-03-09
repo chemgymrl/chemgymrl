@@ -483,7 +483,7 @@ class Vessel:
 
             # if enough heat is available, modify the vessel temp and boil off the material
             if heat_to_lowest_bp < heat_available:
-                print("Raising Boil Vessel Temperature by {} Kelvin".format(np.max([temp_change_needed, 0.0])))
+                #print("Raising Boil Vessel Temperature by {} Kelvin".format(np.max([temp_change_needed, 0.0])))
 
                 # change the vessel temperature to the lowest boiling point
                 self._update_temperature(
