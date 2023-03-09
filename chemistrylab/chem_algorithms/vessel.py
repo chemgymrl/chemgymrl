@@ -572,7 +572,7 @@ class Vessel:
                 # calculate the change in vessel temperature if all heat is used
                 vessel_temp_change = heat_available / total_entropy
 
-                print("Raising Boil Vessel Temperature by {} Kelvin".format(vessel_temp_change))
+                #print("Raising Boil Vessel Temperature by {} Kelvin".format(vessel_temp_change))
 
                 # modify the boil vessel's temperature accordingly
                 self._update_temperature(
