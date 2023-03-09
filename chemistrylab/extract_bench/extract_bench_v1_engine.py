@@ -123,8 +123,6 @@ class ExtractBenchEnv(gym.Env):
             target_material=target_material,
             out_vessel_path=out_vessel_path
         )
-        print("Target Material:",target_material)
-        print(self.input_parameters["reaction"])
         self.reaction = self.input_parameters["reaction"](
             reaction_file_identifier=self.input_parameters["reaction_file_identifier"],
             target_material=target_material,
@@ -283,7 +281,6 @@ class ExtractBenchEnv(gym.Env):
             target_material = ""
         
         
-        print(out_vessel_path,"PATH")
         if not out_vessel_path==None:
             # ensure the output vessel parameter points to a legitimate directory
             if not isinstance(out_vessel_path, str):
