@@ -311,7 +311,7 @@ if __name__=="__main__":
                 if is_on_policy:
                     model.train()
                 else:                                        
-                    model.train(gradient_steps=op.n_steps,batch_size=400*op.n_envs)
+                    model.train(gradient_steps=op.n_steps,batch_size=100*op.n_envs)
         else:
             model.learn(total_timesteps=op.steps)
             
