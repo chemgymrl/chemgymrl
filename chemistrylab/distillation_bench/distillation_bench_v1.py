@@ -204,7 +204,7 @@ class GeneralWurtzDistill_v1(DistillationBenchEnv):
             in_vessel_path=in_vessel_path,
             target_material=target_mat,
             dQ=1000.0,
-            out_vessel_path=os.getcwd()
+            out_vessel_path=None#os.getcwd()
         )
 
     def reset(self):
