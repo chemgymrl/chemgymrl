@@ -239,7 +239,6 @@ if __name__=="__main__":
         else:
             
             if op.algorithm in ["DQN","DoubleDQN"]:
-                
                 #Set DQN schedule to explore less later on
                 model = model_class(op.policy, env, verbose=1, seed = op.seed,train_freq=op.n_steps,gradient_steps=op.n_steps,
                                    exploration_fraction=0.3,exploration_final_eps=0.01)
