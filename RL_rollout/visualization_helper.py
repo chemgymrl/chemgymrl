@@ -200,6 +200,50 @@ def get_conditional_actions(frame,targets=CWtargs):
         #Obtain the mean action of these episodes
         act+=[cframe.Action.mean()]
     return [targets,act]
+
+
+
+
+def get_discrete_actions(frame,N=None,N2=None):
+    """
+    Gives distribution of actions (index 0) taken as well as the average value of the actions at index 1
+    Inputs:
+        Frame (dataframe) - Pandas Dataframe containing gym information        
+    Outputs:
+        act0 (list<float>) - Action (index 0) distribution
+        act1 (list(float)) - Average action at index 1
+    
+    """
+    # turn observation column into a numpy array
+    act = np.stack(frame.Action)    
+    if len(act.shape)<2:
+        act0=act
+        act=np.zeros(act0.shape+(2,),dtype=np.int32)
+        act[:,0]=act0//N2
+        act[:,1] = act0%N2
+        
+    if N is None:
+        N = np.max(act[:,0])
+    N0= np.max(act[:,1])
+    act0=[]
+    act1=[]
+    #print(N)
+    for i in range(N+1):
+        #gather all data where the target is targets[N]
+        cframe=act[act[:,0]==i]
+        
+        #print(cframe)
+        #Obtain the mean action of these episodes
+        act0+=[len(cframe)/act.shape[0]]
+        if len(cframe)==0:
+            act1+=[0]
+        else:
+            act1+=[cframe[:,1].mean()/N0]
+    return [act0,act1]
+
+
+
+
 ##################################################################################################
 
 
