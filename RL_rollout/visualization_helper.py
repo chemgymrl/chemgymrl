@@ -71,7 +71,7 @@ def fast_compare(result,r,l,steps):
         l_sum+=l[i]
         
         
-def merge_varying_graphs(folder = "./RL_rollout/MODELS/FictReact-v2/TD3",steps:int=100,verbose:bool=False):
+def merge_varying_graphs(folder = "./RL_rollout/MODELS/FictReact-v2/TD3",steps:int=100,verbose:bool=False,separate_runs=True):
     """Collect results from multiple runs and merge them into one run
     
     Inputs:
@@ -105,10 +105,17 @@ def merge_varying_graphs(folder = "./RL_rollout/MODELS/FictReact-v2/TD3",steps:i
                     frame = pd.read_csv(p,header=1)
                     if verbose:print(frame.l.sum())
                     RESULT=np.zeros([frame.l.sum()//steps,2])
-                frame = pd.read_csv(p,header=1)
-                fast_compare(RESULT,np.stack(frame.r),np.stack(frame.l),steps)
+                if separate_runs:
+                    frame = pd.read_csv(p,header=1)
+                    fast_compare(RESULT,np.stack(frame.r),np.stack(frame.l),steps)
+                else:
+                    frame = pd.read_csv(p,header=1)
+                    if tot>0:RESULT=np.zeros(all_results[0].shape)
+                    fast_compare(RESULT,np.stack(frame.r),np.stack(frame.l),steps)
+                    all_results+=[RESULT]
+                    
                 tot+=1
-            if len(paths)>0:all_results+=[RESULT]
+            if len(paths)>0 and separate_runs:all_results+=[RESULT]
     if verbose:print(tot,[bestdir,best])
     #print(*[a.shape for a in all_results])
     all_results=np.stack(all_results)
