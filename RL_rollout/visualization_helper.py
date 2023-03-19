@@ -18,16 +18,19 @@ calc_return = default_obj = lambda x: x.Reward.sum()/x.Done.sum()
 worst_obj = lambda x: -x.Reward.sum()/x.Done.sum()
 
 
-def load_rollouts(env: str,obj = default_obj,last: bool = True,verbose:bool=False,TOL:float = 1e-4):
-    """Retrieve RL rollouts of each algorithm from the file system
-    
-    Parameters:
-        obj (function) - Method to measure how good the rollout is
-        env (str) - The environment you want rollouts from
-        last (bool) - Use the rollout of the last timestep if true and the best performing timestep if false
-        verbose (bool) - Set to true if you want filepaths and objective evaluations printed
-        TOL (int)      - Tolerance for evaluating two runs as the same objective-wise (in which case the run with more
-                         episodes is preferred)
+def load_rollouts(env: str, obj=default_obj, last: bool = True, verbose: bool = False, TOL: float = 1e-4):
+    """
+    Retrieve RL rollouts of each algorithm from the file system
+
+    Args:
+    - env (str): The environment you want rollouts from
+    - obj (function): Method to measure how good the rollout is. When set to none all rollouts are concatenated into one dataframe.
+    - last (bool): Use the rollout of the last timestep if true and the best performing timestep if false
+    - verbose (bool): Set to true if you want filepaths and objective evaluations printed
+    - TOL (float): Tolerance for evaluating two runs as the same objective-wise (in which case the run with more episodes is preferred)
+
+    Returns:
+    - rollouts (list): List of rollouts where each element is a Pandas dataframe
     """
     #nt is for windows
     delim = "\\" if os.name=='nt' else "/"
@@ -71,16 +74,22 @@ def fast_compare(result,r,l,steps):
         l_sum+=l[i]
         
         
-def merge_varying_graphs(folder = "./RL_rollout/MODELS/FictReact-v2/TD3",steps:int=100,verbose:bool=False,separate_runs=True):
-    """Collect results from multiple runs and merge them into one run
-    
-    Inputs:
-        folder - Directory in which to look for monitor.csv files
-        steps - size of the step window. For fixed length environments set this to a multiple of the episode length
-        verbose - Whether or not to print additional details
-    Outputs:
-        returns (Array) - Shape [runs,timesteps/steps] array of average return vs step for each run
-        episode_counts (Array) - [runs,timesteps/steps] array of episode counts for each step window and run    
+def merge_varying_graphs(folder: str = "./RL_rollout/MODELS/FictReact-v2/TD3",
+                         steps: int = 100,
+                         verbose: bool = False,
+                         separate_runs: bool = True):
+    """
+    Collects results from multiple runs and merges them into one run.
+
+    Args:
+    - folder (str): Directory in which to look for monitor.csv files.
+    - steps (int): Size of the step window. For fixed length environments set this to a multiple of the episode length.
+    - verbose (bool): Whether or not to print additional details.
+    - separate_runs (bool): Whether to calculate results for each run separately.
+
+    Returns:
+    - returns (ndarray): Shape [runs,timesteps/steps] array of average return vs step for each run.
+    - episode_counts (ndarray): [runs,timesteps/steps] array of episode counts for each step window and run.
     """
     tot=0
     best=-1e10
@@ -90,7 +99,7 @@ def merge_varying_graphs(folder = "./RL_rollout/MODELS/FictReact-v2/TD3",steps:i
     for a,b,c in os.walk(folder):
         if len(c)>0:
             
-            if "rollout" in c:
+            if "rollout" in c and verbose:
                 rollout = pd.read_pickle(a+"/rollout")
                 rew = rollout[rollout.Done==True].Reward.mean()
                 if rew>best:
@@ -129,18 +138,46 @@ def merge_varying_graphs(folder = "./RL_rollout/MODELS/FictReact-v2/TD3",steps:i
 
 ###########################################Parsing Data##########################################################
 
-def target_subset(frame,N,i):
+def mean_stdv_step_n(data, interp_steps=1, steps=20):
     """
-    Filters the rollout for episodes which have a specific target
-    Inputs:
-        Frame (dataframe) - Pandas Dataframe containing gym information
-        N (int)           - Number of targets in your environment
-        i (int)           - The index of your target as it appears in the observation space
-        
-    Outputs:
-        cframe (dataframe) - Subset of your Pandas dataframe with only episodes of target i
+    Computes the mean, standard deviation, and step counts for an array of K runs
+    
+    Args:
+    - data (np.array):     Shape [K,totalsteps] array of runtime information
+    - interp_steps (int):  How many steps to average over in axis 1 of data
+    - steps (int):         The number of timesteps per single value in axis 1 of data
+    
+    Returns:
+    - mean (np.array): Shape [totalsteps/interp_steps] array of mean values
+    - stdv (np.array): Shape [totalsteps/interp_steps] array of standard deviations
+    - steps (np.array): Shape [totalsteps/interp_steps] array containing what step each point is at
     
     """
+    
+    alt_data=data.reshape([data.shape[0],data.shape[1]//interp_steps,interp_steps])
+    alt_data=alt_data.transpose(0,2,1)
+    alt_data=alt_data.reshape([data.shape[0]*interp_steps,data.shape[1]//interp_steps])
+    mean=alt_data.mean(axis=0)
+    stdv=(alt_data.var(axis=0))**0.5
+    steps=np.arange(mean.shape[0])*steps*interp_steps
+    N=alt_data.shape[0]
+    return mean,stdv,steps,N
+
+
+
+def target_subset(frame, N, i):
+    """
+    Filters the rollout for episodes that have a specific target.
+
+    Args:
+    - frame (DataFrame): Pandas DataFrame containing gym information.
+    - N (int): Number of targets in your environment.
+    - i (int): The index of your target as it appears in the observation space.
+
+    Returns:
+    - cframe (DataFrame): Subset of your Pandas DataFrame with only episodes of target i.
+    """
+    
     obs = np.stack(frame.InState)
     cframe=frame[obs[:,-N+i]>0.9]
     return cframe
@@ -162,17 +199,17 @@ def actions_by_time(frame):
 
 
 
-def get_conditional_rewards(frame,targets=CWtargs):
+def get_conditional_rewards(frame, targets=CWtargs):
     """
-    Gives returns conditioned on the different targets
-    Inputs:
-        Frame (dataframe) - Pandas Dataframe containing gym information
-        targets (list) - List of N targets (reaction products)
-        
-    Outputs:
-        targets
-        rew (List<float>) - List of size N containing the average return given each target
-    
+    Returns the returns conditioned on different targets.
+
+    Args:
+    - frame (DataFrame): Pandas DataFrame containing gym information.
+    - targets (list, optional): List of N targets (reaction products). Defaults to CWtargs.
+
+    Returns:
+    - targets (list): List of N targets (reaction products).
+    - rew (list of float): List of size N containing the average return given each target.
     """
     # turn observation column into a numpy array
     obs = np.stack(frame.InState)
@@ -185,17 +222,17 @@ def get_conditional_rewards(frame,targets=CWtargs):
         rew+=[calc_return(cframe)]
     return [targets,np.array(rew)]
 
-def get_conditional_actions(frame,targets=CWtargs):
+def get_conditional_actions(frame, targets=CWtargs):
     """
-    Gives actions conditioned on the different targets, meant for continuous action spaces
-    Inputs:
-        Frame (dataframe) - Pandas Dataframe containing gym information
-        targets (list) - List of N targets (reaction products)
-        
-    Outputs:
-        targets
-        act (List<array>) - List of size N containing the mean action given each target
-    
+    Returns the actions conditioned on different targets for continuous action spaces.
+
+    Args:
+    - frame (DataFrame): Pandas DataFrame containing gym information.
+    - targets (list, optional): List of N targets (reaction products). Defaults to CWtargs.
+
+    Returns:
+    - targets (list): List of N targets (reaction products).
+    - act (list of array): List of size N containing the mean action given each target.
     """
     # turn observation column into a numpy array
     obs = np.stack(frame.InState)
@@ -211,15 +248,18 @@ def get_conditional_actions(frame,targets=CWtargs):
 
 
 
-def get_discrete_actions(frame,N=None,N2=None):
+def get_discrete_actions(frame, N=None, N2=None):
     """
-    Gives distribution of actions (index 0) taken as well as the average value of the actions at index 1
-    Inputs:
-        Frame (dataframe) - Pandas Dataframe containing gym information        
-    Outputs:
-        act0 (list<float>) - Action (index 0) distribution
-        act1 (list(float)) - Average action at index 1
-    
+    Returns the distribution of actions taken (index 0) and the average value of actions at index 1.
+
+    Args:
+    - frame (DataFrame): Pandas DataFrame containing gym information.
+    - N (int, optional): Number of elements to keep in the distribution. Defaults to None.
+    - N2 (int, optional): Number of elements to keep in the running average. Defaults to None.
+
+    Returns:
+    - act0 (list of float): Distribution of actions taken (index 0).
+    - act1 (list of float): Average value of actions at index 1.
     """
     # turn observation column into a numpy array
     act = np.stack(frame.Action)    
@@ -257,22 +297,21 @@ def get_discrete_actions(frame,N=None,N2=None):
 
 #####################################Plotting Data#################################################
 
-def stat_show(radar_info:dict,spoke_labels:list,labels,figsize=(22,7),gridlines=[0.0,0.4,0.8,1.2,1.6,2.0],relative=True):
-    """Radar Plots a set of stats
-    
-    Inputs:
-        radar_info (dict) - A dictionary containing the data for all the radar graphs, it should be formatted like so:
-                        {graph name: graph data} where graph data is a 2D array of shape [len(labels),len(spoke_labels)]
-                        
-        spoke_labels (list) - A list of text labels for each spoke (vertex) of the radar graph
-        
-        labels (list) - A list of text labels telling you what each shaded area means (Ex the first shaded area is Return)
-        
-        figsize - How large to make the figure
-        
-        relative - Whether or not to scale the last graph (Are the initial graphs 'relative' to the final graph?)
-    
-        gridlines (list) - list of where to put each gridline
+def stat_show(radar_info: dict, spoke_labels: list, labels, figsize=(22, 7), 
+              gridlines=[0.0, 0.4, 0.8, 1.2, 1.6, 2.0], relative=True):
+    """
+    Radar Plots a set of stats.
+
+    Args:
+    - radar_info (dict): A dictionary containing the data for all the radar graphs, it should be formatted like so:
+                    {graph name: graph data} where graph data is a 2D array of shape [len(labels), len(spoke_labels)]
+    - spoke_labels (list): A list of text labels for each spoke (vertex) of the radar graph.
+    - labels (list): A list of text labels telling you what each shaded area means 
+                     (e.g. the first shaded area is Return).
+    - figsize (tuple): How large to make the figure. Default is (22, 7).
+    - relative (bool): Whether or not to scale the last graph 
+                       (Are the initial graphs 'relative' to the final graph?). Default is True.
+    - gridlines (list): list of where to put each gridline. Default is [0.0, 0.4, 0.8, 1.2, 1.6, 2.0].
     """
     
     colors = ["r","g","b","c","y","m","k"]
