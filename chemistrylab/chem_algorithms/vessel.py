@@ -1306,7 +1306,7 @@ class Vessel:
             A=np.array(layers_amount),
             B=np.array(layers_position),
             C=layers_variance,
-            colors=layers_color,
+            colors=np.array(layers_color),
             x=separate.x
         )
 
