@@ -420,10 +420,10 @@ class Vessel:
             # if attempting to find the lowest boiling point yields a ValueError (because the boil vessel
             # contains no materials) no further operations will contribute to the distillation of materials
             except ValueError:
-                print(
-                    "No material remaining in the boil vessel. "
-                    "Only the vessel and air will be heated. "
-                )
+                #print(
+                #    "No material remaining in the boil vessel. "
+                #    "Only the vessel and air will be heated. "
+                #)
 
                 # use the pressure, volume, and temperature of the vessel
                 # to find the molar amount of the air being heated
@@ -508,7 +508,7 @@ class Vessel:
 
                 # if enough heat is available, boil off all of the material
                 if heat_to_boil_all < heat_available:
-                    print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
+                    #print("Boiling Off {} mol of {}".format(smallest_bp_amount, smallest_bp_name))
 
                     if self._material_dict[smallest_bp_name][0].is_solvent():
                         solute_dict = self.get_solute_dict()
@@ -555,7 +555,7 @@ class Vessel:
                     # calculate the material that is boiled off by using all of the remaining heat
                     boiled_material = heat_available / smallest_bp_enth_vap
 
-                    print("Boiling Off {} mol of {}".format(boiled_material, smallest_bp_name))
+                    #print("Boiling Off {} mol of {}".format(boiled_material, smallest_bp_name))
 
                     # subtract the boiled material from the boil vessel's material dictionary
                     self._material_dict[smallest_bp_name][1] -= boiled_material
@@ -1306,7 +1306,7 @@ class Vessel:
             A=np.array(layers_amount),
             B=np.array(layers_position),
             C=layers_variance,
-            colors=layers_color,
+            colors=np.array(layers_color),
             x=separate.x
         )
 
@@ -1423,10 +1423,10 @@ class Vessel:
             # check that the target temperature is within the bounds set by the vessel's temperature constraints
             if target_temperature > self.Tmax:
                 target_temperature = self.Tmax
-                print("Target temperature in not within the temperature bounds imposed on the vessel.")
+                #print("Target temperature in not within the temperature bounds imposed on the vessel.")
             elif target_temperature < self.Tmin:
                 target_temperature = self.Tmin
-                print("Target temperature in not within the temperature bounds imposed on the vessel.")
+                #print("Target temperature in not within the temperature bounds imposed on the vessel.")
 
             # set the temperature change
             self.temperature = target_temperature

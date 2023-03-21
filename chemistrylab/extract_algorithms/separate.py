@@ -64,6 +64,9 @@ Cmix = 2.0
 # Array for x/height positions
 x = np.linspace(-10.0, 10.0, 1000, endpoint=True, dtype=np.float32)
 
+import numba
+
+@numba.jit
 # Function to map the separation Gaussians to discretized state
 def map_to_state(A, B, C, colors, x=x):
     # Create a copy of B for temporary changes
@@ -73,7 +76,7 @@ def map_to_state(A, B, C, colors, x=x):
     L = np.zeros(100, dtype=np.float32) + colors[-1]
 
     # Initialize time variable such that Gaussians have normalized area
-    C = np.max([C, 1e-10])
+    C = max(C, 1e-10)
     t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
 
     # Number of pixels available for each phase
@@ -84,7 +87,10 @@ def map_to_state(A, B, C, colors, x=x):
         n[i] = ceil(n[i])
         count += 1
 
-    n = n.astype(int)
+    #n = n.astype(int)
+    n0=n
+    n=np.zeros(n0.shape,dtype=np.int32)
+    n[:]=n0
     if np.sum(n[:-1]) > L.shape[0]:
         for i in range(count):
             n[n.argmax()] -= 1
@@ -137,8 +143,8 @@ def map_to_state(A, B, C, colors, x=x):
             # Loop until pixel is set
             while not placed:
                 j += 1
-                if j == P.shape[0]:
-                    print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------'.format(p, Psum, P, r))                
+                #if j == P.shape[0]:
+                    #print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------'.format(p, Psum, P, r))                
                 p += P[j]
                 # If random number is less than relative probability for that phase
                 if r - p / Psum < 1e-6:
@@ -151,9 +157,10 @@ def map_to_state(A, B, C, colors, x=x):
     
     return L
 
+@numba.jit
 def mix(A, B, C, D, Spol, Lpol, S, mixing):
     # Initialize time variable such that Gaussians have normalized area
-    C = np.max([C, 1e-10])
+    C = max(C, 1e-10)
     t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
 
     # Time of fully mixed solution
@@ -186,8 +193,8 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
         Ldif = 0
         Ldif0 = 0
         for j in range(Lpol.shape[0]):
-            Ldif += abs(Spol[i] - Lpol[j])
-            Ldif0 += A[j] * abs(Spol[i] - Lpol[j])
+            Ldif += np.abs(Spol[i] - Lpol[j])
+            Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
 
         # Calculate total amount of solute
         Ssum = np.sum(Scur[i])
@@ -198,7 +205,7 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
         # Calculate the ideal amount of solute i in each phase
         # Check conditions that this adds to Ssum
         t_scale = 200
-        St = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t)) + c * (1 - np.exp(t_scale*(tmix - t))) * (1 - (abs(Spol[i] - Lpol) / Ldif)))
+        St = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t)) + c * (1 - np.exp(t_scale*(tmix - t))) * (1 - (np.abs(Spol[i] - Lpol) / Ldif)))
         Sts[i] = np.copy(St)
 
     # Update amount of solute i in each phase
@@ -207,8 +214,8 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
         Ldif = 0
         Ldif0 = 0
         for j in range(Lpol.shape[0]):
-            Ldif += abs(Spol[i] - Lpol[j])
-            Ldif0 += A[j] * abs(Spol[i] - Lpol[j])
+            Ldif += np.abs(Spol[i] - Lpol[j])
+            Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
 
         # Calculate total amount of solute
         Ssum = np.sum(Scur[i])
@@ -217,10 +224,10 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
         c = 1 / (1 - (Ldif0) / (np.sum(A) * Ldif))
 
         # Calculate the ideal amount of solute i in each phase for the previous time step
-        St0 = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t + mixing)) + c * (1 - np.exp(t_scale*(tmix - t + mixing))) * (1 - (abs(Spol[i] - Lpol) / Ldif)))
+        St0 = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t + mixing)) + c * (1 - np.exp(t_scale*(tmix - t + mixing))) * (1 - (np.abs(Spol[i] - Lpol) / Ldif)))
 
-        if abs(t - mixing - tmix) > 1e-9:
-            S[i] = Sts[i] + 0.5 * ((1 - abs(mixing) / mixing) * (S[i] - St0) * (t - tmix) / (t - mixing - tmix) + (1 + abs(mixing) / mixing) * (S[i] - St0))
+        if np.abs(t - mixing - tmix) > 1e-9:
+            S[i] = Sts[i] + 0.5 * ((1 - np.abs(mixing) / mixing) * (S[i] - St0) * (t - tmix) / (t - mixing - tmix) + (1 + np.abs(mixing) / mixing) * (S[i] - St0))
         else:
             S[i] = Sts[i]
 

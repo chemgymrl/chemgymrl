@@ -34,10 +34,31 @@ Used throughout this class are the following arrays:
 
 import numpy as np
 import copy
-
+import numba
 # specify the R constant
 R = 8.314462619
 
+@numba.jit
+def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc):
+    R = 8.314462619
+    
+    conc = np.clip(conc, 0, None)
+    
+    #k are the reaction constants
+    k = pre_exp_arr * np.exp((-1.0 * activ_energy_arr) / (R * temp))
+        
+    rates = k*1
+    for i in range(len(rates)):
+        for j in range(num_reagents):
+            rates[i] *= conc[j] ** stoich_coeff_arr[i][j]
+    
+    conc_change = np.zeros(conc_coeff_arr.shape[0])
+    for i in range(conc_change.shape[0]):
+        for j in range(rates.shape[0]):
+            conc_change[i] += conc_coeff_arr[i][j]*rates[j]
+    
+    return conc_change
+    
 
 class De:
     def __init__(self, stoich_coeff_arr: np.array, pre_exp_arr: np.array, activ_energy_arr: np.array, conc_coeff_arr: np.array,
@@ -97,7 +118,11 @@ class De:
         ---------------
         None
         """
+        return get_rates(self.stoich_coeff_arr, self.pre_exp_arr,
+                         self.activ_energy_arr, self.conc_coeff_arr,
+                         self.num_reagents, self.temp, conc)
 
+        
         # acquire the change of concentrations array by executing the `run` function
         conc_change = self.run(conc, self.temp)
 
