@@ -140,21 +140,6 @@ register(
 
 
 
-##############################################BLIND########################################################
-
-register(
-    id='BlindWurtzExtract-v1',
-    entry_point='chemistrylab.extract_bench.blind_extract:BlindWurtzExtract_v1',
-)
-
-
-#v1 removes some duplicate actions
-register(
-    id='DBWurtzExtract-v1',
-    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
-    kwargs=dict(entry_point='chemistrylab.extract_bench.blind_extract:BlindWurtzExtract_v1',exclude=4)
-)
-
 
 
 
