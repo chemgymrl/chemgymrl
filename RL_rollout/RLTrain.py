@@ -33,20 +33,19 @@ Example call:
 import json,os
 
 class Opt:
-    """
-    Description of these options:
+    """Description of Options.
     
-    policy  (str) -- which policy to use in your network (MLP, etc)
-    algorithm  (str) -- Number of minibatches in the queue (PPO,DQN,etc)
-    environment (str) -- Which environment to use
-    steps (int) -- Number of training steps
-    dir (str) -- Output directory, set to <DEFAULT> for a generated folder name
-    seed (int) -- random seed for the run
-    best_episodes (int) -- how many best performing episodes to keep in the Experience Replay
-    best_ratio (float) -- The ratio of samples obtained from looking at only the best performing episodes
+    Args:
+        policy (str): Which policy to use in your network (MLP, etc)
+        algorithm (str): Which algorithm to train (PPO, DQN, etc)
+        environment (str): Which environment to use
+        steps (int): Number of training steps
+        dir (str): Output directory, set to <DEFAULT> for a generated folder name
+        seed (int): Random seed for the run
+        dummy_vec (bool): Set to True if you want all environments on one thread
     """
     DEFAULTS=dict(policy="MlpPolicy",algorithm="PPO",environment="WurtzReact-v1",
-                  steps= 51200,dir="<DEFAULT>",n_steps=256,n_envs=1,seed=None)
+                  steps= 51200,dir="<DEFAULT>",n_steps=256,n_envs=1,seed=None,dummy_vec=False)
                  #best_episodes=200,best_ratio=0.2)
     def __init__(self,**kwargs):
         self.__dict__.update(Opt.DEFAULTS)
@@ -212,13 +211,18 @@ if __name__=="__main__":
     env = gym.make(op.environment)
     print("The action space is", env.action_space)
     print("The observation space is", env.observation_space)
+    del env
     
-    if op.n_envs==1:
+    if op.n_envs==1 or op.dummy_vec:
         #set up environment monitor
-        def f():
-            return Monitor(env, op.dir, allow_early_resets=True)
+        def f(count=[0]):
+            env = gym.make(op.environment)
+            dummy= Monitor(env, op.dir+"\\%d.monitor.csv"%count[0], allow_early_resets=True)
+            #the array count is maintained between calls so incrementing it's intial elem works
+            count[0]+=1
+            return dummy
 
-        env = DummyVecEnv([f])
+        env = DummyVecEnv([f]*op.n_envs)
         
     else:
         env = make_vec_env(
