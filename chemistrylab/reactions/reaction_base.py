@@ -537,7 +537,12 @@ class _Reaction:
                         if vessels._material_dict[material_name][1] > 1e-12:
                             new_solute_dict[material_name][solvent][1] += solute_change_amount * vessels._solute_dict[material_name][solvent][1] / vessels._material_dict[material_name][1]
                 except KeyError:
-                    new_solute_dict[material_name] = {solvent: [convert_to_class(materials=[solvent])[0](), solute_change_amount/len(self.solvents), 'mol'] for solvent in self.solvents}
+                    present_solvents = []
+                    for solvent in self.solvents:
+                        if vessels.get_material_amount(solvent) > 1e-12:
+                            present_solvents.append(solvent)
+
+                    new_solute_dict[material_name] = {solvent: [convert_to_class(materials=[solvent])[0](), solute_change_amount/len(self.solvents), 'mol'] for solvent in present_solvents}
 
         # update target vessel's material amount
         vessels._material_dict = new_material_dict
