@@ -100,9 +100,16 @@ register(
 ######################## Discretized ######################################
 
 register(
-    id='DiscreteGenWurtzExtract-v1',
+    id='DiscreteGenWurtzExtract-v0',
     entry_point='chemistrylab.make_discrete:DiscreteWrapper',
-    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v1',exclude=4)
+    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v1')
+)
+
+register(
+    id='DiscreteGenWurtzDistill-v0',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.distillation_bench.distillation_bench_v1:GeneralWurtzDistill_v1'),
+    max_episode_steps=100
 )
 
 register(
