@@ -128,7 +128,8 @@ def wurtz_vessel(add_mat):
         add_material = products[add_mat]()
     
     except KeyError:
-        add_material = products['dodecane']()
+        add_mat = 'dodecane'
+        add_material = products[add_mat]()
     
     add_material.set_solute_flag(True)
     add_material.set_color(0.0)
@@ -144,6 +145,17 @@ def wurtz_vessel(add_mat):
     solute_dict = {
         add_material.get_name(): {C6H14.get_name(): [C6H14, 1.0, 'mol']}
     }
+
+    if choice([0, 1]) > 0.5:
+        if add_mat == 'NaCl':
+            add_material2 = material.Dodecane()
+            material_dict[add_material2.get_name()] = [add_material2, 1.0, 'mol']
+            solute_dict[add_material.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
+
+        else:
+            add_material2 = material.NaCl()
+            material_dict[add_material2.get_name()] = [add_material2, 1.0, 'mol']
+            solute_dict[add_material.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
 
     material_dict, solute_dict, _ = util.check_overflow(
         material_dict=material_dict,
