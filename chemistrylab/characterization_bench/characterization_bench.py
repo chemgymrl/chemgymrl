@@ -31,6 +31,30 @@ import sys
 sys.path.append("../../")
 from chemistrylab.ode_algorithms.spectra.diff_spectra import convert_inverse_cm_to_nm
 
+import numba
+
+@numba.jit
+def calc_absorb(params, x, C):
+    # define an array to contain absorption data
+    absorb = np.zeros(x.shape[0], dtype=np.float32)
+
+    # iterate through the spectral parameters in self.params and the wavelength space
+    for i, item in enumerate(params):
+        if item is not None:
+            for j in range(item.shape[0]):
+                for k in range(x.shape[0]):
+                    decay_rate = np.exp(
+                        -0.5 * (
+                            (x[k] - item[j, 1]) / item[j, 2]
+                        ) ** 2.0
+                    )
+                    if decay_rate < 1e-30:
+                        decay_rate = 0
+                    absorb[k] += C[i] * item[j, 0] * decay_rate
+
+    # absorption must be between 0 and 1
+    absorb = np.clip(absorb, 0.0, 1.0)
+    return absorb
 
 class CharacterizationBench:
     """
@@ -129,6 +153,10 @@ class CharacterizationBench:
         # set the wavelength space
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
 
+        
+        #print(params)
+        params = tuple([np.zeros([0,0]) if a is None else a for a in params])
+        return calc_absorb(params, x, C)
         # define an array to contain absorption data
         absorb = np.zeros(x.shape[0], dtype=np.float32)
 

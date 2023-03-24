@@ -100,17 +100,38 @@ register(
 ######################## Discretized ######################################
 
 register(
-    id='DiscreteGenWurtzExtract-v1',
+    id='DiscreteGenWurtzExtract-v0',
     entry_point='chemistrylab.make_discrete:DiscreteWrapper',
-    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v1',exclude=4)
+    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v1')
 )
 
+register(
+    id='DiscreteGenWurtzDistill-v0',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.distillation_bench.distillation_bench_v1:GeneralWurtzDistill_v1'),
+    max_episode_steps=100
+)
+
+register(
+    id='DiscreteWurtzExtract-v0',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1')
+)
+
+#v1 removes some duplicate actions
 register(
     id='DiscreteWurtzExtract-v1',
     entry_point='chemistrylab.make_discrete:DiscreteWrapper',
     kwargs=dict(entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1',exclude=4)
 )
 
+register(
+    id='DiscreteWurtzDistill-v0',
+    entry_point='chemistrylab.make_discrete:DiscreteWrapper',
+    kwargs=dict(entry_point='chemistrylab.distillation_bench.distillation_bench_v1:WurtzDistill_v1'),
+    max_episode_steps=100
+)
+#v1 removes some duplicate actions
 register(
     id='DiscreteWurtzDistill-v1',
     entry_point='chemistrylab.make_discrete:DiscreteWrapper',
@@ -123,3 +144,9 @@ register(
     entry_point='chemistrylab.make_discrete:DiscreteWrapper',
     kwargs=dict(entry_point='chemistrylab.reaction_bench.reaction_bench_v1:GeneralWurtzReact_v1',null_act=(0.5,0.5,0,0,0,0))
 )
+
+
+
+
+
+
