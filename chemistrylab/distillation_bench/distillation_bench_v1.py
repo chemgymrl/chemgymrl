@@ -150,12 +150,12 @@ def wurtz_vessel(add_mat):
         if add_mat == 'NaCl':
             add_material2 = material.Dodecane()
             material_dict[add_material2.get_name()] = [add_material2, 1.0, 'mol']
-            solute_dict[add_material.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
+            solute_dict[add_material2.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
 
         else:
             add_material2 = material.NaCl()
             material_dict[add_material2.get_name()] = [add_material2, 1.0, 'mol']
-            solute_dict[add_material.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
+            solute_dict[add_material2.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
 
     material_dict, solute_dict, _ = util.check_overflow(
         material_dict=material_dict,
@@ -203,7 +203,7 @@ class GeneralWurtzDistill_v1(DistillationBenchEnv):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
-    def __init__(self, target_material="", in_vessel_path=None):
+    def __init__(self, target_material="NaCl", in_vessel_path=None):
         self.original_target_material = target_material
         distill_vessel, target_mat = wurtz_vessel(self.original_target_material)
 
