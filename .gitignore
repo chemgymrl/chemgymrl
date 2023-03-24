@@ -15,3 +15,5 @@ models/
 *.pickle
 RL_tests/*.zip
 *.log
+RL_rollout/MODELS*
+*.pdf
