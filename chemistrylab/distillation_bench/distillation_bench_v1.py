@@ -215,13 +215,13 @@ class GeneralWurtzDistill_v1(DistillationBenchEnv):
             precipitation_file_identifier="precipitation",
             in_vessel_path=in_vessel_path,
             target_material=target_mat,
-            dQ=1000.0,
-            out_vessel_path=os.getcwd()
+            dQ=20000.0,
+            out_vessel_path=None#os.getcwd()
         )
 
     def reset(self):
         distill_vessel, target_mat = wurtz_vessel(self.original_target_material)
-        self.original_boil_vessel = deepcopy(distill_vessel)
+        self.boil_vessel = deepcopy(distill_vessel)
         self.target_material = target_mat
 
         return super(GeneralWurtzDistill_v1, self).reset()

@@ -44,7 +44,7 @@ class WurtzReact_v1(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             in_hand=[ # initialize the bench with the following materials
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "2-chlorohexane", "Initial": 1},
@@ -77,7 +77,7 @@ class WurtzReact_v2(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             in_hand=[ # initialize the bench with the following materials
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "2-chlorohexane", "Initial": 1},
@@ -110,7 +110,7 @@ class GeneralWurtzReact_v1(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=in_vessel_path, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             in_hand=[ # initialize the bench with the following materials
                 {"Material": "1-chlorohexane", "Initial": 1},
                 {"Material": "2-chlorohexane", "Initial": 1},
@@ -143,7 +143,7 @@ class FictReact_v1(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="fict_react",
             in_vessel_path=in_vessel_path, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             in_hand=[ # initialize the bench with the following materials
                 {"Material": "A", "Initial": 1},
                 {"Material": "B", "Initial": 1},
@@ -177,7 +177,7 @@ class FictReact_v2(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="fict_react2",
             in_vessel_path=in_vessel_path, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             in_hand=[ # initialize the bench with the following materials
                 {"Material": "A", "Initial": 1},
                 {"Material": "B", "Initial": 1},
@@ -210,7 +210,7 @@ class ReactionBenchEnv_1(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="decomp",
             in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             in_hand=[ # initialize the bench with the following materials
                 {"Material": "NaCl", "Initial": 1},
             ],
@@ -239,7 +239,7 @@ class ReactionBenchEnv_2(ReactionBenchEnv):
             reaction=_Reaction,
             reaction_file_identifier="equilibrium",
             in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
+            out_vessel_path=None, # include an output vessel directory
             materials=[ # initialize the bench with the following materials
                 {"Material": "CuSO4", "Initial": 0.001},
                 {"Material": "CuS04*5H2O", "Initial": 0.001},

@@ -229,7 +229,7 @@ class ExtractionReward:
 
         self.initial_target_amount = initial_target_amount
 
-    def _check_parameters(self, vessels, desired_material):
+    def _check_parameters(self, vessels, desired_material,print_flag = False):
         '''
         Method to validate the inputted parameters. The desired material must be a string object
         and present in the vessel's `material_dict`. The vessel must be a vessel object and
@@ -271,7 +271,7 @@ class ExtractionReward:
             all_materials = [material for material, __ in vessel._material_dict.items()]
 
             # check that the input vessel has at least one material
-            if not all_materials:
+            if print_flag and not all_materials:
                 print("{} has no materials.".format(label))
 
             # check that the inputted vessel has the desired material;
@@ -281,10 +281,11 @@ class ExtractionReward:
                     desired_material not in all_materials
             ]):
                 is_present[i] = False
-                print("Desired material not found in {}.".format(label))
+                if print_flag:
+                    print("Desired material not found in {}.".format(label))
 
         # if no vessel contains the desired material, all elements in `is_present` will be False
-        if not any(is_present):
+        if print_flag and not any(is_present):
             print("No desired material found in any inputted vessels.")
 
         # create a new list of vessels that contain the desired material
@@ -400,7 +401,7 @@ class ExtractionReward:
                 vessel=vessel,
                 desired_material=self.desired_material,
                 initial_target_amount=self.initial_target_amount,
-                print_flag = True
+                print_flag = False
             ) * vessel._material_dict[self.desired_material][1]
 
         # calculate the final reward by dividing the sum of the purity rewards by the number of
@@ -498,7 +499,7 @@ class DistillationReward:
             desired_material=desired_material
         )
 
-    def _check_parameters(self, vessels, desired_material):
+    def _check_parameters(self, vessels, desired_material,print_flag=False):
         '''
         Method to validate the parameters defined by the constructor class.
 
@@ -542,8 +543,7 @@ class DistillationReward:
 
             # check that the input vessel has at least one material;
             # if it does not change the ith element in `is_present` to False
-            if not all_materials:
-                is_present[i] = False
+            if print_flag and not all_materials:
                 print("{} has no materials.".format(label))
                 
 
@@ -554,10 +554,11 @@ class DistillationReward:
                     desired_material not in all_materials
             ]):
                 is_present[i] = False
-                print("Desired material not found in {}.".format(label))
+                if print_flag:
+                    print("Desired material not found in {}.".format(label))
 
         # if no vessel contains the desired material, all elements in `is_present` will be False
-        if not any(is_present):
+        if print_flag and not any(is_present):
             print("No desired material found in any inputted vessels.")
 
         # create a new list of vessels that contain the desired material
@@ -652,7 +653,7 @@ class DistillationReward:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
                 desired_material=self.desired_material,
-                print_flag=True
+                print_flag=False
             )
 
         # divide the sum reward by the number of vessels containing some of the desired material

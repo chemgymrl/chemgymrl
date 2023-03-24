@@ -123,7 +123,6 @@ class ExtractBenchEnv(gym.Env):
             target_material=target_material,
             out_vessel_path=out_vessel_path
         )
-
         self.reaction = self.input_parameters["reaction"](
             reaction_file_identifier=self.input_parameters["reaction_file_identifier"],
             target_material=target_material,
@@ -280,16 +279,18 @@ class ExtractBenchEnv(gym.Env):
         if not isinstance(target_material, str):
             print("Invalid `desired` type. The default will be provided.")
             target_material = ""
-
-        # ensure the output vessel parameter points to a legitimate directory
-        if not isinstance(out_vessel_path, str):
-            print("The provided output vessel path is invalid. The default will be provided.")
-            out_vessel_path = os.getcwd()
-        elif os.path.isdir(out_vessel_path):
-            pass
-        else:
-            print("The provided output vessel path is invalid. The default will be provided.")
-            out_vessel_path = os.getcwd()
+        
+        
+        if not out_vessel_path==None:
+            # ensure the output vessel parameter points to a legitimate directory
+            if not isinstance(out_vessel_path, str):
+                print("The provided output vessel path is invalid. The default will be provided.")
+                out_vessel_path = os.getcwd()
+            elif os.path.isdir(out_vessel_path):
+                pass
+            else:
+                print("The provided output vessel path is invalid. The default will be provided. KS")
+                out_vessel_path = os.getcwd()
 
         # collect the input parameters in a labelled dictionary
         input_parameters = {
@@ -375,7 +376,7 @@ class ExtractBenchEnv(gym.Env):
         ---------------
         None
         '''
-
+        if self.out_vessel_path is None:return
         # specify a vessel path for saving the extract vessel
         file_directory = self.out_vessel_path
         filename = "{}.pickle".format(vessel_rootname)
@@ -426,6 +427,13 @@ class ExtractBenchEnv(gym.Env):
             extraction_vessel=self.extraction_vessel,
             targets=self.reaction.products
         )
+        
+        
+        self.initial_reward = ExtractionReward(
+                vessels=self.vessels,
+                desired_material=self.target_material,
+                initial_target_amount=self.initial_target_amount
+            ).calc_reward()
 
         return self.state
 
@@ -510,7 +518,7 @@ class ExtractBenchEnv(gym.Env):
                 vessels=self.vessels,
                 desired_material=self.target_material,
                 initial_target_amount=self.initial_target_amount
-            ).calc_reward()
+            ).calc_reward() - self.initial_reward
 
             # save each validated vessel as pickle files
             for i, vessel in enumerate(valid_vessels):
@@ -522,7 +530,7 @@ class ExtractBenchEnv(gym.Env):
 
         return self.state, reward, self.done, {}
 
-    def render(self, mode='human', nb=False):
+    def render(self, mode='human'):
         '''
         Select a render mode to display pertinent information.
 
@@ -541,11 +549,11 @@ class ExtractBenchEnv(gym.Env):
         '''
 
         if mode == 'human':
-            self.human_render(nb)
+            self.human_render()
         elif mode == 'full':
-            self.full_render(nb)
+            self.full_render()
 
-    def human_render(self, nb=False):
+    def human_render(self, mode='plot',redraw=True):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -636,7 +644,6 @@ class ExtractBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
-            if not nb:
                 self._first_render = False
 
         # if the plot has already been rendered, update the plot
@@ -659,7 +666,7 @@ class ExtractBenchEnv(gym.Env):
 
                 self._first_render = False
 
-    def full_render(self, nb=False):
+    def full_render(self, mode='plot'):
         '''
         Render the pertinent information in a minimal style for the user to visualize and process.
 
@@ -786,7 +793,6 @@ class ExtractBenchEnv(gym.Env):
                 self._plot_fig.canvas.draw()
                 plt.show()
 
-            if not nb:
                 self._first_render = False
 
         # if the plot has already been rendered, update the plot
