@@ -204,7 +204,7 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
 
         # Calculate the ideal amount of solute i in each phase
         # Check conditions that this adds to Ssum
-        t_scale = 200
+        t_scale = 50
         St = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t)) + c * (1 - np.exp(t_scale*(tmix - t))) * (1 - (np.abs(Spol[i] - Lpol) / Ldif)))
         Sts[i] = np.copy(St)
 
