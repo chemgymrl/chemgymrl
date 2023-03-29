@@ -16,7 +16,7 @@ import numba
 ###################################################Loading Data########################################################
 calc_return = default_obj = lambda x: x.Reward.sum()/x.Done.sum()
 worst_obj = lambda x: -x.Reward.sum()/x.Done.sum()
-
+max_obj = lambda x:x.Reward.max()
 
 def load_rollouts(env: str, obj=default_obj, last: bool = True, verbose: bool = False, TOL: float = 1e-4):
     """
@@ -179,7 +179,14 @@ def target_subset(frame, N, i):
     """
     
     obs = np.stack(frame.InState)
+    #for environments with multiple vessels
+    if len(obs.shape)>2:
+        obs=obs[:,0,:]
+        
     cframe=frame[obs[:,-N+i]>0.9]
+    
+    cframe=pd.concat([cframe],ignore_index=True)
+    
     return cframe
 
 
