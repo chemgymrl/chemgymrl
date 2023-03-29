@@ -65,5 +65,6 @@ class DiscreteWrapper(gym.Env):
     def step(self,act):
         #create the multidiscrete input with your single number
         return self.gym.step(self.actions[act])
+    
     def reset(self):
         return self.gym.reset()

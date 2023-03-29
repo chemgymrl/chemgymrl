@@ -71,14 +71,16 @@ REACTANTS = [
     "Na",
     "Cl",
     "H2O",
-    "C6H14"]
+    "C6H14",
+    "DiEthylEther"]
 PRODUCTS = [
     "NaCl",
     "Na",
     "Cl"]
 SOLVENTS = [
     "H2O",
-    "C6H14"]
+    "C6H14",
+    "DiEthylEther"]
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin
@@ -94,14 +96,15 @@ Vmax = 2
 dV = 0.005
 
 # add the arrays containing rate calculation parameters; these include:
-    # the pre-exponentional factors for each reaction (3x1 array)
-    # the activation energies for each reaction (3x1 array)
-    # the stoichiometric coefficients (3x5 array)
+    # the pre-exponentional factors for each reaction (4x1 array)
+    # the activation energies for each reaction (4x1 array)
+    # the stoichiometric coefficients (4x6 array)
 pre_exp_arr = np.array(
     [
         1e4, # pre-exp factor for reaction 0
         1e4, # pre-exp factor for reaction 1
-        1e4 # pre-exp factor for reaction 2
+        1e4, # pre-exp factor for reaction 2
+        1e4 # pre-exp factor for reaction 3
     ]
 )
 activ_energy_arr = np.array(
@@ -109,13 +112,15 @@ activ_energy_arr = np.array(
         1.0, # activation energy for reaction 0
         1.0, # activation energy for reaction 1
         1.0, # activation energy for reaction 2
+        1.0 # activation energy for reaction 3
     ]
 )
 stoich_coeff_arr = np.array(
     [
-        [1.0, 0.0, 0.0, 1.0, 0.0], # stoichiometric coefficients for reaction 0
-        [1.0, 0.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 1
-        [0.0, 1.0, 1.0, 0.0, 0.0] # stoichiometric coefficients for reaction 2
+        [1.0, 0.0, 0.0, 1.0, 0.0, 0.0], # stoichiometric coefficients for reaction 0
+        [1.0, 0.0, 0.0, 0.0, 1.0, 0.0], # stoichiometric coefficients for reaction 1
+        [1.0, 0.0, 0.0, 0.0, 0.0, 1.0], # stoichiometric coefficients for reaction 2
+        [0.0, 1.0, 1.0, 0.0, 0.0, 0.0] # stoichiometric coefficients for reaction 3
     ]
 )
 
@@ -123,10 +128,11 @@ stoich_coeff_arr = np.array(
 # this will be an lxn array for the l involved materials and n occurring reactions
 conc_coeff_arr = np.array(
     [
-        [-1.0, -1.0, 1.0], # concentration calculation coefficients for NaCl
-        [1.0, 1.0, -1.0], # concentration calculation coefficients for Na
-        [1.0, 1.0, -1.0], # concentration calculation coefficients for Cl
-        [0.0, 0.0, 0.0], # concentration calculation coefficients for H2O
-        [0.0, 0.0, 0.0], # concentration calculation coefficients for C6H14
+        [-1.0, -1.0, -1.0, 1.0], # concentration calculation coefficients for NaCl
+        [1.0, 1.0, 1.0, -1.0], # concentration calculation coefficients for Na
+        [1.0, 1.0, 1.0, -1.0], # concentration calculation coefficients for Cl
+        [0.0, 0.0, 0.0, 0.0], # concentration calculation coefficients for H2O
+        [0.0, 0.0, 0.0, 0.0], # concentration calculation coefficients for C6H14
+        [0.0, 0.0, 0.0, 0.0] # concentration calculation coefficients for DiEthylEther
     ]
 )

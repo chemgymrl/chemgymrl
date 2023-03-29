@@ -205,9 +205,13 @@ def wurtz_vessel(add_mat=""):
         if add_mat == "":
             add_mat = choice(list(products.keys()))
         
-        add_material = products[add_mat]()
+        if add_mat != "NaCl":
+            add_material = products[add_mat]()
+        else:
+            add_material = products['dodecane']()
     
     except KeyError:
+        add_mat = 'dodecane'
         add_material = products['dodecane']()
     
     add_material.set_solute_flag(True)
