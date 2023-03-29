@@ -170,6 +170,9 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self._plot_fig = None
         self._plot_axs = None
+        
+        
+        self.prev_target_material=""
         self.reset()
 
     @staticmethod
@@ -408,8 +411,21 @@ class ExtractBenchEnv(gym.Env):
         None
         '''
 
-        self.done = False
+        
+
+        
+        
         self._first_render = True
+        
+        #early reset conditions (only action taken was to end the experiment)
+        if self.done and self.n_steps+1==self.input_parameters["n_steps"] and self.prev_target_material==self.target_material:
+            self.n_steps+=1
+            self.done = False
+            return self.state
+        
+        self.done = False
+        self.prev_target_material=self.target_material
+        
         self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
 
         self.extraction_vessel = copy.deepcopy(self.original_extraction_vessel)
@@ -479,6 +495,10 @@ class ExtractBenchEnv(gym.Env):
         self.vessels = vessels
         self.external_vessels = ext_vessels
         self.done = done
+        
+        if done and self.n_steps==self.input_parameters["n_steps"]:
+            self.n_steps-=1
+            return self.state, 0, self.done, {}
 
         state = np.zeros((self.extraction.n_total_vessels, self.n_vessel_pixels + len(self.reaction.products)), dtype=np.float32)
 
