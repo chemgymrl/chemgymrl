@@ -102,7 +102,8 @@ class ExtractBenchEnv(gym.Env):
             solvents=[""],
             target_material="",
             out_vessel_path="",
-            extractor=None
+            extractor=None,
+            Extraction=Extraction
     ):
         '''
         Constructor class method for the Extract Bench Environment
@@ -142,7 +143,10 @@ class ExtractBenchEnv(gym.Env):
         self.out_vessel_path = self.input_parameters["out_vessel_path"]
         self.extractor = extractor
         self.original_extraction_vessel = self.input_parameters["extraction_vessel"]
-        self.extraction = Extraction(
+        
+        self.Extraction=Extraction
+        
+        self.extraction = self.Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -170,9 +174,6 @@ class ExtractBenchEnv(gym.Env):
         self._first_render = True
         self._plot_fig = None
         self._plot_axs = None
-        
-        
-        self.prev_target_material=""
         self.reset()
 
     @staticmethod
@@ -347,7 +348,7 @@ class ExtractBenchEnv(gym.Env):
     def update_vessel(self, vessel):
         self.extraction_vessel = vessel
         self.vessels[0] = self.extraction_vessel
-        self.extraction = Extraction(
+        self.extraction = self.Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -411,26 +412,13 @@ class ExtractBenchEnv(gym.Env):
         None
         '''
 
-        
-
-        
-        
-        self._first_render = True
-        
-        #early reset conditions (only action taken was to end the experiment)
-        if self.done and self.n_steps+1==self.input_parameters["n_steps"] and self.prev_target_material==self.target_material:
-            self.n_steps+=1
-            self.done = False
-            return self.state
-        
         self.done = False
-        self.prev_target_material=self.target_material
-        
+        self._first_render = True
         self.n_steps = copy.deepcopy(self.input_parameters["n_steps"])
 
         self.extraction_vessel = copy.deepcopy(self.original_extraction_vessel)
 
-        self.extraction = Extraction(
+        self.extraction = self.Extraction(
             extraction_vessel=self.extraction_vessel,
             n_vessel_pixels=self.n_vessel_pixels,
             max_valve_speed=self.max_valve_speed,
@@ -495,10 +483,6 @@ class ExtractBenchEnv(gym.Env):
         self.vessels = vessels
         self.external_vessels = ext_vessels
         self.done = done
-        
-        if done and self.n_steps==self.input_parameters["n_steps"]:
-            self.n_steps-=1
-            return self.state, 0, self.done, {}
 
         state = np.zeros((self.extraction.n_total_vessels, self.n_vessel_pixels + len(self.reaction.products)), dtype=np.float32)
 
