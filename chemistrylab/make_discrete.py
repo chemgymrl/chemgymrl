@@ -54,8 +54,17 @@ class DiscreteWrapper(gym.Env):
                     self.actions[i*nbins+j+1][i] = (j/(nbins-1))*(high-low)+low
                     
         self.observation_space=self.gym.observation_space
+        
+    @property
+    def vessels(self):
+        return self.gym.vessels
+    
+    def update_vessel(self, new_vessel):
+        return self.gym.update_vessel(new_vessel)
+    
     def step(self,act):
         #create the multidiscrete input with your single number
         return self.gym.step(self.actions[act])
+    
     def reset(self):
         return self.gym.reset()
