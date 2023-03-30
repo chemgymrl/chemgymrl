@@ -583,35 +583,20 @@ class DistillationReward:
         None
         '''
 
-        # get the name of the vessel object containing the target material
-        label = vessel.label
-
-        # extract the material dictionary from the vessel object
-        materials = vessel._material_dict
-
         # obtain the names and value lists from the material dictionary
-        material_names = list(materials.keys())
-        values = list(materials.values())
-
-        # get the index and then amount of the target material in the material dictionary
-        target_material_index = material_names.index(desired_material)
-        target_material_amount = values[target_material_index][1]
+        target_material_amount = vessel.get_material_amount(desired_material)
 
         # sum the amounts of all materials in the material dictionary
         total_material_amount = 0
-        for value_list in values:
-            material_amount = value_list[1]
-            total_material_amount += material_amount
+        mat_dict = vessel.get_material_dict()
+        for material in mat_dict:
+            total_material_amount += mat_dict[material][1]
 
         # calculate the reward as the purity of the target material in the vessel
-        reward = target_material_amount / total_material_amount
-
-        # print the results to the terminal
-        if print_flag:
-            print("Done Reward in {}:".format(label))
-            print("----- Target Material Amount = {} -----".format(target_material_amount))
-            print("----- Total Material Amount = {} -----".format(total_material_amount))
-            print("----- Reward = {} -----".format(reward))
+        try:
+            reward = target_material_amount / total_material_amount
+        except ZeroDivisionError:
+            reward = 0
 
         return reward
 
@@ -643,20 +628,14 @@ class DistillationReward:
         total_reward = 0
 
         # sum the rewards from each vessel containing at least some of the desired material
-        for vessel in self.desired_vessels:
+        for vessel in self.vessels:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
                 desired_material=self.desired_material,
                 print_flag=False
-            )
+            ) * vessel.get_material_amount(self.desired_material)
 
-        # divide the sum reward by the number of vessels containing some of the desired material
-        if len(self.desired_vessels) == 0:
-            final_reward = 0
-        else:
-            final_reward = total_reward / len(self.desired_vessels)
-
-        return final_reward
+        return total_reward
 
     def validate_vessels(self, purity_threshold=0.0):
         '''
