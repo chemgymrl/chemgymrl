@@ -293,8 +293,7 @@ class ExtractionReward:
 
         return vessels, desired_material, desired_vessels
 
-    @staticmethod
-    def calc_vessel_purity(vessel, desired_material, initial_target_amount, print_flag):
+    def calc_vessel_purity(self, vessel, desired_material, initial_target_amount, print_flag):
         '''
         Method to calculate the full reward once the final action has taken place.
 
@@ -321,19 +320,7 @@ class ExtractionReward:
         '''
 
         # acquire the amount of desired material from the `vessel` parameter
-        material_amounts = []
-        desired_material_class = convert_to_class(materials=[desired_material])[0]()
-        dis_mats = desired_material_class.dissolve()
-        dis_mats_names = []
-        for mat_obj in dis_mats:
-            mat_name = mat_obj.get_name()
-            dis_mats_names.append(mat_name)
-            material_amounts.append(vessel.get_material_amount(mat_name) / dis_mats[mat_obj])
-
-        if all(item in dis_mats_names for item in vessel._material_dict):
-            material_amount = min(material_amounts)
-        else:
-            material_amount = 0
+        material_amount = self.get_dissolved_amounts(vessel, desired_material)
 
         material_amount += vessel.get_material_amount(desired_material)
 
@@ -370,6 +357,18 @@ class ExtractionReward:
 
         return reward
 
+    def get_dissolved_amounts(self, vessel, desired_material):
+        material_amounts = []
+        desired_material_class = convert_to_class(materials=[desired_material])[0]()
+        dis_mats = desired_material_class.dissolve()
+        dis_mats_names = []
+        for mat_obj in dis_mats:
+            mat_name = mat_obj.get_name()
+            dis_mats_names.append(mat_name)
+            material_amounts.append(vessel.get_material_amount(mat_name) / dis_mats[mat_obj])
+
+        return min(material_amounts)
+
     def calc_reward(self):
         '''
         Method to calculate the reward accumulated from completing the Extraction Bench. Upon
@@ -396,22 +395,17 @@ class ExtractionReward:
         total_reward = 0
 
         # calculate the purity reward in each vessel (ranges between 0 and 1)
-        for vessel in self.desired_vessels:
+        for vessel in self.vessels:
             total_reward += self.calc_vessel_purity(
                 vessel=vessel,
                 desired_material=self.desired_material,
                 initial_target_amount=self.initial_target_amount,
                 print_flag = False
-            ) * vessel._material_dict[self.desired_material][1]
+            ) * (vessel.get_material_amount(self.desired_material) + self.get_dissolved_amounts(vessel, self.desired_material))
 
         # calculate the final reward by dividing the sum of the purity rewards by the number of
         # vessels containing at least some of the desired material
-        if len(self.desired_vessels) == 0:
-            final_reward = 0
-        else:
-            final_reward = total_reward
-
-        return final_reward
+        return total_reward
 
     def validate_vessels(self, purity_threshold=0.01):
         '''
