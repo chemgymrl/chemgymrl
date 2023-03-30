@@ -155,16 +155,13 @@ def oil_vessel():
 def wurtz_vessel(add_mat=""):
     """
     Function to generate an input vessel for the wurtz extraction experiment.
-
     Parameters
     ---------------
     None
-
     Returns
     ---------------
     `extract_vessel` : `vessel`
         A vessel object containing state variables, materials, solutes, and spectral data.
-
     Raises
     ---------------
     None
@@ -207,9 +204,13 @@ def wurtz_vessel(add_mat=""):
         if add_mat == "":
             add_mat = choice(list(products.keys()))
         
-        add_material = products[add_mat]()
+        if add_mat != "NaCl":
+            add_material = products[add_mat]()
+        else:
+            add_material = products['dodecane']()
     
     except KeyError:
+        add_mat = 'dodecane'
         add_material = products['dodecane']()
     
     add_material.set_solute_flag(True)
