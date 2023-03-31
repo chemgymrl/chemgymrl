@@ -267,7 +267,7 @@ class WurtzExtract_v1(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             n_steps=50,
             target_material='dodecane',
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             out_vessel_path=None
         )
         
@@ -283,7 +283,7 @@ class WurtzExtract_v2(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             n_steps=50,
             target_material='dodecane',
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             out_vessel_path=None,
             Extraction=Extraction2
         )
@@ -303,7 +303,7 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=in_vessel_path,
             n_steps=50,
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             target_material=target_mat,
             out_vessel_path=None
         )
@@ -331,7 +331,7 @@ class GeneralWurtzExtract_v2(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=in_vessel_path,
             n_steps=50,
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             target_material=target_mat,
             out_vessel_path=None,
             Extraction=Extraction2
@@ -360,7 +360,7 @@ class WurtzExtractCtd_v1(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             n_steps=50,
             target_material='dodecane',
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             out_vessel_path=None
         )
 
