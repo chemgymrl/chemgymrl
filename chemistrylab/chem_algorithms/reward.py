@@ -597,12 +597,10 @@ class DistillationReward:
             total_material_amount += mat_dict[material][1]
 
         # calculate the reward as the purity of the target material in the vessel
-        try:
-            reward = target_material_amount / total_material_amount
-        except ZeroDivisionError:
-            reward = 0
-
-        return reward
+        if total_material_amount>1e-6:
+            return target_material_amount / total_material_amount
+        else:
+            return 0
 
     def calc_reward(self):
         '''
