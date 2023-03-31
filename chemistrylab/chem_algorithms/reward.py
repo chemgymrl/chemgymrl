@@ -336,7 +336,10 @@ class ExtractionReward:
                     total_solute_amount += vessel.get_material_amount(sol)
                 
                 # find the ratio of the current desired material to the available desired material
-                reward = material_amount / total_solute_amount
+                if total_solute_amount > 1e-9:
+                    reward = material_amount / total_solute_amount
+                else:
+                    reward = 0
 
                 if print_flag:
                     print(
@@ -597,9 +600,9 @@ class DistillationReward:
             total_material_amount += mat_dict[material][1]
 
         # calculate the reward as the purity of the target material in the vessel
-        try:
+        if total_material_amount > 1e-9:
             reward = target_material_amount / total_material_amount
-        except ZeroDivisionError:
+        else:
             reward = 0
 
         return reward
