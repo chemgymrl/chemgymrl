@@ -361,11 +361,15 @@ class ExtractionReward:
         material_amounts = []
         desired_material_class = convert_to_class(materials=[desired_material])[0]()
         dis_mats = desired_material_class.dissolve()
-        dis_mats_names = []
-        for mat_obj in dis_mats:
-            mat_name = mat_obj.get_name()
-            dis_mats_names.append(mat_name)
-            material_amounts.append(vessel.get_material_amount(mat_name) / dis_mats[mat_obj])
+        if len(dis_mats) > 1:
+            dis_mats_names = []
+            for mat_obj in dis_mats:
+                mat_name = mat_obj.get_name()
+                dis_mats_names.append(mat_name)
+                material_amounts.append(vessel.get_material_amount(mat_name) / dis_mats[mat_obj])
+
+        else:
+            material_amounts.append(0)
 
         return min(material_amounts)
 
