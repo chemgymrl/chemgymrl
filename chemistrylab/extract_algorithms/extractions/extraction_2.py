@@ -369,7 +369,7 @@ class Extraction:
 
         elif do_action==WAIT:
             for vessel_obj in vessels:
-                __ = vessel_obj.push_event_to_queue(dt=self.dt*multiplier*5)
+                __ = vessel_obj.push_event_to_queue(dt=self.dt*2**(multiplier*5-1))
         # Indicate that all no more actions are to be completed
         else:
             # pass the fulfilled `done` parameter
