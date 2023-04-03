@@ -473,7 +473,7 @@ class ExtractBenchEnv(gym.Env):
         done = self.done
         
         # perform the inputted action in the extraction module
-        vessels, ext_vessels, reward, done = self.extraction.perform_action(
+        vessels, ext_vessels, reward, done, step_count = self.extraction.perform_action(
             vessels=vessels,
             ext_vessel=ext_vessels,
             action=action
@@ -499,7 +499,7 @@ class ExtractBenchEnv(gym.Env):
         self.state = copy.deepcopy(state)
 
         # document the most recent step and determine if future steps are necessary
-        self.n_steps -= 1
+        self.n_steps = max(self.n_steps-step_count,0)
         if self.n_steps == 0:
             self.done = True
         
