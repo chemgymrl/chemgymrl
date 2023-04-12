@@ -74,7 +74,53 @@ def trace_closed(x,y,points,seq,size,fill="url(#grad)",stroke="none",sw=5,op=1,t
                Z" fill="{fill}" stroke="{stroke}" stroke-width="{sw}" opacity="{op}"/>
         </g>"""
 
+################################# SPECIAL PATH TRACING USING A CLIP PATH#########################
 
+def fill_vessel(x, y, amount, points, seq, size, fill, sw=5, op=0.2, bbox=[0,0,1,1]):
+    """
+    Generates SVG code for filling a vessel represented by a polygonal shape with a liquid-like color.
+    Note: This can only fill vessels in an upright position, hence why there is no theta variable as input
+    
+    Args:
+    - x: x-position to place the vessel
+    - y: y position to place the vessel
+    - amount (float): number in [0,1] representing the percentage of the vessel's height that should be filled with the
+        liquid-like color.
+    - points: list of 2-tuples representing the vertices of the polygonal shape defining the vessel.
+    - seq (str): A string of path commands specifying the type of each contour segment. Use commas (,) instead of commands
+        if a command requres additional x,y pairs. (ex: a Bezier cubic should be C,,)
+    - size (float): The scaling factor for the SVG image (larger values produce bigger images).
+    - fill: string representing the vessel glass coloring 
+        (in any SVG format, e.g., "#a2d0fa", "blue", "rgb(100,200,50)", etc.).
+    - sw: float or int representing the width of the stroke (in SVG units) used to draw the outline of the vessel's shape.
+    - op: opacity of the glass coloring (0 means fully transparent, 1 means fully opaque).
+    - bbox: list of 4 floats or ints representing the coordinates of the bounding box for the vessel.
+    
+    Returns:
+    - A string containing the SVG code for the filled vessel image.
+    """
+
+    code=np.random.randint(1000000)
+    path = trace_closed(x,y,points,seq,size,fill="none",stroke="black",sw=sw)
+    svg_code=path.split("<path")[0]
+    
+    svg_code+=f"""
+    <defs>
+        <clipPath id="gen-clip{code}">
+            <path {path.split("<path")[1].split("fill")[0]} />
+        </clipPath>
+      </defs>
+    """
+    svg_code+=f"""
+    <rect x="{bbox[0]*size}" y="{(bbox[1]+(1-amount)*bbox[3])*size}" 
+    width="{bbox[2]*size}" height="{amount*bbox[3]*size}" fill="#a2d0fa" stroke="none" clip-path="url(#gen-clip{code})"/>
+    """
+    svg_code+=f"""
+    <rect x="{bbox[0]*size}" y="{bbox[1]*size}" width="{bbox[2]*size}" height="{bbox[3]*size}" 
+    fill="{fill}" opacity="{op}" stroke="none" clip-path="url(#gen-clip{code})"/>
+    """
+    svg_code+=path.split('rotate(0)">')[1]
+    return svg_code
 
 ###################################DISTILLATION ACTIONS#########################################
 
@@ -110,7 +156,8 @@ def DISTILL_0A(amount):
     <path d="M 5 195 L 15 115 L 90 115 L 100 195 M 35 195 L 70 195" fill="none" stroke="black" stroke-width="5"/>
     """
     
-    svg_code+=trace_closed(150,145,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="blue",stroke="black")
+    svg_code+=trace_closed(150,145,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="blue",stroke="black",op=0.2)
+    svg_code+=trace_closed(150,145,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="none",stroke="black")
     
     svg_code +="""
     <path d="M 60 40 L 154 118 M 60 45 L 147 118" fill="none" stroke="black" stroke-width="2"/>
@@ -145,7 +192,7 @@ def DISTILL_0B(amount):
         theta=np.random.random()*360
         svg_code+=trace_closed(pos[0],pos[1],CUBE,CUBE_INSTRUCT,25,fill="#a2bafa",stroke="black",sw=2,op=0.4,theta=theta)
         svg_code+=trace_closed(pos[0],pos[1],CUBE_INNER,CUBE_INNER_INSTRUCT,25,fill="black",op=0.4,theta=theta)
-        svg_code+="</q>"
+        #svg_code+="</q>"
     return svg_code
 
 DISTILL_0 = lambda amount: DISTILL_0A(amount) if amount>=0.5 else DISTILL_0B(1-amount)
@@ -154,19 +201,19 @@ def DISTILL_1(amount):
     theta=45+amount*90
     dx = -np.sin(theta/180*np.pi)*20
     svg_code = trace_closed(105+dx,80,ROUND_FLASK,ROUND_FLASK_INSTRUCT,50,fill="#deafaf",stroke="black",theta=theta)
-    svg_code+=trace_closed(115,150,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="blue",stroke="black")
-    
+    svg_code+=fill_vessel(115,150,amount,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="blue",bbox=[-0.5,-0.45,1,1.4])    
     return svg_code
 
 
 def DISTILL_2(amount):
-
     theta=45+amount*90
     dx = -np.sin(theta/180*np.pi)*20
-    svg_code = trace_closed(105+dx,80,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="blue",stroke="black",theta=theta)
-    svg_code+=trace_closed(115,150,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="#71ab9c",stroke="black")
-    
+    svg_code = trace_closed(105+dx,80,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="blue",op=0.2,stroke="black",theta=theta)
+    svg_code += trace_closed(105+dx,80,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="none",stroke="black",theta=theta)
+    svg_code+=fill_vessel(115,150,amount,ERLENMEYER,ERLENMEYER_INSTRUCT,50,fill="green",bbox=[-0.5,-0.45,1,1.4])    
     return svg_code
+    
+    
 
 def DISTILL_3(amount):
     func=lambda x: x*0.75 if x < 0.8 else x*2-1
@@ -187,64 +234,13 @@ for i,D in enumerate(DISTILL_ACTIONS):
 
 
 def EXTRACT_0(amount):
-    code=np.random.randint(1000000)
-    svg_code=""
     
-    #create beaker path (beziers and lines)
-    b2_path=trace_closed(30,115,B2,B2_INSTRUCT,120,fill="none",stroke="black")
-    
-    #add in transform information
-    svg_code=b2_path.split("<path")[0]
-    
-    #add beaker as clip path for the water
-    svg_code+=f"""
-    <defs>
-        <clipPath id="b2-clip{code}">
-            <path {b2_path.split("<path")[1].split("fill")[0]} />
-        </clipPath>
-      </defs>
-    """
-    #add in beaker water
-    svg_code+=f"""
-    <rect x="-100" y="{18+(1-amount)*85}" width="200" height="200" fill="#a2d0fa" stroke="none" clip-path="url(#b2-clip{code})"/>
-    """
-    # add in beaker coloring
-    svg_code+=f"""
-    <rect x="-100" y="-90" width="200" height="200" fill="#71ab9c" opacity="0.2" stroke="none" clip-path="url(#b2-clip{code})"/>
-    """
-    #add in beaker 
-    svg_code+=b2_path.split('rotate(0)">')[1]
-    
-    # store path for extraction vessel
-    evpath = trace_closed(38,20,EV_0,EV_0_INSTRUCT,100,fill="none",stroke="black")
-    #add in transform information
-    svg_code+=evpath.split("<path")[0]
-    
-    #create clip path for extraction vessel
-    svg_code+=f"""
-    <defs>
-        <clipPath id="ev-clip{code}">
-            <path {evpath.split("<path")[1].split("fill")[0]} />
-        </clipPath>
-      </defs>
-    """
-    #add in water to ev
-    svg_code+=f"""
-    <rect x="20" y="{5+amount*60}" width="50" height="60" fill="#a2d0fa" stroke="none" clip-path="url(#ev-clip{code})"/>
-    """
-    #add in ev
-    svg_code+=evpath.split('rotate(0)">')[1]
-    
-    #add in valve
+    svg_code=fill_vessel(30,115,amount,B2,B2_INSTRUCT,120,fill="#71ab9c",bbox=[0,0.15,1,0.73])
+    svg_code+= fill_vessel(38,20,1-amount,EV_0,EV_0_INSTRUCT,100,fill="none",bbox=[0.2,0.05,0.5,0.61])    
     svg_code += trace_closed(38,20,EV_1,"L"*20,100,fill="#365470",stroke="black",sw=2)
-   
-    #beaker and ev holder
     svg_code+="""
-    
     <path d="M 72 50 L 30 50 30 225 150 225" fill="none" stroke="black" stroke-width="10"/>
     """
-
-    
     return svg_code
 
 def EXTRACT_1(amount):
@@ -298,7 +294,7 @@ def EXTRACT_2_3(amount,color="none"):
     
     dx = np.sin(theta/360*np.pi-0.1)*180
     dy=theta/2
-    svg_code = trace_closed(60,135,EV_0,EV_0_INSTRUCT,100,fill="#a2d0fa",stroke="black")
+    svg_code = fill_vessel(60,135,amount,EV_0,EV_0_INSTRUCT,100,fill="none",bbox=[0.2,0.05,0.5,0.61])
     
     svg_code +=trace_closed(0+dx,-15+dy,B2,B2_INSTRUCT,120,fill=color,stroke="black",sw=0,op=0.2,theta=theta)
     svg_code +=trace_closed(0+dx,-15+dy,B2,B2_INSTRUCT,120,fill="none",stroke="black",sw=5,theta=theta)
@@ -315,8 +311,7 @@ def EXTRACT_4(amount):
     dx = np.sin(theta/360*np.pi-0.1)*120
     dy=theta/2
     svg_code = trace_closed(30+dx,0+dy,EV_0,EV_0_INSTRUCT,100,fill="#a2d0fa",stroke="black",theta=theta)
-    svg_code +=trace_closed(50,115,B2,B2_INSTRUCT,120,fill="#703636",stroke="black",sw=0,op=0.2)
-    svg_code +=trace_closed(50,115,B2,B2_INSTRUCT,120,fill="none",stroke="black",sw=5)
+    svg_code +=fill_vessel(50,115,amount,B2,B2_INSTRUCT,120,fill="#703636",sw=5,op=0.2,bbox=[0,0.15,1,0.73])
     
     return svg_code
 
@@ -332,7 +327,7 @@ def EXTRACT_5_6(amount,is5=False):
         svg_code+=trace_open(28+dx*3+40,138-theta*0.7,ETHER_0,"LLMLL",50,sw=3)
         svg_code+=trace_open(28+dx*3+40,138-theta*0.7,ETHER_1,"LMAML",50,stroke="red",sw=3)
     
-    svg_code += trace_closed(60,135,EV_0,EV_0_INSTRUCT,100,fill="#a2d0fa",stroke="black")
+    svg_code += fill_vessel(60,135,amount,EV_0,EV_0_INSTRUCT,100,fill="none",bbox=[0.2,0.05,0.5,0.61])
 
     
     return svg_code

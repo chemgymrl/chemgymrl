@@ -311,7 +311,7 @@ def stop(x,y,size,sw=5):
     svg_code = f"""
     <g transform="translate({x}, {y})">
         <path d="M {xs[0]} {ys[0]} L {lines}  Z" fill="red" stroke="black" stroke-width="{sw}"/>
-        <text x="{-size*0.85}" y="{size*0.2}" font-family="Highway Gothic" fill="white" font-size="{size*0.7}">STOP</text>
+        <text x="{-size*0.85}" y="{size*0.2}" font-family="Times New Roman" fill="white" font-size="{size*0.7}">STOP</text>
     </g>
     """
     return svg_code
