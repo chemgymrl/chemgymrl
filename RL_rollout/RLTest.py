@@ -137,6 +137,10 @@ class WurtzExtractHeuristic(Heuristic):
 HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic}
 
 
+def salt_check(env):
+    return any([vessel._material_dict.get(mat,(0,0))[1]>1e-3 for vessel in env.vessels for mat in ["Na","Cl","NaCl"]])
+
+
 if __name__=="__main__":
     #get options from settings.txt
     print(sys.argv[1:])
@@ -182,6 +186,8 @@ if __name__=="__main__":
         rollout["Reward"]+=[rew]
         rollout["OutState"]+=[newobs]
         rollout["Done"]+=[done]
+        if "Distill" in op.environment:
+            info=dict(NaCl=salt_check(env))
         rollout["Info"]+=[info]
         rollout["Step"]+=[i]
         i+=1

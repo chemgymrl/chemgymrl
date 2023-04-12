@@ -39,6 +39,8 @@ from chemistrylab.chem_algorithms import material, util, vessel
 from chemistrylab.extract_bench.extract_bench_v1_engine import ExtractBenchEnv
 from chemistrylab.reactions.reaction_base import _Reaction
 
+from chemistrylab.extract_algorithms.extractions.extraction_2 import Extraction as Extraction2
+
 def get_extract_vessel(vessel_path=None, extract_vessel=None):
     """
     Function to obtain an extraction vessel containing materials.
@@ -153,16 +155,13 @@ def oil_vessel():
 def wurtz_vessel(add_mat=""):
     """
     Function to generate an input vessel for the wurtz extraction experiment.
-
     Parameters
     ---------------
     None
-
     Returns
     ---------------
     `extract_vessel` : `vessel`
         A vessel object containing state variables, materials, solutes, and spectral data.
-
     Raises
     ---------------
     None
@@ -268,8 +267,25 @@ class WurtzExtract_v1(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             n_steps=50,
             target_material='dodecane',
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             out_vessel_path=None
+        )
+        
+class WurtzExtract_v2(ExtractBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        super(WurtzExtract_v2, self).__init__(
+            extraction_vessel=wurtz_vessel('dodecane')[0],
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            n_steps=50,
+            target_material='dodecane',
+            solvents=["C6H14", "diethyl ether"],
+            out_vessel_path=None,
+            Extraction=Extraction2
         )
 
 class GeneralWurtzExtract_v1(ExtractBenchEnv):
@@ -287,7 +303,7 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             in_vessel_path=in_vessel_path,
             n_steps=50,
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             target_material=target_mat,
             out_vessel_path=None
         )
@@ -298,6 +314,35 @@ class GeneralWurtzExtract_v1(ExtractBenchEnv):
         self.target_material = target_mat
 
         return super(GeneralWurtzExtract_v1, self).reset()
+    
+    
+class GeneralWurtzExtract_v2(ExtractBenchEnv):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self, target_material="", in_vessel_path=None):
+        self.original_target_material = target_material
+        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
+
+        super(GeneralWurtzExtract_v2, self).__init__(
+            extraction_vessel=extract_vessel,
+            reaction=_Reaction,
+            reaction_file_identifier="chloro_wurtz",
+            in_vessel_path=in_vessel_path,
+            n_steps=50,
+            solvents=["C6H14", "diethyl ether"],
+            target_material=target_mat,
+            out_vessel_path=None,
+            Extraction=Extraction2
+        )
+
+    def reset(self):
+        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
+        self.original_extraction_vessel = deepcopy(extract_vessel)
+        self.target_material = target_mat
+
+        return super(GeneralWurtzExtract_v2, self).reset()
 
 
 class WurtzExtractCtd_v1(ExtractBenchEnv):
@@ -315,7 +360,7 @@ class WurtzExtractCtd_v1(ExtractBenchEnv):
             reaction_file_identifier="chloro_wurtz",
             n_steps=50,
             target_material='dodecane',
-            solvents=["C6H14", "DiEthylEther"],
+            solvents=["C6H14", "diethyl ether"],
             out_vessel_path=None
         )
 
