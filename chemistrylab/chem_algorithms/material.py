@@ -553,23 +553,6 @@ class Li(Material):
                          )
 
 
-# Note: F is very unstable when not an aqueous ion
-class F(Material):
-    def __init__(self):
-        super().__init__(name='F',
-                         density={'s': None, 'l': None, 'g': 1.696e-3},
-                         polarity=0.0,
-                         temperature=298,
-                         pressure=1,
-                         phase='g',
-                         molar_mass=18.998,
-                         color=0.8,
-                         charge=0.0,
-                         boiling_point=85.05,
-                         index=14
-                         )
-
-
 class F2(Material):
     def __init__(self):
         super().__init__(name='F2',
@@ -904,7 +887,7 @@ class A(Material):
     def __init__(self):
         super().__init__(
             name='A',
-            density={'s': None, 'l': 0.75, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -927,7 +910,7 @@ class B(Material):
     def __init__(self):
         super().__init__(
             name='B',
-            density={'s': None, 'l': 0.879, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -951,7 +934,7 @@ class C(Material):
     def __init__(self):
         super().__init__(
             name='C',
-            density={'s': None, 'l': 0.87, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -975,7 +958,7 @@ class D(Material):
     def __init__(self):
         super().__init__(
             name='D',
-            density={'s': None, 'l': 0.9, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -999,7 +982,7 @@ class E(Material):
     def __init__(self):
         super().__init__(
             name='E',
-            density={'s': None, 'l': 0.75, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -1023,7 +1006,7 @@ class F(Material):
     def __init__(self):
         super().__init__(
             name='F',
-            density={'s': None, 'l': 0.75, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -1047,7 +1030,7 @@ class G(Material):
     def __init__(self):
         super().__init__(
             name='G',
-            density={'s': None, 'l': 0.757, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -1071,7 +1054,7 @@ class H(Material):
     def __init__(self):
         super().__init__(
             name='H',
-            density={'s': None, 'l': 0.75, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
@@ -1095,7 +1078,7 @@ class I(Material):
     def __init__(self):
         super().__init__(
             name='I',
-            density={'s': None, 'l': 0.768, 'g': None},
+            density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
             pressure=1,
