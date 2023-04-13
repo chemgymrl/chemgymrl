@@ -96,6 +96,36 @@ class FictReact2Heuristic():
                 return actions[2],[]# make G
         else: 
             return actions[t],[]
+        
+class FictReact1Heuristic():
+    def predict(self,observation,CONST=0.074):
+        t = np.argmax(observation[-5:])
+        #targs = [E F G H I]
+        #print("EFGHI"[t],t)
+        actions=np.array([
+        #T V A B C D F G H
+        [1,1,1,1,1,0,0,0,0],#A+B+C -> E
+        [1,1,1,0,0,1,0,0,0],#A+D -> F
+        [1,1,0,1,0,1,0,1,0],#B+D -> G
+        [1,1,0,0,1,1,0,0,0], #C+D -> H
+        [1,1,0,0,1,0,0,0,0]# F+G+C -> I
+        ],dtype=np.float32)
+        #making I is a special case
+        if t==4:
+            marker=observation[:100].mean()
+            #print(marker)
+            if marker<0.01:
+                #dump in a little bit of A+B and D so it's all used up
+                return np.array([1,1,0.8,0.8,0,1,1,1,0]),[]# make F
+            #Const is set to a value that gives the optimal time to add B
+            elif marker>CONST:
+                #Just keep the temps up
+                return np.array([1,1,0,0,0,0.0,0,0,0]),[]
+            else:
+                #Dump in some C
+                return actions[t],[]# make G
+        else: 
+            return actions[t],[]
     
 class WurtzDistillHeuristic(Heuristic):
     def predict(self,observation):
@@ -134,7 +164,10 @@ class WurtzExtractHeuristic(Heuristic):
         return np.array(self._pred(obs)),[]
 
 
-HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic}
+HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic,
+             "FR1H":FictReact1Heuristic
+             
+             }
 
 
 def salt_check(env):

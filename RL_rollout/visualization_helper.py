@@ -38,11 +38,14 @@ def load_rollouts(env: str, obj=default_obj, last: bool = True, verbose: bool = 
     folder = f"MODELS{delim}{env}" if len(env.split(delim))==1 else env
     algoidx = [i for i,string in enumerate(folder.split(delim)) if "-v" in string][0]
     data = dict()
+    all_obj=dict()
     rollName=["best_rollout","rollout"][last]
     for a,b,c in os.walk(folder):
         if rollName in c:
             algo = a.split(delim)[algoidx+1]
             df1 = pd.read_pickle(a+delim+rollName)
+            if obj is not None:
+                all_obj[algo] = all_obj.get(algo,[])+[obj(df1)]
             if verbose:print(a,"|",0 if obj is None else obj(df1))
             if not algo in data:
                 data[algo]=df1
@@ -58,7 +61,7 @@ def load_rollouts(env: str, obj=default_obj, last: bool = True, verbose: bool = 
                 #prefer higher ranking ones
                 elif obj(df1)>obj(df0):
                     data[algo]=df1
-    return data
+    return data,all_obj
 
 
 
@@ -305,7 +308,7 @@ def get_discrete_actions(frame, N=None, N2=None):
 #####################################Plotting Data#################################################
 
 def stat_show(radar_info: dict, spoke_labels: list, labels, figsize=(22, 7), 
-              gridlines=[0.0, 0.4, 0.8, 1.2, 1.6, 2.0], relative=True):
+              gridlines=[0.0, 0.4, 0.8, 1.2, 1.6, 2.0], relative=True, rmax=1):
     """
     Radar Plots a set of stats.
 
@@ -319,6 +322,8 @@ def stat_show(radar_info: dict, spoke_labels: list, labels, figsize=(22, 7),
     - relative (bool): Whether or not to scale the last graph 
                        (Are the initial graphs 'relative' to the final graph?). Default is True.
     - gridlines (list): list of where to put each gridline. Default is [0.0, 0.4, 0.8, 1.2, 1.6, 2.0].
+    
+    - rmax (float): Default uppder bound to use for the range
     """
     
     colors = ["r","g","b","c","y","m","k"]
@@ -338,7 +343,7 @@ def stat_show(radar_info: dict, spoke_labels: list, labels, figsize=(22, 7),
         #scale all but the heurstic the same
         for ax in axs.flat[:-1]:
             ax.set_rmin(max(0,min([a[0].min() for (c,a) in info[1:-1]]+[0])))
-            ax.set_rmax(max([a[0].max() for (c,a) in info[1:-1]]+[1]))
+            ax.set_rmax(max([a[0].max() for (c,a) in info[1:-1]]+[rmax]))
     else:
         #scale them all the same
         for ax in axs.flat:
