@@ -69,6 +69,17 @@ import numpy as np
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import vessel, util
 
+#Boil vessel: BV
+#Beaker n: B<n>
+
+ADD_OR_REMOVE_HEAT=0
+POUR_BV_TO_B1=1
+POUR_B1_TO_B2=2
+WAIT=3
+END=4
+
+
+
 class Distillation:
     '''
     Class object for a Wurtz extraction experiment.
@@ -105,7 +116,8 @@ class Distillation:
             dQ=1.0, # maximal change in heat
             dt=0.05, # default time step
             max_vessel_volume=1.0, # maximal volume of empty vessels
-            n_actions=10 # number of available actions
+            n_actions=10, # number of available actions
+            overboil_penalty=0.1
     ):
         '''
         Constructor class for the Distillation class
@@ -122,13 +134,16 @@ class Distillation:
         self.n_empty_vessels = n_empty_vessels
         self.n_total_vessels = n_empty_vessels + 1
         self.max_vessel_volume = max_vessel_volume
-
+        
         # target material
         self.target_material = target_material
 
         # thermodynamic variables
         self.dt = dt
         self.dQ = dQ
+        
+        #penalties
+        self.overboil_penalty=overboil_penalty
 
     def get_observation_space(self, targets):
 
@@ -247,7 +262,7 @@ class Distillation:
         else:
 
             # Add/Remove Heat (Heat multiplier)
-            if do_action == 0:
+            if do_action == ADD_OR_REMOVE_HEAT:
                 # calculate the amount of heat being added/removed
                 multiplier = 2 * (multiplier/(self.n_actions-1) - 0.5)
                 heat_change = multiplier * self.dQ
@@ -256,13 +271,13 @@ class Distillation:
                 event = ['change_heat', heat_change, beaker_1]
 
                 # push the event to the extraction vessel
-                reward = boil_vessel.push_event_to_queue(events=[event], dt=self.dt)
+                reward = boil_vessel.push_event_to_queue(events=[event], dt=self.dt)*self.overboil_penalty
 
                 # push no events to beaker 2
                 __ = beaker_2.push_event_to_queue(dt=self.dt)
 
             # pour the Boil Vessel into Beaker 1
-            if do_action == 1:
+            elif do_action == POUR_BV_TO_B1:
                 # determine the volume to pour
                 d_volume = boil_vessel.get_max_volume() * multiplier/self.n_actions
 
@@ -274,7 +289,7 @@ class Distillation:
                 __ = beaker_2.push_event_to_queue(dt=self.dt)
 
             # Pour Beaker 1 into Beaker 2
-            if do_action == 2:
+            elif do_action == POUR_B1_TO_B2:
                 # determine the volume to pour
                 d_volume = beaker_1.get_max_volume() * multiplier/self.n_actions
 
@@ -286,7 +301,7 @@ class Distillation:
                 boil_vessel.push_event_to_queue(dt=self.dt)
 
             # Wait an amount of time such that vessel temperature will tend toward room temperature
-            if do_action == 3:
+            elif do_action == WAIT:
 
                 # room temperature
                 room_temp = beaker_1.get_temperature()
@@ -301,7 +316,7 @@ class Distillation:
                 reward = boil_vessel.push_event_to_queue(events=[event], dt=self.dt)
 
             # Indicate that all no more actions are to be completed
-            if do_action == 4:
+            elif do_action == END:
                 # pass the fulfilled `done` parameter
                 done = True
 

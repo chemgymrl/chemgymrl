@@ -22,6 +22,17 @@ register(
     entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1',
 )
 
+
+register(
+    id='GenWurtzExtract-v2',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:GeneralWurtzExtract_v2',
+)
+
+register(
+    id='WurtzExtract-v2',
+    entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v2',
+)
+
 register(
     id='WurtzExtractCtd-v1',
     entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtractCtd_v1',

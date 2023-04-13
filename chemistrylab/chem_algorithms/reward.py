@@ -293,88 +293,68 @@ class ExtractionReward:
 
         return vessels, desired_material, desired_vessels
 
-    def calc_vessel_purity(self, vessel, desired_material, initial_target_amount, print_flag):
+    def calc_vessel_purity(self, vessel, desired_material, initial_target_amount, print_flag = False):
         '''
-        Method to calculate the full reward once the final action has taken place.
+        Method to calculate the purity of a single vessel
 
-        Parameters
-        ---------------
-        `vessel` : `vessel.Vessel`
-            A vessel object that contains all of the extracted materials and solutes.
-        `desired_material` : `str`
-            The name of the required output material that has been designated as reward.
-        `initial_target_amount` : `float`
-            The initial amount of target material in the vessel first provided to the Extraction Bench
-            environment.
+        Args:
+        - vessel (vessel.Vessel): A vessel object that contains all of the extracted materials and solutes.
+        - desired_material (str): The name of the required output material that has been designated as reward.
+        Returns:
+        - purity (float): The purity of the desired material with respect to the total desired material available in
+                            the original vessel provided by the Reaction Bench.
 
-        Returns
-        ---------------
-        `reward` : `float`
-            The purity of the desired material with respect to the total desired material available in
-            the original vessel provided by the Reaction Bench.
-
-        Raises
-        ---------------
-        `AssertionError`:
-            Raised if no target material is found in the extraction vessel.
         '''
+        # acquire the amount of desired you could make by boiling, and how much dissolved material is used to make it
+        material_yield,dissolved_amount = self.get_dissolved_amounts(vessel, desired_material)
 
-        # acquire the amount of desired material from the `vessel` parameter
-        material_amount = self.get_dissolved_amounts(vessel, desired_material)
+        #add the amount of material you could make by boiling to the total amount of desired material
+        material_amount = material_yield+vessel.get_material_amount(desired_material)
 
-        material_amount += vessel.get_material_amount(desired_material)
+        # get the total amount of material in the vessel
+        solutes = list(vessel.get_solute_dict().keys())
+        total_solute_amount = 0.0
+        for sol in solutes:
+            total_solute_amount += vessel.get_material_amount(sol)
+        #replace the amount of material used to make the desired material with the amount of desired materil which would be made
+        total_solute_amount-= (dissolved_amount-material_yield)
 
-        # set a negative reward if no desired material was made available to the Extraction Bench
-        if abs(material_amount - 0) < 1e-6:
-            reward = 0.0
+        # find the ratio of the current desired material to the available desired material
+        if total_solute_amount > 1e-9:
+            purity = material_amount / total_solute_amount
         else:
-            try:
-                # get the total amount of material in the vessel
-                solutes = list(vessel.get_solute_dict().keys())
-                total_solute_amount = 0.0
-                for sol in solutes:
-                    total_solute_amount += vessel.get_material_amount(sol)
-                
-                # find the ratio of the current desired material to the available desired material
-                if total_solute_amount > 1e-9:
-                    reward = material_amount / total_solute_amount
-                else:
-                    reward = 0
+            purity = 0
 
-                if print_flag:
-                    print(
-                        "done_reward ({}): {}, in_vessel: {}, initial: {}".format(
-                            vessel.label,
-                            "{} %".format(round(reward*100, 2)),
-                            "{:e}".format(material_amount),
-                            "{:e}".format(initial_target_amount)
-                        )
-                    )
+        if print_flag:
+            print(
+                f"Purity: {purity}, target material: {material_amount}, all materials: {total_solute_amount}")
+        return purity
 
-            except AssertionError:
-                reward = 0
-                print(
-                    "Error: There was no target material in the original vessel passed to the "
-                    "Extraction Bench."
-                )
+    def get_dissolved_amounts(self,vessel, desired_material):
+        """    
+        Returns:
+        - min_amount (float): The amount material that could be produced if you removed the solvent
+                                This is the minimum of (quantity/stoich_coeff) for each dissolved component
+        - contributions (float): Amount of mols of solutes involved in making the min_amount of desired material
 
-        return reward
-
-    def get_dissolved_amounts(self, vessel, desired_material):
+        """
         material_amounts = []
         desired_material_class = convert_to_class(materials=[desired_material])[0]()
         dis_mats = desired_material_class.dissolve()
+
         if len(dis_mats) > 1:
-            dis_mats_names = []
-            for mat_obj in dis_mats:
-                mat_name = mat_obj.get_name()
-                dis_mats_names.append(mat_name)
-                material_amounts.append(vessel.get_material_amount(mat_name) / dis_mats[mat_obj])
+            min_amount=float("inf")
+            n=0
+            for mat in dis_mats:
+                amount=vessel.get_material_amount(mat.get_name()) / dis_mats[mat]
+                if amount< min_amount:
+                    min_amount=amount
+                n+=dis_mats[mat]
 
+            contributions=min_amount*n
+            return min_amount,contributions
         else:
-            material_amounts.append(0)
-
-        return min(material_amounts)
+            return 0,0
 
     def calc_reward(self):
         '''
@@ -408,7 +388,7 @@ class ExtractionReward:
                 desired_material=self.desired_material,
                 initial_target_amount=self.initial_target_amount,
                 print_flag = False
-            ) * (vessel.get_material_amount(self.desired_material) + self.get_dissolved_amounts(vessel, self.desired_material))
+            ) * (vessel.get_material_amount(self.desired_material) + self.get_dissolved_amounts(vessel, self.desired_material)[0])
 
         # calculate the final reward by dividing the sum of the purity rewards by the number of
         # vessels containing at least some of the desired material

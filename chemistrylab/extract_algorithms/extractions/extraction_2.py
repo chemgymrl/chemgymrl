@@ -51,6 +51,17 @@ sys.path.append("../../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.reactions.get_reactions import convert_to_class
 
+OPEN_VALVE=0
+MIX=1
+POUR_B2_TO_EV=2
+POUR_B1_TO_EV=3
+POUR_EV_TO_B2=4
+POUR_S1_TO_EV=5
+POUR_S2_TO_EV=6
+WAIT=7
+END=8
+
+
 class Extraction:
     '''
     Class object for a Wurtz extraction experiment.
@@ -95,7 +106,7 @@ class Extraction:
             max_vessel_volume=1.0,  # max volume of empty vessels in L
             n_vessel_pixels=100,  # number of pixels for each vessel
             max_valve_speed=10,  # maximum draining speed (pixels/step)
-            n_actions=8,
+            n_actions=9,
             extractor=None,
             spill_penalty=0.1
     ):
@@ -117,8 +128,7 @@ class Extraction:
         self.target_material = target_material
         self.target_material_init_amount = extraction_vessel.get_material_amount(target_material)
         self.spill_penalty=spill_penalty
-        
-        
+
     def get_observation_space(self, targets):
         obs_low = np.zeros((self.n_total_vessels, self.n_vessel_pixels + len(targets)), dtype=np.float32)
         obs_high = 1.0 * np.ones((self.n_total_vessels, self.n_vessel_pixels + len(targets)), dtype=np.float32)
@@ -140,7 +150,7 @@ class Extraction:
         None
         """
 
-        action_space = gym.spaces.MultiDiscrete([self.n_actions, 5])
+        action_space = gym.spaces.Discrete(self.n_actions*5-4)
 
         return action_space
 
@@ -258,121 +268,121 @@ class Extraction:
 
         # set the completed variable
         done = False
-
+        step_count=1
         # deconstruct the action
-        do_action = int(action[0])
-        multiplier = (action[1]) / 4 if action[1] != 0 else 0
+        do_action = int(action//5)
+        multiplier = (action%5+1)/5
 
-        # if the multiplier is 0, push an empty list of events to the vessel queue
-        if all([multiplier == 0, do_action != 7]):
+        # obtain the necessary vessels
+        extract_vessel = vessels[0]
+        beaker_1 = vessels[1]
+        beaker_2 = vessels[2]
+        solvent_vessel1 = ext_vessel[0]
+        solvent_vessel2 = ext_vessel[1]
+
+
+        # Open Valve (Speed multiplier)
+        if do_action == OPEN_VALVE:
+            # calculate the number of pixels being drained
+            drained_pixels = multiplier * self.max_valve_speed
+
+            # drain the extraction vessel into the first beaker;
+            event = ['drain by pixel', beaker_1, drained_pixels]
+
+            # push the event to the extraction vessel
+            reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
+
+            # push no events to the second beaker
+            __ = beaker_2.push_event_to_queue(dt=self.dt)
+
+        # Mix the Extraction Vessel
+        elif do_action == MIX:
+            # mix the extraction vessel
+            event = ['mix', -multiplier]
+
+            # push the event to the extraction vessel
+            reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
+
+            # push no events to either beaker
+            __ = beaker_1.push_event_to_queue(dt=self.dt)
+            __ = beaker_2.push_event_to_queue(dt=self.dt)
+
+        # pour Beaker 1 into the Extraction Vessel
+        elif do_action == POUR_B1_TO_EV:
+            # determine the volume to pour from the first beaker into the extraction vessel
+            d_volume = beaker_1.get_max_volume() * multiplier
+
+            # push the event to the first beaker
+            event = ['pour by volume', extract_vessel, d_volume]
+            reward = beaker_1.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
+
+            # push no events to the second beaker
+            __ = beaker_2.push_event_to_queue(dt=self.dt)
+
+        # Pour Beaker 2 into the Extraction Vessel
+        elif do_action == POUR_B2_TO_EV:
+            # determine the volume to pour from the second beaker into the extraction vessel
+            d_volume = beaker_2.get_max_volume() * multiplier
+
+            # push the event to the second beaker
+            event = ['pour by volume', extract_vessel, d_volume]
+            reward = beaker_2.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
+
+            # push no events to the first beaker
+            beaker_1.push_event_to_queue(dt=self.dt)
+
+        # Pour the Extraction Vessel into Beaker 2
+        elif do_action == POUR_EV_TO_B2:
+            # determine the volume to pour from the extraction vessel into the second beaker
+            d_volume = 1.0 * multiplier # use the default volume for the extraction vessel
+
+            # push the event to the extraction vessel
+            event = ['pour by volume', beaker_2, d_volume]
+            reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
+
+            # push no events to the first beaker
+            beaker_1.push_event_to_queue(dt=self.dt)
+
+        # pour the (first) Solute Vessel into the Extraction Vessel
+        elif do_action == POUR_S1_TO_EV:
+            # determine the volume to pour from the solvent vessel into the extraction vessel
+            d_volume = extract_vessel.get_max_volume() * multiplier/2
+
+            # push the event to the solvent vessel
+            event = ['pour by volume', extract_vessel, d_volume]
+            reward = solvent_vessel1.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
+
+            # push no events to either of the beakers
+            beaker_1.push_event_to_queue(dt=self.dt)
+            beaker_2.push_event_to_queue(dt=self.dt)
+
+        # pour the (second) Solute Vessel into the Extraction Vessel
+        elif do_action == POUR_S2_TO_EV:
+            # determine the volume to pour from the solvent vessel into the extraction vessel
+            d_volume = extract_vessel.get_max_volume() * multiplier/2
+
+            # push the event to the solvent vessel
+            event = ['pour by volume', extract_vessel, d_volume]
+            reward = solvent_vessel2.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
+
+            # push no events to either of the beakers
+            beaker_1.push_event_to_queue(dt=self.dt)
+            beaker_2.push_event_to_queue(dt=self.dt)
+
+        elif do_action==WAIT:
+            step_count = 2**int(multiplier*5-0.5)
             for vessel_obj in vessels:
-                __ = vessel_obj.push_event_to_queue(dt=self.dt)
+                __ = vessel_obj.push_event_to_queue(dt=self.dt*step_count)
+        # Indicate that all no more actions are to be completed
         else:
-            # obtain the necessary vessels
-            extract_vessel = vessels[0]
-            beaker_1 = vessels[1]
-            beaker_2 = vessels[2]
-            solvent_vessel1 = ext_vessel[0]
-            solvent_vessel2 = ext_vessel[1]
+            # pass the fulfilled `done` parameter
+            done = True
 
-            # Open Valve (Speed multiplier)
-            if do_action == 0:
-                # calculate the number of pixels being drained
-                drained_pixels = multiplier * self.max_valve_speed
+            # look through each vessel's material dict looking for the target material
+            reward = 0
 
-                # drain the extraction vessel into the first beaker;
-                event = ['drain by pixel', beaker_1, drained_pixels]
+        # redefine the vessels and external_vessels parameters
+        vessels = [extract_vessel, beaker_1, beaker_2]
+        ext_vessel = [solvent_vessel1, solvent_vessel2]
 
-                # push the event to the extraction vessel
-                reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
-
-                # push no events to the second beaker
-                __ = beaker_2.push_event_to_queue(dt=self.dt)
-
-            # Mix the Extraction Vessel
-            if do_action == 1:
-                # mix the extraction vessel
-                event = ['mix', -multiplier]
-
-                # push the event to the extraction vessel
-                reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)
-
-                # push no events to either beaker
-                __ = beaker_1.push_event_to_queue(dt=self.dt)
-                __ = beaker_2.push_event_to_queue(dt=self.dt)
-
-            # pour Beaker 1 into the Extraction Vessel
-            if do_action == 2:
-                # determine the volume to pour from the first beaker into the extraction vessel
-                d_volume = beaker_1.get_max_volume() * multiplier
-
-                # push the event to the first beaker
-                event = ['pour by volume', extract_vessel, d_volume]
-                reward = beaker_1.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
-
-                # push no events to the second beaker
-                __ = beaker_2.push_event_to_queue(dt=self.dt)
-
-            # Pour Beaker 2 into the Extraction Vessel
-            if do_action == 3:
-                # determine the volume to pour from the second beaker into the extraction vessel
-                d_volume = beaker_2.get_max_volume() * multiplier
-
-                # push the event to the second beaker
-                event = ['pour by volume', extract_vessel, d_volume]
-                reward = beaker_2.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
-
-                # push no events to the first beaker
-                beaker_1.push_event_to_queue(dt=self.dt)
-
-            # Pour the Extraction Vessel into Beaker 2
-            if do_action == 4:
-                # determine the volume to pour from the extraction vessel into the second beaker
-                d_volume = 1.0 * multiplier # use the default volume for the extraction vessel
-
-                # push the event to the extraction vessel
-                event = ['pour by volume', beaker_2, d_volume]
-                reward = extract_vessel.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
-
-                # push no events to the first beaker
-                beaker_1.push_event_to_queue(dt=self.dt)
-
-            # pour the (first) Solute Vessel into the Extraction Vessel
-            if do_action == 5:
-                # determine the volume to pour from the solvent vessel into the extraction vessel
-                d_volume = extract_vessel.get_max_volume() * multiplier
-
-                # push the event to the solvent vessel
-                event = ['pour by volume', extract_vessel, d_volume]
-                reward = solvent_vessel1.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
-
-                # push no events to either of the beakers
-                beaker_1.push_event_to_queue(dt=self.dt)
-                beaker_2.push_event_to_queue(dt=self.dt)
-
-            # pour the (second) Solute Vessel into the Extraction Vessel
-            if do_action == 6:
-                # determine the volume to pour from the solvent vessel into the extraction vessel
-                d_volume = extract_vessel.get_max_volume() * multiplier
-
-                # push the event to the solvent vessel
-                event = ['pour by volume', extract_vessel, d_volume]
-                reward = solvent_vessel2.push_event_to_queue(events=[event], dt=self.dt)*self.spill_penalty
-
-                # push no events to either of the beakers
-                beaker_1.push_event_to_queue(dt=self.dt)
-                beaker_2.push_event_to_queue(dt=self.dt)
-
-            # Indicate that all no more actions are to be completed
-            if do_action == 7:
-                # pass the fulfilled `done` parameter
-                done = True
-
-                # look through each vessel's material dict looking for the target material
-                reward = 0
-
-            # redefine the vessels and external_vessels parameters
-            vessels = [extract_vessel, beaker_1, beaker_2]
-            ext_vessel = [solvent_vessel1, solvent_vessel2]
-
-        return vessels, ext_vessel, reward, done, 1
+        return vessels, ext_vessel, reward, done, step_count
