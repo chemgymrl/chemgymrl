@@ -39,22 +39,28 @@ print(ALGO)
 
 
 class Heuristic():
-  """
-  Heuristic policy for a chemgymrl bench.
-  
-  The predict function is implemented the same as in a stable baselines policy, so
-  you should be able to use this heuristic policy in place of an RL algorithm.
-  
-  """
-  def predict(self,observation):
     """
-    Get an action from an observation based off of heurstics
-    
-    :param observation: (np.ndarray) the input observation
+    Heuristic policy for a chemgymrl bench.
 
-    :return: (np.ndarray, []) the model's action and an empty array (for baselines compatability)
+    The predict function is implemented the same as in a stable baselines policy, so
+    you should be able to use this heuristic policy in place of an RL algorithm.
+
     """
-    raise NotImplementedError
+
+    def __init__(self,env,level=1):
+        self.env=env
+        self.level=level
+        self.step=0
+
+    def predict(self,observation):
+        """
+        Get an action from an observation based off of heurstics
+
+        :param observation: (np.ndarray) the input observation
+
+        :return: (np.ndarray, []) the model's action and an empty array (for baselines compatability)
+        """
+        raise NotImplementedError
 
 class WurtzReactHeuristic(Heuristic):
     def predict(self,observation):
@@ -72,14 +78,14 @@ class WurtzReactHeuristic(Heuristic):
         return actions[t],[]
     
 class FictReact2Heuristic():
-    def predict(self,observation):
+    def predict(self,observation,a=0.69749509,b=1.0,thresh=0.0575):
         t = np.argmax(observation[-4:])
         #targs = [E F G I]
         actions=np.array([
         #T V A B D F G
         [1,0,1,1,0,0,0],#A+B -> E
         [1,0,1,0,1,1,1],#A+D -> F
-        [1,0,0,1,1,0,1],#B+D -> G
+        [1,0,0,b,1,0,1],#B+D -> G
         [1,0,0,0,0,1,1],#F+G -> I
         ],dtype=np.float32)
         #making I is a special case
@@ -87,8 +93,8 @@ class FictReact2Heuristic():
             marker=observation[:100].mean()
             if marker<0.01:
                 #dump in a little bit of A so it's all used up
-                return np.array([1,0,0.4,0,1,1,1]),[]# make F
-            elif marker>0.045:
+                return np.array([1,0,a,0,1,1,1]),[]# make F
+            elif marker>thresh:
                 #Just keep the temps up
                 return np.array([0.9,0,0,0,0,0,0]),[]
             else:
@@ -98,7 +104,7 @@ class FictReact2Heuristic():
             return actions[t],[]
         
 class FictReact1Heuristic():
-    def predict(self,observation,CONST=0.074):
+    def predict(self,observation,a=0.91378666,b=0.92011728,thresh=0.093):
         t = np.argmax(observation[-5:])
         #targs = [E F G H I]
         #print("EFGHI"[t],t)
@@ -116,9 +122,9 @@ class FictReact1Heuristic():
             #print(marker)
             if marker<0.01:
                 #dump in a little bit of A+B and D so it's all used up
-                return np.array([1,1,0.8,0.8,0,1,1,1,0]),[]# make F
+                return np.array([1,1,a,b,0,1,1,1,0]),[]# make F
             #Const is set to a value that gives the optimal time to add B
-            elif marker>CONST:
+            elif marker>thresh:
                 #Just keep the temps up
                 return np.array([1,1,0,0,0,0.0,0,0,0]),[]
             else:
@@ -128,40 +134,76 @@ class FictReact1Heuristic():
             return actions[t],[]
     
 class WurtzDistillHeuristic(Heuristic):
+    level_2 = "0909090940"
+    level_3 = ["0909090940","0909090929090909090940"]
     def predict(self,observation):
-        #check if the C6H14 is still in the beaker
-        if observation[0].mean()>0.56:
-            #If so raise the temperature
-            return np.array([0,9]),[]
-        #If not then end the experiment
+        if self.level==2:
+            pol= WurtzDistillHeuristic.level_2
+        elif self.level==3:
+            pol= WurtzDistillHeuristic.level_3[salt_check(self.env)]
+            
+        if self.level>1:
+            act,param = pol[2*self.step:2*self.step+2]
         else:
-            return np.array([4,4]),[]
+            act=np.random.choice([0]*3+[4])
+            param=9
+        
+        self.step+=1
+        if int(act)==4:
+            self.step=0
+        return np.array([int(act),int(param)]),[]
     
 class WurtzExtractHeuristic(Heuristic):
-    def _pred(self,obs):
-        marker=obs[1].mean()
-        #Mixing phase
-        if marker > 0.61:
-            #Adding in the C6H14
-            if obs[0].mean()<0.3:
-                return [5,1]
-            else:
-                #Pouring phase start
-                self.count=1
-                return [0,1]
-        #Pouring Phase
-        elif marker>0.35:
-            #wait for Na to float up
-            if self.count<40:
-                self.count+=1
-                return [0,0]
-            #pour more contents
-            return [0,2]
-        #done mixing and pouring
+    level_2 = "5074010404040480"
+    level_3 = "5074700004040404647472040404040480"
+    
+    def mix_check(self,o):
+        if self.step==0:
+            self.step+=1
+            return 5*5
+        
+        if self.step==49:
+            self.step=0
+            return 8*5
+        #Drain if the dodecane is near the bottom
+        elif o[0,0:14].mean()>0.72:
+            self.step+=1
+            return 4
+        elif o[0,0:11].mean()>0.72:
+            self.step+=1
+            return 3
+        elif o[0,0:8].mean()>0.72:
+            self.step+=1
+            return 2
+        elif o[0,0:5].mean()>0.72:
+            self.step+=1
+            return 1
+        elif o[0,0:2].mean()>0.72:
+            self.step+=1
+            return 0
+            
+        #if not mix then wait one step
         else:
-            return [7,1]
-    def predict(self,obs):
-        return np.array(self._pred(obs)),[]
+            self.step+=1
+            if self.step%2==0:
+                return 1*5+2
+            else:
+                return 7*5
+
+    def predict(self,observation):
+        if self.level==1:
+            return self.mix_check(observation),[]
+        if self.level==2:
+            pol= WurtzExtractHeuristic.level_2
+        elif self.level==3:
+            pol= WurtzExtractHeuristic.level_3
+        
+        act,param = pol[2*self.step:2*self.step+2]
+        
+        self.step+=1
+        if int(act)==8:
+            self.step=0
+        return int(act)*5+int(param),[]
 
 
 HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic,
@@ -185,13 +227,21 @@ if __name__=="__main__":
         
     except:
         os.makedirs(sys.argv[1], exist_ok=True)
+
     
     #Allow user to change settings (like steps)
     op.apply(sys.argv[1:])
     print(op)
+    
+    #make the environment
+    env = gym.make(op.environment)
+    print("The action space is", env.action_space)
+    print("The observation space is", env.observation_space)
+    
+    
     #choose algorithm
     if op.algorithm in HEURISTICS:
-        model = HEURISTICS[op.algorithm]()
+        model = HEURISTICS[op.algorithm](env,level=op.__dict__.get("level",1))
     elif not "--best" in sys.argv:
         #Load the model
         model = ALGO[op.algorithm].load(sys.argv[1]+"/model")
@@ -202,10 +252,8 @@ if __name__=="__main__":
         
     
     
-    #make the environment
-    env = gym.make(op.environment)
-    print("The action space is", env.action_space)
-    print("The observation space is", env.observation_space)
+
+
     
     rollout = {"InState":[],"Action":[],"Reward":[],"OutState":[],"Done":[],"Info":[],"Step":[]}
     obs=env.reset()

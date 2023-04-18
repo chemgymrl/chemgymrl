@@ -344,6 +344,7 @@ def stat_show(radar_info: dict, spoke_labels: list, labels, figsize=(22, 7),
         for ax in axs.flat[:-1]:
             ax.set_rmin(max(0,min([a[0].min() for (c,a) in info[1:-1]]+[0])))
             ax.set_rmax(max([a[0].max() for (c,a) in info[1:-1]]+[rmax]))
+        axs.flat[-1].set_rmin(0)
     else:
         #scale them all the same
         for ax in axs.flat:
