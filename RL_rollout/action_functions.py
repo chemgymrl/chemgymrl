@@ -301,8 +301,8 @@ def EXTRACT_2_3(amount,color="none"):
     
     return svg_code
 
-EXTRACT_3 = lambda x: EXTRACT_2_3(x,"#703636")
-EXTRACT_2 = lambda x: EXTRACT_2_3(x,"#71ab9c")
+EXTRACT_2 = lambda x: EXTRACT_2_3(x,"#703636")
+EXTRACT_3 = lambda x: EXTRACT_2_3(x,"#71ab9c")
 
 
 def EXTRACT_4(amount):
@@ -340,7 +340,7 @@ EXTRACT_7,EXTRACT_8 = DISTILL_3,DISTILL_4
 
 EXTRACT_ACTIONS=[EXTRACT_0,EXTRACT_1,EXTRACT_2,EXTRACT_3,EXTRACT_4,EXTRACT_5,EXTRACT_6,EXTRACT_7,EXTRACT_8]
 
-EXTRACT_NAMES = ["Drain EV to B1", "Mix EV","Pour B1 into EV","Pour B2 into EV", 
+EXTRACT_NAMES = ["Drain EV to B1", "Mix EV","Pour B2 into EV","Pour B1 into EV", 
         "Pour EV into B2", "Pour S1 into EV", "Pour S2 into EV","Wait","End Experiment"]
 
 for i,E in enumerate(EXTRACT_ACTIONS):
