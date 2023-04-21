@@ -179,7 +179,9 @@ class Vessel:
         self.dimensions = self.get_vessel_dimensions() # returns a tuple (max_height, radius)
 
         self.push_event_to_queue(events=None, dt=0)
-
+    
+    def __repr__(self):
+        return self.label
     def push_event_to_queue(
             self,
             events=None,  # a list of event tuples(['event', parameters])

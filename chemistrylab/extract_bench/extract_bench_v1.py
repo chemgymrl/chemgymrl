@@ -151,7 +151,7 @@ def wurtz_vessel(add_mat=""):
 def make_solvent(mat):
     "Makes a Vessel with a single material"
     solvent_vessel = vessel.Vessel(
-        label='solvent_vessel',
+        label=f'{mat} Vessel',
         v_max=1e6,
         n_pixels=100,
         settling_switch=False,
@@ -177,8 +177,8 @@ class GeneralWurtzExtract_v2(GenBench):
         e_rew= lambda x,y:ExtractionReward(vessels=x,desired_material=y,initial_target_amount=0).calc_reward()
         vessel_generators = [
             lambda x:wurtz_vessel(x)[0],
-            lambda x:vessel.Vessel(x),
-            lambda x:vessel.Vessel(x),
+            lambda x:vessel.Vessel("Beaker 1"),
+            lambda x:vessel.Vessel("Beaker 2"),
             lambda x:make_solvent("C6H14"),
             lambda x:make_solvent("diethyl ether")
         ]
