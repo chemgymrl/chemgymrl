@@ -36,121 +36,13 @@ from copy import deepcopy
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms import material, util, vessel
-from chemistrylab.extract_bench.extract_bench_v1_engine import ExtractBenchEnv
 from chemistrylab.reactions.reaction_base import _Reaction
+from chemistrylab.general_bench.general_bench import *
 
-from chemistrylab.extract_algorithms.extractions.extraction_2 import Extraction as Extraction2
+from chemistrylab.reactions.get_reactions import convert_to_class,get_reactions
+from chemistrylab.chem_algorithms.reward import ExtractionReward
+import importlib
 
-def get_extract_vessel(vessel_path=None, extract_vessel=None):
-    """
-    Function to obtain an extraction vessel containing materials.
-
-    Parameters
-    ---------------
-    `vessel_path` : `str` (default=`None`)
-        A string indicating the local of a pickle file containing the required vessel object.
-    `extract_vessel` : `vessel` (default=`None`)
-        A vessel object containing state variables, materials, solutes, and spectral data.
-
-    Returns
-    ---------------
-    `extract_vessel` : `vessel`
-        A vessel object containing state variables, materials, solutes, and spectral data.
-
-    Raises
-    ---------------
-    `IOError`:
-        Raised if neither a path to a pickle file nor a vessel object is provided.
-    """
-
-    # ensure that at least one of the methods to obtain a vessel is provided
-    if all([not os.path.exists(vessel_path), not extract_vessel]):
-        raise IOError("No vessel acquisition method specified.")
-
-    # if a vessel object is provided, use it;
-    # otherwise locate and extract the vessel object as a pickle file
-    if not extract_vessel:
-        with open(vessel_path, 'rb') as open_file:
-            extract_vessel = pickle.load(open_file)
-
-    return extract_vessel
-
-
-def oil_vessel():
-    """
-    Function to generate an input vessel for the oil and water extraction experiment.
-
-    Parameters
-    ---------------
-    None
-
-    Returns
-    ---------------
-    `extract_vessel` : `vessel`
-        A vessel object containing state variables, materials, solutes, and spectral data.
-
-    Raises
-    ---------------
-    None
-    """
-
-    # initialize extraction vessel
-    extraction_vessel = vessel.Vessel(label='extraction_vessel')
-
-    # initialize H2O
-    H2O = material.H2O()
-
-    # initialize Na
-    Na = material.Na()
-    Na.set_charge(1.0)
-    Na.set_solute_flag(True)
-    Na.set_polarity(2.0)
-    Na.set_phase('l')
-    Na._boiling_point = material.NaCl()._boiling_point
-
-    # initialize Cl
-    Cl = material.Cl()
-    Cl.set_charge(-1.0)
-    Cl.set_solute_flag(True)
-    Cl.set_polarity(2.0)
-    Cl.set_phase('l')
-    Cl._boiling_point = material.NaCl()._boiling_point
-
-    # material_dict
-    material_dict = {
-        H2O.get_name(): [H2O, 30.0, 'mol'],
-        Na.get_name(): [Na, 1.0, 'mol'],
-        Cl.get_name(): [Cl, 1.0, 'mol']
-    }
-
-    # solute_dict
-    solute_dict = {
-        Na.get_name(): {H2O.get_name(): [H2O, 1, 'mol']},
-        Cl.get_name(): {H2O.get_name(): [H2O, 1, 'mol']},
-    }
-
-    material_dict, solute_dict, _ = util.check_overflow(
-        material_dict=material_dict,
-        solute_dict=solute_dict,
-        v_max=extraction_vessel.get_max_volume()
-    )
-
-    # set events and push them to the queue
-    extraction_vessel.push_event_to_queue(
-        events=None,
-        feedback=[
-            ['update material dict', material_dict],
-            ['update solute dict', solute_dict]
-        ],
-        dt=0
-    )
-    extraction_vessel.push_event_to_queue(
-        events=None,
-        feedback=None,
-        dt=-100000
-    )
-
-    return extraction_vessel
 
 def wurtz_vessel(add_mat=""):
     """
@@ -255,127 +147,59 @@ def wurtz_vessel(add_mat=""):
 
     return extraction_vessel, add_mat
 
-class WurtzExtract_v1(ExtractBenchEnv):
+
+def make_solvent(mat):
+    "Makes a Vessel with a single material"
+    solvent_vessel = vessel.Vessel(
+        label='solvent_vessel',
+        v_max=1e6,
+        n_pixels=100,
+        settling_switch=False,
+        layer_switch=False,
+    )
+    # create the material dictionary for the solvent vessel
+    solvent_class = convert_to_class(materials=[mat])[0]()
+    solvent_material_dict = {mat:[solvent_class, 1e6]}
+
+    # instruct the vessel to update its material dictionary
+    event = Event('update material dict', solvent_material_dict,None)
+
+    solvent_vessel.push_event_to_queue(feedback=[event], dt=0)
+    return solvent_vessel
+
+
+class GeneralWurtzExtract_v2(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
     def __init__(self):
-        super(WurtzExtract_v1, self).__init__(
-            extraction_vessel=wurtz_vessel('dodecane')[0],
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz",
-            n_steps=50,
-            target_material='dodecane',
-            solvents=["C6H14", "diethyl ether"],
-            out_vessel_path=None
-        )
+        e_rew= lambda x,y:ExtractionReward(vessels=x,desired_material=y,initial_target_amount=0).calc_reward()
+        vessel_generators = [
+            lambda x:wurtz_vessel(x)[0],
+            lambda x:vessel.Vessel(x),
+            lambda x:vessel.Vessel(x),
+            lambda x:make_solvent("C6H14"),
+            lambda x:make_solvent("diethyl ether")
+        ]
+        amounts=np.linspace(0.2,1,5).reshape([5,1])
+        actions = [
+            Action([0], amounts*10,          'drain by pixel',[1],  False),
+            Action([0],-amounts,             'mix',           None, False),
+            Action([1], amounts,             'pour by volume',[0],  False),
+            Action([2], amounts,             'pour by volume',[0],  False),
+            Action([0], amounts,             'pour by volume',[2],  False),
+            Action([3], amounts/2,           'pour by volume',[0],  False),
+            Action([4], amounts/2,           'pour by volume',[0],  False),
+            Action([0], 32**amounts/200-0.01,'mix',           None, False),
+            Action([0], [[0.01]],            'mix',           None, True)
+        ]
         
-class WurtzExtract_v2(ExtractBenchEnv):
-    """
-    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
-    """
-
-    def __init__(self):
-        super(WurtzExtract_v2, self).__init__(
-            extraction_vessel=wurtz_vessel('dodecane')[0],
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz",
-            n_steps=50,
-            target_material='dodecane',
-            solvents=["C6H14", "diethyl ether"],
-            out_vessel_path=None,
-            Extraction=Extraction2
-        )
-
-class GeneralWurtzExtract_v1(ExtractBenchEnv):
-    """
-    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
-    """
-
-    def __init__(self, target_material="", in_vessel_path=None):
-        self.original_target_material = target_material
-        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
-
-        super(GeneralWurtzExtract_v1, self).__init__(
-            extraction_vessel=extract_vessel,
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz",
-            in_vessel_path=in_vessel_path,
-            n_steps=50,
-            solvents=["C6H14", "diethyl ether"],
-            target_material=target_mat,
-            out_vessel_path=None
-        )
-
-    def reset(self):
-        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
-        self.original_extraction_vessel = deepcopy(extract_vessel)
-        self.target_material = target_mat
-
-        return super(GeneralWurtzExtract_v1, self).reset()
-    
-    
-class GeneralWurtzExtract_v2(ExtractBenchEnv):
-    """
-    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
-    """
-
-    def __init__(self, target_material="", in_vessel_path=None):
-        self.original_target_material = target_material
-        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
-
         super(GeneralWurtzExtract_v2, self).__init__(
-            extraction_vessel=extract_vessel,
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz",
-            in_vessel_path=in_vessel_path,
-            n_steps=50,
-            solvents=["C6H14", "diethyl ether"],
-            target_material=target_mat,
-            out_vessel_path=None,
-            Extraction=Extraction2
+            vessel_generators,
+            actions,
+            importlib.import_module("chemistrylab.reactions.available_reactions.chloro_wurtz"),
+            n_visible=3,
+            reward_function=e_rew
         )
 
-    def reset(self):
-        extract_vessel, target_mat = wurtz_vessel(self.original_target_material)
-        self.original_extraction_vessel = deepcopy(extract_vessel)
-        self.target_material = target_mat
-
-        return super(GeneralWurtzExtract_v2, self).reset()
-
-
-class WurtzExtractCtd_v1(ExtractBenchEnv):
-    """
-    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
-    """
-
-    def __init__(self):
-        super(WurtzExtractCtd_v1, self).__init__(
-            extraction_vessel=get_extract_vessel(
-                vessel_path=os.path.join(os.getcwd(), "react_vessel.pickle"),
-                extract_vessel=vessel.Vessel(label='temp')
-            ),
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz",
-            n_steps=50,
-            target_material='dodecane',
-            solvents=["C6H14", "diethyl ether"],
-            out_vessel_path=None
-        )
-
-class WaterOilExtract_v1(ExtractBenchEnv):
-    """
-    Class to define an environment which performs a water-oil extraction on materials in a vessel.
-    """
-
-    def __init__(self):
-        super(WaterOilExtract_v1, self).__init__(
-            reaction=_Reaction,
-            reaction_file_identifier="decomp",
-            solvents=["C6H14", "H2O"],
-            extraction_vessel=oil_vessel(),
-            n_steps=50,
-            target_material='Na',
-            out_vessel_path=None
-        )

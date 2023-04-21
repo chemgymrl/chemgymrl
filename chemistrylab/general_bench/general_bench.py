@@ -13,7 +13,6 @@ import numpy as np
 import sys
 sys.path.append("../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
-from chemistrylab.chem_algorithms.reward import DistillationReward
 
 
 
@@ -43,7 +42,11 @@ class Event(NamedTuple):
     parameter: tuple
     other_vessel: Optional[object]   
 
-
+def default_reward(vessels,targ):
+    sum_=0
+    for vessel in vessels:
+        mats=vessel._material_dict
+        sum_+=mats.get(targ,(0,0))[1]**2/sum(mats[a][1] for a in mats)
     
 class GenBench(Bench):
     """A class representing an bench setup for conducting experiments.
@@ -57,6 +60,7 @@ class GenBench(Bench):
     - action_list (list): A list of Action objects containing information describing what each action is.
     - reaction_info (ReactInfo): A ReactInfo object that provides information about the chemical reactions taking
             place.
+    - n_visible (Optional int): The number of vessels (first n) which will be visible in the observation space
 
     Keyword Args:
         kwargs: To be determined based on need.
@@ -64,14 +68,19 @@ class GenBench(Bench):
     """
     def __init__(
         self,
-        vessel_generators,
-        action_list,
-        reaction_info,
+        vessel_generators: Callable,
+        action_list: Tuple[Action],
+        reaction_info,#work in progress
+        n_visible: Optional[int] = None,
+        reward_function: Callable = default_reward,
         **kwargs
     ):
+        
+        self.n_visible = len(vessel_generators) if n_visible is None else n_visible
         self.vessel_generators=vessel_generators
         self.action_list=action_list
         self.reaction_info=reaction_info
+        self.reward_function=reward_function
         
         self.n_actions=sum(1 for a in action_list for p in a.parameters)
         
@@ -79,7 +88,7 @@ class GenBench(Bench):
         
         #This block will have to change later to accomodate other observation spaces (right now I used extract bench)
         self.n_pixels=100
-        obs_high = np.ones((len(vessel_generators), self.n_pixels + self.num_targets), dtype=np.float32)
+        obs_high = np.ones((self.n_visible, self.n_pixels + self.num_targets), dtype=np.float32)
         self.observation_space = gym.spaces.Box(obs_high*0, obs_high, dtype=np.float32)
         
         #only supporting discrete action spaces right now
@@ -93,11 +102,11 @@ class GenBench(Bench):
         self.vessels=new_vessels
         
     def get_state(self):
-        state = np.zeros((len(self.vessels), self.n_pixels + self.num_targets), dtype=np.float32)
+        state = np.zeros((self.n_visible, self.n_pixels + self.num_targets), dtype=np.float32)
         #layer observation (used for extract and distill benches)
         state[:, :self.n_pixels] = util.generate_layers_obs(
-            vessel_list=self.vessels,
-            max_n_vessel=len(self.vessels),
+            vessel_list=self.vessels[:self.n_visible],
+            max_n_vessel=self.n_visible,
             n_vessel_pixels=self.n_pixels
         )
         #target is like this in all benches
@@ -116,7 +125,7 @@ class GenBench(Bench):
         else:
             other_vessels = [self.vessels[i] for i in action.affected_vessels]
 
-        return [(v,Event(action.event_name,param,other_vessels[i])) for i,v in enumerate(action.vessels)],action
+        return [(v,Event(action.event_name,param,other_vessels[i])) for i,v in enumerate(action.vessels)]
     
     def step(self,action):
         act,_action = self.actions[action]
@@ -125,19 +134,16 @@ class GenBench(Bench):
         for v,event in act:
             updated.add(v)
             #going to hard-code dt for now
-            self.vessels[v].push_event_to_queue(events=[event], dt=0.05)
-        #all uninvolved vessels
-        for v,vessel in enumerate(self.vessels):
+            self.vessels[v].push_event_to_queue(events=[event], dt=0.01)
+        #all uninvolved vessels which appear in the observation space
+        for v in range(self.n_visible):
             if not v in updated:
-                vessel.push_event_to_queue(dt=0.05)
+                self.vessels[v].push_event_to_queue(dt=0.01)
                 
         #Handle reward
         reward=0
         if _action.terminal:
-            reward = DistillationReward(
-                vessels=self.vessels,
-                desired_material=self.target_material,
-            ).calc_reward()-self.initial_reward
+            reward = self.reward_function(self.vessels[:self.n_visible],self.target_material)-self.initial_reward
         
         return self.get_state(), reward, _action.terminal, {}
     
@@ -146,18 +152,16 @@ class GenBench(Bench):
         self.target_material=target
         
         #might rethink this line
-        self.actions = [self.build_event(a,p)  for a in self.action_list for p in a.parameters]
+        self.actions = [(self.build_event(a,p),a)  for a in self.action_list for p in a.parameters]
         
         
         #Reward (will probably change the reward system later)
-        self.initial_reward = DistillationReward(
-                vessels=self.vessels,
-                desired_material=self.target_material,
-            ).calc_reward()
+        self.initial_reward = self.reward_function(self.vessels[:self.n_visible],self.target_material)
         
         return self.get_state()
     
     def reset(self):
-        return self._reset("dodecane")
+        target=np.random.choice(self.reaction_info.PRODUCTS)
+        return self._reset(target)
         
         
