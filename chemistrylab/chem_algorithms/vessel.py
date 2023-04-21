@@ -266,11 +266,11 @@ class Vessel:
             action = self._event_dict[event[0]]
 
             # if action is wait
-            if event[0] == 'wait':
-                reward += action(parameter=event[1:], dt=dt)
+            if event[2] is not None:
+                reward += action(event[1],event[2], dt=dt)
             else:
                 # call the function corresponding to the event
-                reward += action(parameter=event[1:], dt=dt)
+                reward += action(parameter=event[1], dt=dt)
 
         # generate the merged queue from feedback queue and empty the feedback queue
         merged = self._merge_event_queue(
@@ -343,22 +343,21 @@ class Vessel:
         return merged
 
     # ---------- START EVENT FUNCTIONS ---------- #
-    def _wait(self, parameter, dt):
+    def _wait(self, parameter,out_beaker, dt):
         room_temp = parameter[0]
         initial_temp = self.get_temperature()
-        out_beaker = parameter[1]
-        wait_until_room = parameter[2]
+        wait_until_room = parameter[1]
         if wait_until_room:
             self._update_temperature([room_temp, False], dt)
         else:
             rate = 1.143 * self.get_material_surface_area() * (room_temp - initial_temp)/self.thickness
             heat_change = rate * dt
-            self._change_heat([heat_change, out_beaker], dt)
+            self._change_heat([heat_change],out_beaker, dt)
             if initial_temp > room_temp > self.get_temperature() or initial_temp < room_temp < self.get_temperature():
                 self._update_temperature([room_temp, False], dt)
         return 0
 
-    def _change_heat(self, parameter, dt):
+    def _change_heat(self, parameter,out_beaker, dt):
         """
         Method to modify the temperature and contents of a vessel by adding or removing heat.
 
@@ -381,7 +380,6 @@ class Vessel:
 
         # extract the inputted parameters
         heat_available = parameter[0] # floating point in joules
-        out_beaker = parameter[1] # vessel.Vessel object
 
         # set up a variable to track the total change of the vessel temperature
         self.total_temp_change = 0
@@ -645,6 +643,7 @@ class Vessel:
     def _pour_by_volume(
             self,
             parameter,  # [target_vessel, d_volume, unit] unit is optional, if not included we assume the use of l
+            target_vessel,
             dt
     ):
         """
@@ -668,10 +667,9 @@ class Vessel:
         """
 
         # extract the relevant parameters
-        target_vessel = parameter[0]
-        d_volume = parameter[1]
-        if len(parameter) == 3:
-            unit = parameter[2]
+        d_volume = parameter[0]
+        if len(parameter) == 2:
+            unit = parameter[1]
         else:
             unit = 'l'
         d_volume = util.convert_volume(d_volume, unit)
@@ -810,6 +808,7 @@ class Vessel:
     def _drain_by_pixel(
             self,
             parameter,  # [target_vessel, n_pixel]
+            target_vessel,
             dt
     ):
         """
@@ -833,8 +832,7 @@ class Vessel:
         """
 
         # extract the necessary parameters
-        target_vessel = parameter[0]
-        n_pixel = parameter[1]
+        n_pixel = parameter[0]
 
         # collect data
         target_material_dict = target_vessel.get_material_dict()
