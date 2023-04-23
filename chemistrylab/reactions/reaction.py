@@ -104,10 +104,11 @@ class Reaction():
         """
         Takes in a vessel and applies the reaction to it, updating the material and solvent dicts in the process
         """
+        
+        if vessel.get_total_material_amount() < 1e-12:return
         n = get_amounts(self.materials, vessel._material_dict)
         temperature = vessel.get_temperature()
         current_volume = vessel.get_current_volume()[-1]
-        if current_volume<1e-10:return
         dt = vessel.default_dt
         
         #update concentrations

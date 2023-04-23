@@ -101,10 +101,10 @@ dV = 0.005
     # the stoichiometric coefficients (4x6 array)
 pre_exp_arr = np.array(
     [
-        1e4, # pre-exp factor for reaction 0
-        1e4, # pre-exp factor for reaction 1
-        1e4, # pre-exp factor for reaction 2
-        1e4 # pre-exp factor for reaction 3
+        1e0, # pre-exp factor for reaction 0
+        1e0, # pre-exp factor for reaction 1
+        1e0, # pre-exp factor for reaction 2
+        1e0 # pre-exp factor for reaction 3
     ]
 )
 activ_energy_arr = np.array(

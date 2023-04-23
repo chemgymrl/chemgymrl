@@ -130,6 +130,8 @@ def wurtz_vessel(add_mat):
         dt=-100000
     )
 
+    boil_vessel.default_dt=10.0
+    
     return boil_vessel, add_mat
 
 
@@ -154,7 +156,7 @@ class GeneralWurtzDistill_v1(GenBench):
             Action([0],    amounts,              'pour by volume', [1],      False),
             Action([1],    amounts,              'pour by volume', [2],      False),
             Action([0], [[T, False], [T, True]], 'wait',           [1],      False),
-            Action([0],  [[0.05]],               'mix',            None,     True)
+            Action([0],  [[0.05]]*5,               'mix',            None,     True)
         ]
         
         targets = [
