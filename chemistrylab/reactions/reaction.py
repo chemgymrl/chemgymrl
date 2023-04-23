@@ -107,6 +107,7 @@ class Reaction():
         n = get_amounts(self.materials, vessel._material_dict)
         temperature = vessel.get_temperature()
         current_volume = vessel.get_current_volume()[-1]
+        if current_volume<1e-10:return
         dt = vessel.default_dt
         
         #update concentrations
