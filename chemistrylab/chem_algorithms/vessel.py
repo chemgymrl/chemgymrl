@@ -162,6 +162,7 @@ class Vessel:
         self._event_dict = {
             'update temperature': self._update_temperature,
             'pour by volume': self._pour_by_volume,
+            'dump fraction':self._dump_fraction,
             'drain by pixel': self._drain_by_pixel,
             'update material dict': self._update_material_dict,
             'update solute dict': self._update_solute_dict,
@@ -641,6 +642,31 @@ class Vessel:
         else:
             self.open_vessel = False
             # followed by several updates
+
+    def _dump_fraction(
+        self,
+        parameter,
+        target_vessel,
+        dt
+    ):
+        d_percentage = parameter[0]
+        target_material_dict = target_vessel._material_dict
+        for M in self._material_dict:
+            # calculate the change of amount(mole) of each material
+            d_mole = self._material_dict[M][1] * d_percentage
+            # update material dict for this vessel
+            self._material_dict[M][1] -= d_mole
+            # update material dict for the target vessel, if it's in target vessel
+            if M in target_material_dict:
+                target_material_dict[M][1] += d_mole
+            # if it's not in target vessel, create it in material dict
+            else:
+                target_material_dict[M] = [
+                    copy.deepcopy(self._material_dict[M][0]),
+                    d_mole,
+                    'mol'
+                ]
+        return 0
 
     def _pour_by_volume(
             self,

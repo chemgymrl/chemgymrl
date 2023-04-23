@@ -29,6 +29,11 @@ import gym.spaces
 sys.path.append("../../")
 from chemistrylab.reaction_bench.reaction_bench_v1_engine import ReactionBenchEnv
 from chemistrylab.reactions.reaction_base import _Reaction
+from chemistrylab.reactions.get_reactions import convert_to_class,get_reactions
+from chemistrylab.chem_algorithms.reward import ReactionReward
+from chemistrylab.chem_algorithms import material, util, vessel
+from chemistrylab.general_bench.general_bench import *
+import importlib
 
 class WurtzReact_v1(ReactionBenchEnv):
     '''
@@ -163,7 +168,67 @@ class FictReact_v1(ReactionBenchEnv):
             overlap=False
         )
 
-class FictReact_v2(ReactionBenchEnv):
+        
+def get_mat(mat,amount,name=None):
+    "Makes a Vessel with a single material"
+    
+    my_vessel = vessel.Vessel(
+        label=f'{mat} Vessel' if name is None else name,
+        settling_switch=False,
+        layer_switch=False,
+    )
+    # create the material dictionary for the vessel
+    matclass = convert_to_class(materials=[mat])[0]()
+    material_dict = {mat:[matclass, amount]}
+    # instruct the vessel to update its material dictionary
+    event = Event('update material dict', material_dict,None)
+
+    my_vessel.push_event_to_queue(feedback=[event], dt=0)
+    
+    my_vessel.default_dt=0.01
+    
+    return my_vessel
+        
+class FictReact_v2(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        r_rew= lambda x,y:ReactionReward(vessel=x[0],desired_material=y,undesired_material="E").calc_reward(done=True)
+        vessel_generators = [
+            lambda x:get_mat("H2O",30,"Reaction Vessel"),
+            lambda x:get_mat("A",1),
+            lambda x:get_mat("B",1),
+            lambda x:get_mat("C",1),
+            lambda x:get_mat("D",3),
+        ]
+        dQ=20000.0
+        actions = [
+            Action([0],    [ContinuousParam(-dQ,dQ,0,None)],   'change_heat',    [0],      False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
+        ]
+        
+        targets = ["E", "F", "G", "H", "I"]
+        
+        super(FictReact_v2, self).__init__(
+            vessel_generators,
+            actions,
+            importlib.import_module("chemistrylab.reactions.available_reactions.fict_react"),
+            n_visible=1,
+            reward_function=r_rew,
+            react_list=[0],
+            targets=targets,
+            discrete=False
+        )
+        
+        
+        
+class FictReact_v2B(ReactionBenchEnv):
     '''
     Class object to define an environment available in the reaction bench.
     '''

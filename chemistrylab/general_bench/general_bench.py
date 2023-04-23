@@ -16,20 +16,6 @@ from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.reactions.reaction import Reaction
 
 
-class Bench(gym.Env):
-    def get_vessels(self):
-        raise NotImplementedError("Bench is abstract class")
-    
-    def update_vessels(self, new_vessels):
-        raise NotImplementedError("Bench is abstract class")
-    
-    def step(self,act):
-        raise NotImplementedError("Bench is abstract class")
-    
-    def reset(self):
-        raise NotImplementedError("Bench is abstract class")
-        
-        
 class Action(NamedTuple):
     vessels: Tuple[int]
     parameters: Tuple[tuple]
@@ -40,7 +26,13 @@ class Action(NamedTuple):
 class Event(NamedTuple):
     name: str
     parameter: tuple
-    other_vessel: Optional[object]   
+    other_vessel: Optional[object]
+        
+class ContinuousParam(NamedTuple):
+    min_val: float
+    max_val: float
+    thresh: float
+    other: object
 
 def default_reward(vessels,targ):
     sum_=0
@@ -48,7 +40,7 @@ def default_reward(vessels,targ):
         mats=vessel._material_dict
         sum_+=mats.get(targ,(0,0))[1]**2/sum(mats[a][1] for a in mats)
     
-class GenBench(Bench):
+class GenBench(gym.Env):
     """A class representing an bench setup for conducting experiments.
 
     This class represents a bench setup. The setup consists of a
@@ -61,7 +53,9 @@ class GenBench(Bench):
     - reaction_info (ReactInfo): A ReactInfo object that provides information about the chemical reactions taking
             place.
     - n_visible (Optional int): The number of vessels (first n) which will be visible in the observation space
-
+    - react_list (Tuple[int]): Which vessels reactions should take place in (leave empty for no reacting)
+    - targets (Tuple[str]): The target materials for this bench
+    - discrete (bool): set to True for a discrete action space and False for a continuous one
     Keyword Args:
         kwargs: To be determined based on need.
 
@@ -73,8 +67,9 @@ class GenBench(Bench):
         reaction_info,#work in progress
         n_visible: Optional[int] = None,
         reward_function: Callable = default_reward,
-        react_list=None,
-        targets=None,
+        react_list: Optional[Tuple[int]] = None,
+        targets: Optional[Tuple[str]] = None,
+        discrete=True,
         **kwargs
     ):
         
@@ -100,8 +95,12 @@ class GenBench(Bench):
         obs_high = np.ones((self.n_visible, self.n_pixels + self.num_targets), dtype=np.float32)
         self.observation_space = gym.spaces.Box(obs_high*0, obs_high, dtype=np.float32)
         
-        #only supporting discrete action spaces right now
-        self.action_space = gym.spaces.Discrete(self.n_actions)
+        self.discrete=discrete
+        if self.discrete:
+            self.action_space = gym.spaces.Discrete(self.n_actions)
+        else:
+            low,high=np.zeros(self.n_actions),np.ones(self.n_actions)
+            self.action_space = gym.spaces.Box(low, high, dtype=np.float32)
         
         self.reset()
         
@@ -111,6 +110,13 @@ class GenBench(Bench):
         self.vessels=new_vessels
         
     def get_state(self):
+        """
+        work in progress:
+        
+        Calling this will return an observation of the current state.
+        This needs to  be updated to allow for distillation and reaction observations.
+        
+        """
         state = np.zeros((self.n_visible, self.n_pixels + self.num_targets), dtype=np.float32)
         #layer observation (used for extract and distill benches)
         state[:, :self.n_pixels] = util.generate_layers_obs(
@@ -126,17 +132,46 @@ class GenBench(Bench):
 
     def build_event(self,action,param):
         """
-        Returns a tuple of (index,Event) where index is the index of the vessel the Event will occur in
+        Returns a list of (index,Event) tuples where index is the index of the vessel the Event will occur in
         """
         #watch out for null case
         if action.affected_vessels is None:
             other_vessels = [None]*len(action.vessels)  
         else:
             other_vessels = [self.vessels[i] for i in action.affected_vessels]
-
+        
+        #I may change this in the future to remove support for an action to span multiple vessel pairs
         return [(v,Event(action.event_name,param,other_vessels[i])) for i,v in enumerate(action.vessels)]
     
-    def step(self,action):
+    def _perform_continuous_action(self,action):
+        """
+        Action should be a 1D array
+        """
+        for i,(act,_action) in enumerate(self.actions):
+            val=action[i]
+            #handling any end of episode actions
+            if _action.terminal and (val>act[0][1].parameter.thresh):
+                return True
+            
+            #update the involved vessels
+            for v,event in act:
+                # move the action in [0,1] to [min_val,max_val]
+                min_val, max_val, thresh, other = event.parameter
+                activ=val*(val>thresh)
+                rescaled = activ*(max_val-min_val)+min_val
+                #create a new event with this
+                param=(rescaled,other)
+                derived_event = Event(event.name,param,event.other_vessel)
+                #perform the new event
+                self.vessels[v].push_event_to_queue(events=[derived_event], dt=0.0)
+        #all vessels which appear in the observation space are updated
+        for v in range(self.n_visible):
+            self.vessels[v].push_event_to_queue(dt=0.01)
+        return False
+    def _perform_discrete_action(self,action):
+        """
+        Action should be an integer
+        """
         act,_action = self.actions[action]
         updated=set()
         #update the involved vessels
@@ -148,15 +183,25 @@ class GenBench(Bench):
         for v in range(self.n_visible):
             if not v in updated:
                 self.vessels[v].push_event_to_queue(dt=0.01)
-                
+        
+        return _action.terminal
+    
+    def step(self,action):
+        if self.discrete:
+            done = self._perform_discrete_action(action)
+        else:
+            done = self._perform_continuous_action(action)
+            
+        #perform any reactions
         for v in self.react_list:
             self.reaction.update_concentrations(self.vessels[v])
+        
         #Handle reward
         reward=0
-        if _action.terminal:
+        if done:
             reward = self.reward_function(self.vessels[:self.n_visible],self.target_material)-self.initial_reward
         
-        return self.get_state(), reward, _action.terminal, {}
+        return self.get_state(), reward, done, {}
     
     def _reset(self,target):
         self.vessels = [v(target) for v in self.vessel_generators]

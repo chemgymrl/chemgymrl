@@ -125,15 +125,15 @@ class ReactionReward:
         all_materials = [material for material, __ in vessel._material_dict.items()]
 
         # check that the input vessel has at least one material
-        if not all_materials:
-            print("Vessel has no materials.")
+        #if not all_materials:
+        #    print("Vessel has no materials.")
 
         # check that the inputted vessel has the desired material
-        if any([
-                not desired_material,
-                desired_material not in all_materials
-        ]):
-            print("Desired material not found in input vessel.")
+        #if any([
+        #        not desired_material,
+        #        desired_material not in all_materials
+        #]):
+        #    print("Desired material not found in input vessel.")
 
         # ensure the undesired material is represented by a string
         if not isinstance(desired_material, str):
@@ -141,13 +141,13 @@ class ReactionReward:
             desired_material = ""
 
         # check that the inputted vessel has the desired material
-        if undesired_material=="":
-            pass
-        elif any([
-                not desired_material,
-                desired_material not in all_materials
-        ]):
-            print("Undesired material not found in input vessel.")
+        #if undesired_material=="":
+        #    pass
+        #elif any([
+        #        not desired_material,
+        #        desired_material not in all_materials
+        #]):
+        #    print("Undesired material not found in input vessel.")
 
         return vessel, desired_material, undesired_material
 

@@ -184,7 +184,7 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
     Sts = np.zeros(S.shape)
     Scur = np.copy(S)
     # only do the calculation if there are two or more solvent
-    if (len(A) < 2):
+    if (len(A) < 2) or A.sum()-A.max()<1e-12:
         C = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
         return B, C, S, Sts
 
