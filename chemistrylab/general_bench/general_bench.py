@@ -13,7 +13,7 @@ import numpy as np
 import sys
 sys.path.append("../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
-
+from chemistrylab.reactions.reaction import Reaction
 
 
 class Bench(gym.Env):
@@ -73,10 +73,15 @@ class GenBench(Bench):
         reaction_info,#work in progress
         n_visible: Optional[int] = None,
         reward_function: Callable = default_reward,
+        react_list=None,
         **kwargs
     ):
         
         self.n_visible = len(vessel_generators) if n_visible is None else n_visible
+        
+        self.react_list = [] if react_list is None else react_list
+        self.reaction=Reaction(reaction_info)
+        
         self.vessel_generators=vessel_generators
         self.action_list=action_list
         self.reaction_info=reaction_info
@@ -140,6 +145,8 @@ class GenBench(Bench):
             if not v in updated:
                 self.vessels[v].push_event_to_queue(dt=0.01)
                 
+        for v in self.react_list:
+            self.reaction.update_concentrations(self.vessels[v])
         #Handle reward
         reward=0
         if _action.terminal:
