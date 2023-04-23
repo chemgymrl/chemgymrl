@@ -59,6 +59,11 @@ register(
 )
 
 register(
+    id='GenWurtzReact-v2',
+    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:GeneralWurtzReact_v2'
+)
+
+register(
     id='FictReact-v1',
     entry_point='chemistrylab.reaction_bench.reaction_bench_v1:FictReact_v1'
 )

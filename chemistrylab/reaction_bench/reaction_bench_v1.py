@@ -133,6 +133,43 @@ class GeneralWurtzReact_v1(ReactionBenchEnv):
             dt=0.01,
             overlap=False
         )
+        
+        
+class GeneralWurtzReact_v2(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        r_rew= lambda x,y:ReactionReward(vessel=x[0],desired_material=y,undesired_material="E").calc_reward(done=True)
+        vessel_generators = [
+            lambda x:get_mat("DiEthylEther",4,"Reaction Vessel"),
+            lambda x:get_mat("1-chlorohexane",1),
+            lambda x:get_mat("2-chlorohexane",1),
+            lambda x:get_mat("3-chlorohexane",1),
+            lambda x:get_mat("Na",3),
+        ]
+        dQ=20000.0
+        actions = [
+            Action([0],    [ContinuousParam(-dQ,dQ,0,None)],   'change_heat',    [0],      False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
+        ]
+                
+        super(GeneralWurtzReact_v2, self).__init__(
+            vessel_generators,
+            actions,
+            importlib.import_module("chemistrylab.reactions.available_reactions.chloro_wurtz"),
+            n_visible=1,
+            reward_function=r_rew,
+            react_list=[0],
+            targets=None,
+            discrete=False
+        )
+        
 
 class FictReact_v1(ReactionBenchEnv):
     '''
