@@ -157,12 +157,23 @@ class GeneralWurtzDistill_v1(GenBench):
             Action([0],  [[0.05]],               'mix',            None,     True)
         ]
         
+        targets = [
+            "dodecane",
+            "5-methylundecane",
+            "4-ethyldecane",
+            "5,6-dimethyldecane",
+            "4-ethyl-5-methylnonane",
+            "4,5-diethyloctane",
+            "NaCl"
+        ]
+        
         super(GeneralWurtzDistill_v1, self).__init__(
             vessel_generators,
             actions,
-            importlib.import_module("chemistrylab.reactions.available_reactions.chloro_wurtz"),
+            importlib.import_module("chemistrylab.reactions.available_reactions.precipitation"),
             reward_function=d_rew,
-            react_list=[0]
+            react_list=[0],
+            targets=targets
         )
 
 

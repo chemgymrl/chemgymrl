@@ -32,7 +32,7 @@ def set_amounts(materials,solvents, material_classes, n, vessel):
                     if vessel.get_material_amount(solvent) > 1e-12:
                         present_solvents.append(solvent)
 
-                new_solute_dict[material_name] = {solvent: [convert_to_class(materials=[solvent])[0](), solute_change_amount/len(self.solvents), 'mol'] for solvent in present_solvents}
+                new_solute_dict[material_name] = {solvent: [convert_to_class(materials=[solvent])[0](), solute_change_amount/len(solvents), 'mol'] for solvent in present_solvents}
 
     # update target vessel's material amount
     vessel._material_dict = new_material_dict

@@ -74,6 +74,7 @@ class GenBench(Bench):
         n_visible: Optional[int] = None,
         reward_function: Callable = default_reward,
         react_list=None,
+        targets=None,
         **kwargs
     ):
         
@@ -89,7 +90,10 @@ class GenBench(Bench):
         
         self.n_actions=sum(1 for a in action_list for p in a.parameters)
         
-        self.num_targets=len(self.reaction_info.PRODUCTS)
+        self.targets = targets
+        if self.targets is None:
+            self.targets = self.reaction_info.PRODUCTS
+        self.num_targets=len(self.targets)
         
         #This block will have to change later to accomodate other observation spaces (right now I used extract bench)
         self.n_pixels=100
@@ -115,7 +119,7 @@ class GenBench(Bench):
             n_vessel_pixels=self.n_pixels
         )
         #target is like this in all benches
-        targ_ind = self.reaction_info.PRODUCTS.index(self.target_material)
+        targ_ind = self.targets.index(self.target_material)
         state[:, self.n_pixels + targ_ind] = 1
         
         return state
@@ -168,7 +172,7 @@ class GenBench(Bench):
         return self.get_state()
     
     def reset(self):
-        target=np.random.choice(self.reaction_info.PRODUCTS)
+        target=np.random.choice(self.targets)
         return self._reset(target)
         
         
