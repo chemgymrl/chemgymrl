@@ -187,7 +187,7 @@ class ReactionBenchEnv(gym.Env):
         # this an array denoting spectral signatures (varying
         # between 0.0 and 1.0) for a wide range of wavelengths;
         # only needed for specifying the observation space so only the array size is required
-        self.char_bench = CharacterizationBench()
+        self.char_bench = CharacterizationBench([],[],0)
         absorb = self.char_bench.get_spectra(self.vessels, materials=self.reaction.materials)
 
         # Observations have several attributes

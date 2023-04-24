@@ -173,6 +173,7 @@ class GeneralWurtzDistill_v1(GenBench):
             vessel_generators,
             actions,
             importlib.import_module("chemistrylab.reactions.available_reactions.precipitation"),
+            ["layers","PVT","targets"],
             reward_function=d_rew,
             react_list=[0],
             targets=targets

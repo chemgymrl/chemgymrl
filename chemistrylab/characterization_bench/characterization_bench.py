@@ -10,269 +10,167 @@ ChemGymRL is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
-
-Characterization Bench Class
-
-:title: characterization_bench
-
-:author: Nicholas Paquin
-
-:history: 26-03-2021
-
-Class to initialize reaction vessels, prepare the reaction base environment, and designate actions to occur.
 """
 
 import numpy as np
 import copy
 import sys
 sys.path.append("../../")
-from chemistrylab.ode_algorithms.spectra.diff_spectra import convert_inverse_cm_to_nm
 
 import numba
 
 @numba.jit
-def calc_absorb(params, x, C):
+def calc_absorb3(params, C, x, w_min, w_max):
     # define an array to contain absorption data
     absorb = np.zeros(x.shape[0], dtype=np.float32)
 
     # iterate through the spectral parameters in self.params and the wavelength space
-    for i, item in enumerate(params):
-        if item is not None:
-            for j in range(item.shape[0]):
-                for k in range(x.shape[0]):
-                    decay_rate = np.exp(
-                        -0.5 * (
-                            (x[k] - item[j, 1]) / item[j, 2]
-                        ) ** 2.0
-                    )
-                    if decay_rate < 1e-30:
-                        decay_rate = 0
-                    absorb[k] += C[i] * item[j, 0] * decay_rate
+    for i,item in enumerate(params):
+        for j in range(item.shape[0]):
+            for k in range(x.shape[0]):
+                #convert inverse cm to nm
+                nm = abs((1e7/item[j,1]-w_min)/(w_min-w_max))
+                decay_rate = np.exp(
+                    -0.5 * (
+                        (x[k] - nm) / item[j, 2]
+                    ) ** 2.0
+                )
+                if decay_rate < 1e-30:
+                    decay_rate = 0
+                absorb[k] += C[i] * item[j, 0] * decay_rate
 
     # absorption must be between 0 and 1
     absorb = np.clip(absorb, 0.0, 1.0)
     return absorb
 
+
 class CharacterizationBench:
     """
-    Class to define the characterization bench and its methods made available to inspect an inputted vessel.
+    A set of methods made available to inspect an inputted vessel.
+
+    Args:
+    - observation_list (Tuple[str]): Ordered list of observations to make (see Method Map)
+    - targets (Tuple[str]): A list of target materials
+    - n_vessels (int): The (maximum) number of vessels included in an observation
+
+    Method Map:
+    - 'spectra' -> get_spectra
+    - 'layers'  -> get_layers
+    - 'targets' -> encode_target
+    - 'PVT'     -> encode_PVT
+
     """
 
-    def __init__(self):
-        """
-        Constructor class method for the analysis bench.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
+    def __init__(self, observation_list,targets,n_vessels):
 
         # specify the analysis techniques available in this bench
         self.techniques = {'spectra': self.get_spectra}
         self.params = {'spectra': {'range_ir': (2000, 20000)}}
 
-    def update_ir_range(self, min, max):
-        self.params['spectra']['range_ir'] = (min, max)
+        self.targets=targets
+        self.n_vessels=n_vessels
+        self.sizes=dict(
+            spectra=200,
+            layers=100,
+            targets=len(targets),
+            PVT = 3
+        )
 
-    def analyze(self, vessel, analysis, overlap=False):
+        #List of all functions, this can probably be a class variable instead of an instance variable
+        self.all_functions = dict(
+            spectra=self.get_spectra,
+            layers=self.get_layers,
+            targets=self.encode_target,
+            PVT=self.encode_PVT
+        )
+
+        #create a list of functions which will be used to build your observations
+        self.observation_list=observation_list
+        self.functions = [self.all_functions[a] for a in observation_list]
+        
+        #Determine the shape of the observations
+        n_pixels=sum(self.sizes[a] for a in observation_list)
+        self.observation_shape=(n_vessels,n_pixels)
+
+    def get_observation(self, vessels, target):
         """
-        Constructor class method to pass thermodynamic variables to class methods.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
+        Returns a concatenation of observations of the vessels provided, using the list of observations provided
+        in __init__
         """
+        self.target=target
+        state=np.zeros(self.observation_shape)
+        for i,v in enumerate(vessels):
+            if i>= self.n_vessels:break
+            state[i] = np.concatenate([f(v) for f in self.functions])
+        return state
 
-        # perform the specified analysis technique
-        analysis = self.techniques[analysis](vessel, overlap)
-        return analysis, vessel
+    def __call__(self, vessels, target):
+        return self.get_observation(vessels, target)
 
-    def normalize_spectra(self, params, ir_range):
-        spectras = copy.deepcopy(params)
-        min = ir_range[0]
-        wave_range = abs(ir_range[1] - ir_range[0])
-        for i in range(len(spectras)):
-            if spectras[i] is not None:
-                for k in range(len(spectras[i])):
-                    spectras[i][k][1] = abs(spectras[i][k][1] - min)/wave_range
-        return spectras
 
     def get_spectra(self, vessel, materials=None, overlap=True):
         """
-        Class method to generate total spectral data using a guassian decay.
+        Class method to generate total spectral data using a gaussian decay.
 
-        Parameters
-        ---------------
-        `vessel` : `vessel.Vessel`
-            The vessel inputted for spectroscopic analysis.
-        `overlap` : `boolean` (default=`False`)
-            Indicates if the spectral plots show overlapping signatures.
+        Args:
+        - vessel (Vessel): The vessel inputted for spectroscopic analysis.
+        - materials (Optional[list]): List of materials to get the spectra from
+        - overlap (bool): Indicates if the spectral plots show overlapping signatures. 
+                Defaults to False.
 
-        Returns
-        ---------------
-        `absorb` : `np.array`
-            An array of the total absorption data of every chemical in the experiment
+        Returns:
+            np.ndarray: A 1D array containing the absorption data of the present materials.
 
-        Raises
-        ---------------
-        None
+        Note: Note sure if this is improved. . . consider falling back to previous implementation: calc_absorb
         """
-
+        
+        mat_dict=vessel.get_material_dict()
         # acquire the array of material concentrations
         if not materials:
-            materials = list(vessel.get_material_dict().keys())
-
-        C = vessel.get_concentration(materials=materials)
-        mat_dict = vessel.get_material_dict()
-
-        if not overlap:
-            params = [mat_dict[mat][0].get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+            materials = list(mat_dict.keys())
         else:
-            params = [mat_dict[mat][0].get_spectra_overlap() if mat in mat_dict else None for mat in materials]
-        params = convert_inverse_cm_to_nm(params)
-        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
-        # set the wavelength space
-        x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
+            materials = [mat for mat in materials if mat in mat_dict]
 
+        C = tuple(vessel.get_concentration(materials=materials))
         
-        #print(params)
-        params = tuple([np.zeros([0,0]) if a is None else a for a in params])
-        return calc_absorb(params, x, C)
-        # define an array to contain absorption data
-        absorb = np.zeros(x.shape[0], dtype=np.float32)
-
-        # iterate through the spectral parameters in self.params and the wavelength space
-        for i, item in enumerate(params):
-            if item is not None:
-                for j in range(item.shape[0]):
-                    for k in range(x.shape[0]):
-                        decay_rate = np.exp(
-                            -0.5 * (
-                                (x[k] - item[j, 1]) / item[j, 2]
-                            ) ** 2.0
-                        )
-                        if decay_rate < 1e-30:
-                            decay_rate = 0
-                        absorb[k] += C[i] * item[j, 0] * decay_rate
-
-        # absorption must be between 0 and 1
-        absorb = np.clip(absorb, 0.0, 1.0)
-
-        return absorb
-
-    def get_spectra_peak(self, vessel, wave_min, wave_max, materials=None, overlap=True):
-        """
-        Method to populate a list with the spectral peak of each chemical.
-
-        Parameters
-        ---------------
-        `C` : `np.array`
-            An array containing the concentrations of all materials in the vessel.
-        `params` : `list`
-            A list of spectra overlap parameters.
-        `materials` : `list`
-            A list of the materials in the inputted vessel.
-
-        Returns
-        ---------------
-        `spectra_peak` : `list`
-            A list of parameters specifying the peak of the spectra for each chemical.
-
-        Raises
-        ---------------
-        None
-        """
-        if not materials:
-            materials = list(vessel.get_material_dict().keys())
-
-        C = vessel.get_concentration(materials=materials)
-        mat_dict = vessel.get_material_dict()
-
         if not overlap:
-            params = [mat_dict[mat][0].get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
+            params = tuple(mat_dict[mat][0].get_spectra_no_overlap() for mat in materials)
         else:
-            params = [mat_dict[mat][0].get_spectra_overlap() if mat in mat_dict else None for mat in materials]
-        params = convert_inverse_cm_to_nm(params)
-        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
-        # create a list of the spectral peak of each chemical
-        spectra_peak = []
-        for i, material in enumerate(materials):
-            if params[i] is not None:
-                spectra_peak.append([
-                    params[i][:, 1] * (wave_max - wave_min) + wave_min,
-                    C[i] * params[i][:, 0],
-                    material
-                ])
+            params = tuple(mat_dict[mat][0].get_spectra_overlap() for mat in materials)
 
-        return spectra_peak
-
-    def get_dash_line_spectra(self, vessel, materials=None, overlap=True):
-        """
-        Module to generate each individual spectral dataset using gaussian decay.
-
-        Parameters
-        ---------------
-        `C` : `np.array`
-            An array containing the concentrations of all materials in the vessel.
-        `params` : `list`
-            A list of spectra overlap parameters.
-
-        Returns
-        ---------------
-        dash_spectra : list
-            A list of all the spectral data of each chemical
-
-        Raises
-        ---------------
-        None
-        """
-        if not materials:
-            materials = list(vessel.get_material_dict().keys())
-
-        C = vessel.get_concentration(materials=materials)
-        mat_dict = vessel.get_material_dict()
-
-        if not overlap:
-            params = [mat_dict[mat][0].get_spectra_no_overlap() if mat in mat_dict else None for mat in materials]
-        else:
-            params = [mat_dict[mat][0].get_spectra_overlap() if mat in mat_dict else None for mat in materials]
-        params = convert_inverse_cm_to_nm(params)
-        params = self.normalize_spectra(params, self.params['spectra']['range_ir'])
-        dash_spectra = []
-
-        # set the wavelength space
+        w_min,w_max=self.params['spectra']['range_ir']
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
+        return calc_absorb3(params, C, x, w_min, w_max)
 
-        for i, item in enumerate(params):
-            if item is not None:
-                each_absorb = np.zeros(x.shape[0], dtype=np.float32)
-                for j in range(item.shape[0]):
-                    for k in range(x.shape[0]):
-                        decay_rate = np.exp(
-                            -0.5 * (
-                                (x[k] - item[j, 1]) / item[j, 2]
-                            ) ** 2.0
-                        )
-                        each_absorb[k] += C[i] * item[j, 0] * decay_rate
-                dash_spectra.append(each_absorb)
+            
+    def get_layers(self, vessel):
+        """Returns a 1D array of vessel layer information"""
+        return vessel.get_layers()
 
-        return dash_spectra
+    def encode_PVT(self,vessel):
+        """Returns a size 3 array containing [temperature,volume,pressure]"""
+        # set up the temperature
+        Tmin, Tmax = vessel.get_Tmin(), vessel.get_Tmax()
+        temp = vessel.get_temperature()
+        normalized_temp = (temp - Tmin) / (Tmax - Tmin)
+        # set up the volume: this measure is kind of bad
+        #consider using (vessel.get_current_volume()[-1] / vessel.get_volume()) instead
+        Vmin, Vmax = vessel.get_min_volume(), vessel.get_max_volume()
+        volume = vessel.get_volume()
+        normalized_volume = (volume - Vmin) / (Vmax - Vmin)
+        # set up the pressure
+        Pmax = vessel.get_pmax()
+        total_pressure = vessel.get_pressure()
+        normalized_pressure = total_pressure / Pmax
+        #add them all into a 1D array
+        return np.array([normalized_temp,normalized_volume,normalized_pressure],dtype=np.float32)
+
+    def encode_target(self, vessel):
+        """
+        Returns a 1D one-hot encoding of the target material
+        """
+        targ_index = self.targets.index(self.target)
+        one_hot=np.zeros(len(self.targets))
+        one_hot[targ_index]=1
+
+        return one_hot

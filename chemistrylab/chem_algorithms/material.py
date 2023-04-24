@@ -77,6 +77,13 @@ class Material:
                  spectra_no_overlap=None,
                  index=None
                  ):
+        
+        
+        if spectra_overlap is None:
+            spectra_overlap=np.zeros([0,3])
+        if spectra_no_overlap is None:
+            spectra_no_overlap=np.zeros([0,3])
+        
         self._name = name
         self.w2v = None
         self._density = density
@@ -98,7 +105,8 @@ class Material:
         self.spectra_overlap = spectra_overlap
         self.spectra_no_overlap = spectra_no_overlap
         self._index = index
-
+    def __repr__(self):
+        return self._name
     def _update_properties(self,
                            # temperature,
                            # pressure,

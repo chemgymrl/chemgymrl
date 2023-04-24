@@ -199,6 +199,7 @@ class GeneralWurtzExtract_v2(GenBench):
             vessel_generators,
             actions,
             importlib.import_module("chemistrylab.reactions.available_reactions.chloro_wurtz"),
+            ["layers","targets"],
             n_visible=3,
             reward_function=e_rew
         )

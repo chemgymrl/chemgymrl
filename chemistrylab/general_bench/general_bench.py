@@ -14,7 +14,7 @@ import sys
 sys.path.append("../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import util, vessel
 from chemistrylab.reactions.reaction import Reaction
-
+from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 
 class Action(NamedTuple):
     vessels: Tuple[int]
@@ -65,6 +65,7 @@ class GenBench(gym.Env):
         vessel_generators: Callable,
         action_list: Tuple[Action],
         reaction_info,#work in progress
+        observation_list: Tuple[str],
         n_visible: Optional[int] = None,
         reward_function: Callable = default_reward,
         react_list: Optional[Tuple[int]] = None,
@@ -74,33 +75,35 @@ class GenBench(gym.Env):
     ):
         
         self.n_visible = len(vessel_generators) if n_visible is None else n_visible
-        
+        #set up reactions
         self.react_list = [] if react_list is None else react_list
         self.reaction=Reaction(reaction_info)
         
+        # store bench information
         self.vessel_generators=vessel_generators
         self.action_list=action_list
         self.reaction_info=reaction_info
         self.reward_function=reward_function
         
-        self.n_actions=sum(1 for a in action_list for p in a.parameters)
-        
+        #Making sure targets are populated
         self.targets = targets
         if self.targets is None:
             self.targets = self.reaction_info.PRODUCTS
-        self.num_targets=len(self.targets)
         
-        #This block will have to change later to accomodate other observation spaces (right now I used extract bench)
-        self.n_pixels=100
-        obs_high = np.ones((self.n_visible, self.n_pixels + self.num_targets), dtype=np.float32)
-        self.observation_space = gym.spaces.Box(obs_high*0, obs_high, dtype=np.float32)
+        #get counts
+        self.num_targets=len(self.targets)
+        self.n_actions=sum(1 for a in action_list for p in a.parameters)
+
+        
+        #Set up observation and action space
+        self.characterization_bench =  CharacterizationBench(observation_list,self.targets,self.n_visible)
+        self.observation_space = gym.spaces.Box(0,1,self.characterization_bench.observation_shape, dtype=np.float32)
         
         self.discrete=discrete
         if self.discrete:
             self.action_space = gym.spaces.Discrete(self.n_actions)
         else:
-            low,high=np.zeros(self.n_actions),np.ones(self.n_actions)
-            self.action_space = gym.spaces.Box(low, high, dtype=np.float32)
+            self.action_space = gym.spaces.Box(0, 1, (self.n_actions,), dtype=np.float32)
         
         self.reset()
         
@@ -109,27 +112,6 @@ class GenBench(gym.Env):
     def update_vessels(self,new_vessels):
         self.vessels=new_vessels
         
-    def get_state(self):
-        """
-        work in progress:
-        
-        Calling this will return an observation of the current state.
-        This needs to  be updated to allow for distillation and reaction observations.
-        
-        """
-        state = np.zeros((self.n_visible, self.n_pixels + self.num_targets), dtype=np.float32)
-        #layer observation (used for extract and distill benches)
-        state[:, :self.n_pixels] = util.generate_layers_obs(
-            vessel_list=self.vessels[:self.n_visible],
-            max_n_vessel=self.n_visible,
-            n_vessel_pixels=self.n_pixels
-        )
-        #target is like this in all benches
-        targ_ind = self.targets.index(self.target_material)
-        state[:, self.n_pixels + targ_ind] = 1
-        
-        return state
-
     def build_event(self,action,param):
         """
         Returns a list of (index,Event) tuples where index is the index of the vessel the Event will occur in
@@ -201,7 +183,10 @@ class GenBench(gym.Env):
         if done:
             reward = self.reward_function(self.vessels[:self.n_visible],self.target_material)-self.initial_reward
         
-        return self.get_state(), reward, done, {}
+        #gather observations
+        state=self.characterization_bench(self.vessels[:self.n_visible],self.target_material)
+        
+        return state, reward, done, {}
     
     def _reset(self,target):
         self.vessels = [v(target) for v in self.vessel_generators]
@@ -214,7 +199,7 @@ class GenBench(gym.Env):
         #Reward (will probably change the reward system later)
         self.initial_reward = self.reward_function(self.vessels[:self.n_visible],self.target_material)
         
-        return self.get_state()
+        return self.characterization_bench(self.vessels[:self.n_visible],self.target_material)
     
     def reset(self):
         target=np.random.choice(self.targets)
