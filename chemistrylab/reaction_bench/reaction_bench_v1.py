@@ -168,7 +168,8 @@ class GeneralWurtzReact_v2(GenBench):
             reward_function=r_rew,
             react_list=[0],
             targets=None,
-            discrete=False
+            discrete=False,
+            max_steps=20
         )
         
 
@@ -262,7 +263,8 @@ class FictReact_v2(GenBench):
             reward_function=r_rew,
             react_list=[0],
             targets=targets,
-            discrete=False
+            discrete=False,
+            max_steps=20
         )
         
         

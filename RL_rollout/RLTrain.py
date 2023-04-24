@@ -192,7 +192,7 @@ if __name__=="__main__":
     if op.dir=="<DEFAULT>":
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y--%H-%M-%S")
-        op.dir="MODELS\\"+op.environment+"\\"+op.algorithm+"\\"+dt_string
+        op.dir="RLMODELS\\"+op.environment+"\\"+op.algorithm+"\\"+dt_string
     
     
     #Set up output directory

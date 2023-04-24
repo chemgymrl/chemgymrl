@@ -71,6 +71,7 @@ class GenBench(gym.Env):
         react_list: Optional[Tuple[int]] = None,
         targets: Optional[Tuple[str]] = None,
         discrete=True,
+        max_steps=50,
         **kwargs
     ):
         
@@ -84,7 +85,7 @@ class GenBench(gym.Env):
         self.action_list=action_list
         self.reaction_info=reaction_info
         self.reward_function=reward_function
-        
+        self.max_steps=max_steps
         #Making sure targets are populated
         self.targets = targets
         if self.targets is None:
@@ -177,6 +178,10 @@ class GenBench(gym.Env):
         #perform any reactions
         for v in self.react_list:
             self.reaction.update_concentrations(self.vessels[v])
+            
+        #Increment the step counter and check if you are done
+        self.steps+=1
+        done=done or self.steps>=self.max_steps
         
         #Handle reward
         reward=0
@@ -189,6 +194,9 @@ class GenBench(gym.Env):
         return state, reward, done, {}
     
     def _reset(self,target):
+        
+        self.steps=0
+        
         self.vessels = [v(target) for v in self.vessel_generators]
         self.target_material=target
         
