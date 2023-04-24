@@ -132,7 +132,7 @@ class CharacterizationBench:
             materials = [mat for mat in materials if mat in mat_dict]
 
         C = tuple(vessel.get_concentration(materials=materials))
-        
+
         if not overlap:
             params = tuple(mat_dict[mat][0].get_spectra_no_overlap() for mat in materials)
         else:
@@ -167,7 +167,7 @@ class CharacterizationBench:
 
     def encode_target(self, vessel):
         """
-        Returns a 1D one-hot encoding of the target material
+        Returns a 1D one-hot encoding of the target material (note self.target must be set before doing this)
         """
         targ_index = self.targets.index(self.target)
         one_hot=np.zeros(len(self.targets))
