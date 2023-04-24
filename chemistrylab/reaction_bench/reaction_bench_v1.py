@@ -156,7 +156,7 @@ class GeneralWurtzReact_v2(GenBench):
             Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
             Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
+            #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
                 
         super(GeneralWurtzReact_v2, self).__init__(
@@ -249,7 +249,7 @@ class FictReact_v2(GenBench):
             Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
             Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
+            #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
         
         targets = ["E", "F", "G", "H", "I"]
