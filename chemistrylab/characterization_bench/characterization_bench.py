@@ -96,6 +96,10 @@ class CharacterizationBench:
         """
         Returns a concatenation of observations of the vessels provided, using the list of observations provided
         in __init__
+
+        Args:
+        - vessels (Tuple[Vessel]): A list of vessels you want an observtation of.
+        - target (str): The current target material
         """
         self.target=target
         state=np.zeros(self.observation_shape)

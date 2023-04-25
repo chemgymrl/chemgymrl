@@ -152,11 +152,11 @@ class GeneralWurtzDistill_v1(GenBench):
         temps=amounts*2-1
         T=297.0
         actions = [
-            Action([0],    dQ * temps,           'change_heat',    [1],      False),
-            Action([0],    amounts,              'pour by volume', [1],      False),
-            Action([1],    amounts,              'pour by volume', [2],      False),
-            Action([0], [[T, False], [T, True]], 'wait',           [1],      False),
-            Action([0],  [[0.05]],               'mix',            None,     True)
+            Action([0],    dQ * temps,           'change_heat',    [1],   0.01,   False),
+            Action([0],    amounts,              'pour by volume', [1],   0.01,   False),
+            Action([1],    amounts,              'pour by volume', [2],   0.01,   False),
+            Action([0], [[T, False], [T, True]], 'wait',           [1],   0.01,   False),
+            Action([0],  [[0]],                  'mix',            None,  0,      True)
         ]
         
         targets = [

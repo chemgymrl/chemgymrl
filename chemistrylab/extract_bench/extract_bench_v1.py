@@ -160,7 +160,7 @@ def make_solvent(mat):
     # create the material dictionary for the solvent vessel
     solvent_class = convert_to_class(materials=[mat])[0]()
     solvent_material_dict = {mat:[solvent_class, 1e6]}
-
+    
     # instruct the vessel to update its material dictionary
     event = Event('update material dict', solvent_material_dict,None)
 
@@ -184,15 +184,16 @@ class GeneralWurtzExtract_v2(GenBench):
         ]
         amounts=np.linspace(0.2,1,5).reshape([5,1])
         actions = [
-            Action([0], amounts*10,          'drain by pixel',[1],  False),
-            Action([0],-amounts,             'mix',           None, False),
-            Action([1], amounts,             'pour by volume',[0],  False),
-            Action([2], amounts,             'pour by volume',[0],  False),
-            Action([0], amounts,             'pour by volume',[2],  False),
-            Action([3], amounts/2,           'pour by volume',[0],  False),
-            Action([4], amounts/2,           'pour by volume',[0],  False),
-            Action([0], 32**amounts/200-0.01,'mix',           None, False),
-            Action([0], [[0.01]],            'mix',           None, True)
+            Action([0], amounts*10,          'drain by pixel',[1],  0.01, False),
+            Action([0],-amounts,             'mix',           None, 0.01, False),
+            Action([1], amounts,             'pour by volume',[0],  0.01, False),
+            Action([2], amounts,             'pour by volume',[0],  0.01, False),
+            Action([0], amounts,             'pour by volume',[2],  0.01, False),
+            #If pouring by volume takes time, then there is no change in observation when waiting after pouring in some cases
+            Action([3], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([4], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([0,1,2], 32**amounts/200,'mix',            None, 0,    False),
+            Action([0], [[0]],            'mix',              None, 0,    True)
         ]
         
         super(GeneralWurtzExtract_v2, self).__init__(

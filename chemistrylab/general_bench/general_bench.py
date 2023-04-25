@@ -21,7 +21,9 @@ class Action(NamedTuple):
     parameters: Tuple[tuple]
     event_name: str
     affected_vessels: Optional[Tuple[int]]
+    dt: float
     terminal: bool
+    
 
 class Event(NamedTuple):
     name: str
@@ -161,11 +163,11 @@ class GenBench(gym.Env):
         for v,event in act:
             updated.add(v)
             #going to hard-code dt for now
-            self.vessels[v].push_event_to_queue(events=[event], dt=0.01)
+            self.vessels[v].push_event_to_queue(events=[event], dt=_action.dt)
         #all uninvolved vessels which appear in the observation space
         for v in range(self.n_visible):
             if not v in updated:
-                self.vessels[v].push_event_to_queue(dt=0.01)
+                self.vessels[v].push_event_to_queue(dt=_action.dt)
         
         return _action.terminal
     

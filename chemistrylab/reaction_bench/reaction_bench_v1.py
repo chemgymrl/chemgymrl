@@ -151,11 +151,11 @@ class GeneralWurtzReact_v2(GenBench):
         ]
         dQ=20000.0
         actions = [
-            Action([0],    [ContinuousParam(-dQ,dQ,0,None)],   'change_heat',    [0],      False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([0],    [ContinuousParam(-dQ,dQ,0,None)],   'change_heat',    [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
             #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
                 
@@ -244,11 +244,11 @@ class FictReact_v2(GenBench):
         ]
         dQ=20000.0
         actions = [
-            Action([0],    [ContinuousParam(-dQ,dQ,0,None)],   'change_heat',    [0],      False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],      False),
+            Action([0],    [ContinuousParam(-dQ,dQ,0,None)],   'change_heat',    [0],   0.01,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
             #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
         
