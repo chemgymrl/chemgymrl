@@ -69,22 +69,66 @@ def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, n
             conc_change[i] += conc_coeff_arr[i][j]*rates[j]
     
     return conc_change
+
+
+@numba.jit
+def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc, dt, N):
+    """
+    Solves the initial value problem dy/dt = f(y) specifically in the case where f(y) is chemical a rate calculation
+    
+    (The problem is that we have y(t0) and need y(t0+dt))
+    
+    This solver uses newton's method:
+        set T = dt/N
+        set y_0 = y(t0)
+        for n = 1,2,3,...N:
+            y_n = y_(n-1) + f(y_(n-1))*T
+        
+        y(dt) <- y_N 
+   
+    Intuitively, it is like taking a Riemann sum of dy/dt (but you get dy/dt by bootstrapping your current sum for y(t))
+    """
+    R = 8.314462619
+    
+    ddt=dt/N
+    k = (ddt*pre_exp_arr) * np.exp((-1.0 * activ_energy_arr) / (R * temp))
+        
+    for n in range(N):
+        conc = np.clip(conc, 0, None)
+        #k are the reaction constants
+        
+        rates = k*1
+        for i in range(len(rates)):
+            for j in range(num_reagents):
+                rates[i] *= conc[j] ** stoich_coeff_arr[i][j]
+        #calculate concentration changes and add them to the concentration
+        for i in range(conc.shape[0]):
+            for j in range(rates.shape[0]):
+                conc[i] += conc_coeff_arr[i][j]*rates[j]
+                
+    return conc
    
 
 class Reaction():
-    def __init__(self,react_module,solver='RK45'):
+    def __init__(self,react_info,solver='RK45',newton_steps=100):
+        """
+        Args:
+        - react_info (ReactInfo): Named Tuple containing all necessary reaction information
+        - solver (str): Which solver to use
+        - newton_steps (int): How many steps to use when the solver is 'newton'
+        """
         
-        if not solver in {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA'}:
+        if not solver in {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA','newton'}:
             solver='RK45'
         self.solver=solver
-        
+        self.newton_steps=newton_steps
         #has to be set somewhere
         self.threshold=1e-12
         
         #materials we need for the reaction
-        self.reactants=react_module.REACTANTS
-        self.products=react_module.PRODUCTS
-        self.solvents=react_module.SOLVENTS
+        self.reactants=react_info.REACTANTS
+        self.products=react_info.PRODUCTS
+        self.solvents=react_info.SOLVENTS
         #Concatenate all of the materials (this should realistically be done in the reaction file since it has a direct
         #Impact on the conc_coeff_arr
         self.materials=[]
@@ -94,10 +138,10 @@ class Reaction():
         self.material_classes = convert_to_class(materials=self.materials)
         
         #Necessary for calculating rates
-        self.stoich_coeff_arr = react_module.stoich_coeff_arr
-        self.pre_exp_arr = react_module.pre_exp_arr
-        self.activ_energy_arr = react_module.activ_energy_arr
-        self.conc_coeff_arr = react_module.conc_coeff_arr
+        self.stoich_coeff_arr = react_info.stoich_coeff_arr
+        self.pre_exp_arr = react_info.pre_exp_arr
+        self.activ_energy_arr = react_info.activ_energy_arr
+        self.conc_coeff_arr = react_info.conc_coeff_arr
         self.num_reagents = len(self.reactants)
 
     def update_concentrations(self,vessel):
@@ -123,13 +167,21 @@ class Reaction():
         - temp (float): The temperature of the system in Kelvin.
         - volume (float): The volume of the system in Litres.
         - dt (float): The time-step demarcating separate steps in seconds.
-        Returns
-        - new_n (np.array) The new amounts of each material in the vessel
+        Returns:
+        - new_n (np.array): The new amounts of each material in the vessel
         """
         # set the intended vessel temperature in the differential equation module
         self.temp = temp
         conc=n/volume
-        new_conc = solve_ivp(self, (0, dt), conc, method=self.solver).y[:, -1]
+        
+        
+        if self.solver=='newton':
+            #newton solver should be faster but less accurate
+            new_conc = newton_solve(self.stoich_coeff_arr, self.pre_exp_arr,
+                         self.activ_energy_arr, self.conc_coeff_arr,
+                         self.num_reagents, self.temp, conc, dt, self.newton_steps)
+        else:
+            new_conc = solve_ivp(self, (0, dt), conc, method=self.solver).y[:, -1]
         new_n = new_conc * volume
         #set negligible amounts to 0
         new_n *= (new_n > self.threshold)

@@ -130,7 +130,7 @@ def wurtz_vessel(add_mat):
         dt=-100000
     )
 
-    boil_vessel.default_dt=10.0
+    boil_vessel.default_dt=0.01
     
     return boil_vessel, add_mat
 

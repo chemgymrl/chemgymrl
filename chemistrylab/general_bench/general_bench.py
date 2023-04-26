@@ -24,7 +24,6 @@ class Action(NamedTuple):
     dt: float
     terminal: bool
     
-
 class Event(NamedTuple):
     name: str
     parameter: tuple
@@ -52,14 +51,13 @@ class GenBench(gym.Env):
     Args:
     - vessel_generators (tuple): A tuple of generators, each of which yield a Vessel object.
     - action_list (list): A list of Action objects containing information describing what each action is.
-    - reaction_info (ReactInfo): A ReactInfo object that provides information about the chemical reactions taking
-            place.
+    - reaction_info (ReactInfo): A ReactInfo object that provides information about the chemical reactions taking place.
     - n_visible (Optional int): The number of vessels (first n) which will be visible in the observation space
     - react_list (Tuple[int]): Which vessels reactions should take place in (leave empty for no reacting)
     - targets (Tuple[str]): The target materials for this bench
     - discrete (bool): set to True for a discrete action space and False for a continuous one
     Keyword Args:
-        kwargs: To be determined based on need.
+    - kwargs: To be determined based on need.
 
     """
     def __init__(
@@ -117,7 +115,15 @@ class GenBench(gym.Env):
         
     def build_event(self,action,param):
         """
-        Returns a list of (index,Event) tuples where index is the index of the vessel the Event will occur in
+        Builds a list of (index, Event) tuples where index is the index of the vessel the Event will occur in.
+
+        Args:
+        - action (Action): An action containing information about the vessels and parameters
+                involved in the event.
+        - param (tuple): A tuple containing parameters for the event.
+
+        Returns:
+        - events (List[Tuple]): A list of (index, Event) tuples, where index is the index of the vessel the Event will occur in.
         """
         #watch out for null case
         if action.affected_vessels is None:
@@ -130,16 +136,21 @@ class GenBench(gym.Env):
     
     def _perform_continuous_action(self,action):
         """
-        Action should be a 1D array
+        Action should be a 1D array.
+        
+        Here, event parameters follow the ContinuousParam format. 
+        In this implementation all actions are performed with dt=0, then afterwards
+        all visible vessels are given an empty event with dt=0.01. 
+        (May create a variable to replace 0.01)
         """
-        for i,(act,_action) in enumerate(self.actions):
+        for i,(events,_action) in enumerate(self.actions):
             val=action[i]
             #handling any end of episode actions
-            if _action.terminal and (val>act[0][1].parameter.thresh):
+            if _action.terminal and (val>events[0][1].parameter.thresh):
                 return True
             
             #update the involved vessels
-            for v,event in act:
+            for v,event in events:
                 # move the action in [0,1] to [min_val,max_val]
                 min_val, max_val, thresh, other = event.parameter
                 activ=val*(val>thresh)
@@ -155,12 +166,14 @@ class GenBench(gym.Env):
         return False
     def _perform_discrete_action(self,action):
         """
-        Action should be an integer
+        Action should be an integer.
+        Here, the chosen action is perfomed on all relevant vessels, then all
+        other visible vessels are fed an empty event with the same dt.
         """
-        act,_action = self.actions[action]
+        events,_action = self.actions[action]
         updated=set()
         #update the involved vessels
-        for v,event in act:
+        for v,event in events:
             updated.add(v)
             #going to hard-code dt for now
             self.vessels[v].push_event_to_queue(events=[event], dt=_action.dt)
@@ -172,6 +185,14 @@ class GenBench(gym.Env):
         return _action.terminal
     
     def step(self,action):
+        """
+        Here, actions are performed by '_perform_discrete_action' or '_perform_continuous_action'. Afterwards, all vessels in
+        react_list have their concentrations updated by a reaction (specified in __init__). Finally, a CharacterizationBench
+        is used to generate an observation, and a reward function provides a reward (if a terminal state was reached).
+        
+        Args:
+        - action (int or 1D array): The action to be performed
+        """
         if self.discrete:
             done = self._perform_discrete_action(action)
         else:
@@ -196,17 +217,12 @@ class GenBench(gym.Env):
         return state, reward, done, {}
     
     def _reset(self,target):
-        
         self.steps=0
-        
         self.vessels = [v(target) for v in self.vessel_generators]
         self.target_material=target
-        
-        #might rethink this line
+        #Rebuild the list of actions with the new vessels
         self.actions = [(self.build_event(a,p),a)  for a in self.action_list for p in a.parameters]
-        
-        
-        #Reward (will probably change the reward system later)
+        #Gather the initial reward using a provided reward function
         self.initial_reward = self.reward_function(self.vessels[:self.n_visible],self.target_material)
         
         return self.characterization_bench(self.vessels[:self.n_visible],self.target_material)
