@@ -12,7 +12,7 @@ import numpy as np
 #Imports which need to go soon
 import sys
 sys.path.append("../../") # to access chemistrylab
-from chemistrylab.chem_algorithms import util, vessel
+from chemistrylab.chem_algorithms import vessel
 from chemistrylab.reactions.reaction import Reaction
 from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 

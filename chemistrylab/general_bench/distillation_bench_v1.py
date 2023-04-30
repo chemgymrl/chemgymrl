@@ -33,7 +33,7 @@ from random import choice
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms.reward import RewardGenerator
-from chemistrylab.chem_algorithms import material, util, vessel
+from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.general_bench.general_bench import *
 import importlib
 

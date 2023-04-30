@@ -25,7 +25,7 @@ import gym
 import gym.spaces
 sys.path.append("../../")
 from chemistrylab.chem_algorithms.reward import RewardGenerator
-from chemistrylab.chem_algorithms import material, util, vessel
+from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.general_bench.general_bench import *
 import importlib
 
