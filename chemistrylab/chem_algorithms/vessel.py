@@ -1,5 +1,6 @@
 from typing import NamedTuple, Tuple, Callable, Optional
 import numpy as np
+import numba
 from chemistrylab.extract_algorithms import separate
 
 class Event(NamedTuple):
@@ -16,6 +17,30 @@ def rebuild_solute_dict(solvent_dict, solute_dict, solvents):
         for sol in solvents]) 
             for mat in solute_dict}
     return new_solvent_dict, new_solute_dict
+
+@numba.jit
+def validate_solute_amounts(mol_solute, mol_solvent, mol_dissolved):
+    # First make sure there are solvents
+    tot_solvent=mol_solvent.sum()
+    if tot_solvent<1e-12:
+        mol_dissolved[:]=0
+        return
+    #get normalized solvent amounts
+    norm_solvent=mol_solvent/tot_solvent
+    #Make sure there are no solutes in empty solvents
+    for j,v_mol in enumerate(mol_solvent):
+        if v_mol<1e-12:
+            mol_dissolved[:,j]=0
+    #make sure the sums consistent
+    for i,u_mol in enumerate(mol_solute):
+        checksum=mol_dissolved[i].sum()
+        #Decrease amounts proportional to what's in each solvent
+        if checksum>u_mol:
+            mol_dissolved[i] *= (u_mol/checksum)
+        #But increase amounts proportional to how much solvent there is
+        elif checksum<u_mol:
+            mol_dissolved[i] += (u_mol-checksum)*norm_solvent
+
 
 class Vessel:
     """
@@ -62,27 +87,29 @@ class Vessel:
         self._layers = None
 
     def validate_solutes(self,checksum=True):
-        solutes = tuple(a for a in self.material_dict if self.material_dict[a].is_solute())
+        """
+        It is very likely that this function will have to change
+
+        Consider turning the solute dict into a 2D array, getting a 1D array
+        of solute amounts, as well as a 1D array of solvent amounts, then
+        doing all of your consistency checks in compiled code.
+        """
         n_solvents=len(self.solvents)
-        if not n_solvents:return
-        new_solute_dict=dict()
-        for key in solutes:
-            if key in self.solute_dict:
-                # Doing a checksum to keep the amount dissolved the same as the total amount
-                if checksum:
-                    s_mol,mol = self.solute_dict[key].sum(),self.material_dict[key].mol
-                    #Decrease amounts proportionally
-                    if s_mol>mol:
-                        new_solute_dict[key] = self.solute_dict[key]*(mol/s_mol)
-                    #But increase amounts linearly
-                    else:
-                        new_solute_dict[key] = self.solute_dict[key]+(mol-s_mol)/n_solvents
-                # If you aren't doing a checksum you can just copy the values
-                else:
-                    new_solute_dict[key] = self.solute_dict[key]
-            else:
-                new_solute_dict[key] = np.ones(n_solvents)*self.material_dict[key].mol/n_solvents
-        self.solute_dict=new_solute_dict
+        #gather a list of solutes
+        solutes = tuple(a for a in self.material_dict if self.material_dict[a].is_solute())
+        if n_solvents==0 or len(solutes)==0:return
+        #get mol information for solutes and solvents
+        solute_mols = np.array([self.material_dict[key].mol for key in solutes])
+        solvent_mols = np.array([self.material_dict[key].mol for key in self.solvents])
+
+        #get all of the dissolved amounts
+        null = np.zeros(n_solvents)
+        old_dict=self.solute_dict
+        mol_dissolved=np.stack([old_dict[key] if key in old_dict else null for key in solutes])
+        #run the validation
+        validate_solute_amounts(solute_mols, solvent_mols, mol_dissolved)
+        #set the new solute dict
+        self.solute_dict={key:mol_dissolved[i] for i,key in enumerate(solutes)}
 
     def validate_solvents(self):
 
@@ -154,6 +181,8 @@ class Vessel:
             iv. Calculate new dT based off of your new dQ value
             4. T+=dT
             return
+
+            TODO: Handle solutes when a solvent is boiled off
         """
         dQ=param[0]
         other_mats=other_vessel.material_dict
