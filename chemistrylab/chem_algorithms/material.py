@@ -176,7 +176,7 @@ class Material:
         dis_mat = self.__class__()
         dis_mat.set_solute_flag(True)
         dis_mat.set_color(0.0)
-        dis_mat.set_phase('l')
+        dis_mat.phase = 'l'
 
         return {dis_mat: 1}
 
@@ -230,7 +230,7 @@ class Material:
     def set_enthalpy_fusion(self, enthalpy_fusion):
         self._enthalpy_fusion = enthalpy_fusion
 
-    def set_enthalpy_vapor(self, enthalpy_vapor):
+    def     enthalpy_vapor(self, enthalpy_vapor):
         self._enthalpy_vapor = enthalpy_vapor
 
     def set_color(self, color):
