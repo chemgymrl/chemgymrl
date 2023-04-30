@@ -181,8 +181,6 @@ class Vessel:
             iv. Calculate new dT based off of your new dQ value
             4. T+=dT
             return
-
-            TODO: Handle solutes when a solvent is boiled off
         """
         dQ=param[0]
         other_mats=other_vessel.material_dict
@@ -215,7 +213,6 @@ class Vessel:
             key,boil=bp[i]
         self.temperature+=dT
         
-        #TODO: Handle when entire materials are boiled off better
         self.validate_solutes()
         other_vessel.validate_solvents()
         other_vessel.validate_solutes()
