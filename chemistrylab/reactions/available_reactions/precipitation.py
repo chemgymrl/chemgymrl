@@ -72,7 +72,7 @@ REACTANTS = [
     "Cl",
     "H2O",
     "C6H14",
-    "DiEthylEther"]
+    "diethyl ether"]
 PRODUCTS = [
     "NaCl",
     "Na",
@@ -80,7 +80,7 @@ PRODUCTS = [
 SOLVENTS = [
     "H2O",
     "C6H14",
-    "DiEthylEther"]
+    "diethyl ether"]
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin

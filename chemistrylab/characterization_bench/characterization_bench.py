@@ -128,7 +128,7 @@ class CharacterizationBench:
         Note: Note sure if this is improved. . . consider falling back to previous implementation: calc_absorb
         """
         
-        mat_dict=vessel._material_dict
+        mat_dict=vessel.material_dict
         # acquire the array of material concentrations
         if not materials:
             materials = list(mat_dict.keys())

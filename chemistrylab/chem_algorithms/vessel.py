@@ -59,6 +59,7 @@ class Vessel:
         self.solvents=[]
         self._layers_position = np.zeros(1)
         self._layers_variance=2.0
+        self._layers = None
 
     def validate_solutes(self,checksum=True):
         solutes = tuple(a for a in self.material_dict if self.material_dict[a].is_solute())
@@ -132,6 +133,8 @@ class Vessel:
                 out.append(self._event_dict[event.name](event.parameter,event.other_vessel,dt))
             else:
                 out.append(self._event_dict[event.name](event.parameter,dt))
+
+        self._update_layers(0,0)
         return out
 
     def _change_heat(self, param, other_vessel, dt) -> int:
@@ -203,7 +206,7 @@ class Vessel:
         #Iterate through each material in the vessel
         for key,mat in self.material_dict.items():
             # Update other vessel's material dict
-            if mat.is_solute():
+            if mat.is_solute() and len(self.solvents)>0:
                 self.solute_dict[key] *= (1-fraction)
             if key in other_mats:
                 other_mats[key].mol+=mat.mol*fraction
@@ -300,8 +303,10 @@ class Vessel:
         #Get sulute properties
         solute_polarity = np.array([mat.polarity for mat in solutes])
         #Hopefully this is the correct 2D array shape
-        solute_amount = np.stack([self.solute_dict[a] for a in s_names])
-
+        if len(s_names)>0:
+            solute_amount = np.stack([self.solute_dict[a] for a in s_names])
+        else:
+            solute_amount=np.zeros([0,len(solvents)])
         self._layers_position, self._layers_variance, new_solute_amount, __ = separate.mix(
             A=solvent_volume,
             B=self._layers_position,
@@ -338,5 +343,5 @@ class Vessel:
         )
 
     def get_layers(self):
-        self._update_layers(0,0)
+        if self._layers is None:self._update_layers(0,0)
         return self._layers

@@ -51,7 +51,7 @@ import sys
 
 sys.path.append("../../")
 from chemistrylab.chem_algorithms import material
-from chemistrylab.reactions.get_reactions import convert_to_class
+#from chemistrylab.reactions.get_reactions import convert_to_class
 
 # ---------- # REACTION BENCH # ---------- #
 

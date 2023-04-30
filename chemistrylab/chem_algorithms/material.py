@@ -58,6 +58,13 @@ import math
 import sys
 from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
 
+REGISTRY = dict()
+def register(*material_classes):
+    for material_class in material_classes:
+        key = material_class()._name
+        if key in REGISTRY:
+            raise Exception(f"Cannot register the same Material ({key}) Twice!")
+        REGISTRY[key] = material_class
 
 class Material:
     def __init__(self,
@@ -397,18 +404,18 @@ class NaCl(Material):
 
     def dissolve(self):
         dis_Na = Na()
-        dis_Na.set_charge(1.0)
+        dis_Na.charge = 1.0
         dis_Na.set_solute_flag(True)
         dis_Na.set_color(0.0)
-        dis_Na.set_polarity(2.0)
-        dis_Na.set_phase('l')
+        dis_Na.polarity = (2.0)
+        dis_Na.phase = ('l')
 
         dis_Cl = Cl()
-        dis_Cl.set_charge(-1.0)
+        dis_Cl.charge = (-1.0)
         dis_Cl.set_solute_flag(True)
         dis_Cl.set_color(0.0)
-        dis_Cl.set_polarity(2.0)
-        dis_Cl.set_phase('l')
+        dis_Cl.polarity = (2.0)
+        dis_Cl.phase = ('l')
 
         return {dis_Na: 1, dis_Cl: 1}
 
@@ -434,18 +441,18 @@ class Na(Material):
 
     def precipitate(self):
         prep_Na = Na()
-        prep_Na.set_charge(1.0)
+        prep_Na.charge = (1.0)
         prep_Na.set_solute_flag(True)
         prep_Na.set_color(0.0)
-        prep_Na.set_polarity(2.0)
-        prep_Na.set_phase('l')
+        prep_Na.polarity = (2.0)
+        prep_Na.phase = ('l')
 
         prep_Cl = Cl()
-        prep_Cl.set_charge(-1.0)
+        prep_Cl.charge = (-1.0)
         prep_Cl.set_solute_flag(True)
         prep_Cl.set_color(0.0)
-        prep_Cl.set_polarity(2.0)
-        prep_Cl.set_phase('l')
+        prep_Cl.polarity = (2.0)
+        prep_Cl.phase = ('l')
 
         prep_NaCl = NaCl()
 
@@ -474,18 +481,18 @@ class Cl(Material):
 
     def precipitate(self):
         prep_Na = Na()
-        prep_Na.set_charge(1.0)
+        prep_Na.charge = 1.0
         prep_Na.set_solute_flag(True)
         prep_Na.set_color(0.0)
-        prep_Na.set_polarity(2.0)
-        prep_Na.set_phase('l')
+        prep_Na.polarity = 2.0
+        prep_Na.phase = 'l'
 
         prep_Cl = Cl()
-        prep_Cl.set_charge(-1.0)
+        prep_Cl.charge = -1.0
         prep_Cl.set_solute_flag(True)
         prep_Cl.set_color(0.0)
-        prep_Cl.set_polarity(2.0)
-        prep_Cl.set_phase('l')
+        prep_Cl.polarity = 2.0
+        prep_Cl.phase = 'l'
 
         prep_NaCl = NaCl()
 
@@ -875,7 +882,7 @@ class DiEthylEther(Material):
 class A(Material):
     def __init__(self):
         super().__init__(
-            name='A',
+            name='fict_A',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -898,7 +905,7 @@ class A(Material):
 class B(Material):
     def __init__(self):
         super().__init__(
-            name='B',
+            name='fict_B',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -922,7 +929,7 @@ class B(Material):
 class C(Material):
     def __init__(self):
         super().__init__(
-            name='C',
+            name='fict_C',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -946,7 +953,7 @@ class C(Material):
 class D(Material):
     def __init__(self):
         super().__init__(
-            name='D',
+            name='fict_D',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -970,7 +977,7 @@ class D(Material):
 class E(Material):
     def __init__(self):
         super().__init__(
-            name='E',
+            name='fict_E',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -994,7 +1001,7 @@ class E(Material):
 class F(Material):
     def __init__(self):
         super().__init__(
-            name='F',
+            name='fict_F',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -1018,7 +1025,7 @@ class F(Material):
 class G(Material):
     def __init__(self):
         super().__init__(
-            name='G',
+            name='fict_G',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -1042,7 +1049,7 @@ class G(Material):
 class H(Material):
     def __init__(self):
         super().__init__(
-            name='H',
+            name='fict_H',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -1066,7 +1073,7 @@ class H(Material):
 class I(Material):
     def __init__(self):
         super().__init__(
-            name='I',
+            name='fict_I',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
             temperature=298,
@@ -1136,62 +1143,4 @@ class HCl(Material):
         )
 
 
-def get_materials():
-    '''
-    Function to get a tuple containing a list of the names of all the available materials as well
-    as their class object instances.
-
-    Parameters
-    ---------------
-    `boil_vessel` : `vessel` (default=`None`)
-        A vessel object containing state variables, materials, solutes, and spectral data.
-    `target_material` : `str` (default=`None`)
-        The name of the required output material designated as reward.
-    `n_steps` : `int` (default=`100`)
-        The number of steps in an episode.
-
-    Returns
-    ---------------
-    None
-
-    Raises
-    ---------------
-    None
-    '''
-
-    # construct empty lists to contain the names and class instances of the materials.
-    names_list = []
-    objects_list = []
-
-    for name, obj in inspect.getmembers(sys.modules[__name__]):
-        if all([
-            inspect.isclass(obj),
-            name != "Material"
-        ]):
-            names_list.append(name)
-            objects_list.append(obj)
-
-    return (names_list, objects_list)
-
-# get the number of materials available in this file
-total_num_material = len(Material.__subclasses__())
-
-#
-#
-# class T1(Material):
-#     def __init__(self):
-#         super().__init__(name='temp1',
-#                          density=0.655,
-#                          polarity=0.9,
-#                          temperature=298,
-#                          )
-#
-#
-# class T2(Material):
-#     def __init__(self):
-#         super().__init__(name='temp2',
-#                          density=0.655,
-#                          polarity=0.1,
-#                          temperature=298,
-#                          )
-
+register(*Material.__subclasses__())

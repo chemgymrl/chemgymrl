@@ -25,20 +25,20 @@ REACTION_CLASS = "ficticious reactions"
 
 # add the names of the reactants, products, and solutes available to all reactions
 REACTANTS = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "F",
-    "G",
-    "H"
+    "fict_A",
+    "fict_B",
+    "fict_C",
+    "fict_D",
+    "fict_F",
+    "fict_G",
+    "fict_H"
 ]
 PRODUCTS = [
-    "E",
-    "F",
-    "G",
-    "H",
-    "I"
+    "fict_E",
+    "fict_F",
+    "fict_G",
+    "fict_H",
+    "fict_I"
 ]
 
 SOLVENTS = ["H2O"]

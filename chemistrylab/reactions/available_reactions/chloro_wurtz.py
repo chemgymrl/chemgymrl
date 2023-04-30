@@ -39,7 +39,7 @@ PRODUCTS = [
     "4,5-diethyloctane",
     "NaCl"
 ]
-SOLVENTS = ["DiEthylEther"]
+SOLVENTS = ["diethyl ether"]
 
 # add the initial thermodynamic values
 Ti = 297.0 # in Kelvin

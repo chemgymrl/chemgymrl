@@ -24,7 +24,7 @@ def set_amounts(materials,solvents, material_classes, n, vessel):
 import numpy as np
 import numba
 from scipy.integrate import solve_ivp
-from chemistrylab.reactions.get_reactions import convert_to_class
+from chemistrylab.chem_algorithms import material
 
 
 
@@ -113,7 +113,7 @@ class Reaction():
         for mat in self.reactants + self.products + self.solvents:
             if mat not in self.materials:
                 self.materials.append(mat)
-        self.material_classes = convert_to_class(materials=self.materials)
+        self.material_classes = tuple(material.REGISTRY[key] for key in self.materials)
         
         #Necessary for calculating rates
         self.stoich_coeff_arr = react_info.stoich_coeff_arr
