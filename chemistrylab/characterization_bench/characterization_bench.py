@@ -135,12 +135,12 @@ class CharacterizationBench:
         else:
             materials = [mat for mat in materials if mat in mat_dict]
 
-        C = tuple(vessel.get_concentration(materials=materials))
+        C = np.array([mat_dict[key].mol for key in materials])/vessel.filled_volume()
 
         if not overlap:
-            params = tuple(mat_dict[mat][0].get_spectra_no_overlap() for mat in materials)
+            params = tuple(mat_dict[mat].get_spectra_no_overlap() for mat in materials)
         else:
-            params = tuple(mat_dict[mat][0].get_spectra_overlap() for mat in materials)
+            params = tuple(mat_dict[mat].get_spectra_overlap() for mat in materials)
 
         w_min,w_max=self.params['spectra']['range_ir']
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
@@ -154,18 +154,18 @@ class CharacterizationBench:
     def encode_PVT(self,vessel):
         """Returns a size 3 array containing [temperature,volume,pressure]"""
         # set up the temperature
-        Tmin, Tmax = vessel.get_Tmin(), vessel.get_Tmax()
-        temp = vessel.get_temperature()
-        normalized_temp = (temp - Tmin) / (Tmax - Tmin)
+        #Tmin, Tmax = vessel.get_Tmin(), vessel.get_Tmax()
+        temp = vessel.temperature
+        normalized_temp = (temp - 0) / (500 - 0)
         # set up the volume: this measure is kind of bad
         #consider using (vessel.get_current_volume()[-1] / vessel.get_volume()) instead
-        Vmin, Vmax = vessel.get_min_volume(), vessel.get_max_volume()
-        volume = vessel.get_volume()
-        normalized_volume = (volume - Vmin) / (Vmax - Vmin)
+        #Vmin, Vmax = vessel.get_min_volume(), vessel.get_max_volume()
+        #volume = vessel.get_volume()
+        normalized_volume = 0#(volume - Vmin) / (Vmax - Vmin)
         # set up the pressure
-        Pmax = vessel.get_pmax()
-        total_pressure = vessel.get_pressure()
-        normalized_pressure = total_pressure / Pmax
+        #Pmax = vessel.get_pmax()
+        #total_pressure = vessel.get_pressure()
+        normalized_pressure = 0#total_pressure / Pmax
         #add them all into a 1D array
         return np.array([normalized_temp,normalized_volume,normalized_pressure],dtype=np.float32)
 

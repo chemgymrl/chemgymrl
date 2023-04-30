@@ -142,6 +142,7 @@ class GeneralWurtzReact_v2(GenBench):
 
     def __init__(self):
         r_rew= lambda x,y:ReactionReward(vessel=x[0],desired_material=y,undesired_material="E").calc_reward(done=True)
+        r_rew=default_reward
         vessel_generators = [
             lambda x:get_mat("DiEthylEther",4,"Reaction Vessel"),
             lambda x:get_mat("1-chlorohexane",1),
@@ -235,6 +236,7 @@ class FictReact_v2(GenBench):
 
     def __init__(self):
         r_rew= lambda x,y:ReactionReward(vessel=x[0],desired_material=y,undesired_material="E").calc_reward(done=True)
+        r_rew=default_reward
         vessel_generators = [
             lambda x:get_mat("H2O",30,"Reaction Vessel"),
             lambda x:get_mat("A",1),

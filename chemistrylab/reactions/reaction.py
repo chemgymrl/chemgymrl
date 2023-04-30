@@ -1,47 +1,25 @@
-####################################Vessel-Reaction Translation functions (Will be redone)#########################################
 
-def get_amounts(materials, material_dict):
+def get_amounts(materials, vessel):
     n=np.zeros(len(materials))
-    null=(0,0)
-    for i,mat in enumerate(materials):
-        n[i]=material_dict.get(mat,null)[1]
+    for i,key in enumerate(materials):
+        if key in vessel.material_dict:
+            n[i] = vessel.material_dict[key].mol
+        else:
+            n[i] = 0
     return n
 
-#trash function which just gives a temporary go-between from the new reactions to the old vessels (will be rewritten or discarded)
 def set_amounts(materials,solvents, material_classes, n, vessel):
-     # tabulate all the materials and solutes used and their new values
-    new_material_dict = vessel.get_material_dict()
-    new_solute_dict = vessel.get_solute_dict()
-    for i,material_name in enumerate(materials):
-        
+    for i,key in enumerate(materials):
         amount = n[i]
-        try:
-            new_material_dict[material_name] = [new_material_dict[material_name][0], amount, 'mol']
-        except KeyError:
-            new_material_dict[material_name] = [material_classes[i](), amount, 'mol']
-        if new_material_dict[material_name][0].is_solute():
-            # create the new solute dictionary to be appended to a new vessel object
-            solute_change_amount = new_material_dict[material_name][1] - vessel.get_material_amount(material_name)
-            try:
-                for solvent in new_solute_dict[material_name]:
-                    if vessel._material_dict[material_name][1] > 1e-12:
-                        new_solute_dict[material_name][solvent][1] += solute_change_amount * vessel._solute_dict[material_name][solvent][1] / vessel._material_dict[material_name][1]
-            except KeyError:
-                present_solvents = []
-                for solvent in solvents:
-                    if vessel.get_material_amount(solvent) > 1e-12:
-                        present_solvents.append(solvent)
-
-                new_solute_dict[material_name] = {solvent: [convert_to_class(materials=[solvent])[0](), solute_change_amount/len(solvents), 'mol'] for solvent in present_solvents}
-
-    # update target vessel's material amount
-    vessel._material_dict = new_material_dict
-    # update target vessel's solute dict
-    vessel._solute_dict = new_solute_dict
-    # empty call to mix to rebuild layers?
-    __ = vessel.push_event_to_queue(events=None,dt=0)
-
-    
+        if key in vessel.material_dict:
+            vessel.material_dict[key].mol=amount
+        elif n[i]>0:
+            mat = material_classes[i]()
+            mat.mol=amount
+            vessel.material_dict[key] = mat
+    vessel.validate_solvents()
+    vessel.validate_solutes()
+        
 #####################################################################################################################################
 import numpy as np
 import numba
@@ -149,10 +127,11 @@ class Reaction():
         Takes in a vessel and applies the reaction to it, updating the material and solvent dicts in the process
         """
         
-        if vessel.get_total_material_amount() < 1e-12:return
-        n = get_amounts(self.materials, vessel._material_dict)
-        temperature = vessel.get_temperature()
-        current_volume = vessel.get_current_volume()[-1]
+        
+        n = get_amounts(self.materials, vessel)
+        if n.sum() < 1e-12:return
+        temperature = vessel.temperature
+        current_volume = vessel.filled_volume()
         dt = vessel.default_dt
         
         #update concentrations

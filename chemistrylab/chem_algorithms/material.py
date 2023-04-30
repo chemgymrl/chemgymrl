@@ -45,6 +45,10 @@ Property : Intended Units -- Object Type -- Brief Description
     - `enthalpy_vapor` : J/mol -- `float` -- The material's enthalpy of vapor.
     - `index` : N/A -- `int` -- An additional index used for identification purposes.
 
+    - heat_capacity: heat capacity in J/K
+    - litres: volume in litres
+    - vapour_enthalpy: heat to vaporize in J
+
 Moreover, the `get_materials` function gives a list of the already available materials.
 '''
 
@@ -78,60 +82,85 @@ class Material:
                  index=None
                  ):
         
-        
-        if spectra_overlap is None:
-            spectra_overlap=np.zeros([0,3])
-        if spectra_no_overlap is None:
-            spectra_no_overlap=np.zeros([0,3])
-        
+        #properties that can change
+        self.polarity = polarity
+        self.temperature = temperature
+        self.pressure = pressure
+        self.phase = phase
+        self.charge = charge
+        self.mol = 0
+
+        #Properties likely to remain constant
         self._name = name
-        self.w2v = None
-        self._density = density
-        self._polarity = polarity
-        self._temperature = temperature
-        self._pressure = pressure
-        self._phase = phase
-        self._charge = charge
         self._molar_mass = molar_mass
+        self._density = density
         self._color = color
         self._solute = solute
         self._solvent = solvent
         self._boiling_point = boiling_point
         self._melting_point = melting_point
-        self._melting_point = melting_point
         self._specific_heat = specific_heat
         self._enthalpy_fusion = enthalpy_fusion
         self._enthalpy_vapor = enthalpy_vapor
+
+        #dealing with spectra
+        if spectra_overlap is None:
+            spectra_overlap=np.zeros([0,3])
+        if spectra_no_overlap is None:
+            spectra_no_overlap=np.zeros([0,3])
+        
         self.spectra_overlap = spectra_overlap
         self.spectra_no_overlap = spectra_no_overlap
         self._index = index
+
+    #Hashing / Naming properties
     def __repr__(self):
         return self._name
-    def _update_properties(self,
-                           # temperature,
-                           # pressure,
-                           # polarity,
-                           # density,
-                           # phase,
-                           ):
-        feedback = []
-        # called by event functions
-        # update the rest of properties
-        # check if any feedback is generated, if so feedback.append(['event', parameter])
-        # return feedback
-        return feedback
+    def __hash__(self):
+        return hash(self._name)
+    def __eq__(self,other):
+        return self._name==other._name
+    # Less mutable properties
+    @property
+    def molar_mass(self):
+        return self._molar_mass
+    @property
+    def get_color(self):
+        return self._color
+    @property
+    def boiling_point(self):
+        return self._boiling_point
+    @property
+    def melting_point(self):
+        return self._melting_point
+    #Derived quantities
+    @property
+    def heat_capacity(self):
+        return self.mol*self._molar_mass*self._specific_heat
+    @property
+    def litres(self):
+        return 1e-3*self.mol*self._molar_mass/self._density[self.phase]
+    @property
+    def vapour_enthalpy(self):
+        return self.mol*self._enthalpy_vapor
 
-    # event functions
-    def update_temperature(self, target_temperature, dt):  # this is an example
-        feedback = []
+    def ration(self,ratio):
+        """
+        Creates a new Material and moves `ratio` fraction of the moles to the new material
+        Args:
+        - ratio (float): Should be in [0,1]
+        Returns
+        - mat (Material): Material with the same class where the moles were moved
+        """
+        diff=ratio*self.mol
+        self.mol -= diff
+        mat = type(self)()
+        mat.mol=diff
 
-        # update the material's temperature based on the target_temperature and dt
-        # check if a feedback is generated
-        # if generated, current_feedback.append(['feedback_event', parameter])
-        # if target is not reached re-append this event to feedback
-
-        feedback.extend(self._update_properties())
-        return feedback
+        mat.phase=self.phase
+        mat._solute=self._solute
+        mat._solvent=self._solvent
+        return mat
 
     def dissolve(self):
         # should be able to return how this material is dissolved
@@ -156,55 +185,18 @@ class Material:
     def get_name(self):
         return self._name
 
-    def get_density(self, convert_to_g_cubic_meter=True):
+    def get_density(self, per_L=True):
         # need to convert to g/dm^3 in order to get volume in litres
-        if convert_to_g_cubic_meter:
-            return self._density[self._phase] * 1000
+        if per_L:
+            return self._density[self.phase] * 1000
         else:
-            return self._density[self._phase]
-
-    def get_polarity(self):
-        return self._polarity
-
-    def get_temperature(self):
-        return self._temperature
-
-    def get_pressure(self):
-        return self._pressure
-
-    def get_phase(self):
-        return self._phase
-
-    def get_charge(self):
-        return self._charge
-
-    def get_molar_mass(self):
-        return self._molar_mass
-
-    def get_color(self):
-        return self._color
-
+            return self._density[self.phase]
+    
     def is_solute(self):
         return self._solute
 
     def is_solvent(self):
         return self._solvent
-
-    def get_boiling_point(self, in_kelvin=True):
-        temp = self._boiling_point
-
-        if not in_kelvin:
-            temp = temp - 273.15
-
-        return temp
-
-    def get_melting_point(self, in_kelvin=True):
-        temp = self._melting_point
-
-        if not in_kelvin:
-            temp = temp - 273.15
-
-        return temp
 
     # functions to change material's properties
     def set_solute_flag(self,
@@ -224,17 +216,6 @@ class Material:
             self._solute = False
         elif not flag:
             self._solvent = False
-
-    def set_phase(self, phase):
-        self._phase = phase
-
-    def set_charge(self,
-                   charge):
-        self._charge = charge
-
-    def set_polarity(self,
-                     polarity):
-        self._polarity = polarity
 
     def set_specific_heat(self, specific_heat):
         self._specific_heat = specific_heat

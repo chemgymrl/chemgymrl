@@ -175,6 +175,7 @@ class GeneralWurtzExtract_v2(GenBench):
 
     def __init__(self):
         e_rew= lambda x,y:ExtractionReward(vessels=x,desired_material=y,initial_target_amount=0).calc_reward()
+        e_rew=default_reward
         vessel_generators = [
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),

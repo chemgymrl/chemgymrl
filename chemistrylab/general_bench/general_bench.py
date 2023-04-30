@@ -38,8 +38,11 @@ class ContinuousParam(NamedTuple):
 def default_reward(vessels,targ):
     sum_=0
     for vessel in vessels:
-        mats=vessel._material_dict
-        sum_+=mats.get(targ,(0,0))[1]**2/sum(mats[a][1] for a in mats)
+        mats=vessel.material_dict
+        all_mat = sum(mats[a].mol for a in mats)
+        if all_mat>1e-12:
+            sum_+=(mats[targ].mol if targ in mats else 0)**2/all_mat
+    return sum_
     
 class GenBench(gym.Env):
     """A class representing an bench setup for conducting experiments.

@@ -62,6 +62,7 @@ def wurtz_vessel(add_mat):
 
     # initialize C6H14
     C6H14 = material.C6H14()
+    C6H14.mol = 4.0
 
     # initialize material
     products = {'dodecane': material.Dodecane,
@@ -85,50 +86,27 @@ def wurtz_vessel(add_mat):
     
     add_material.set_solute_flag(True)
     add_material.set_color(0.0)
-    add_material.set_phase('l')
+    add_material.phase = 'l'
+    add_material.mol=1
 
     # material_dict
     material_dict = {
-        C6H14.get_name(): [C6H14, 4.0, 'mol'],
-        add_material.get_name(): [add_material, 1.0, 'mol']
+        C6H14.get_name(): C6H14,
+        add_material.get_name(): add_material
     }
 
-    # solute_dict
-    solute_dict = {
-        add_material.get_name(): {C6H14.get_name(): [C6H14, 1.0, 'mol']}
-    }
+
 
     if choice([0, 1]) > 0.5:
-        if add_mat == 'NaCl':
-            add_material2 = material.Dodecane()
-            material_dict[add_material2.get_name()] = [add_material2, 1.0, 'mol']
-            solute_dict[add_material2.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
+        add_material2 = material.Dodecane() if (add_mat == 'NaCl') else material.NaCl()
+        add_material2.mol=1
+        material_dict[add_material2.get_name()] = add_material2
 
-        else:
-            add_material2 = material.NaCl()
-            material_dict[add_material2.get_name()] = [add_material2, 1.0, 'mol']
-            solute_dict[add_material2.get_name()] = {C6H14.get_name(): [C6H14, 1.0, 'mol']}
 
-    material_dict, solute_dict, _ = util.check_overflow(
-        material_dict=material_dict,
-        solute_dict=solute_dict,
-        v_max=boil_vessel.get_max_volume()
-    )
+    boil_vessel.material_dict=material_dict
 
-    # set events and push them to the queue
-    boil_vessel.push_event_to_queue(
-        events=None,
-        feedback=[
-            ['update material dict', material_dict],
-            ['update solute dict', solute_dict]
-        ],
-        dt=0
-    )
-    boil_vessel.push_event_to_queue(
-        events=None,
-        feedback=None,
-        dt=-100000
-    )
+    boil_vessel.validate_solvents()
+    boil_vessel.validate_solutes()
 
     boil_vessel.default_dt=0.01
     
@@ -142,6 +120,7 @@ class GeneralWurtzDistill_v1(GenBench):
 
     def __init__(self):
         d_rew= lambda x,y:DistillationReward(vessels=x,desired_material=y).calc_reward()
+        d_rew=default_reward
         vessel_generators = [
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),
@@ -152,10 +131,10 @@ class GeneralWurtzDistill_v1(GenBench):
         temps=amounts*2-1
         T=297.0
         actions = [
-            Action([0],    dQ * temps,           'change_heat',    [1],   0.01,   False),
+            Action([0],    dQ * temps,           'change heat',    [1],   0.01,   False),
             Action([0],    amounts,              'pour by volume', [1],   0.01,   False),
             Action([1],    amounts,              'pour by volume', [2],   0.01,   False),
-            Action([0], [[T, False], [T, True]], 'wait',           [1],   0.01,   False),
+            #Action([0], [[T, False], [T, True]], 'wait',           [1],   0.01,   False),
             Action([0],  [[0]],                  'mix',            None,  0,      True)
         ]
         

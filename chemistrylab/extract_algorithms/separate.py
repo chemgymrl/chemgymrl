@@ -74,6 +74,7 @@ def map_to_state(A, B, C, colors, x=x):
     
     # Array for layers at each time step
     L = np.zeros(100, dtype=np.float32) + colors[-1]
+    L2 = np.zeros(100, dtype=np.int32)+(len(colors)-1)
 
     # Initialize time variable such that Gaussians have normalized area
     C = max(C, 1e-10)
@@ -133,6 +134,7 @@ def map_to_state(A, B, C, colors, x=x):
             j = np.argmin(B1 - x[k])
             # Set pixel value
             L[l] = colors[j]
+            L2[l]=j
             # Subtract pixel for that phase
             n[j] -= 1
         # If x position is inside at least one Gaussian peak (random set)
@@ -150,12 +152,13 @@ def map_to_state(A, B, C, colors, x=x):
                 if r - p / Psum < 1e-6:
                     # Set pixel value
                     L[l] = colors[j]
+                    L2[l]=j
                     # Subtract pixel for that phase
                     n[j] -= 1
                     # End loop
                     placed = True
     
-    return L
+    return L,L2
 
 @numba.jit
 def mix(A, B, C, D, Spol, Lpol, S, mixing):
