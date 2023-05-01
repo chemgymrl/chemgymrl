@@ -35,6 +35,7 @@ sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms.reward import RewardGenerator
 from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.benches.general_bench import *
+from chemistrylab.reactions.reaction_info import ReactInfo
 import importlib
 
 
@@ -154,15 +155,20 @@ class GeneralWurtzDistill_v2(GenBench):
             "4,5-diethyloctane",
             "NaCl"
         ]
+
+        react_info = ReactInfo.from_json("./chemistrylab\\reactions\\available_reactions\\precipitation.json")
         
         super(GeneralWurtzDistill_v2, self).__init__(
             vessel_generators,
             actions,
-            importlib.import_module("chemistrylab.reactions.available_reactions.precipitation"),
+            react_info,
             ["layers","PVT","targets"],
             reward_function=d_rew,
             react_list=[0],
             targets=targets
         )
+
+        self.reaction.solver="newton"
+        self.reaction.newton_steps=1000
 
 

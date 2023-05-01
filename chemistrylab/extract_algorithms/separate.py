@@ -20,44 +20,6 @@ import cmocean
 from math import ceil
 from copy import deepcopy
 
-## ---------- ## DEFAULTS ## ---------- ##
-
-'''
-# Labels for plotting and index of arrays
-labels = ['Water', 'Oil', 'Air']
-
-# Color value used for color map
-colors = np.array([0.2, 0.65, 0.45])
-
-# Amount of each phase
-A = np.array([0.4, 0.6, 0.5])
-
-# Starting position for Gaussian peaks
-B = np.array([0.0, 0.0, 0.0])
-
-# Variance of Gaussian peaks
-C = 2.0
-
-# Density of each phase
-D = np.array([1.0, 0.93, 1.225e-3])
-
-# Amount of solute in each phase
-# S[-1] = target solute
-S = np.array([[0.95, 0.05], [0.05, 0.95]])
-
-# Polarity of solvent
-Lpol = np.array([2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0)), 0.0])
-
-# Polarity of solutes
-Spol = np.array([0.9, 0.1])
-
-# Initial time variable such that Gaussians have normalized area
-t0 = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
-
-# Time step
-dt = 0.05
-'''
-
 # Maximum varience of Gaussian peaks
 Cmix = 2.0
 
@@ -69,6 +31,19 @@ import numba
 @numba.jit
 # Function to map the separation Gaussians to discretized state
 def map_to_state(A, B, C, colors, x=x):
+    """
+    Uses the position and variance of each solvent to stochastically create a layer-view of the vessel
+
+    Args:
+    - A (np.ndarray): The volume of each solvent
+    - B (np.ndarray): The current positions of the solvent layers in the vessel
+    - C (float): The current variance of the solvent layers in the vessel
+    - colors (np.ndarray): The color of each solvent
+
+    Returns:
+    - L (np.ndarray): The solvent at each layer position (0.65 for air)
+    - L2 (np.ndarray): The index of the solvent at each position (len(B)-1 for air)
+    """
     # Create a copy of B for temporary changes
     B1 = np.copy(B)
     
@@ -162,6 +137,31 @@ def map_to_state(A, B, C, colors, x=x):
 
 @numba.jit
 def mix(A, B, C, D, Spol, Lpol, S, mixing):
+    """
+    Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
+
+    Args:
+    - A (np.ndarray): The volume of each solvent
+    - B (np.ndarray): The current positions of the solvent layers in the vessel
+    - C (float): The current variance of the solvent layers in the vessel
+    - D (np.ndarray): The density of each solvent
+    - Spol (np.ndarray): The relative polarities of the solutes
+    - Lpol (np.ndarray): The relative polarities of the solvents
+    - S (np.ndarray): The current amounts of solutes in each solvent layer (2D array)
+    - mixing (float): The time value assigned to a fully mixed solution
+
+    Returns:
+    - layers_position (np.ndarray): An array of floats representing the new positions of the solvent layers in the vessel
+    - layers_variance (np.ndarray): An array of floats representing the new variances of the solvent layers in the vessel
+    - new_solute_amount (np.ndarray): An array of floats representing the new amounts of solutes in each solvent layer
+    - Sts (np.ndarray): TODO: Figure out what this stores
+
+    Note:
+    - This function calculates the new positions and variances of the solvent layers using the layer separation equations described in the documentation.
+    - The new solute amounts are calculated based on the relative polarities of the solutes and solvents using the solute dispersion equation described in the paper.
+    """
+
+
     # Initialize time variable such that Gaussians have normalized area
     C = max(C, 1e-10)
     t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))

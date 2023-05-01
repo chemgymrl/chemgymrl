@@ -28,6 +28,9 @@ from chemistrylab.chem_algorithms.reward import RewardGenerator
 from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.benches.general_bench import *
 import importlib
+from chemistrylab.reactions.reaction_info import ReactInfo
+
+
 
 def get_mat(mat,amount,name=None):
     "Makes a Vessel with a single material"
@@ -65,18 +68,21 @@ class GeneralWurtzReact_v2(GenBench):
             lambda x:get_mat("Na",3),
         ]
         actions = [
-            Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',    [0],  0.01,  False),
+            Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
             Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
             Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
             Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
             #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
-                
+
+        react_info = ReactInfo.from_json("./chemistrylab\\reactions\\available_reactions\\chloro_wurtz.json")
+        
+        
         super(GeneralWurtzReact_v2, self).__init__(
             vessel_generators,
             actions,
-            importlib.import_module("chemistrylab.reactions.available_reactions.chloro_wurtz"),
+            react_info,
             ["PVT","spectra","targets"],
             n_visible=1,
             reward_function=r_rew,
@@ -113,11 +119,11 @@ class FictReact_v2(GenBench):
         ]
         
         targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
-        
+        react_info = ReactInfo.from_json("./chemistrylab\\reactions\\available_reactions\\fict_react.json")
         super(FictReact_v2, self).__init__(
             vessel_generators,
             actions,
-            importlib.import_module("chemistrylab.reactions.available_reactions.fict_react"),
+            react_info,
             ["PVT","spectra","targets"],
             n_visible=1,
             reward_function=r_rew,
