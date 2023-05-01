@@ -109,10 +109,7 @@ class Reaction():
         self.solvents=react_info.SOLVENTS
         #Concatenate all of the materials (this should realistically be done in the reaction file since it has a direct
         #Impact on the conc_coeff_arr
-        self.materials=[]
-        for mat in self.reactants + self.products + self.solvents:
-            if mat not in self.materials:
-                self.materials.append(mat)
+        self.materials=react_info.MATERIALS
         self.material_classes = tuple(material.REGISTRY[key] for key in self.materials)
         
         #Necessary for calculating rates
