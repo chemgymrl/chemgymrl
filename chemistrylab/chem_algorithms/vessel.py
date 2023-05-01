@@ -240,7 +240,7 @@ class Vessel:
 
         key,boil=bp[0]
         i=0
-        while T>boil:
+        while T>boil and T>self.temperature:
             material = mdict[key]
             #amount of transfer-time required to reach boiling temperature
             ht -= np.log((Tf-self.temperature)/(Tf-boil))*self.heat_capacity() #i
