@@ -14,19 +14,19 @@ from gym.envs.registration import register
 
 register(
     id='GenWurtzExtract-v2',
-    entry_point='chemistrylab.general_bench.extract_bench_v1:GeneralWurtzExtract_v2',
+    entry_point='chemistrylab.benches.extract_bench_v1:GeneralWurtzExtract_v2',
 )
 
 ############################ ReactBench ####################################
 
 register(
     id='GenWurtzReact-v2',
-    entry_point='chemistrylab.general_bench.reaction_bench_v1:GeneralWurtzReact_v2'
+    entry_point='chemistrylab.benches.reaction_bench_v1:GeneralWurtzReact_v2'
 )
 
 register(
     id='FictReact-v2',
-    entry_point='chemistrylab.general_bench.reaction_bench_v1:FictReact_v2'
+    entry_point='chemistrylab.benches.reaction_bench_v1:FictReact_v2'
 )
 
 
@@ -34,7 +34,7 @@ register(
 
 register(
     id='GenWurtzDistill-v2',
-    entry_point='chemistrylab.general_bench.distillation_bench_v1:GeneralWurtzDistill_v2',
+    entry_point='chemistrylab.benches.distillation_bench_v1:GeneralWurtzDistill_v2',
     max_episode_steps=100
 )
 
