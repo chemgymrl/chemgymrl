@@ -2,6 +2,9 @@ from typing import NamedTuple, Tuple, Callable, Optional, List
 import numpy as np
 import json
 
+import os
+REACTION_PATH = os.path.dirname(__file__)+"\\available_reactions"
+
 
 def serial(x):
     """Turn a 1D or 2D array into a tuple"""

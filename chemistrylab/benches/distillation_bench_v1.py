@@ -35,7 +35,7 @@ sys.path.append("../../") # to access `chemistrylab`
 from chemistrylab.chem_algorithms.reward import RewardGenerator
 from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.benches.general_bench import *
-from chemistrylab.reactions.reaction_info import ReactInfo
+from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 import importlib
 
 
@@ -156,7 +156,7 @@ class GeneralWurtzDistill_v2(GenBench):
             "NaCl"
         ]
 
-        react_info = ReactInfo.from_json("./chemistrylab\\reactions\\available_reactions\\precipitation.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\precipitation.json")
         
         super(GeneralWurtzDistill_v2, self).__init__(
             vessel_generators,

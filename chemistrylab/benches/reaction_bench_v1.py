@@ -28,8 +28,7 @@ from chemistrylab.chem_algorithms.reward import RewardGenerator
 from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.benches.general_bench import *
 import importlib
-from chemistrylab.reactions.reaction_info import ReactInfo
-
+from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 
 
 def get_mat(mat,amount,name=None):
@@ -76,8 +75,7 @@ class GeneralWurtzReact_v2(GenBench):
             #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
 
-        react_info = ReactInfo.from_json("./chemistrylab\\reactions\\available_reactions\\chloro_wurtz.json")
-        
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
         
         super(GeneralWurtzReact_v2, self).__init__(
             vessel_generators,
@@ -119,7 +117,8 @@ class FictReact_v2(GenBench):
         ]
         
         targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
-        react_info = ReactInfo.from_json("./chemistrylab\\reactions\\available_reactions\\fict_react.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\fict_react.json")
+
         super(FictReact_v2, self).__init__(
             vessel_generators,
             actions,

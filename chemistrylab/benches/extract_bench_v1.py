@@ -41,6 +41,7 @@ from chemistrylab.benches.general_bench import *
 from chemistrylab.chem_algorithms.reward import RewardGenerator
 import importlib
 
+from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 
 def wurtz_vessel(add_mat=""):
     """
@@ -173,10 +174,12 @@ class GeneralWurtzExtract_v2(GenBench):
             Action([0], [[0]],            'mix',              None, 0,    True)
         ]
         
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+
         super(GeneralWurtzExtract_v2, self).__init__(
             vessel_generators,
             actions,
-            importlib.import_module("chemistrylab.reactions.available_reactions.chloro_wurtz"),
+            react_info,
             ["layers","targets"],
             n_visible=3,
             reward_function=e_rew
