@@ -5,10 +5,14 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
-from chemistrylab.reactions.available_reactions.fict_react2 import PRODUCTS as FRtargs
-from chemistrylab.reactions.available_reactions.fict_react2 import REACTANTS as FRchoices
-from chemistrylab.reactions.available_reactions.chloro_wurtz import PRODUCTS as CWtargs
-from chemistrylab.reactions.available_reactions.chloro_wurtz import REACTANTS as CWchoices
+#from chemistrylab.reactions.available_reactions.fict_react2 import PRODUCTS as FRtargs
+#from chemistrylab.reactions.available_reactions.fict_react2 import REACTANTS as FRchoices
+#from chemistrylab.reactions.available_reactions.chloro_wurtz import PRODUCTS as CWtargs
+#from chemistrylab.reactions.available_reactions.chloro_wurtz import REACTANTS as CWchoices
+CWtargs=[]
+CWchoices=[]
+
+
 from RadarGraph import *
 
 import numba

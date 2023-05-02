@@ -213,7 +213,8 @@ HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDi
 
 
 def salt_check(env):
-    return any([vessel._material_dict.get(mat,(0,0))[1]>1e-3 for vessel in env.vessels for mat in ["Na","Cl","NaCl"]])
+    return any([(mat in vessel.material_dict) and (vessel.material_dict[mat].mol>1e-3)
+                for vessel in env.vessels for mat in ["Na","Cl","NaCl"]])
 
 
 if __name__=="__main__":

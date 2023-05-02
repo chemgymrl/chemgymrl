@@ -67,11 +67,18 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
     Intuitively, it is like taking a Riemann sum of dy/dt (but you get dy/dt by bootstrapping your current sum for y(t))
     """
     R = 8.314462619
+    #if your updates are below 5e-4 you can increase factor (I decided this is a good number)
+    targ = 5e-4
     
     ddt=dt/N
+    
+    factor=1
+    
     k = (ddt*pre_exp_arr) * np.exp((-1.0 * activ_energy_arr) / (R * temp))
+    
+    count=0
         
-    for n in range(N):
+    while dt>0:
         conc = np.clip(conc, 0, None)
         #k are the reaction constants
         
@@ -79,11 +86,28 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
         for i in range(len(rates)):
             for j in range(num_reagents):
                 rates[i] *= conc[j] ** stoich_coeff_arr[i][j]
+        
+        ratio=np.max(rates)/(np.max(conc)+1e-6)
+        
+        #mess with how much time passes
+        while ratio*factor<targ and factor<10:
+            factor*=2
+        while ratio*factor>0.1:
+            factor*=0.5
+            
+        if factor*ddt>=dt:
+            factor = dt/ddt
+            dt=0
+        
+        dt-=factor*ddt
+            
+        rates*=factor
+        count+=1
         #calculate concentration changes and add them to the concentration
         for i in range(conc.shape[0]):
             for j in range(rates.shape[0]):
                 conc[i] += conc_coeff_arr[i][j]*rates[j]
-                
+               
     return conc
    
 
