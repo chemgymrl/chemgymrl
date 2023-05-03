@@ -24,7 +24,7 @@ from copy import deepcopy
 Cmix = 2.0
 
 # Array for x/height positions
-x = np.linspace(-10.0, 10.0, 1000, endpoint=True, dtype=np.float32)
+x = np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
 
 import numba
 
@@ -47,13 +47,19 @@ def map_to_state(A, B, C, colors, x=x):
     # Create a copy of B for temporary changes
     B1 = np.copy(B)
     
+    x = x*np.sum(A)
+
     # Array for layers at each time step
     L = np.zeros(100, dtype=np.float32) + colors[-1]
     L2 = np.zeros(100, dtype=np.int32)+(len(colors)-1)
 
     # Initialize time variable such that Gaussians have normalized area
-    C = max(C, 1e-10)
-    t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
+    C=np.clip(C,1e-10,None)
+
+    #Note: MINP is linked to MINVAR
+    #If you want to change one you have to change both
+    #https://www.desmos.com/calculator/jc0ensg38o
+    MINP=0.13533
 
     # Number of pixels available for each phase
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
@@ -79,9 +85,15 @@ def map_to_state(A, B, C, colors, x=x):
     for l in range(L.shape[0]):
         # Map layer pixel position to x position
         k = int(((l + 0.5) / L.shape[0]) * x.shape[0])
+        #print(x[k],end='|')
 
+        P_raw = np.exp(-0.5 * (((x[k] - B) / C) ** 2))
+        # MINP is a cutoff value to set the gaussian to 0
+        P_raw = P_raw* ((P_raw > MINP) + (P_raw < MINP)/3)
+        
         # Calculate Gaussian values at current x position
-        P = A * np.exp(-1.0 * (((x[k] - B) / (2.0 * C)) ** 2) + t)
+        P = A /C * P_raw
+        
 
         # Check to see if any phases have no pixels remaining
         past_due = False
@@ -94,8 +106,8 @@ def map_to_state(A, B, C, colors, x=x):
                 B1[j] += 1e9
 
             # Check to see if most negative phase is past due to have all pixels
-            elif P[j] < 1e-6 and j == np.argmin(B1 - x[k]):
-                past_due = True
+            #elif P[j] < 1e-6 and j == np.argmin(B1 - x[k]):
+            #    past_due = True
 
         # Sum of all Gaussians at this x position
         Psum = np.sum(P)
@@ -135,13 +147,81 @@ def map_to_state(A, B, C, colors, x=x):
     
     return L,L2
 
+
 @numba.jit
-def mix(A, B, C, D, Spol, Lpol, S, mixing):
+def get_end_means(v,d):
+    """Get final gaussian peak positions"""
+    order=np.argsort(d)[::-1]
+    Vtot=0
+    m_end = np.zeros(d.shape[0])
+    for i in order:
+        m_end[i] = Vtot+v[i]/2
+        Vtot+=v[i]
+    return Vtot,m_end
+
+
+@numba.jit
+def get_diff(v,means,d):
+    """Get timescale multiplier using densities"""
+    diff = np.zeros(d.shape[0])
+    for i in range(diff.shape[0]):
+        for j in range(0, i):
+            diff[j] -= (d[j] - d[i])
+        for j in range(i+1, d.shape[0]):
+            diff[j] -= (d[j] - d[i])
+    return np.clip(np.abs(diff),1e-2,None)
+
+@numba.jit
+def pos(T, Vtot, vi, means):
+    """Get position from time elapsed"""
+    c=1.2/(np.abs(means-Vtot/2)+1e-6)
+    if np.max(c)>1200:
+        return means
+    f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
+    return means+(Vtot/2-means)*f
+
+@numba.jit
+def s_T(T, Vtot, vi, MINVAR):
+    """Get variance from time elapsed"""
+    sf = vi/MINVAR
+    si = Vtot/3.46
+    g = np.exp(-2*(T/Vtot)**2)
+    return sf+(si-sf)*g
+
+@numba.jit
+def Ts(s, Vtot, Vi, MINVAR):
+    """Get time elapsed from variance"""
+    #sqrt(12) ~3.46
+    sf = Vi/MINVAR
+    si = Vtot/3.46
+    s=np.clip(s,sf+1e-10,si-1e-10)
+    ratio = np.clip((si-sf)/(s-sf),1,None)
+
+    return np.sqrt(np.log(ratio)/2)*Vtot
+
+@numba.jit
+def dT(dt,Vtot,vi,diff):
+    """Get time that has passed
+    
+    Note: I will be adding a scaling factor at the end so settling makes sense
+    """
+    SCALING=1e-2
+    ratio = np.clip(vi/Vtot,0,0.999)
+    return dt*diff/(1-ratio)**2*SCALING
+
+
+
+
+
+
+
+@numba.jit
+def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
 
     Args:
-    - A (np.ndarray): The volume of each solvent
+    - v (np.ndarray): The volume of each solvent
     - B (np.ndarray): The current positions of the solvent layers in the vessel
     - C (float): The current variance of the solvent layers in the vessel
     - D (np.ndarray): The density of each solvent
@@ -163,33 +243,58 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
 
 
     # Initialize time variable such that Gaussians have normalized area
-    C = max(C, 1e-10)
-    t = -1.0 * np.log(C * np.sqrt(2.0 * np.pi))
+    s=C*1.0
+    x=B*1.0
+    #figure out where the gaussians should end up at T-> inf
+    Vtot,means = get_end_means(v,D)
 
+    diff = get_diff(v,means,D)
+    max_var = Vtot/3.46
+    MINVAR=4.0
+    #adjust variance
+    for i in range(v.shape[0]):
+        # Figure out how much the volume has changed
+        dv = v[i] - Vprev[i]
+        # Make sure variance is at least as big as fully separated variance
+        cur_var= max(s[i],v[i]/MINVAR)
+        
+        # Extra mixing dependant on the position and how much was added
+        if dv>1e-6:
+            s+=dv/3.46
+            new_var = (dv/(np.abs(v[i]-dv)+1e-6))*((Vtot-x[i])/3.46)
+            new_var = min(max_var, max(cur_var,new_var))
+            s[i]=new_var
+
+    #Get the time
+    T = Ts(s,Vtot,v,MINVAR)
+    # Add any extra time
+    T+=dT(mixing,Vtot,v,diff)
+    #Make sure it's >= 0 (0 is fully mixed time)
+    T=np.clip(T,0,None)
+    #update positions
+    B = pos(T, Vtot,v,means)
+    #Update variance
+    C = s_T(T, Vtot, v, MINVAR)
+
+    A=v[:-1]
+
+##############################Below Here is unknown code#######################################
+    t = -1.0 * np.log(C0 * np.sqrt(2.0 * np.pi))
     # Time of fully mixed solution
     tmix = -1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi))
-
     # Check if fully mixed already
     if t + mixing < tmix:
         mixing = tmix - t
-
     t += mixing
 
-    # Reset layer positions to 0 and mix 
-    # Update shift of Gaussian peaks
-    B *= 0
-    for i in range(B.shape[0]):
-        for j in range(0, i):
-            B[j] -= (D[j] - D[i]) * (t - tmix)
-        for j in range(i+1, B.shape[0]):
-            B[j] -= (D[j] - D[i]) * (t - tmix)
+
 
     Sts = np.zeros(S.shape)
     Scur = np.copy(S)
     # only do the calculation if there are two or more solvent
     if (len(A) < 2) or A.sum()-A.max()<1e-12 or abs(mixing)<1e-12:
-        C = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
-        return B, C, S, Sts
+        C0 = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
+        return B, C, C0 , S, Sts
 
     for i in range(S.shape[0]):
         # Calculate the relative and weighted polarity terms
@@ -234,8 +339,7 @@ def mix(A, B, C, D, Spol, Lpol, S, mixing):
         else:
             S[i] = Sts[i]
 
-    # Update the varience of each Gaussian peak
-    C = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
+    C0 = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
 
-    return B, C, S, Sts
+    return B, C,C0, S, Sts
 

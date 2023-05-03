@@ -116,7 +116,9 @@ class Vessel:
         self.solvent_dict=dict() #String Keys, index values
         self.solvents=[]
         self._layers_position = np.zeros(1)
-        self._layers_variance=2.0
+        self._layers_variance = np.ones(1)*self.volume/3.46
+        self._solvent_volumes = np.ones(1)*self.volume
+        self._variance = 2
         self._layers = None
         self.ignore_layout=ignore_layout
 
@@ -154,6 +156,14 @@ class Vessel:
         #union should be the same length as both new_solvents and solvents
         union = tuple(a for a in new_solvents if a in self.solvent_dict)
         if len(new_solvents)!=len(self.solvents) or len(new_solvents)!= len(union) :
+
+            #copy over variances
+            self._layers_variance = np.array([self._layers_variance[self.solvent_dict[sol]]
+            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_variance[-1]])
+            #copy over amounts
+            self._solvent_volumes = np.array([self._solvent_volumes[self.solvent_dict[sol]]
+            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._solvent_volumes[-1]])
+            #make a new solvent dict
             self.solvent_dict,self.solute_dict = rebuild_solute_dict(
                 self.solvent_dict, self.solute_dict, new_solvents
             )
@@ -163,10 +173,8 @@ class Vessel:
             if len(self.solvents)==0 and n_solvents:
                 for key,arr in self.solute_dict.items():
                     arr+=self.material_dict[key].mol/n_solvents
+                
             self.solvents=new_solvents
-
-            #for now just reset the layer information
-            self._layers_variance = 2.0
             #last entry is for air
             self._layers_position = np.zeros(n_solvents+1)
 
@@ -430,7 +438,7 @@ class Vessel:
         t=param[0] #or replace dt
         # Make air layer properties
         d_air = 1.225 #in g/L
-        #v_air = self.volume-self.filled_volume()
+        v_air = self.volume-self.filled_volume()
 
         #This is just to ensure the order of solutes does not change
         s_names = tuple(s for s in self.solute_dict)
@@ -439,7 +447,7 @@ class Vessel:
         solvents = tuple(self.material_dict[s] for s in self.solvents)
         #Get solvent properties
         #Apparently you don't need the volume of air
-        solvent_volume = np.array([mat.litres for mat in solvents])#+[v_air])
+        solvent_volume = np.array([mat.litres for mat in solvents]+[v_air])
         solvent_density = np.array([mat.get_density() for mat in solvents]+[d_air])
         #Exclude air I guess?
         solvent_polarity = np.array([mat.polarity for mat in solvents])
@@ -451,16 +459,22 @@ class Vessel:
             solute_amount = np.stack([self.solute_dict[a] for a in s_names])
         else:
             solute_amount=np.zeros([0,len(solvents)])
-        self._layers_position, self._layers_variance, new_solute_amount, __ = separate.mix(
-            A=solvent_volume,
+
+        self._layers_position, self._layers_variance, self._variance, new_solute_amount, __ = separate.mix(
+            v=solvent_volume,
+            Vprev = self._solvent_volumes,
             B=self._layers_position,
             C=self._layers_variance,
+            C0=self._variance,
             D=solvent_density,
             Spol=solute_polarity,
             Lpol=solvent_polarity,
             S=solute_amount,
             mixing=t
         )
+
+        self._solvent_volumes = solvent_volume
+
         for i,s in enumerate(s_names):
             self.solute_dict[s] = new_solute_amount[i]
    
