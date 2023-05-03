@@ -127,13 +127,8 @@ def map_to_state(A, B, C, colors, x=x):
         # If x position is inside at least one Gaussian peak (random set)
         else:
             p = 0.0
-            placed = False
-            j = -1
             # Loop until pixel is set
-            while not placed:
-                j += 1
-                #if j == P.shape[0]:
-                    #print('--p:{}---------------Psum:{}-----------P[]:{}--------r:{}----------------------'.format(p, Psum, P, r))                
+            for j in range(P.shape[0]):
                 p += P[j]
                 # If random number is less than relative probability for that phase
                 if r - p / Psum < 1e-6:
@@ -143,79 +138,16 @@ def map_to_state(A, B, C, colors, x=x):
                     # Subtract pixel for that phase
                     n[j] -= 1
                     # End loop
-                    placed = True
+                    break
+            else: # This code runs when the loop didn't actually set any pixels and fills it with air
+                L[l] = colors[j]
+                L2[l]=j
+                n[j] -= 1
     
     return L,L2
 
 
-@numba.jit
-def get_end_means(v,d):
-    """Get final gaussian peak positions"""
-    order=np.argsort(d)[::-1]
-    Vtot=0
-    m_end = np.zeros(d.shape[0])
-    for i in order:
-        m_end[i] = Vtot+v[i]/2
-        Vtot+=v[i]
-    return Vtot,m_end
-
-
-@numba.jit
-def get_diff(v,means,d):
-    """Get timescale multiplier using densities"""
-    diff = np.zeros(d.shape[0])
-    for i in range(diff.shape[0]):
-        for j in range(0, i):
-            diff[j] -= (d[j] - d[i])
-        for j in range(i+1, d.shape[0]):
-            diff[j] -= (d[j] - d[i])
-    return np.clip(np.abs(diff),1e-2,None)
-
-@numba.jit
-def pos(T, Vtot, vi, means):
-    """Get position from time elapsed"""
-    c=1.2/(np.abs(means-Vtot/2)+1e-6)
-    if np.max(c)>1200:
-        return means
-    f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
-    return means+(Vtot/2-means)*f
-
-@numba.jit
-def s_T(T, Vtot, vi, MINVAR):
-    """Get variance from time elapsed"""
-    sf = vi/MINVAR
-    si = Vtot/3.46
-    g = np.exp(-2*(T/Vtot)**2)
-    return sf+(si-sf)*g
-
-@numba.jit
-def Ts(s, Vtot, Vi, MINVAR):
-    """Get time elapsed from variance"""
-    #sqrt(12) ~3.46
-    sf = Vi/MINVAR
-    si = Vtot/3.46
-    s=np.clip(s,sf+1e-10,si-1e-10)
-    ratio = np.clip((si-sf)/(s-sf),1,None)
-
-    return np.sqrt(np.log(ratio)/2)*Vtot
-
-@numba.jit
-def dT(dt,Vtot,vi,diff):
-    """Get time that has passed
-    
-    Note: I will be adding a scaling factor at the end so settling makes sense
-    """
-    SCALING=1e-2
-    ratio = np.clip(vi/Vtot,0,0.999)
-    return dt*diff/(1-ratio)**2*SCALING
-
-
-
-
-
-
-
-@numba.jit
+#@numba.jit
 def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
@@ -245,10 +177,27 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     # Initialize time variable such that Gaussians have normalized area
     s=C*1.0
     x=B*1.0
-    #figure out where the gaussians should end up at T-> inf
-    Vtot,means = get_end_means(v,D)
 
-    diff = get_diff(v,means,D)
+    #figure out where the gaussians should end up at T-> inf
+    order=np.argsort(D)[::-1]
+    Vtot=0 #Total volume
+    means = np.zeros(D.shape[0])
+    for i in order:
+        means[i] = Vtot+v[i]/2
+        Vtot+=v[i]
+
+
+    #Get convergence speeds based off of how different the densities are
+    diff = np.zeros(D.shape[0])
+    for i in range(diff.shape[0]):
+        for j in range(0, i):
+            diff[j] -= (D[j] - D[i])
+        for j in range(i+1, D.shape[0]):
+            diff[j] -= (D[j] - D[i])
+    diff = np.clip(np.abs(diff),1e-2,None)
+
+
+
     max_var = Vtot/3.46
     MINVAR=4.0
     #adjust variance
@@ -265,16 +214,28 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             new_var = min(max_var, max(cur_var,new_var))
             s[i]=new_var
 
-    #Get the time
-    T = Ts(s,Vtot,v,MINVAR)
+    #Get the mixing-time variable
+    sf = v/MINVAR # final variances
+    si = Vtot/3.46 # initial variances
+    s=np.clip(s,sf+1e-10,si-1e-10)
+    ratio = np.clip((si-sf)/(s-sf),1,None)
+    T = np.sqrt(np.log(ratio)/2)*Vtot
     # Add any extra time
-    T+=dT(mixing,Vtot,v,diff)
+    SCALING=1e-2
+    ratio = np.clip(v/Vtot,0,0.999)
+    dt = mixing*diff/(1-ratio)**2*SCALING
+    T+=dt
     #Make sure it's >= 0 (0 is fully mixed time)
     T=np.clip(T,0,None)
+
     #update positions
-    B = pos(T, Vtot,v,means)
+    c=1.2/(np.abs(means-Vtot/2)+1e-6)
+    c=np.clip(c,1e-3,30)
+    f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
+    B= means+(Vtot/2-means)*f
     #Update variance
-    C = s_T(T, Vtot, v, MINVAR)
+    g = np.exp(-2*(T/Vtot)**2)
+    C = sf+(si-sf)*g
 
     A=v[:-1]
 
