@@ -147,7 +147,7 @@ def map_to_state(A, B, C, colors, x=x):
     return L,L2
 
 
-#@numba.jit
+@numba.jit
 def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
@@ -206,10 +206,9 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
         dv = v[i] - Vprev[i]
         # Make sure variance is at least as big as fully separated variance
         cur_var= max(s[i],v[i]/MINVAR)
-        
+        s+=dv/3.46
         # Extra mixing dependant on the position and how much was added
         if dv>1e-6:
-            s+=dv/3.46
             new_var = (dv/(np.abs(v[i]-dv)+1e-6))*((Vtot-x[i])/3.46)
             new_var = min(max_var, max(cur_var,new_var))
             s[i]=new_var

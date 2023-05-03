@@ -219,7 +219,9 @@ class Vessel:
             else:
                 out.append(self._event_dict[event.name](event.parameter,dt))
 
-        if not self.ignore_layout:self._update_layers(0,0)
+        if not self.ignore_layout:
+            self._mix((0,),0)
+            self._update_layers(0,0)
         return out
 
     def _heat_contact(self,param,other_vessel,dt):
@@ -446,20 +448,19 @@ class Vessel:
         solutes = tuple(self.material_dict[s] for s in s_names)
         solvents = tuple(self.material_dict[s] for s in self.solvents)
         #Get solvent properties
-        #Apparently you don't need the volume of air
         solvent_volume = np.array([mat.litres for mat in solvents]+[v_air])
         solvent_density = np.array([mat.get_density() for mat in solvents]+[d_air])
         #Exclude air I guess?
         solvent_polarity = np.array([mat.polarity for mat in solvents])
 
-        #Get sulute properties
+        #Get solute properties
         solute_polarity = np.array([mat.polarity for mat in solutes])
         #Hopefully this is the correct 2D array shape
         if len(s_names)>0:
             solute_amount = np.stack([self.solute_dict[a] for a in s_names])
         else:
             solute_amount=np.zeros([0,len(solvents)])
-
+        
         self._layers_position, self._layers_variance, self._variance, new_solute_amount, __ = separate.mix(
             v=solvent_volume,
             Vprev = self._solvent_volumes,
@@ -477,6 +478,8 @@ class Vessel:
 
         for i,s in enumerate(s_names):
             self.solute_dict[s] = new_solute_amount[i]
+        
+        return 0
    
     def _update_layers(self, param, dt) -> int:
 
