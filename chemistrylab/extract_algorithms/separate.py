@@ -247,7 +247,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     A=v[:-1]
 
-##############################Mixing / Separating Solutes#######################################
+##############################[Mixing / Separating Solutes]#######################################
     t_scale = 25
     
 
@@ -275,6 +275,11 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     
     # Update amount of solute i in each solvent
     for i in range(S.shape[0]):
+
+        Ssum = np.sum(Scur[i])
+        if Ssum<1e-6:
+            continue    
+
         # Calculate the relative and weighted polarity terms
         Ldif = 0
         Ldif0 = 0
@@ -283,7 +288,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
 
         # Calculate total amount of solute
-        Ssum = np.sum(Scur[i])
+        
         
         # Note A*re_weight has the same sum as A
         re_weight = (1 - (np.abs(Spol[i] - Lpol) / Ldif)) / (1 - (Ldif0) / (np.sum(A) * Ldif))
