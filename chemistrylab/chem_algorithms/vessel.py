@@ -440,15 +440,16 @@ class Vessel:
         t=param[0] #or replace dt
         # Make air layer properties
         d_air = 1.225 #in g/L
-        v_air = self.volume-self.filled_volume()
 
         #This is just to ensure the order of solutes does not change
         s_names = tuple(s for s in self.solute_dict)
         #Grab solute and solvent objects
         solutes = tuple(self.material_dict[s] for s in s_names)
         solvents = tuple(self.material_dict[s] for s in self.solvents)
-        #Get solvent properties
-        solvent_volume = np.array([mat.litres for mat in solvents]+[v_air])
+        #Get solvent volumes
+        solvent_volume = [mat.litres for mat in solvents]
+        # Add air to the end ov the volume list s.t it fills the remainder of the vessel
+        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)])
         solvent_density = np.array([mat.get_density() for mat in solvents]+[d_air])
         #Exclude air I guess?
         solvent_polarity = np.array([mat.polarity for mat in solvents])
@@ -486,12 +487,15 @@ class Vessel:
         """
         This wraps separate.map_to_state
         It's used to get a layer image as well as layer information
+        TODO: Handle solutes having a volume
         """
         _=param
         v_air = self.volume-self.filled_volume()
         c_air = 0.65 #chosen color of air
         solvents = tuple(self.material_dict[s] for s in self.solvents)
-        solvent_volume = np.array([mat.litres for mat in solvents]+[v_air])
+        solvent_volume = [mat.litres for mat in solvents]
+        # Add air to the end ov the volume list s.t it fills the remainder of the vessel
+        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)])
 
         solvent_colors = np.array([mat._color for mat in solvents]+[c_air])
 

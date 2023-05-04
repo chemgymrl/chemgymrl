@@ -217,12 +217,21 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     sf = v/MINVAR # final variances
     si = Vtot/3.46 # initial variances
     s=np.clip(s,sf+1e-10,si-1e-10)
+    #ratio -> inf as t -> inf
     ratio = np.clip((si-sf)/(s-sf),1,None)
+
+    #Elapsed time T is [0,inf) and increases monotonely with ratio
     T = np.sqrt(np.log(ratio)/2)*Vtot
     # Add any extra time
     SCALING=1e-2
     ratio = np.clip(v/Vtot,0,0.999)
     dt = mixing*diff/(1-ratio)**2*SCALING
+    # Do a cap on T when mixing since you should always be able to stir the vessel
+    # Even if the vessel has been settling for 100 years
+    if mixing<-1e-4:
+        T_max = 3.278*dt/dt.min()
+        T = (T>T_max)*T_max+(T<=T_max)*T
+
     T+=dt
     #Make sure it's >= 0 (0 is fully mixed time)
     T=np.clip(T,0,None)
@@ -238,15 +247,22 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     A=v[:-1]
 
-##############################Below Here is unknown code#######################################
+##############################Mixing / Separating Solutes#######################################
+    t_scale = 25
+    
+
     t = -1.0 * np.log(C0 * np.sqrt(2.0 * np.pi))
+
+    # Mixing should always mix at least a bit   
+    if mixing<0:
+        t=min(t,-1.47)
+
     # Time of fully mixed solution
     tmix = -1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi))
     # Check if fully mixed already
     if t + mixing < tmix:
         mixing = tmix - t
     t += mixing
-
 
 
     Sts = np.zeros(S.shape)
@@ -256,6 +272,8 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
         C0 = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
         return B, C, C0 , S, Sts
 
+    
+    # Update amount of solute i in each solvent
     for i in range(S.shape[0]):
         # Calculate the relative and weighted polarity terms
         Ldif = 0
@@ -266,40 +284,35 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
 
         # Calculate total amount of solute
         Ssum = np.sum(Scur[i])
-
-        # Calculate constant
-        c = 1 / (1 - (Ldif0) / (np.sum(A) * Ldif))
-
-        # Calculate the ideal amount of solute i in each phase
-        # Check conditions that this adds to Ssum
-        t_scale = 25
-        St = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t)) + c * (1 - np.exp(t_scale*(tmix - t))) * (1 - (np.abs(Spol[i] - Lpol) / Ldif)))
-        Sts[i] = np.copy(St)
-
-    # Update amount of solute i in each phase
-    for i in range(S.shape[0]):
-        # Calculate the relative and weighted polarity terms
-        Ldif = 0
-        Ldif0 = 0
-        for j in range(Lpol.shape[0]):
-            Ldif += np.abs(Spol[i] - Lpol[j])
-            Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
-
-        # Calculate total amount of solute
-        Ssum = np.sum(Scur[i])
-
-        # Calculate constant
-        c = 1 / (1 - (Ldif0) / (np.sum(A) * Ldif))
-
-        # Calculate the ideal amount of solute i in each phase for the previous time step
-        St0 = (Ssum * A / np.sum(A)) * (np.exp(t_scale*(tmix - t + mixing)) + c * (1 - np.exp(t_scale*(tmix - t + mixing))) * (1 - (np.abs(Spol[i] - Lpol) / Ldif)))
-
+        
+        # Note A*re_weight has the same sum as A
+        re_weight = (1 - (np.abs(Spol[i] - Lpol) / Ldif)) / (1 - (Ldif0) / (np.sum(A) * Ldif))
+        #coeff for current timestep
+        alpha = np.exp(t_scale*(tmix - t))
+        #coeff for prev timestep
+        beta = np.exp(t_scale*(tmix - (t - mixing)))
+        # Calculate the ideal amount of solute i in each solvent for the current time step
+        St = (Ssum * A / np.sum(A)) * (alpha + (1-alpha)*re_weight)
+        # Calculate the ideal amount of solute i in each solvent for the previous time step
+        St0 = (Ssum * A / np.sum(A)) * (beta + (1 - beta) * re_weight)
+        #print(S[i],St0,St,re_weight,mixing,alpha,beta)
         if np.abs(t - mixing - tmix) > 1e-9:
-            S[i] = Sts[i] + 0.5 * ((1 - np.abs(mixing) / mixing) * (S[i] - St0) * (t - tmix) / (t - mixing - tmix) + (1 + np.abs(mixing) / mixing) * (S[i] - St0))
+            #Square of the cosine between the two distributions
+            cosine = (St0*S[i]).sum()/((S[i]**2).sum()*(St**2).sum())**0.5
+            # Moving backwards in time
+            if mixing<0:
+                #Make sure mixing always happens reasonably well
+                cosine = max(cosine,1-cosine)
+                S[i] = S[i]*(1-cosine) + St*cosine
+            # Moving Forwards in time
+            else:
+                #scale cosine to be higher if you wait longer (bad approximation)
+                cosine = max(min(1,cosine**1.5*(mixing*t_scale*5)**1.5),1e-2)
+                # Move towards projected step St with cosine step size
+                S[i] = S[i]*(1-cosine) + St*cosine
         else:
-            S[i] = Sts[i]
+            S[i] = St
 
     C0 = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
-
     return B, C,C0, S, Sts
 
