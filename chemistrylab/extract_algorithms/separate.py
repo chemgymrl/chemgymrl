@@ -28,7 +28,7 @@ x = np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
 
 import numba
 
-@numba.jit
+@numba.jit(cache=True)
 # Function to map the separation Gaussians to discretized state
 def map_to_state(A, B, C, colors, x=x):
     """
@@ -105,10 +105,8 @@ def map_to_state(A, B, C, colors, x=x):
                 # Set Gaussian center extremely positive outside of range to avoid placement by default set
                 B1[j] += 1e9
 
-            # Check to see if most negative phase is past due to have all pixels
-            #elif P[j] < 1e-6 and j == np.argmin(B1 - x[k]):
-            #    past_due = True
-
+        # j_min is the index of the lowest gaussian which still has pixels to place
+        j_min = np.argmin(B1)
         # Sum of all Gaussians at this x position
         Psum = np.sum(P)
 
@@ -116,9 +114,9 @@ def map_to_state(A, B, C, colors, x=x):
         r = np.random.rand()
 
         # If x position is outside every Gaussian peak (default set)
-        if Psum < 1e-6 or past_due:
+        if Psum < 1e-6 or P[j_min] < 1e-3:
             # Calculate the index of the most negative phase
-            j = np.argmin(B1 - x[k])
+            j = j_min
             # Set pixel value
             L[l] = colors[j]
             L2[l]=j
@@ -147,7 +145,7 @@ def map_to_state(A, B, C, colors, x=x):
     return L,L2
 
 
-@numba.jit
+@numba.jit(cache=True)
 def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
@@ -174,10 +172,19 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
 
 
-    # Initialize time variable such that Gaussians have normalized area
+    
     s=C*1.0
     x=B*1.0
+    # CONSTANTS
+    MINVAR=4.0
+    SCALING=1e-2
+    t_scale = 25
+    tmix = -1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi)) #-1.6120857137646178
+    tseparate = -1.47
 
+
+    # copy mixing for the solutes in case you need to modify it
+    solute_mixing = 0
     #figure out where the gaussians should end up at T-> inf
     order=np.argsort(D)[::-1]
     Vtot=0 #Total volume
@@ -196,10 +203,8 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             diff[j] -= (D[j] - D[i])
     diff = np.clip(np.abs(diff),1e-2,None)
 
-
-
     max_var = Vtot/3.46
-    MINVAR=4.0
+    
     #adjust variance
     for i in range(v.shape[0]):
         # Figure out how much the volume has changed
@@ -212,6 +217,9 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             new_var = (dv/(np.abs(v[i]-dv)+1e-6))*((Vtot-x[i])/3.46)
             new_var = min(max_var, max(cur_var,new_var))
             s[i]=new_var
+            #TODO: Set extra mixing of solutes
+            var_ratio = (new_var-cur_var)/(max_var-cur_var)
+            solute_mixing = min(solute_mixing, (tmix-tseparate)*var_ratio )
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
@@ -223,7 +231,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     #Elapsed time T is [0,inf) and increases monotonely with ratio
     T = np.sqrt(np.log(ratio)/2)*Vtot
     # Add any extra time
-    SCALING=1e-2
+    
     ratio = np.clip(v/Vtot,0,0.999)
     dt = mixing*diff/(1-ratio)**2*SCALING
     # Do a cap on T when mixing since you should always be able to stir the vessel
@@ -233,7 +241,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
         T = (T>T_max)*T_max+(T<=T_max)*T
 
     T+=dt
-    #Make sure it's >= 0 (0 is fully mixed time)
+    #Make sure Time is >= 0 (0 is fully mixed time)
     T=np.clip(T,0,None)
 
     #update positions
@@ -245,20 +253,18 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     g = np.exp(-2*(T/Vtot)**2)
     C = sf+(si-sf)*g
 
+    # A are the volumes used for dissolving
     A=v[:-1]
 
 ##############################[Mixing / Separating Solutes]#######################################
-    t_scale = 25
-    
 
     t = -1.0 * np.log(C0 * np.sqrt(2.0 * np.pi))
 
     # Mixing should always mix at least a bit   
-    if mixing<0:
-        t=min(t,-1.47)
+    if mixing<0 or solute_mixing<0:
+        t=min(t,tseparate)
 
-    # Time of fully mixed solution
-    tmix = -1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi))
+    mixing+=solute_mixing
     # Check if fully mixed already
     if t + mixing < tmix:
         mixing = tmix - t
