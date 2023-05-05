@@ -1,7 +1,7 @@
 from typing import NamedTuple, Tuple, Callable, Optional
 import numpy as np
 import numba
-from chemistrylab.extract_algorithms import separate
+from chemistrylab.extract_algorithms import separate#separate_cc as separate
 
 class Event(NamedTuple):
     name: str
@@ -27,7 +27,7 @@ def rebuild_solute_dict(solvent_dict, solute_dict, solvents):
     new_solvent_dict = {mat:i for i,mat in enumerate(solvents)}
     new_solute_dict = \
     {mat: np.array([solute_dict[mat][solvent_dict[sol]] if sol in solvent_dict else 0 
-        for sol in solvents]) 
+        for sol in solvents], dtype=np.float32) 
             for mat in solute_dict}
     return new_solvent_dict, new_solute_dict
 
@@ -73,6 +73,8 @@ def validate_solute_amounts(mol_solute, mol_solvent, mol_dissolved):
             mol_dissolved[i] += (u_mol-checksum)*norm_solvent
 
 
+layer_values=np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
+
 class Vessel:
     """
     Class defining the Vessel object.
@@ -115,9 +117,9 @@ class Vessel:
         self.solute_dict=dict() # String Keys, float array values
         self.solvent_dict=dict() #String Keys, index values
         self.solvents=[]
-        self._layers_position = np.zeros(1)
-        self._layers_variance = np.ones(1)*self.volume/3.46
-        self._solvent_volumes = np.ones(1)*self.volume
+        self._layers_position = np.zeros(1, dtype=np.float32)
+        self._layers_variance = np.array([self.volume/3.46], dtype=np.float32)
+        self._solvent_volumes = np.array([self.volume], dtype=np.float32)
         self._variance = 2
         self._layers = None
         self.ignore_layout=ignore_layout
@@ -159,10 +161,12 @@ class Vessel:
 
             #copy over variances
             self._layers_variance = np.array([self._layers_variance[self.solvent_dict[sol]]
-            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_variance[-1]])
+            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_variance[-1]],
+            dtype = np.float32)
             #copy over amounts
             self._solvent_volumes = np.array([self._solvent_volumes[self.solvent_dict[sol]]
-            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._solvent_volumes[-1]])
+            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._solvent_volumes[-1]],
+            dtype = np.float32)
             #make a new solvent dict
             self.solvent_dict,self.solute_dict = rebuild_solute_dict(
                 self.solvent_dict, self.solute_dict, new_solvents
@@ -176,7 +180,7 @@ class Vessel:
                 
             self.solvents=new_solvents
             #last entry is for air
-            self._layers_position = np.zeros(n_solvents+1)
+            self._layers_position = np.zeros(n_solvents+1, dtype=np.float32)
 
     def handle_overflow(self):
         """
@@ -405,6 +409,8 @@ class Vessel:
             if drained_volume<=1e-12:continue
             #how much solvent is drained (percent wise)
             fraction=np.clip(drained_volume/mat.litres,0,1)
+            if mat.litres<1e-12:
+                self.DEBUG=self._hashed_layers*1,self.solvents
             #drain out the solvent
             if key in other_mats:
                 d_mol=mat.mol*fraction
@@ -437,7 +443,7 @@ class Vessel:
         This updates the amounts dissolved, layer positions and layer variances  
         """
         if self.ignore_layout:return -2
-        t=param[0] #or replace dt
+        t=np.float32(param[0]) #or replace dt
         # Make air layer properties
         d_air = 1.225 #in g/L
 
@@ -449,30 +455,30 @@ class Vessel:
         #Get solvent volumes
         solvent_volume = [mat.litres for mat in solvents]
         # Add air to the end ov the volume list s.t it fills the remainder of the vessel
-        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)])
-        solvent_density = np.array([mat.get_density() for mat in solvents]+[d_air])
+        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)], dtype=np.float32)
+        solvent_density = np.array([mat.get_density() for mat in solvents]+[d_air], dtype=np.float32)
         #Exclude air I guess?
-        solvent_polarity = np.array([mat.polarity for mat in solvents])
+        solvent_polarity = np.array([mat.polarity for mat in solvents], dtype=np.float32)
 
         #Get solute properties
-        solute_polarity = np.array([mat.polarity for mat in solutes])
+        solute_polarity = np.array([mat.polarity for mat in solutes], dtype=np.float32)
         #Hopefully this is the correct 2D array shape
         if len(s_names)>0:
-            solute_amount = np.stack([self.solute_dict[a] for a in s_names])
+            solute_amount = np.stack([self.solute_dict[a] for a in s_names]).astype(np.float32)
         else:
-            solute_amount=np.zeros([0,len(solvents)])
+            solute_amount=np.zeros([0,len(solvents)],dtype=np.float32)
         
         self._layers_position, self._layers_variance, self._variance, new_solute_amount, __ = separate.mix(
-            v=solvent_volume,
-            Vprev = self._solvent_volumes,
-            B=self._layers_position,
-            C=self._layers_variance,
-            C0=self._variance,
-            D=solvent_density,
-            Spol=solute_polarity,
-            Lpol=solvent_polarity,
-            S=solute_amount,
-            mixing=t
+            solvent_volume,
+            self._solvent_volumes.astype(np.float32),
+            self._layers_position.astype(np.float32),
+            self._layers_variance.astype(np.float32),
+            np.float32(self._variance),
+            solvent_density,
+            solute_polarity,
+            solvent_polarity,
+            solute_amount,
+            t
         )
 
         self._solvent_volumes = solvent_volume
@@ -495,16 +501,16 @@ class Vessel:
         solvents = tuple(self.material_dict[s] for s in self.solvents)
         solvent_volume = [mat.litres for mat in solvents]
         # Add air to the end ov the volume list s.t it fills the remainder of the vessel
-        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)])
+        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)], dtype=np.float32)
 
-        solvent_colors = np.array([mat._color for mat in solvents]+[c_air])
+        solvent_colors = np.array([mat._color for mat in solvents]+[c_air], dtype=np.float32)
 
         self._layers,self._hashed_layers = separate.map_to_state(
-            A=solvent_volume,
-            B=self._layers_position,
-            C=self._layers_variance,
-            colors=solvent_colors,
-            x=separate.x
+            solvent_volume,
+            self._layers_position.astype(np.float32),
+            self._layers_variance.astype(np.float32),
+            solvent_colors,
+            layer_values
         )
 
     def get_layers(self):

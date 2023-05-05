@@ -15,21 +15,23 @@ You should have received a copy of the GNU General Public License
 along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 """
 import numpy as np
-import matplotlib.pyplot as plt
-import cmocean
 from math import ceil
-from copy import deepcopy
+import numba
+
+
 
 # Maximum varience of Gaussian peaks
-Cmix = 2.0
+
 
 # Array for x/height positions
 x = np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
 
-import numba
+
+from numba.pycc import CC
+cc = CC('separate_cc')
 
 @numba.jit(cache=True)
-# Function to map the separation Gaussians to discretized state
+#@cc.export('map_to_state', '(f4[:], f4[:],f4[:],f4[:],f4[:])')
 def map_to_state(A, B, C, colors, x=x):
     """
     Uses the position and variance of each solvent to stochastically create a layer-view of the vessel
@@ -50,6 +52,10 @@ def map_to_state(A, B, C, colors, x=x):
     x = x*np.sum(A)
     #grab the index of the least dense material
     j_max = np.argmax(B)
+    # If there are duplicates of the least dense material jmax won't work
+    if np.sum(np.abs(B[j_max]-B)<1e-4)>1:
+        j_max=-10
+
     # Array for layers at each time step
     L = np.zeros(100, dtype=np.float32) + colors[-1]
     L2 = np.zeros(100, dtype=np.int32)+(len(colors)-1)
@@ -62,25 +68,19 @@ def map_to_state(A, B, C, colors, x=x):
     #https://www.desmos.com/calculator/jc0ensg38o
     MINP=0.13533
 
-    # Number of pixels available for each phase
+    
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
-    n = ((A / sum_A) * L.shape[0])
-    count = 0
-    for i in np.where((n > 1e-8) | (n < 0.5 - 1e-8))[0]:
-        n[i] = ceil(n[i])
-        count += 1
-
-    #n = n.astype(int)
-    n0=n
-    n=np.zeros(n0.shape,dtype=np.int32)
-    n[:]=n0
-    if np.sum(n[:-1]) > L.shape[0]:
+    # Number of pixels available for each solvent
+    n=np.zeros(A.shape,dtype=np.int32)
+    n[:]=((A / sum_A) * L.shape[0] + np.float32(0.999))
+    # Since this agressively rounds up, fix any rounding issues
+    count = np.sum(n[:-1]) - L.shape[0]
+    if count>0:
         for i in range(count):
             n[n.argmax()] -= 1
     else:
-        # Take rounding errors into account
-        n[-1] = 0
-        n[-1] = L.shape[0] - np.sum(n)
+        # Make any unused pixels air
+        n[-1] = -count
     
     # Loop over each layer pixel
     for l in range(L.shape[0]):
@@ -110,7 +110,7 @@ def map_to_state(A, B, C, colors, x=x):
         j_min = np.argmin(B1)
 
         # Only need to place the least dense material
-        if j_min==j_max:
+        if j_min==j_max and n[j_max]>0:
             L[l:] = colors[j_max]
             L2[l:]=j_max
             return L,L2
@@ -120,7 +120,9 @@ def map_to_state(A, B, C, colors, x=x):
         # Random number for mixing of layers
         r = np.random.rand()
         place_jmin = False
-        if P_raw[j_min] < MINP:
+        #Below if statement handles when you passed over a gaussian but didn't set all of its pixels
+        # The current point has to be far to the RIGHT of the gaussian for it to have passed over
+        if P_raw[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
             if P_raw[j_min]<1e-12:
                 place_jmin=True
             else:
@@ -164,14 +166,17 @@ def map_to_state(A, B, C, colors, x=x):
 
 
 @numba.jit(cache=True)
+#@cc.export('mix', '(f4[:], f4[:], f4[:], f4[:], f4, f4[:], f4[:], f4[:], f4[:,:],f4)')
 def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
 
     Args:
     - v (np.ndarray): The volume of each solvent
+    - Vprev (np.ndarray): The volume of each solvent on the previous iteration
     - B (np.ndarray): The current positions of the solvent layers in the vessel
-    - C (float): The current variance of the solvent layers in the vessel
+    - C (np.ndarray): The current variances of the solvent layers in the vessel
+    - C0 (float) The current variance of solutes in the vessel
     - D (np.ndarray): The density of each solvent
     - Spol (np.ndarray): The relative polarities of the solutes
     - Lpol (np.ndarray): The relative polarities of the solvents
@@ -191,37 +196,40 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
 
 
     
-    s=C*1.0
-    x=B*1.0
+    s=C*1
+    x=B*1
     # CONSTANTS
-    MINVAR=4.0
-    SCALING=1e-2
+    MINVAR=np.float32(4.0)
+    SCALING=np.float32(1e-2)
     t_scale = 25
-    tmix = -1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi)) #-1.6120857137646178
-    tseparate = -1.47
-
+    #Cmix = np.float32(2.0)
+    tmix = np.float32(-1.6120857137646178)#-1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi))
+    tseparate = np.float32(-1.47)
+    TOL=np.float32(1e-10)
+    E3 = np.float32(1e-3)
+    sq12 = np.float32(3.4641)
 
     # copy mixing for the solutes in case you need to modify it
     solute_mixing = 0
     #figure out where the gaussians should end up at T-> inf
     order=np.argsort(D)[::-1]
-    Vtot=0 #Total volume
-    means = np.zeros(D.shape[0])
+    Vtot= np.float32(0) #Total volume
+    means = np.zeros(D.shape[0],dtype=np.float32)
     for i in order:
         means[i] = Vtot+v[i]/2
         Vtot+=v[i]
 
 
     #Get convergence speeds based off of how different the densities are
-    diff = np.zeros(D.shape[0])
+    diff = np.zeros(D.shape[0],dtype=np.float32)
     for i in range(diff.shape[0]):
         for j in range(0, i):
             diff[j] -= (D[j] - D[i])
         for j in range(i+1, D.shape[0]):
             diff[j] -= (D[j] - D[i])
-    diff = np.clip(np.abs(diff),1e-2,None)
+    diff = np.clip(np.abs(diff),E3,None)
 
-    max_var = Vtot/3.46
+    max_var = Vtot/sq12
     
     #adjust variance
     for i in range(v.shape[0]):
@@ -229,20 +237,21 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
         dv = v[i] - Vprev[i]
         # Make sure variance is at least as big as fully separated variance
         cur_var= max(s[i],v[i]/MINVAR)
-        s+=dv/3.46
+        # Add some variance to each solvent
+        s+=dv/sq12
         # Extra mixing dependant on the position and how much was added
         if dv>1e-6:
-            new_var = (dv/(np.abs(v[i]-dv)+1e-6))*((Vtot-x[i])/3.46)
+            new_var = (dv/(np.abs(v[i]-dv)+TOL))*((Vtot-x[i])/sq12)
             new_var = min(max_var, max(cur_var,new_var))
             s[i]=new_var
             #TODO: Set extra mixing of solutes
-            var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+1e-6)
+            var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+TOL)
             solute_mixing = min(solute_mixing, (tmix-tseparate)*var_ratio )
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
-    si = Vtot/3.46 # initial variances
-    s=np.clip(s,sf+1e-10,si-1e-10)
+    si = Vtot/sq12 # initial variances
+    s=np.clip(s,sf+TOL,si-TOL)
     #ratio -> inf as t -> inf
     ratio = np.clip((si-sf)/(s-sf),1,None)
 
@@ -250,12 +259,12 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     T = np.sqrt(np.log(ratio)/2)*Vtot
     # Add any extra time
     
-    ratio = np.clip(v/Vtot,0,0.999)
+    ratio = np.clip(v/Vtot,0,1-E3)
     dt = mixing*diff/(1-ratio)**2*SCALING
     # Do a cap on T when mixing since you should always be able to stir the vessel
     # Even if the vessel has been settling for 100 years
-    if mixing<-1e-4:
-        T_max = 3.278*dt/dt.min()
+    if mixing< -1e-4:
+        T_max = np.float32(3.278)*dt/dt.min()
         T = (T>T_max)*T_max+(T<=T_max)*T
 
     T+=dt
@@ -263,8 +272,8 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     T=np.clip(T,0,None)
 
     #update positions
-    c=1.2/(np.abs(means-Vtot/2)+1e-6)
-    c=np.clip(c,1e-3,30)
+    c=1.2/(np.abs(means-Vtot/2)+TOL)
+    c=np.clip(c,E3,30)
     f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
     B= means+(Vtot/2-means)*f
     #Update variance
@@ -276,7 +285,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
 
 ##############################[Mixing / Separating Solutes]#######################################
 
-    t = -1.0 * np.log(C0 * np.sqrt(2.0 * np.pi))
+    t = np.float32(-np.log(C0 * np.sqrt(2.0 * np.pi)) )
 
     # Mixing should always mix at least a bit   
     if mixing<0 or solute_mixing<0:
@@ -289,11 +298,11 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     t += mixing
 
 
-    Sts = np.zeros(S.shape)
+    Sts = np.zeros(S.shape,dtype=np.float32)
     Scur = np.copy(S)
     # only do the calculation if there are two or more solvent
     if (len(A) < 2) or A.sum()-A.max()<1e-12 or abs(mixing)<1e-12:
-        C0 = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
+        C0 = np.float32( np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi) )
         return B, C, C0 , S, Sts
 
     
@@ -305,8 +314,8 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             continue    
 
         # Calculate the relative and weighted polarity terms
-        Ldif = 0
-        Ldif0 = 0
+        Ldif = np.float32(0)
+        Ldif0 = np.float32(0)
         for j in range(Lpol.shape[0]):
             Ldif += np.abs(Spol[i] - Lpol[j])
             Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
@@ -342,6 +351,9 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
         else:
             S[i] = St
 
-    C0 = np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi)
+    C0 = np.float32( np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi) )
     return B, C,C0, S, Sts
 
+if __name__ == "__main__":
+    
+    cc.compile()
