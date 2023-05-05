@@ -48,7 +48,8 @@ def map_to_state(A, B, C, colors, x=x):
     B1 = np.copy(B)
     
     x = x*np.sum(A)
-
+    #grab the index of the least dense material
+    j_max = np.argmax(B)
     # Array for layers at each time step
     L = np.zeros(100, dtype=np.float32) + colors[-1]
     L2 = np.zeros(100, dtype=np.int32)+(len(colors)-1)
@@ -89,7 +90,7 @@ def map_to_state(A, B, C, colors, x=x):
 
         P_raw = np.exp(-0.5 * (((x[k] - B) / C) ** 2))
         # MINP is a cutoff value to set the gaussian to 0
-        P_raw = P_raw* ((P_raw > MINP) + (P_raw < MINP)/3)
+        P_raw = P_raw* ((P_raw > MINP) + P_raw*(P_raw < MINP))
         
         # Calculate Gaussian values at current x position
         P = A /C * P_raw
@@ -107,14 +108,31 @@ def map_to_state(A, B, C, colors, x=x):
 
         # j_min is the index of the lowest gaussian which still has pixels to place
         j_min = np.argmin(B1)
+
+        # Only need to place the least dense material
+        if j_min==j_max:
+            L[l:] = colors[j_max]
+            L2[l:]=j_max
+            return L,L2
         # Sum of all Gaussians at this x position
         Psum = np.sum(P)
 
         # Random number for mixing of layers
         r = np.random.rand()
+        place_jmin = False
+        if P_raw[j_min] < MINP:
+            if P_raw[j_min]<1e-12:
+                place_jmin=True
+            else:
+                #More likely to place j_min pixels the lower it's propability is
+                choice_ratio = 0.1*MINP**2/P_raw[j_min]
+                r2=np.random.rand()
+                if choice_ratio>=r2:
+                    place_jmin=True
+
 
         # If x position is outside every Gaussian peak (default set)
-        if Psum < 1e-6 or P[j_min] < 1e-3:
+        if Psum < 1e-6  or place_jmin:
             # Calculate the index of the most negative phase
             j = j_min
             # Set pixel value
@@ -218,7 +236,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             new_var = min(max_var, max(cur_var,new_var))
             s[i]=new_var
             #TODO: Set extra mixing of solutes
-            var_ratio = (new_var-cur_var)/(max_var-cur_var)
+            var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+1e-6)
             solute_mixing = min(solute_mixing, (tmix-tseparate)*var_ratio )
 
     #Get the mixing-time variable
