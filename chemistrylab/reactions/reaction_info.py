@@ -53,6 +53,7 @@ class ReactInfo(NamedTuple):
     conc_coeff_arr:   np.array
         
     def dump_to_json(self,fn):
+        """Saves the reaction information to a json file"""
         with open(fn,"w") as f:
             f.write(
             format_2d_array_string(
@@ -62,6 +63,7 @@ class ReactInfo(NamedTuple):
             )
     @staticmethod
     def from_json(fn):
+        """Creates a new ReactInfo object from a json file"""
         with open(fn,"r") as f:
             kwargs = json.load(f)
         modified_kwargs = {i: np.array(kwargs[i]) if "_arr" in i else kwargs[i] for i in kwargs}

@@ -52,12 +52,35 @@ def get_dissolved_amounts(vessel, desired_material):
     return min_amount,contributions
         
 class RewardGenerator():
+    """
+    RewardGenerator class generates rewards for a given set of vessels and desired materials.
+
+    Args:
+    - use_purity (bool): True if reward is based on purity, False if reward is based on the amount of desired material.
+    - exclude_solvents (bool): True if solvents should be excluded from the total amount of materials for purity calculations.
+    - include_dissolved (bool): True if reward should include dissolved material components in the vessels as the desired material.
+    - exclude_mat (str, optional): A string representing a material which gives a negative reward.
+    
+    This class returns callable objects, which serve as reward functions
+    """
     def __init__(self, use_purity, exclude_solvents, include_dissolved, exclude_mat=None):
         self.exclude_solvents=exclude_solvents
         self.include_dissolved=include_dissolved
         self.use_purity=use_purity
         self.exclude_mat=exclude_mat
     def __call__(self,vessels,desired_material,exclude_material = None):
+        """
+        Assign a reward to a set of vessels based off of what is desired/undesired
+
+        Args:
+        - vessels (list[Vessel]): A list of Vessel objects.
+        - desired_material (str): A string representing the desired material for which the reward should be calculated.
+        - exclude_material (str, optional): Currently unused
+    
+        Returns:
+        - reward (float): A floating point number representing the calculated reward.
+
+        """
         reward=0
         for v in vessels:
             mat_dict = v.material_dict

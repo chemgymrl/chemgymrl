@@ -65,6 +65,7 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
         y(dt) <- y_N 
    
     Intuitively, it is like taking a Riemann sum of dy/dt (but you get dy/dt by bootstrapping your current sum for y(t))
+    This implementation uses a variable step size in order to account for super fast-changing concentrations (wurtz distill)
     """
     R = 8.314462619
     #if your updates are below 5e-4 you can increase factor (I decided this is a good number)
@@ -89,7 +90,7 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
         
         ratio=np.max(rates)/(np.max(conc)+1e-6)
         
-        #mess with how much time passes
+        #mess with the step size to make sure you don't get any super huge concentration changes
         while ratio*factor<targ and factor<10:
             factor*=2
         while ratio*factor>0.1:

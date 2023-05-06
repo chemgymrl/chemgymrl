@@ -35,7 +35,7 @@ cc = CC('separate_cc')
 def map_to_state(A, B, C, colors, x=x):
     """
     Uses the position and variance of each solvent to stochastically create a layer-view of the vessel
-
+    TODO: Generalize to solvents who's volume changes due to dissolved solutes?
     Args:
     - A (np.ndarray): The volume of each solvent
     - B (np.ndarray): The current positions of the solvent layers in the vessel
@@ -45,6 +45,22 @@ def map_to_state(A, B, C, colors, x=x):
     Returns:
     - L (np.ndarray): The solvent at each layer position (0.65 for air)
     - L2 (np.ndarray): The index of the solvent at each position (len(B)-1 for air)
+
+    Algorithm:
+    1. Discretize the vessel into 100 layers each with one unit of volume
+    2. Quantize the volumes into units of size sum(v)/100. (Round up agressively)
+    3. Do a checksum to make sure these quantized volumes sum to 100
+        i. If the sum of everything that isn't air is over 100, then decrease the solvent with the largest number of units
+        ii. Otherwise you can just set the number of air units to 100-sum([all vi which aren't air])
+    4. Find the position of the top layer
+    5. For each of the quantized layers, gather the height of each gaussian at that layer position and sample a solvent proportional to this height
+        i. This is approximately the same as doing an integral of the solvents distribution over the layer
+        ii. Unfortunately, the solvent distributions don't add up to 1 so you have to normalize.
+        iii. The distributions are more ballparks so you have to keep track of how many units you placed, and 
+                set the probability of the layer having a solvent to zero if all the units have already been placed
+        iv: This also means you may not have placed all of your units by the time you are way outside the variance of your
+                gaussian, so you should keep track of the lowest layer that still has units to place, and make sure those
+                units are all placed once you start to go way past it.
     """
     # Create a copy of B for temporary changes
     B1 = np.copy(B)
@@ -56,7 +72,7 @@ def map_to_state(A, B, C, colors, x=x):
     if np.sum(np.abs(B[j_max]-B)<1e-4)>1:
         j_max=-10
 
-    # Array for layers at each time step
+    # Array for layers  (1.)
     L = np.zeros(100, dtype=np.float32) + colors[-1]
     L2 = np.zeros(100, dtype=np.int32)+(len(colors)-1)
 
@@ -70,24 +86,25 @@ def map_to_state(A, B, C, colors, x=x):
 
     
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
-    # Number of pixels available for each solvent
+    # Number of pixels available for each solvent (2.)
     n=np.zeros(A.shape,dtype=np.int32)
     n[:]=((A / sum_A) * L.shape[0] + np.float32(0.999))
     # Since this agressively rounds up, fix any rounding issues
     count = np.sum(n[:-1]) - L.shape[0]
     if count>0:
+        # 3.i
         for i in range(count):
             n[n.argmax()] -= 1
     else:
-        # Make any unused pixels air
+        # Make any unused pixels air (3.ii)
         n[-1] = -count
     
     # Loop over each layer pixel
     for l in range(L.shape[0]):
         # Map layer pixel position to x position
         k = int(((l + 0.5) / L.shape[0]) * x.shape[0])
-        #print(x[k],end='|')
 
+        # 5.i
         P_raw = np.exp(-0.5 * (((x[k] - B) / C) ** 2))
         # MINP is a cutoff value to set the gaussian to 0
         P_raw = P_raw* ((P_raw > MINP) + P_raw*(P_raw < MINP))
@@ -95,7 +112,6 @@ def map_to_state(A, B, C, colors, x=x):
         # Calculate Gaussian values at current x position
         P = A /C * P_raw
         
-
         # Check to see if any phases have no pixels remaining
         past_due = False
         for j in range(P.shape[0]):
@@ -106,7 +122,7 @@ def map_to_state(A, B, C, colors, x=x):
                 # Set Gaussian center extremely positive outside of range to avoid placement by default set
                 B1[j] += 1e9
 
-        # j_min is the index of the lowest gaussian which still has pixels to place
+        # j_min is the index of the lowest gaussian which still has pixels to place (5.iv)
         j_min = np.argmin(B1)
 
         # Only need to place the least dense material
@@ -120,7 +136,7 @@ def map_to_state(A, B, C, colors, x=x):
         # Random number for mixing of layers
         r = np.random.rand()
         place_jmin = False
-        #Below if statement handles when you passed over a gaussian but didn't set all of its pixels
+        #Below if part 5.iv
         # The current point has to be far to the RIGHT of the gaussian for it to have passed over
         if P_raw[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
             if P_raw[j_min]<1e-12:
@@ -132,8 +148,7 @@ def map_to_state(A, B, C, colors, x=x):
                 if choice_ratio>=r2:
                     place_jmin=True
 
-
-        # If x position is outside every Gaussian peak (default set)
+        # If x position is outside every Gaussian peak (5.iv and 5.iii)
         if Psum < 1e-6  or place_jmin:
             # Calculate the index of the most negative phase
             j = j_min
@@ -142,13 +157,13 @@ def map_to_state(A, B, C, colors, x=x):
             L2[l]=j
             # Subtract pixel for that phase
             n[j] -= 1
-        # If x position is inside at least one Gaussian peak (random set)
+        # If x position is inside at least one Gaussian peak (5.i - 5.iii)
         else:
             p = 0.0
             # Loop until pixel is set
             for j in range(P.shape[0]):
                 p += P[j]
-                # If random number is less than relative probability for that phase
+                # If random number is less than relative probability for that phase (5.ii)
                 if r - p / Psum < 1e-6:
                     # Set pixel value
                     L[l] = colors[j]
@@ -187,14 +202,30 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     - layers_position (np.ndarray): An array of floats representing the new positions of the solvent layers in the vessel
     - layers_variance (np.ndarray): An array of floats representing the new variances of the solvent layers in the vessel
     - new_solute_amount (np.ndarray): An array of floats representing the new amounts of solutes in each solvent layer
-    - Sts (np.ndarray): TODO: Figure out what this stores
+    - Sts (np.ndarray): TODO: Figure out what this stores. NOTE: Turns out it does nothing
 
-    Note:
-    - This function calculates the new positions and variances of the solvent layers using the layer separation equations described in the documentation.
-    - The new solute amounts are calculated based on the relative polarities of the solutes and solvents using the solute dispersion equation described in the paper.
+    Algorithm (Solvent):
+    1. Using the volumes and densities of each solvent, determine where each solvent's center of mass should be at t-> inf
+    2. Determine the speed in which each solvent should separate out using the densities
+    3. Handle any external changes to the solving (pouring in/out) using v and Vprev
+        i. Since there is an injective map between variance and time, it is easier to work with variance
+            a) Initial variance is sum(v)/sqrt(12) [gaussian approximation of a uniform distribution]
+            b) Final variance is vi/MINVAR -> MINVAR should probably be around sqrt(12) still (but be <=)
+        ii. Pouring in a solvent should kind of mix around the solution, and since the max variance is sum(v)/sqrt(12)
+            adding in dv/sqrt(12) seems reasonable
+        iii. For the solvent actually being added, we can assume you are pouring into the top, so it should be mixed
+            the closer to the bottom the solvent layer is. It should also be mixed more depending on how much you are adding.
+        iv. If adding a solvent causes things to be mixed around a bunch, it should end up mixing the solutes too
+    4. Get a time-like variable saying much each solvent is settled using the current variance (Recall the map is injective)
+    5. Increment this by the mixing parameter
+        i. If time is being decreased by the mixing parameter, we first set T<= Tmax so something which settled for a long time
+            still mixes reasonably fast (and also as T->inf the map between variance and time gets sus cuz of floats)
+    6. Use this incremented time to update your layer positions, as well as layer variances
+
+    Algorithm (Solute):
+    TODO: Write this out
+
     """
-
-
     
     s=C*1
     x=B*1
@@ -280,6 +311,9 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     g = np.exp(-2*(T/Vtot)**2)
     C = sf+(si-sf)*g
 
+    #Math for position vs time:
+    #https://www.desmos.com/calculator/f5pyvybclv 
+
     # A are the volumes used for dissolving
     A=v[:-1]
 
@@ -300,7 +334,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     Sts = np.zeros(S.shape,dtype=np.float32)
     Scur = np.copy(S)
-    # only do the calculation if there are two or more solvent
+    # only do the calculation if there are two or more solvents
     if (len(A) < 2) or A.sum()-A.max()<1e-12 or abs(mixing)<1e-12:
         C0 = np.float32( np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi) )
         return B, C, C0 , S, Sts
