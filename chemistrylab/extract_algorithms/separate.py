@@ -27,8 +27,8 @@ import numba
 x = np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
 
 
-from numba.pycc import CC
-cc = CC('separate_cc')
+#from numba.pycc import CC
+#cc = CC('separate_cc')
 
 @numba.jit(cache=True)
 #@cc.export('map_to_state', '(f4[:], f4[:],f4[:],f4[:],f4[:])')
