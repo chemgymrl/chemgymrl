@@ -224,7 +224,7 @@ class Vessel:
                 out.append(self._event_dict[event.name](event.parameter,dt))
 
         if not self.ignore_layout:
-            self._mix((0,),0)
+            self._mix((dt,),0)
             self._update_layers(0,0)
         return out
 

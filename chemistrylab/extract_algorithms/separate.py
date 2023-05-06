@@ -269,7 +269,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
         # Make sure variance is at least as big as fully separated variance
         cur_var= max(s[i],v[i]/MINVAR)
         # Add some variance to each solvent
-        s+=dv/sq12
+        #s+=dv/sq12
         # Extra mixing dependant on the position and how much was added
         if dv>1e-6:
             new_var = (dv/(np.abs(v[i]-dv)+TOL))*((Vtot-x[i])/sq12)
@@ -278,6 +278,8 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             #TODO: Set extra mixing of solutes
             var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+TOL)
             solute_mixing = min(solute_mixing, (tmix-tseparate)*var_ratio )
+        else:
+            s[i] = min(max_var, max(s[i]+dv/MINVAR,new_var)) 
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
