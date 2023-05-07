@@ -45,17 +45,13 @@ from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 
 def wurtz_vessel(add_mat=""):
     """
-    Function to generate an input vessel for the wurtz extraction experiment.
-    Parameters
-    ---------------
-    None
-    Returns
-    ---------------
-    `extract_vessel` : `vessel`
-        A vessel object containing state variables, materials, solutes, and spectral data.
-    Raises
-    ---------------
-    None
+    Function to generate an input vessel for the wurtz extraction bench.
+
+    Args:
+    - add_mat (str): The target material to include in the vessel
+
+    Returns:
+    - extract_vessel (Vessel): A vessel containing add_mat and some undesired materials
     """
 
     # initialize extraction vessel
@@ -131,6 +127,34 @@ def wurtz_vessel(add_mat=""):
     return extraction_vessel, add_mat
 
 
+def oil_vessel():
+    """
+    Function to generate an input vessel for the oil extraction bench.
+
+    Returns:
+    - extract_vessel (Vessel): A vessel containing oil and NaCl
+    """
+    # initialize extraction vessel
+    extraction_vessel = vessel.Vessel(label='extraction_vessel')
+    # initialize H2O
+    C6H14 = material.C6H14()
+    C6H14.mol=1.0
+    # Get dissolved NaCl
+    dissolved = material.NaCl().dissolve()
+    for d in dissolved:
+        d.mol=dissolved[d]
+    mats = [C6H14]+[d for d in dissolved]
+
+    # material_dict
+    material_dict = {mat._name:mat for mat in mats}
+    # Set up the vessel
+    extraction_vessel.material_dict=material_dict
+    extraction_vessel.validate_solvents()
+    extraction_vessel.validate_solutes()
+
+    return extraction_vessel
+
+
 def make_solvent(mat):
     "Makes a Vessel with a single material"
     solvent_vessel = vessel.Vessel(
@@ -162,7 +186,7 @@ class GeneralWurtzExtract_v2(GenBench):
         amounts=np.linspace(0.2,1,5).reshape([5,1])
         pixels = (amounts*10).astype(np.int32)
         actions = [
-            Action([0], pixels,          'drain by pixel',[1],  0.01, False),
+            Action([0], pixels,              'drain by pixel',[1],  0.01, False),
             Action([0],-amounts,             'mix',           None, 0.01, False),
             Action([1], amounts,             'pour by volume',[0],  0.01, False),
             Action([2], amounts,             'pour by volume',[0],  0.01, False),
@@ -170,8 +194,8 @@ class GeneralWurtzExtract_v2(GenBench):
             #If pouring by volume takes time, then there is no change in observation when waiting after pouring in some cases
             Action([3], amounts/2,           'pour by volume',[0],  0,    False),
             Action([4], amounts/2,           'pour by volume',[0],  0,    False),
-            Action([0,1,2], 32**amounts/200,'mix',            None, 0,    False),
-            Action([0], [[0]],            'mix',              None, 0,    True)
+            Action([0,1,2], 32**amounts/200, 'mix',           None, 0,    False),
+            Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
         react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
@@ -185,3 +209,43 @@ class GeneralWurtzExtract_v2(GenBench):
             reward_function=e_rew
         )
 
+
+class WaterOilExtract_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+    def __init__(self):
+        e_rew= RewardGenerator(use_purity=False,exclude_solvents=True,include_dissolved=True,exclude_mat = "C6H14")
+        vessel_generators = [
+            lambda x:oil_vessel(),
+            lambda x:vessel.Vessel("Beaker 1"),
+            lambda x:vessel.Vessel("Beaker 2"),
+            lambda x:make_solvent("C6H14"),
+            lambda x:make_solvent("H2O")
+        ]
+        amounts=np.linspace(0.2,1,5).reshape([5,1])
+        pixels = (amounts*10).astype(np.int32)
+        actions = [
+            Action([0], pixels,              'drain by pixel',[1],  0.01, False),
+            Action([0],-amounts,             'mix',           None, 0.01, False),
+            Action([1], amounts,             'pour by volume',[0],  0.01, False),
+            Action([2], amounts,             'pour by volume',[0],  0.01, False),
+            Action([0], amounts,             'pour by volume',[2],  0.01, False),
+            #If pouring by volume takes time, then there is no change in observation when waiting after pouring in some cases
+            Action([3], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([4], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([0,1,2], 32**amounts/200, 'mix',           None, 0,    False),
+            Action([0], [[0]],               'mix',           None, 0,    True)
+        ]
+        
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+
+        super(WaterOilExtract_v0, self).__init__(
+            vessel_generators,
+            actions,
+            react_info,
+            ["layers","targets"],
+            n_visible=2,
+            reward_function=e_rew,
+            targets=["NaCl"]
+        )

@@ -41,20 +41,13 @@ import importlib
 
 def wurtz_vessel(add_mat):
     """
-    Function to generate an input vessel for the oil and water extraction experiment.
+    Function to generate an input vessel for the wurtz distillation experiment.
 
-    Parameters
-    ---------------
-    None
+    Args:
+    - add_mat (str): The target material to include in the vessel
 
-    Returns
-    ---------------
-    `extract_vessel` : `vessel`
-        A vessel object containing state variables, materials, solutes, and spectral data.
-
-    Raises
-    ---------------
-    None
+    Returns:
+    - extract_vessel (Vessel): A vessel containing add_mat and some undesired materials
     """
 
     # initialize extraction vessel
@@ -95,8 +88,6 @@ def wurtz_vessel(add_mat):
         add_material.get_name(): add_material
     }
 
-
-
     if choice([0, 1]) > 0.5:
         add_material2 = material.Dodecane() if (add_mat == 'NaCl') else material.NaCl()
         add_material2.mol=1
@@ -111,6 +102,8 @@ def wurtz_vessel(add_mat):
     boil_vessel.default_dt=0.01
     
     return boil_vessel, add_mat
+
+
 
 
 class GeneralWurtzDistill_v2(GenBench):

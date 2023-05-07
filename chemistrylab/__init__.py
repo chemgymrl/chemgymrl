@@ -17,6 +17,11 @@ register(
     entry_point='chemistrylab.benches.extract_bench_v1:GeneralWurtzExtract_v2',
 )
 
+register(
+    id='WaterOilExtract-v0',
+    entry_point='chemistrylab.benches.extract_bench_v1:WaterOilExtract_v0',
+)
+
 ############################ ReactBench ####################################
 
 register(
