@@ -30,6 +30,11 @@ register(
 )
 
 register(
+    id='GenWurtzReact-v0',
+    entry_point='chemistrylab.benches.reaction_bench_v1:GeneralWurtzReact_v0'
+)
+
+register(
     id='FictReact-v2',
     entry_point='chemistrylab.benches.reaction_bench_v1:FictReact_v2'
 )

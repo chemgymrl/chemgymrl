@@ -90,6 +90,42 @@ class GeneralWurtzReact_v2(GenBench):
             max_steps=20
         )
         
+class GeneralWurtzReact_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
+        vessel_generators = [
+            lambda x:get_mat("diethyl ether",4,"Reaction Vessel"),
+            lambda x:get_mat("1-chlorohexane",1),
+            lambda x:get_mat("2-chlorohexane",1),
+            lambda x:get_mat("3-chlorohexane",1),
+            lambda x:get_mat("Na",3),
+        ]
+        actions = [
+            Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+        ]
+
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+        
+        super(GeneralWurtzReact_v0, self).__init__(
+            vessel_generators,
+            actions,
+            react_info,
+            ["PVT","spectra","targets"],
+            n_visible=1,
+            reward_function=r_rew,
+            react_list=[0],
+            targets=react_info.PRODUCTS[:-1],
+            discrete=False,
+            max_steps=20
+        )
         
 class FictReact_v2(GenBench):
     """
