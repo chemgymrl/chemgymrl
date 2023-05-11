@@ -55,3 +55,17 @@ register(
     entry_point='chemistrylab.manager.manager_v1:LabManager',
     max_episode_steps=100
 )
+
+
+######################## Bandit Gyms ############################################
+
+register(
+    id='FictReactBandit-v0',
+    entry_point='chemistrylab.benches.reaction_bench_v1:FictReactBandit_v0'
+)
+
+register(
+    id='FictReactBandit-v1',
+    entry_point='chemistrylab.benches.reaction_bench_v1:FictReactBandit_v0',
+    kwargs = dict(targets=["fict_I"])
+)

@@ -9,8 +9,37 @@ from matplotlib import pyplot as plt
 #from chemistrylab.reactions.available_reactions.fict_react2 import REACTANTS as FRchoices
 #from chemistrylab.reactions.available_reactions.chloro_wurtz import PRODUCTS as CWtargs
 #from chemistrylab.reactions.available_reactions.chloro_wurtz import REACTANTS as CWchoices
-CWtargs=[]
-CWchoices=[]
+FRtargs=[
+    "fict_E",
+    "fict_F",
+    "fict_G",
+    "fict_H",
+    "fict_I"
+ ]
+
+FRchoices=[
+    "fict_A",
+    "fict_B",
+    "fict_C",
+    "fict_D",
+]
+
+CWtargs=[
+    "dodecane",
+    "5-methylundecane",
+    "4-ethyldecane",
+    "5,6-dimethyldecane",
+    "4-ethyl-5-methylnonane",
+    "4,5-diethyloctane",
+    "NaCl"
+]
+
+CWchoices=[
+    "1-chlorohexane",
+    "2-chlorohexane",
+    "3-chlorohexane",
+    "Na"
+]
 
 
 from RadarGraph import *
@@ -227,6 +256,9 @@ def get_conditional_rewards(frame, targets=CWtargs):
     """
     # turn observation column into a numpy array
     obs = np.stack(frame.InState)
+    
+    if len(obs.shape)>2:
+        obs=obs[:,0,:]
     N=len(targets)
     rew=[]
     for i in range(N):

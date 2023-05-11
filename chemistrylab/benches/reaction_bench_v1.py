@@ -68,10 +68,10 @@ class GeneralWurtzReact_v2(GenBench):
         ]
         actions = [
             Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
             #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
 
@@ -106,10 +106,10 @@ class GeneralWurtzReact_v0(GenBench):
         ]
         actions = [
             Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
@@ -126,7 +126,7 @@ class GeneralWurtzReact_v0(GenBench):
             discrete=False,
             max_steps=20
         )
-        
+
 class FictReact_v2(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
@@ -145,10 +145,10 @@ class FictReact_v2(GenBench):
 
         actions = [
             Action([0],    [ContinuousParam(273,373,0,300)],   'heat contact',    [0],   0.01,   False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'dump fraction',  [0],   0.01,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
             #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
         
@@ -168,3 +168,58 @@ class FictReact_v2(GenBench):
             max_steps=20
         )
         
+
+class FictReactBandit_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self,targets=None):
+        r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
+                                include_dissolved=False, exclude_mat = "fict_E")
+        vessel_generators = [
+            lambda x:get_mat("H2O",30,"Reaction Vessel"),
+            lambda x:get_mat("fict_A",1),
+            lambda x:get_mat("fict_B",1),
+            lambda x:get_mat("fict_C",1),
+            lambda x:get_mat("fict_D",3),
+        ]
+
+        actions = [
+            Action([0],    [ContinuousParam(273,373,0,300)],   'heat contact',    [0],   0.01,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+        ]
+        if targets is None:
+            targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
+        react_info = ReactInfo.from_json(REACTION_PATH+"\\fict_react.json")
+
+        super().__init__(
+            vessel_generators,
+            actions,
+            react_info,
+            ["targets"],
+            n_visible=1,
+            reward_function=r_rew,
+            react_list=[0],
+            targets=targets,
+            discrete=False,
+            max_steps=20
+        )
+        self.action_space = gym.spaces.Box(0, 1, (self.n_actions+4,), dtype=np.float32)
+
+    def step(self,action):
+        action=np.array(action)
+        uaction = action[:-4]
+        gate = action[-4:]*self.max_steps-0.5
+        ret=0
+        d=False
+        while not d:
+            act = uaction*1
+            act[1:]*= (gate<self.steps)
+            o,r,d,_ = super().step(act)
+            gate[gate<self.steps-1]=self.max_steps
+            ret+=r
+        return o,ret,d,_

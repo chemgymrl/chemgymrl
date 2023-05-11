@@ -1,6 +1,7 @@
 from typing import NamedTuple, Tuple, Callable, Optional
 import numpy as np
 import numba
+import pandas as pd
 from chemistrylab.extract_algorithms import separate#separate_cc as separate
 
 class Event(NamedTuple):
@@ -97,7 +98,7 @@ class Vessel:
         #Functions to implement
         self._event_dict = {
             'pour by volume': self._pour_by_volume,
-            'dump fraction':self._dump_fraction,
+            'pour by percent':self._pour_by_percent,
             'drain by pixel': self._drain_by_pixel,
             'mix': self._mix,
             'update layer': self._update_layers,
@@ -206,6 +207,14 @@ class Vessel:
     def filled_volume(self):
         return sum(mat.litres for a,mat in self.material_dict.items())
 
+    def get_material_dataframe(self):
+        info_dict = {key:(mat.mol,mat.phase,mat.is_solute(),mat.is_solvent()) for key,mat in self.material_dict.items()}
+    
+        return pd.DataFrame.from_dict(info_dict, orient="index",columns = ["Amount","Phase","Solute","Solvent"])
+
+    def get_solute_dataframe(self):
+        return pd.DataFrame.from_dict(self.solute_dict, orient="index",columns = self.solvents)
+
     def push_event_to_queue(
             self,
             events: Tuple[Event] = tuple(), 
@@ -233,14 +242,37 @@ class Vessel:
         Rough Estimate of heat transfer so we can simulate putting something on a bunson burner
         or in a water bath.
         Param:
-        - T (float): The temperature of the heat source
+        - T (Optional[float]): The temperature of the heat source
         - ht (float): heat transfer coeff multiplied by how long you have
+        
+        Note: When T is None, ht will be used as heat Q
+        Steps:
+            1. Calculate total heat capacity of the vessel
+            2. Get T estimate from heat capacity equation & Newton's law of heat transfer
+            3. While T estimate is above the lowest boiling point of your materials
+                i. Subtract d_ht required to get to boiling point from ht
+                ii. Get boiling enthalpy of your material and calculate how much will boil
+                iii. Boil off material and subtract the necessary d_ht used from ht
+                iv. Calculate new T estimate based off of your new ht value
+            4. set vessel temperature to T
+
         """
         Tf,ht=param
+        use_dQ = (Tf is None)
+        if use_dQ:
+            # Adding heat (dQ) is the same as linearly approximating the exponential and log functions and setting
+            # The reservoir temperature to one unit above the current temperature (trust me)
+            exp= lambda x:1+x
+            ln = lambda x:x-1
+            Tf = self.temperature+1
+        else:
+            ln=np.log
+            exp=np.exp
+
 
         other_mats=other_vessel.material_dict
-        # Estimated final temperature taking boiling into account
-        T = Tf+(self.temperature-Tf)*np.exp(-ht/self.heat_capacity())
+        # Estimated final temperature before taking boiling into account
+        T = Tf+(self.temperature-Tf)*exp(-ht/self.heat_capacity())
 
         mdict=self.material_dict
         #case for changing the heat of an empty vessel
@@ -257,8 +289,9 @@ class Vessel:
         while T>boil and T>self.temperature:
             material = mdict[key]
             #amount of transfer-time required to reach boiling temperature
-            ht -= np.log((Tf-self.temperature)/(Tf-boil))*self.heat_capacity() #i
+            ht += ln((Tf-boil)/(Tf-self.temperature))*self.heat_capacity() #i
             self.temperature = boil #i
+            if use_dQ: Tf = self.temperature+1
             boil_enthalpy=material.vapour_enthalpy #ii
             # ht = dQ/(T_f-T_boil)
             ht_used=min(ht,boil_enthalpy/(Tf-boil)) #ii
@@ -273,7 +306,7 @@ class Vessel:
                 other_mats[key] = material.ration(fraction)
 
             #Heat capacity is called again since it should be lower now
-            T = Tf+(self.temperature-Tf)*np.exp(-ht/self.heat_capacity())
+            T = Tf+(self.temperature-Tf)*exp(-ht/self.heat_capacity())
             i+=1
             if i>=len(bp):break
             key,boil=bp[i]
@@ -286,68 +319,13 @@ class Vessel:
         return other_vessel.handle_overflow()
         
     def _change_heat(self, param, other_vessel, dt) -> int:
-        
         """
-        Heat Capacity Equation:
-        dQ = sum(Ci)dT
-        Here Ci is the heat capacity of all of your materials
-
-        Steps:
-            1. Calculate total heat capacity of the vessel
-            2. Get dT from heat capacity equation
-            3. While T+dT is above the lowest boiling point of your materials
-            i. Subtract Q required to get to boiling point from dQ
-            ii. Get boiling enthalpy of your material and calculate how much will boil
-            iii. Boil off material and subtract the necessary Q used from dQ
-            iv. Calculate new dT based off of your new dQ value
-            4. T+=dT
-            return
+        Depricated function, consider using heat contact instead.
         """
         dQ=param[0]
-        other_mats=other_vessel.material_dict
-        dT = dQ/self.heat_capacity()
-        mdict=self.material_dict
-
-        #case for changing the heat of an empty vessel
-        total_mats = sum(mat.mol for key,mat in mdict.items())
-        if total_mats<1e-12:
-            self.temperature+=dT
-            return 0 if dT<=0 else -1
-        #get sorted boiling points
-        bp = sorted([(key,mdict[key]._boiling_point) for key in mdict],key = lambda x:x[1])
-
-        key,boil=bp[0]
-        i=0
-        while self.temperature+dT>boil:
-            material = mdict[key]
-            dQ -= (boil-self.temperature)*self.heat_capacity() #i
-            self.temperature = boil #i
-            boil_enthalpy=material.vapour_enthalpy #ii
-            Q_used=min(dQ,boil_enthalpy) #ii
-            dQ-=Q_used #iii
-            # Move the boiled material (iii)
-            fraction = (Q_used/boil_enthalpy) if Q_used > 0 else 0
-            if key in other_mats:
-                d_mol = material.mol*fraction
-                other_mats[key].mol += d_mol
-                material.mol -= d_mol
-            else:
-                other_mats[key] = material.ration(fraction)
-            #Heat capacity is called again since it should be lower now
-            dT = dQ/self.heat_capacity() #iv
-            
-            i+=1
-            if i>=len(bp):break
-            key,boil=bp[i]
-        self.temperature+=dT
-        
-        self.validate_solutes()
-        other_vessel.validate_solvents()
-        other_vessel.validate_solutes()
-
-        return other_vessel.handle_overflow()
+        return self._heat_contact([None,dQ],other_vessel,dt)
     
-    def _dump_fraction(self, param, other_vessel, dt ) -> int:
+    def _pour_by_percent(self, param, other_vessel, dt ) -> int:
         """
         - Take each material in this vessel and transfer it's amount * fraction
             to other_vessel
@@ -356,6 +334,7 @@ class Vessel:
 
         TODO: Consider making this call a theoretical _add_materials function
         """
+        if param[0]<1e-16:return 0
         fraction = np.clip(param[0],0,1)
         other_mats=other_vessel.material_dict
         #Iterate through each material in the vessel
@@ -377,14 +356,14 @@ class Vessel:
 
     def _pour_by_volume(self, param, other_vessel, dt) -> int:
         """
-        Pour the same as _dump_fraction but the fraction is determined by how much volume you want
+        Pour the same as _pour_by_percent but the fraction is determined by how much volume you want
         to pour vs how much of the vessel is filled.
         """
         volume=param[0]
         filled_volume=self.filled_volume()
         if filled_volume<1e-12: return 0
         fraction = np.clip(volume/filled_volume,0,1)
-        return self._dump_fraction([fraction], other_vessel, dt)
+        return self._pour_by_percent([fraction], other_vessel, dt)
     
     def _drain_by_pixel(self, param, other_vessel, dt) -> int:
         """

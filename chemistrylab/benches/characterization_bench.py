@@ -62,7 +62,6 @@ class CharacterizationBench:
     def __init__(self, observation_list,targets,n_vessels):
 
         # specify the analysis techniques available in this bench
-        self.techniques = {'spectra': self.get_spectra}
         self.params = {'spectra': {'range_ir': (2000, 20000)}}
 
         self.targets=targets
@@ -75,7 +74,7 @@ class CharacterizationBench:
         )
 
         #List of all functions, this can probably be a class variable instead of an instance variable
-        self.all_functions = dict(
+        self.characterization_tech = dict(
             spectra=self.get_spectra,
             layers=self.get_layers,
             targets=self.encode_target,
@@ -84,7 +83,7 @@ class CharacterizationBench:
 
         #create a list of functions which will be used to build your observations
         self.observation_list=observation_list
-        self.functions = [self.all_functions[a] for a in observation_list]
+        self.functions = [self.characterization_tech[a] for a in observation_list]
         
         #Determine the shape of the observations
         n_pixels=sum(self.sizes[a] for a in observation_list)

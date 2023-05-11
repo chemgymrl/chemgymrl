@@ -75,6 +75,7 @@ class Material:
                  pressure=1.0,  # in kPa
                  phase="",  # one of "s", "l", or "g" at temperature
                  charge=0.0,
+                 mol=0,
                  molar_mass=1.0,  # in g/mol
                  color=0.0,  # color scale from 0 to 1
                  solute=False,  # is material a solute
@@ -95,7 +96,7 @@ class Material:
         self.pressure = pressure
         self.phase = phase
         self.charge = charge
-        self.mol = 0
+        self.mol = mol
 
         #Properties likely to remain constant
         self._name = name
@@ -248,8 +249,9 @@ class Material:
 ## ---------- ## PRE-DEFINED MATERIALS ## ---------- ##
 
 class Air(Material):
-    def __init__(self):
-        super().__init__(name='Air',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='Air',
                          density={'s': None, 'l': None, 'g': 1.225e-3},  # in g/cm^3
                          temperature=297,  # in K
                          pressure=1,
@@ -262,8 +264,9 @@ class Air(Material):
 
 
 class H2O(Material):
-    def __init__(self):
-        super().__init__(name='H2O',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='H2O',
                          density={'s': None, 'l': 0.997, 'g': None},
                          polarity=abs(2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0))),
                          temperature=298,
@@ -282,8 +285,9 @@ class H2O(Material):
 
 
 class H(Material):
-    def __init__(self):
-        super().__init__(name='H',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='H',
                          density={'s': None, 'l': None, 'g': 8.9e-5},
                          polarity=0,
                          temperature=298,
@@ -298,8 +302,9 @@ class H(Material):
 
 
 class H2(Material):
-    def __init__(self):
-        super().__init__(name='H2',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='H2',
                          density={'s': None, 'l': None, 'g': 8.9e-5},
                          polarity=0,
                          temperature=298,
@@ -315,8 +320,9 @@ class H2(Material):
 
 
 class O(Material):
-    def __init__(self):
-        super().__init__(name='O',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='O',
                          density={'s': None, 'l': None, 'g': 1.429e-3},
                          polarity=0,
                          temperature=298,
@@ -332,8 +338,9 @@ class O(Material):
 
 
 class O2(Material):
-    def __init__(self):
-        super().__init__(name='O2',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='O2',
                          density={'s': None, 'l': None, 'g': 1.429e-3},
                          polarity=0,
                          temperature=298,
@@ -349,8 +356,9 @@ class O2(Material):
 
 
 class O3(Material):
-    def __init__(self):
-        super().__init__(name='O3',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='O3',
                          density={'s': None, 'l': None, 'g': 2.144e-3},
                          polarity=abs(1 + 2 * -1 * np.cos((116.8 / 2) * (np.pi / 180.0))),
                          temperature=298,
@@ -366,8 +374,9 @@ class O3(Material):
 
 
 class C6H14(Material):
-    def __init__(self):
-        super().__init__(name='C6H14',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='C6H14',
                          density={'s': None, 'l': 0.655, 'g': None},
                          polarity=0.0,
                          temperature=298,
@@ -384,8 +393,9 @@ class C6H14(Material):
 
 
 class NaCl(Material):
-    def __init__(self):
-        super().__init__(name='NaCl',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='NaCl',
                          density={'s': 2.165, 'l': 2.165, 'g': None},
                          polarity=1.5,
                          temperature=298,
@@ -421,8 +431,9 @@ class NaCl(Material):
 
 # Polarity is dependant on charge for atoms
 class Na(Material):
-    def __init__(self):
-        super().__init__(name='Na',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='Na',
                          density={'s': 0.968, 'l': 0.856, 'g': None},
                          polarity=0.0,
                          temperature=298,
@@ -461,8 +472,9 @@ class Na(Material):
 
 # Note: Cl is very unstable when not an aqueous ion
 class Cl(Material):
-    def __init__(self):
-        super().__init__(name='Cl',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='Cl',
                          density={'s': None, 'l': 1.558, 'g': 3.214e-3},
                          polarity=2.0,
                          temperature=298,
@@ -499,8 +511,9 @@ class Cl(Material):
         return [[[prep_Na, prep_Cl], [prep_NaCl]]]
 
 class Cl2(Material):
-    def __init__(self):
-        super().__init__(name='Cl2',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='Cl2',
                          density={'s': None, 'l': None, 'g': 2.898e-3},
                          polarity=0.0,
                          temperature=298,
@@ -516,8 +529,9 @@ class Cl2(Material):
 
 
 class LiF(Material):
-    def __init__(self):
-        super().__init__(name='LiF',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='LiF',
                          density={'s': 2.640, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
@@ -533,8 +547,9 @@ class LiF(Material):
 
 
 class Li(Material):
-    def __init__(self):
-        super().__init__(name='Li',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='Li',
                          density={'s': 0.534, 'l': None, 'g': None},
                          polarity=0.0,
                          temperature=298,
@@ -550,8 +565,9 @@ class Li(Material):
 
 
 class F2(Material):
-    def __init__(self):
-        super().__init__(name='F2',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='F2',
                          density={'s': None, 'l': None, 'g': 1.696e-3},
                          polarity=0.0,
                          temperature=298,
@@ -567,8 +583,9 @@ class F2(Material):
 
 
 class CuSO4(Material):
-    def __init__(self):
-        super().__init__(name='CuS04',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='CuS04',
                          density={'s': 3.6, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
@@ -587,8 +604,9 @@ class CuSO4(Material):
 
 
 class CuSO4Pentahydrate(Material):
-    def __init__(self):
-        super().__init__(name='CuS04*5H2O',
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         name='CuS04*5H2O',
                          density={'s': 2.286, 'l': None, 'g': None},
                          polarity=1.5,
                          temperature=298,
@@ -609,8 +627,9 @@ class CuSO4Pentahydrate(Material):
 ## ---------- ## HYDROCARBONS ## ---------- ##
 
 class Dodecane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='dodecane',
             density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
@@ -631,8 +650,9 @@ class Dodecane(Material):
 
 
 class OneChlorohexane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='1-chlorohexane',
             density={'s': None, 'l': 0.879, 'g': None},
             polarity=0.0,
@@ -655,8 +675,9 @@ class OneChlorohexane(Material):
 
 
 class TwoChlorohexane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='2-chlorohexane',
             density={'s': None, 'l': 0.87, 'g': None},
             polarity=0.0,
@@ -679,8 +700,9 @@ class TwoChlorohexane(Material):
 
 
 class ThreeChlorohexane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='3-chlorohexane',
             density={'s': None, 'l': 0.9, 'g': None},
             polarity=0.0,
@@ -703,8 +725,9 @@ class ThreeChlorohexane(Material):
 
 
 class FiveMethylundecane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='5-methylundecane',
             density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
@@ -725,8 +748,9 @@ class FiveMethylundecane(Material):
 
 
 class FourEthyldecane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='4-ethyldecane',
             density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
@@ -747,8 +771,9 @@ class FourEthyldecane(Material):
 
 
 class FiveSixDimethyldecane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='5,6-dimethyldecane',
             density={'s': None, 'l': 0.757, 'g': None},
             polarity=0.0,
@@ -769,8 +794,9 @@ class FiveSixDimethyldecane(Material):
 
 
 class FourEthylFiveMethylnonane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='4-ethyl-5-methylnonane',
             density={'s': None, 'l': 0.75, 'g': None},
             polarity=0.0,
@@ -791,8 +817,9 @@ class FourEthylFiveMethylnonane(Material):
 
 
 class FourFiveDiethyloctane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='4,5-diethyloctane',
             density={'s': None, 'l': 0.768, 'g': None},
             polarity=0.0,
@@ -813,8 +840,9 @@ class FourFiveDiethyloctane(Material):
 
 
 class Ethoxyethane(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='ethoxyethane',
             density={'s': None, 'l': 0.713, 'g': None},
             polarity=0.0,
@@ -836,8 +864,9 @@ class Ethoxyethane(Material):
 
 
 class EthylAcetate(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='ethyl acetate',
             density={'s': None, 'l': 0.902, 'g': None},
             polarity=0.654,
@@ -859,8 +888,9 @@ class EthylAcetate(Material):
 
 
 class DiEthylEther(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='diethyl ether',
             density={'s': None, 'l': 0.7134, 'g': None},
             polarity=1.3,
@@ -880,8 +910,9 @@ class DiEthylEther(Material):
         )
 
 class A(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_A',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -903,8 +934,9 @@ class A(Material):
         )
 
 class B(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_B',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -927,8 +959,9 @@ class B(Material):
 
 
 class C(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_C',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -951,8 +984,9 @@ class C(Material):
 
 
 class D(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_D',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -975,8 +1009,9 @@ class D(Material):
 
 
 class E(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_E',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -999,8 +1034,9 @@ class E(Material):
 
 
 class F(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_F',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -1023,8 +1059,9 @@ class F(Material):
 
 
 class G(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_G',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -1047,8 +1084,9 @@ class G(Material):
 
 
 class H(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_H',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -1071,8 +1109,9 @@ class H(Material):
 
 
 class I(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='fict_I',
             density={'s': 2.165, 'l': 2.165, 'g': None},
             polarity=0.0,
@@ -1097,8 +1136,9 @@ class I(Material):
 
 
 class MethylRed(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='methyl red',
             density={'s': 0.902, 'l': None, 'g': None},
             polarity=0.0,
@@ -1122,8 +1162,9 @@ class MethylRed(Material):
 
 
 class HCl(Material):
-    def __init__(self):
-        super().__init__(
+    def __init__(self, mol=0):
+        super().__init__(mol=mol,
+                         
             name='HCl',
             density={'s': None, 'l': None, 'g': 1.48e-3},
             polarity=0.0,
