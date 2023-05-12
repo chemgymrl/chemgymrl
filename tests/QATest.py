@@ -79,7 +79,7 @@ try:
     for x in range(timesteps):
         #testing taking actions
         act = env.action_space.sample()
-        obs,rew,done,_ = env.step(act)
+        obs,rew,done,*_ = env.step(act)
         
         #testing if the observation matches the observation space
         _ = obstest*obs

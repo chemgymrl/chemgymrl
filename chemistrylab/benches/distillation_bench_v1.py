@@ -28,7 +28,6 @@ import os
 import pickle
 import sys
 from copy import deepcopy
-from random import choice
 
 # import local modules
 sys.path.append("../../") # to access `chemistrylab`
@@ -88,7 +87,7 @@ def wurtz_vessel(add_mat):
         add_material.get_name(): add_material
     }
 
-    if choice([0, 1]) > 0.5:
+    if np.random.choice([0, 1]) > 0.5:
         add_material2 = material.Dodecane() if (add_mat == 'NaCl') else material.NaCl()
         add_material2.mol=1
         material_dict[add_material2.get_name()] = add_material2
