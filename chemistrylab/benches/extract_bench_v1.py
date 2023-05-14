@@ -42,6 +42,8 @@ from chemistrylab.chem_algorithms.reward import RewardGenerator
 import importlib
 
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
+from chemistrylab.lab.shelf import VariableShelf
+
 
 def wurtz_vessel(add_mat=""):
     """
@@ -176,13 +178,13 @@ class GeneralWurtzExtract_v2(GenBench):
 
     def __init__(self):
         e_rew= RewardGenerator(use_purity=True,exclude_solvents=True,include_dissolved=True)
-        vessel_generators = [
+        shelf = VariableShelf( [
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
             lambda x:make_solvent("C6H14"),
             lambda x:make_solvent("diethyl ether")
-        ]
+        ],[], n_working = 3)
         amounts=np.linspace(0.2,1,5).reshape([5,1])
         pixels = (amounts*10).astype(np.int32)
         actions = [
@@ -201,11 +203,10 @@ class GeneralWurtzExtract_v2(GenBench):
         react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
 
         super(GeneralWurtzExtract_v2, self).__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["layers","targets"],
-            n_visible=3,
             reward_function=e_rew
         )
 
@@ -215,14 +216,14 @@ class WaterOilExtract_v0(GenBench):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
     def __init__(self):
-        e_rew= RewardGenerator(use_purity=False,exclude_solvents=True,include_dissolved=True,exclude_mat = "C6H14")
-        vessel_generators = [
+        e_rew= RewardGenerator(use_purity=False, exclude_solvents=True, include_dissolved=True, exclude_mat="C6H14")
+        shelf =VariableShelf( [
             lambda x:oil_vessel(),
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
             lambda x:make_solvent("C6H14"),
             lambda x:make_solvent("H2O")
-        ]
+        ], [], n_working = 2)
         amounts=np.linspace(0.2,1,5).reshape([5,1])
         pixels = (amounts*10).astype(np.int32)
         actions = [
@@ -241,11 +242,10 @@ class WaterOilExtract_v0(GenBench):
         react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
 
         super(WaterOilExtract_v0, self).__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["layers","targets"],
-            n_visible=2,
             reward_function=e_rew,
             targets=["NaCl"]
         )

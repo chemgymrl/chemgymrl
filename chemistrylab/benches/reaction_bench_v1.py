@@ -29,7 +29,7 @@ from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.benches.general_bench import *
 import importlib
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
-
+from chemistrylab.lab.shelf import Shelf
 
 def get_mat(mat,amount,name=None):
     "Makes a Vessel with a single material"
@@ -59,30 +59,28 @@ class GeneralWurtzReact_v2(GenBench):
 
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
-        vessel_generators = [
-            lambda x:get_mat("diethyl ether",4,"Reaction Vessel"),
-            lambda x:get_mat("1-chlorohexane",1),
-            lambda x:get_mat("2-chlorohexane",1),
-            lambda x:get_mat("3-chlorohexane",1),
-            lambda x:get_mat("Na",3),
-        ]
+        shelf = Shelf([
+            get_mat("diethyl ether",4,"Reaction Vessel"),
+            get_mat("1-chlorohexane",1),
+            get_mat("2-chlorohexane",1),
+            get_mat("3-chlorohexane",1),
+            get_mat("Na",3),
+        ])
         actions = [
             Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
             Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
             Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
             Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
         
         super(GeneralWurtzReact_v2, self).__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["PVT","spectra","targets"],
-            n_visible=1,
             reward_function=r_rew,
             react_list=[0],
             targets=None,
@@ -97,13 +95,13 @@ class GeneralWurtzReact_v0(GenBench):
 
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
-        vessel_generators = [
-            lambda x:get_mat("diethyl ether",4,"Reaction Vessel"),
-            lambda x:get_mat("1-chlorohexane",1),
-            lambda x:get_mat("2-chlorohexane",1),
-            lambda x:get_mat("3-chlorohexane",1),
-            lambda x:get_mat("Na",3),
-        ]
+        shelf = Shelf([
+            get_mat("diethyl ether",4,"Reaction Vessel"),
+            get_mat("1-chlorohexane",1),
+            get_mat("2-chlorohexane",1),
+            get_mat("3-chlorohexane",1),
+            get_mat("Na",3),
+        ])
         actions = [
             Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
             Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
@@ -115,11 +113,10 @@ class GeneralWurtzReact_v0(GenBench):
         react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
         
         super(GeneralWurtzReact_v0, self).__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["PVT","spectra","targets"],
-            n_visible=1,
             reward_function=r_rew,
             react_list=[0],
             targets=react_info.PRODUCTS[:-1],
@@ -135,13 +132,13 @@ class FictReact_v2(GenBench):
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
-        vessel_generators = [
-            lambda x:get_mat("H2O",30,"Reaction Vessel"),
-            lambda x:get_mat("fict_A",1),
-            lambda x:get_mat("fict_B",1),
-            lambda x:get_mat("fict_C",1),
-            lambda x:get_mat("fict_D",3),
-        ]
+        shelf = Shelf([
+            get_mat("H2O",30,"Reaction Vessel"),
+            get_mat("fict_A",1),
+            get_mat("fict_B",1),
+            get_mat("fict_C",1),
+            get_mat("fict_D",3),
+        ])
 
         actions = [
             Action([0],    [ContinuousParam(273,373,0,300)],   'heat contact',    [0],   0.01,   False),
@@ -149,18 +146,16 @@ class FictReact_v2(GenBench):
             Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
             Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            #Action([0],    [ContinuousParam(0,0.05,0.9,None)], 'mix',            None,     True)
         ]
         
         targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
         react_info = ReactInfo.from_json(REACTION_PATH+"\\fict_react.json")
 
         super(FictReact_v2, self).__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["PVT","spectra","targets"],
-            n_visible=1,
             reward_function=r_rew,
             react_list=[0],
             targets=targets,
@@ -177,13 +172,13 @@ class FictReactBandit_v0(GenBench):
     def __init__(self,targets=None):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
-        vessel_generators = [
-            lambda x:get_mat("H2O",30,"Reaction Vessel"),
-            lambda x:get_mat("fict_A",1),
-            lambda x:get_mat("fict_B",1),
-            lambda x:get_mat("fict_C",1),
-            lambda x:get_mat("fict_D",3),
-        ]
+        shelf = Shelf([
+            get_mat("H2O",30,"Reaction Vessel"),
+            get_mat("fict_A",1),
+            get_mat("fict_B",1),
+            get_mat("fict_C",1),
+            get_mat("fict_D",3),
+        ])
 
         actions = [
             Action([0],    [ContinuousParam(273,373,0,300)],   'heat contact',    [0],   0.01,   False),
@@ -197,11 +192,10 @@ class FictReactBandit_v0(GenBench):
         react_info = ReactInfo.from_json(REACTION_PATH+"\\fict_react.json")
 
         super().__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["targets"],
-            n_visible=1,
             reward_function=r_rew,
             react_list=[0],
             targets=targets,

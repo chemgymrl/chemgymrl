@@ -28,12 +28,12 @@ def run_env_no_overflow(env_id,seed=1,acts = None):
     env.action_space.seed(seed)
     
     #increase vessel sizes so no overflow happens
-    tot_vol = sum(v.filled_volume() for v in env.vessels)
+    tot_vol = sum(v.filled_volume() for v in env.shelf)
     tot_vol = 2**np.ceil(np.log(tot_vol)/np.log(2))
-    for v in env.vessels:
+    for v in env.shelf:
         v.volume=tot_vol
     #collect initial vessels  
-    start_vessels = deepcopy(env.vessels)    
+    start_vessels = deepcopy([v for v in env.shelf])    
     d = False
     i=0
     while not d:
@@ -44,7 +44,7 @@ def run_env_no_overflow(env_id,seed=1,acts = None):
             act=acts[i]
         o,r,d,*_ = env.step(act)
         i+=1
-    return start_vessels,env.vessels,env.reaction_info
+    return start_vessels,env.shelf.get_vessels(),env.reaction_info
 
 
 class BenchTestCase(TestCase):

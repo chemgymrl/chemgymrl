@@ -36,7 +36,7 @@ from chemistrylab.chem_algorithms import material, vessel
 from chemistrylab.benches.general_bench import *
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 import importlib
-
+from chemistrylab.lab.shelf import VariableShelf
 
 def wurtz_vessel(add_mat):
     """
@@ -112,11 +112,11 @@ class GeneralWurtzDistill_v2(GenBench):
 
     def __init__(self):
         d_rew= RewardGenerator(use_purity=True,exclude_solvents=False,include_dissolved=True)
-        vessel_generators = [
+        shelf = VariableShelf( [
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
-        ]
+        ],[], n_working = 3)
 
         amounts=np.linspace(0,1,10).reshape([10,1])
         
@@ -151,7 +151,7 @@ class GeneralWurtzDistill_v2(GenBench):
         react_info = ReactInfo.from_json(REACTION_PATH+"\\precipitation.json")
         
         super(GeneralWurtzDistill_v2, self).__init__(
-            vessel_generators,
+            shelf,
             actions,
             react_info,
             ["layers","PVT","targets"],

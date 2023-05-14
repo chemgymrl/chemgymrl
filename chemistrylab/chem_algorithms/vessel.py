@@ -111,6 +111,7 @@ class Vessel:
             #'update temperature': self._update_temperature,
             #'wait': self._wait
         }
+        self.label=label
         self.default_dt=0.01
         self.temperature=temperature
         self.volume=volume
@@ -124,6 +125,9 @@ class Vessel:
         self._variance = 2
         self._layers = None
         self.ignore_layout=ignore_layout
+
+    def __repr__(self):
+        return self.label
 
     def validate_solutes(self,checksum=True):
         """
