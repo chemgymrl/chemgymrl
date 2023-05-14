@@ -4,7 +4,7 @@ import numpy as np
 
 def salt_check(env):
     return any([(mat in vessel.material_dict) and (vessel.material_dict[mat].mol>1e-3)
-                for vessel in env.vessels for mat in ["Na","Cl","NaCl"]])
+                for vessel in env.shelf for mat in ["Na","Cl","NaCl"]])
 
 class WurtzDistillHeuristic(Heuristic):
     level_2 = "0909090930"
