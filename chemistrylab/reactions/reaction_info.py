@@ -3,7 +3,7 @@ import numpy as np
 import json
 
 import os
-REACTION_PATH = os.path.dirname(__file__)+"\\available_reactions"
+REACTION_PATH = os.path.dirname(__file__)+"/available_reactions"
 
 
 def serial(x):

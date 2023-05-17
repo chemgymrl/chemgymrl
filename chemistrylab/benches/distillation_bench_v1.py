@@ -148,7 +148,7 @@ class GeneralWurtzDistill_v2(GenBench):
             "NaCl"
         ]
 
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\precipitation.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/precipitation.json")
         
         super(GeneralWurtzDistill_v2, self).__init__(
             shelf,

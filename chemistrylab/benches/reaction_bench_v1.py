@@ -72,7 +72,7 @@ class GeneralWurtzReact_v2(GenBench):
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
         ]
 
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
         
         super(GeneralWurtzReact_v2, self).__init__(
             shelf,
@@ -108,7 +108,7 @@ class GeneralWurtzReact_v0(GenBench):
             Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
         ]
 
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
         
         super(GeneralWurtzReact_v0, self).__init__(
             shelf,
@@ -147,7 +147,7 @@ class FictReact_v2(GenBench):
         ]
         
         targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\fict_react.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/fict_react.json")
 
         super(FictReact_v2, self).__init__(
             shelf,
@@ -187,7 +187,7 @@ class FictReactBandit_v0(GenBench):
         ]
         if targets is None:
             targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\fict_react.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/fict_react.json")
 
         super().__init__(
             shelf,

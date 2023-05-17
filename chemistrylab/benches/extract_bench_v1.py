@@ -200,7 +200,7 @@ class GeneralWurtzExtract_v2(GenBench):
             Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
 
         super(GeneralWurtzExtract_v2, self).__init__(
             shelf,
@@ -239,7 +239,7 @@ class WaterOilExtract_v0(GenBench):
             Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
-        react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
 
         super(WaterOilExtract_v0, self).__init__(
             shelf,
