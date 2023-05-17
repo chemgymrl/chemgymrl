@@ -28,7 +28,7 @@ from chemistrylab.chem_algorithms import material
 
 
 
-@numba.jit
+@numba.jit(nopython=True)
 def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc):
     R = 8.314462619
     
@@ -49,7 +49,7 @@ def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, n
     return conc_change
 
 
-@numba.jit
+@numba.jit(nopython=True)
 def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc, dt, N):
     """
     Solves the initial value problem dy/dt = f(y) specifically in the case where f(y) is chemical a rate calculation

@@ -32,7 +32,7 @@ def rebuild_solute_dict(solvent_dict, solute_dict, solvents):
             for mat in solute_dict}
     return new_solvent_dict, new_solute_dict
 
-@numba.jit
+@numba.jit(nopython=True)
 def validate_solute_amounts(mol_solute, mol_solvent, mol_dissolved):
     """
     Performs a series of consistency checks on the mol_dissolved array.

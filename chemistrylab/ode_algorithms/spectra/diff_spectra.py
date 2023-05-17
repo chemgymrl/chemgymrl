@@ -19,7 +19,6 @@ location in cm^-1
 """
 import numpy as np
 import copy
-import matplotlib.pyplot as plt
 
 
 def convert_inverse_cm_to_nm(params: list):
@@ -238,4 +237,5 @@ def plot_mix_peak():
     plt.close()
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
     plot_mix_peak()

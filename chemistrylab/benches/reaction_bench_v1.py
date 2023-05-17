@@ -21,8 +21,6 @@ along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 import os
 import sys
 import numpy as np
-import gym
-import gym.spaces
 sys.path.append("../../")
 from chemistrylab.chem_algorithms.reward import RewardGenerator
 from chemistrylab.chem_algorithms import material, vessel
@@ -213,7 +211,7 @@ class FictReactBandit_v0(GenBench):
         while not d:
             act = uaction*1
             act[1:]*= (gate<self.steps)
-            o,r,d,_ = super().step(act)
+            o,r,d,*_ = super().step(act)
             gate[gate<self.steps-1]=self.max_steps
             ret+=r
-        return o,ret,d,_
+        return o,ret,d,*_

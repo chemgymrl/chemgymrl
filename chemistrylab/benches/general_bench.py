@@ -6,7 +6,7 @@ you can set the actions using a dictionary or json file.
 
 #useful imports
 from typing import NamedTuple, Tuple, Callable, Optional
-import gym
+import gymnasium as gym
 import numpy as np
 
 #Imports which need to go soon
@@ -15,6 +15,8 @@ sys.path.append("../../") # to access chemistrylab
 from chemistrylab.chem_algorithms import vessel
 from chemistrylab.reactions.reaction import Reaction
 from chemistrylab.benches.characterization_bench import CharacterizationBench
+from chemistrylab.benches.Visualization import Visualizer
+
 from chemistrylab.lab.shelf import Shelf
 
 Event = vessel.Event
@@ -101,6 +103,11 @@ class GenBench(gym.Env):
         self.characterization_bench =  CharacterizationBench(observation_list,self.targets,self.shelf.n_working)
         self.observation_space = gym.spaces.Box(0,1,self.characterization_bench.observation_shape, dtype=np.float32)
         
+        # Rendering
+        self.render_mode = "rgb_array"
+        self.visual = Visualizer(self.characterization_bench)
+
+
         self.discrete=discrete
         if self.discrete:
             self.action_space = gym.spaces.Discrete(self.n_actions)
@@ -228,7 +235,7 @@ class GenBench(gym.Env):
         #gather observations
         state=self.characterization_bench(self.shelf.get_working_vessels(),self.target_material)
         
-        return state, reward, done, {}
+        return state, reward, done, False, {}
     
     def _reset(self,target):
         self.steps=0
@@ -241,8 +248,12 @@ class GenBench(gym.Env):
         
         return self.characterization_bench(self.shelf.get_working_vessels(), self.target_material)
     
-    def reset(self):
+    def reset(self, *args, seed=None, options=None):
+
+        np.random.seed(seed)
+        self.action_space.seed(seed)
         target=np.random.choice(self.targets)
-        return self._reset(target)
+        return self._reset(target),{}
         
-        
+    def render(self):
+        return self.visual.get_rgb(self.shelf.get_working_vessels())

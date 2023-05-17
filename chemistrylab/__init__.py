@@ -8,7 +8,7 @@ ChemistryLab Init Registration File
 :history: 2020-07-03
 '''
 
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 
 ############################ ExtractBench ####################################
 

@@ -30,7 +30,7 @@ x = np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
 #from numba.pycc import CC
 #cc = CC('separate_cc')
 
-@numba.jit(cache=True)
+@numba.jit(cache=True,nopython=True)
 #@cc.export('map_to_state', '(f4[:], f4[:],f4[:],f4[:],f4[:])')
 def map_to_state(A, B, C, colors, x=x):
     """
@@ -180,7 +180,7 @@ def map_to_state(A, B, C, colors, x=x):
     return L,L2
 
 
-@numba.jit(cache=True)
+@numba.jit(cache=True,nopython=True)
 #@cc.export('mix', '(f4[:], f4[:], f4[:], f4[:], f4, f4[:], f4[:], f4[:], f4[:,:],f4)')
 def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     """

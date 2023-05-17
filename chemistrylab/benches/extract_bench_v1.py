@@ -42,7 +42,7 @@ from chemistrylab.chem_algorithms.reward import RewardGenerator
 import importlib
 
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
-from chemistrylab.lab.shelf import VariableShelf
+from chemistrylab.lab.shelf import Shelf,VariableShelf
 
 
 def wurtz_vessel(add_mat=""):

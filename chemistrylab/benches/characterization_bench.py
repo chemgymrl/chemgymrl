@@ -87,7 +87,8 @@ class CharacterizationBench:
         
         #Determine the shape of the observations
         n_pixels=sum(self.sizes[a] for a in observation_list)
-        self.observation_shape=(n_vessels,n_pixels)
+        self.observation_shape=(n_vessels*n_pixels,)
+        self.state_s = (n_vessels,n_pixels)
 
     def get_observation(self, vessels, target):
         """
@@ -99,11 +100,11 @@ class CharacterizationBench:
         - target (str): The current target material
         """
         self.target=target
-        state=np.zeros(self.observation_shape)
+        state=np.zeros(self.state_s,dtype=np.float32)
         for i,v in enumerate(vessels):
             if i>= self.n_vessels:break
             state[i] = np.concatenate([f(v) for f in self.functions])
-        return state
+        return np.clip(state.flatten(),0,1)
 
     def __call__(self, vessels, target):
         return self.get_observation(vessels, target)

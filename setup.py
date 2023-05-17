@@ -20,7 +20,7 @@ import sys
 setup(name='chemistrygym',
       packages=find_packages(),
       install_requires=[
-          'gym<0.20.0',
+          'gymnasium',
           'numpy',
           'matplotlib',
           'cmocean',
