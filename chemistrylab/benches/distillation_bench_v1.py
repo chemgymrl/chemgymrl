@@ -164,3 +164,58 @@ class GeneralWurtzDistill_v2(GenBench):
         self.reaction.newton_steps=1000
 
 
+
+
+class WurtzDistillDemo_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        d_rew= RewardGenerator(use_purity=True,exclude_solvents=False,include_dissolved=True)
+        shelf = VariableShelf( [
+            lambda x:wurtz_vessel(x)[0],
+            lambda x:vessel.Vessel("Beaker 1"),
+            lambda x:vessel.Vessel("Beaker 2"),
+        ],[], n_working = 3)
+
+        amounts=np.ones([1,1])*0.02
+        
+        heat_info = np.array([
+            [300,20], # Room temp water
+            [270,20], # Freezing water
+            [1000,3]  # Fire
+        ])
+
+        actions = [
+            Action([0],    heat_info,            'heat contact',   [1],   0.01,   False),
+            Action([0],    amounts,              'pour by volume', [1],   0.01,   False),
+            Action([1],    amounts,              'pour by volume', [2],   0.01,   False),
+            Action([0],    [[0]],                'mix',            None,  0,      True)
+        ]
+        
+        targets = [
+            "dodecane",
+            "5-methylundecane",
+            "4-ethyldecane",
+            "5,6-dimethyldecane",
+            "4-ethyl-5-methylnonane",
+            "4,5-diethyloctane",
+            "NaCl"
+        ]
+
+        react_info = ReactInfo.from_json(REACTION_PATH+"/precipitation.json")
+        
+        super(WurtzDistillDemo_v0, self).__init__(
+            shelf,
+            actions,
+            react_info,
+            ["layers","PVT","targets"],
+            reward_function=d_rew,
+            react_list=[0],
+            targets=targets,
+            max_steps=500
+        )
+
+        self.reaction.solver="newton"
+        self.reaction.newton_steps=1000

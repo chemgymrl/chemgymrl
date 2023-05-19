@@ -215,3 +215,47 @@ class FictReactBandit_v0(GenBench):
             gate[gate<self.steps-1]=self.max_steps
             ret+=r
         return o,ret,d,*_
+
+
+
+class FictReactDemo_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
+                                include_dissolved=False, exclude_mat = "fict_E")
+
+        v = get_mat("H2O",30,"Reaction Vessel")
+        v.default_dt=0.0008
+        shelf = Shelf([
+            v,
+            get_mat("fict_A",1),
+            get_mat("fict_B",1),
+            get_mat("fict_C",1),
+            get_mat("fict_D",3),
+        ])
+
+        actions = [
+            Action([0],    [ContinuousParam(273,373,0,12)],    'heat contact',     [0],  0,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
+        ]
+        
+        targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
+        react_info = ReactInfo.from_json(REACTION_PATH+"/fict_react.json")
+
+        super(FictReactDemo_v0, self).__init__(
+            shelf,
+            actions,
+            react_info,
+            ["PVT","spectra","targets"],
+            reward_function=r_rew,
+            react_list=[0],
+            targets=targets,
+            discrete=False,
+            max_steps=500
+        )

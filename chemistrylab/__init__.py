@@ -69,3 +69,24 @@ register(
     entry_point='chemistrylab.benches.reaction_bench_v1:FictReactBandit_v0',
     kwargs = dict(targets=["fict_I"])
 )
+
+######################## DEMO GYMS #########################################
+
+
+register(
+    id='WurtzExtractDemo-v0',
+    entry_point='chemistrylab.benches.extract_bench_v1:WurtzExtractDemo_v0',
+)
+
+
+register(
+    id='FictReactDemo-v0',
+    entry_point='chemistrylab.benches.reaction_bench_v1:FictReactDemo_v0',
+
+)
+
+register(
+    id='WurtzDistillDemo-v0',
+    entry_point='chemistrylab.benches.distillation_bench_v1:WurtzDistillDemo_v0',
+)
+

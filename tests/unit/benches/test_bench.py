@@ -2,7 +2,8 @@
 import sys
 sys.path.append('../../../')
 
-import gym,time
+import gymnasium as gym
+import time
 import pandas as pd
 import chemistrylab
 import numpy as np
@@ -13,7 +14,7 @@ from unittest import TestCase
 
 from tests.unit.benches.util import chemgym_filter,check_conservation,check_non_negative,check_conservation_react
 
-ENVS = chemgym_filter([a.id for a in gym.envs.registry.all()])
+ENVS = chemgym_filter([a for a in gym.envs.registry])
 
 def run_env_no_overflow(env_id,seed=1,acts = None):
     """
@@ -22,10 +23,8 @@ def run_env_no_overflow(env_id,seed=1,acts = None):
     """
     if acts is None:
         acts = []
-    np.random.seed(seed)
     env = gym.make(env_id)
-    _ = env.reset()
-    env.action_space.seed(seed)
+    _ = env.reset(seed=seed)
     
     #increase vessel sizes so no overflow happens
     tot_vol = sum(v.filled_volume() for v in env.shelf)

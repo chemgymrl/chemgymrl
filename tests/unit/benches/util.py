@@ -4,6 +4,7 @@ def chemgym_filter(x):
     y=[]
     for env in x:
         if ("React" in env or "Extract" in env or "Distill" in env) and not "Discrete" in env:
+            if not "Demo" in env:
                 y+=[env]
     return y
 

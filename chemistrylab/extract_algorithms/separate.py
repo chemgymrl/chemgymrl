@@ -82,7 +82,7 @@ def map_to_state(A, B, C, colors, x=x):
     #Note: MINP is linked to MINVAR
     #If you want to change one you have to change both
     #https://www.desmos.com/calculator/jc0ensg38o
-    MINP=0.13533
+    MINP=0.0111089965382
 
     
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
@@ -230,13 +230,13 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     s=C*1
     x=B*1
     # CONSTANTS
-    MINVAR=np.float32(4.0)
+    MINVAR=np.float32(6)
     SCALING=np.float32(1e-2)
     t_scale = 25
     #Cmix = np.float32(2.0)
     tmix = np.float32(-1.6120857137646178)#-1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi))
     tseparate = np.float32(-1.47)
-    TOL=np.float32(1e-10)
+    TOL=np.float32(1e-12)
     E3 = np.float32(1e-3)
     sq12 = np.float32(3.4641)
 
