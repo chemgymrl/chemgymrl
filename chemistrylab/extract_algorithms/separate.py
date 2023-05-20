@@ -24,7 +24,7 @@ import numba
 
 
 # Array for x/height positions
-x = np.linspace(0, 1, 1000, endpoint=True, dtype=np.float32)
+x = np.linspace(0, 1, 100, endpoint=True, dtype=np.float32)
 
 
 #from numba.pycc import CC
@@ -81,8 +81,8 @@ def map_to_state(A, B, C, colors, x=x):
 
     #Note: MINP is linked to MINVAR
     #If you want to change one you have to change both
-    #https://www.desmos.com/calculator/jc0ensg38o
-    MINP=0.0111089965382
+    #https://www.desmos.com/calculator/kzydc5ra3q
+    MINP=0.21626516683
 
     
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
@@ -102,12 +102,12 @@ def map_to_state(A, B, C, colors, x=x):
     # Loop over each layer pixel
     for l in range(L.shape[0]):
         # Map layer pixel position to x position
-        k = int(((l + 0.5) / L.shape[0]) * x.shape[0])
+        k = l
 
         # 5.i
         P_raw = np.exp(-0.5 * (((x[k] - B) / C) ** 2))
         # MINP is a cutoff value to set the gaussian to 0
-        P_raw = P_raw* ((P_raw > MINP) + P_raw*(P_raw < MINP))
+        P_raw = P_raw* ((P_raw > MINP) | (x[k]>B))#+ P_raw*(P_raw < MINP))
         
         # Calculate Gaussian values at current x position
         P = A /C * P_raw
@@ -131,22 +131,25 @@ def map_to_state(A, B, C, colors, x=x):
             L2[l:]=j_max
             return L,L2
         # Sum of all Gaussians at this x position
-        Psum = np.sum(P)
+        
 
         # Random number for mixing of layers
         r = np.random.rand()
         place_jmin = False
         #Below if part 5.iv
         # The current point has to be far to the RIGHT of the gaussian for it to have passed over
-        if P_raw[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
-            if P_raw[j_min]<1e-12:
+        if P_raw[j_min] < MINP and n[j_min]>0 and (x[k]>B[j_min] or x[k]<0):
+            if P_raw[j_min]<1e-12 or x[k]<0:
                 place_jmin=True
             else:
+                P[j_min] = (A[j_min] / C[j_min]) * MINP
                 #More likely to place j_min pixels the lower it's propability is
-                choice_ratio = 0.1*MINP**2/P_raw[j_min]
-                r2=np.random.rand()
-                if choice_ratio>=r2:
-                    place_jmin=True
+                #choice_ratio = 0.1*MINP**2/P_raw[j_min]
+                #r2=np.random.rand()
+                #if choice_ratio>=r2:
+                #    place_jmin=True
+
+        Psum = np.sum(P)
 
         # If x position is outside every Gaussian peak (5.iv and 5.iii)
         if Psum < 1e-6  or place_jmin:
@@ -181,14 +184,15 @@ def map_to_state(A, B, C, colors, x=x):
 
 
 @numba.jit(cache=True,nopython=True)
-#@cc.export('mix', '(f4[:], f4[:], f4[:], f4[:], f4, f4[:], f4[:], f4[:], f4[:,:],f4)')
-def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
+#@cc.export('mix', '(f4[:], f4[:], f4[:], f4[:], f4[:], f4, f4[:], f4[:], f4[:], f4[:,:],f4)')
+def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
 
     Args:
     - v (np.ndarray): The volume of each solvent
     - Vprev (np.ndarray): The volume of each solvent on the previous iteration
+    - v_solute (np.ndarray): The specific volume of each solute (litres per mol)
     - B (np.ndarray): The current positions of the solvent layers in the vessel
     - C (np.ndarray): The current variances of the solvent layers in the vessel
     - C0 (float) The current variance of solutes in the vessel
@@ -202,7 +206,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     - layers_position (np.ndarray): An array of floats representing the new positions of the solvent layers in the vessel
     - layers_variance (np.ndarray): An array of floats representing the new variances of the solvent layers in the vessel
     - new_solute_amount (np.ndarray): An array of floats representing the new amounts of solutes in each solvent layer
-    - Sts (np.ndarray): TODO: Figure out what this stores. NOTE: Turns out it does nothing
+    - var_layer (np.ndarray): Modified layer variances which account for the extra volume due to dissolved solutes
 
     Algorithm (Solvent):
     1. Using the volumes and densities of each solvent, determine where each solvent's center of mass should be at t-> inf
@@ -230,7 +234,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     s=C*1
     x=B*1
     # CONSTANTS
-    MINVAR=np.float32(6)
+    MINVAR=np.float32(3.5)
     SCALING=np.float32(1e-2)
     t_scale = 25
     #Cmix = np.float32(2.0)
@@ -244,11 +248,8 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     solute_mixing = 0
     #figure out where the gaussians should end up at T-> inf
     order=np.argsort(D)[::-1]
-    Vtot= np.float32(0) #Total volume
-    means = np.zeros(D.shape[0],dtype=np.float32)
-    for i in order:
-        means[i] = Vtot+v[i]/2
-        Vtot+=v[i]
+    Vtot= np.sum(v) #Total volume
+
 
 
     #Get convergence speeds based off of how different the densities are
@@ -304,11 +305,7 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     #Make sure Time is >= 0 (0 is fully mixed time)
     T=np.clip(T,0,None)
 
-    #update positions
-    c=1.2/(np.abs(means-Vtot/2)+TOL)
-    c=np.clip(c,E3,30)
-    f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
-    B= means+(Vtot/2-means)*f
+
     #Update variance
     g = np.exp(-2*(T/Vtot)**2)
     C = sf+(si-sf)*g
@@ -334,16 +331,11 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
     t += mixing
 
 
-    Sts = np.zeros(S.shape,dtype=np.float32)
     Scur = np.copy(S)
     # only do the calculation if there are two or more solvents
-    if (len(A) < 2) or A.sum()-A.max()<1e-12 or abs(mixing)<1e-12:
-        C0 = np.float32( np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi) )
-        return B, C, C0 , S, Sts
-
-    
+    if not ((len(A) < 2) or A.sum()-A.max()<1e-12 or abs(mixing)<1e-12):
     # Update amount of solute i in each solvent
-    for i in range(S.shape[0]):
+      for i in range(S.shape[0]):
 
         Ssum = np.sum(Scur[i])
         if Ssum<1e-6:
@@ -388,7 +380,38 @@ def mix(v, Vprev, B, C, C0 , D, Spol, Lpol, S, mixing):
             S[i] = St
 
     C0 = np.float32( np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi) )
-    return B, C,C0, S, Sts
+
+    #Update layer volumes to include their dissolved solutes
+    v_layer = v.copy()
+    for i in range(S.shape[0]):
+        for j in range(v_layer.shape[0]-1):
+            vol = S[i][j]*v_solute[i]
+            # Add solute volume to solvent volume
+            v_layer[j]+=vol
+            #reduce amount of air
+            v_layer[-1]-=vol
+
+    # Calculate final layer positions
+    means = np.zeros(D.shape[0],dtype=np.float32)
+    Vtot = np.float32(0)
+    for i in order:
+        means[i] = Vtot+v_layer[i]/2
+        Vtot+=v_layer[i]
+
+    #update positions
+    c=1.2/(np.abs(means-Vtot/2)+TOL)
+    c=np.clip(c,E3,30)
+    f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
+    B= means+(Vtot/2-means)*f
+
+    var_layer = C*v_layer/(v+TOL)
+
+    return B, v_layer, C,C0, S, var_layer
+
+
+
+
+
 
 if __name__ == "__main__":
     

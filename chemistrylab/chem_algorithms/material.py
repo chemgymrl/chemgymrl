@@ -149,6 +149,9 @@ class Material:
     def litres(self):
         return 1e-3*self.mol*self._molar_mass/self._density[self.phase]
     @property
+    def litres_per_mol(self):
+        return 1e-3*self._molar_mass/self._density[self.phase]
+    @property
     def vapour_enthalpy(self):
         return self.mol*self._enthalpy_vapor
 
