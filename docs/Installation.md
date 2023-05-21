@@ -52,9 +52,16 @@ Now we simply need to test that the installation of the library is complete. To 
 following:
 
 ```commandline
-cd tests/unit
-python3.8 -m unittest discover -p "*test*.py"
+python3.8 -m unittest discover -s ./tests/unit -p *test*.py
 ```
 
 After you run this, you should get a line that says that all tests passed, if you get any errors please look at the
 troubleshooting page. Thank you for using ChemGymRL.
+
+### Demo
+
+If you want to demo the benches, you will need to install the gymnasium classic control dependency. Then you can play the benches with the following commands:
+```
+pip install gymnasium[classic-control]
+python3.8 ChemGymDemo.py
+```
