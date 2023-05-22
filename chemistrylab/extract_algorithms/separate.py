@@ -138,8 +138,8 @@ def map_to_state(A, B, C, colors, x=x):
         place_jmin = False
         #Below if part 5.iv
         # The current point has to be far to the RIGHT of the gaussian for it to have passed over
-        if P_raw[j_min] < MINP and n[j_min]>0 and (x[k]>B[j_min] or x[k]<0):
-            if P_raw[j_min]<1e-12 or x[k]<0:
+        if P_raw[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
+            if P_raw[j_min]<1e-12:
                 place_jmin=True
             else:
                 P[j_min] = (A[j_min] / C[j_min]) * MINP
@@ -277,7 +277,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
             new_var = min(max_var, max(cur_var,new_var))
 
             if i<s.shape[0]-1:# Pouring in non-air materials mixes the vessel a bit
-                s+=dv/MINVAR
+                s+=dv/MINVAR/2
             s[i]=new_var
             #TODO: Set extra mixing of solutes
             var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+TOL)
