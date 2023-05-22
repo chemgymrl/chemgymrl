@@ -122,7 +122,7 @@ class Vessel:
         self._layers_position = np.zeros(1, dtype=np.float32)
         self._layers_variance = np.array([self.volume/3.46], dtype=np.float32)
         self._solvent_volumes = np.array([self.volume], dtype=np.float32)
-        self._variance = 2
+        self._variance = 1e-5
         self._layers = None
         self.ignore_layout=ignore_layout
 
