@@ -275,12 +275,15 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
         if dv>1e-6:
             new_var = (dv/(np.abs(v[i]-dv)+TOL))*((Vtot-x[i])/sq12)
             new_var = min(max_var, max(cur_var,new_var))
+
+            if i<s.shape[0]-1:# Pouring in non-air materials mixes the vessel a bit
+                s+=dv/MINVAR
             s[i]=new_var
             #TODO: Set extra mixing of solutes
             var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+TOL)
             solute_mixing = min(solute_mixing, (tmix-tseparate)*var_ratio )
         else:
-            s[i] = min(max_var, s[i]+dv/MINVAR)
+            s[i] = min(max_var, s[i]+dv/MINVAR) 
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
