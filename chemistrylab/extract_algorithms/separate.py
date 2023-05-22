@@ -107,10 +107,10 @@ def map_to_state(A, B, C, colors, x=x):
         # 5.i
         P_raw = np.exp(-0.5 * (((x[k] - B) / C) ** 2))
         # MINP is a cutoff value to set the gaussian to 0
-        P_raw = P_raw* ((P_raw > MINP) | (x[k]>B))#+ P_raw*(P_raw < MINP))
+        P_clip = P_raw* ((P_raw > MINP) | (x[k]>B))#+ P_raw*(P_raw < MINP))
         
         # Calculate Gaussian values at current x position
-        P = A /C * P_raw
+        P = A /C * P_clip
         
         # Check to see if any phases have no pixels remaining
         past_due = False
@@ -118,7 +118,7 @@ def map_to_state(A, B, C, colors, x=x):
             if n[j] == 0:
                 # Set Gaussian value to avoid placement by random set
                 P[j] = 0.0
-
+                P_raw[j]=0.0
                 # Set Gaussian center extremely positive outside of range to avoid placement by default set
                 B1[j] += 1e9
 
@@ -138,13 +138,13 @@ def map_to_state(A, B, C, colors, x=x):
         place_jmin = False
         #Below if part 5.iv
         # The current point has to be far to the RIGHT of the gaussian for it to have passed over
-        if P_raw[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
-            if P_raw[j_min]<1e-12:
+        if P_clip[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
+            if P_clip[j_min]<1e-12:
                 place_jmin=True
             else:
                 P[j_min] = (A[j_min] / C[j_min]) * MINP
                 #More likely to place j_min pixels the lower it's propability is
-                #choice_ratio = 0.1*MINP**2/P_raw[j_min]
+                #choice_ratio = 0.1*MINP**2/P_clip[j_min]
                 #r2=np.random.rand()
                 #if choice_ratio>=r2:
                 #    place_jmin=True
@@ -154,7 +154,10 @@ def map_to_state(A, B, C, colors, x=x):
         # If x position is outside every Gaussian peak (5.iv and 5.iii)
         if Psum < 1e-6  or place_jmin:
             # Calculate the index of the most negative phase
-            j = j_min
+            if place_jmin or np.sum(P_raw)<1e-6:
+                j = j_min
+            else:
+                j=np.argmax(P_raw)
             # Set pixel value
             L[l] = colors[j]
             L2[l]=j
@@ -275,9 +278,6 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
         if dv>1e-6:
             new_var = (dv/(np.abs(v[i]-dv)+TOL))*((Vtot-x[i])/sq12)
             new_var = min(max_var, max(cur_var,new_var))
-
-            if i<s.shape[0]-1:# Pouring in non-air materials mixes the vessel a bit
-                s+=dv/MINVAR/2
             s[i]=new_var
             #TODO: Set extra mixing of solutes
             var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+TOL)
