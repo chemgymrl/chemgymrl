@@ -280,7 +280,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
             var_ratio = (new_var-cur_var)/(abs(max_var-cur_var)+TOL)
             solute_mixing = min(solute_mixing, (tmix-tseparate)*var_ratio )
         else:
-            s[i] = min(max_var, max(s[i]+dv/MINVAR,new_var)) 
+            s[i] = min(max_var, s[i]+dv/MINVAR)
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
@@ -404,7 +404,9 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
     B= means+(Vtot/2-means)*f
 
-    var_layer = C*v_layer/(v+TOL)
+    # Adjust variances for dissolved volumes
+    sf2 = v_layer/MINVAR 
+    var_layer = sf2+(si-sf2)*g
 
     return B, v_layer, C,C0, S, var_layer
 
