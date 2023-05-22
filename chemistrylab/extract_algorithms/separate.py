@@ -82,6 +82,9 @@ def map_to_state(A, B, C, colors, x=x):
     #Note: MINP is linked to MINVAR
     #If you want to change one you have to change both
     #https://www.desmos.com/calculator/kzydc5ra3q
+
+    width = C*3.5/2
+    #MINVAR is 3.5 here
     MINP=0.21626516683
 
     
@@ -123,7 +126,7 @@ def map_to_state(A, B, C, colors, x=x):
                 B1[j] += 1e9
 
         # j_min is the index of the lowest gaussian which still has pixels to place (5.iv)
-        j_min = np.argmin(B1)
+        j_min = np.argmin(B1-width)
 
         # Only need to place the least dense material
         if j_min==j_max and n[j_max]>0:
@@ -154,10 +157,7 @@ def map_to_state(A, B, C, colors, x=x):
         # If x position is outside every Gaussian peak (5.iv and 5.iii)
         if Psum < 1e-6  or place_jmin:
             # Calculate the index of the most negative phase
-            if place_jmin or np.sum(P_raw)<1e-6:
-                j = j_min
-            else:
-                j=np.argmax(P_raw)
+            j = j_min
             # Set pixel value
             L[l] = colors[j]
             L2[l]=j
