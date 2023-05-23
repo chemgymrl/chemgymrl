@@ -90,3 +90,9 @@ register(
     entry_point='chemistrylab.benches.distillation_bench_v1:WurtzDistillDemo_v0',
 )
 
+
+register(
+    id='ExtractTest-v0',
+    entry_point='chemistrylab.benches.extract_bench_v1:SeparateTest_v0',
+)
+

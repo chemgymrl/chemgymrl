@@ -245,7 +245,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     tseparate = np.float32(-1.47)
     TOL=np.float32(1e-12)
     E3 = np.float32(1e-3)
-    sq12 = np.float32(3.4641)
+    MAXVAR = np.float32(3.0)
 
     # copy mixing for the solutes in case you need to modify it
     solute_mixing = 0
@@ -264,7 +264,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
             diff[j] -= (D[j] - D[i])
     diff = np.clip(np.abs(diff),E3,None)
 
-    max_var = Vtot/sq12
+    max_var = Vtot/MAXVAR
     solvent_mixing=0
     #adjust variance
     for i in range(v.shape[0]):
@@ -273,13 +273,13 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
         # Make sure variance is at least as big as fully separated variance
         cur_var= max(s[i],v[i]/MINVAR)
         # Add some variance to each solvent
-        #s+=dv/sq12
+        #s+=dv/MAXVAR
         # Extra mixing dependant on the position and how much was added
         if dv>1e-6:
-            new_var = (dv/(np.abs(v[i]-dv)+TOL))*((Vtot-x[i])/sq12)
+            new_var = (dv/(np.abs(v[i]-dv)+TOL))*((Vtot-x[i])/MAXVAR)
             new_var = min(max_var, max(cur_var,new_var))
             #mix surrounding solvents (excludes air)
-            if i<v.shape[0]-1:s[:v.shape[0]-1]+= dv/sq12+(new_var-cur_var)/2
+            if i<v.shape[0]-1:s[:v.shape[0]-1]+= dv/MAXVAR+(new_var-cur_var)/2
             #Mix solvent
             s[i]=new_var
             #TODO: Set extra mixing of solutes
@@ -292,7 +292,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
-    si = Vtot/sq12 # initial variances
+    si = Vtot/MAXVAR # initial variances
     s=np.clip(s,sf+TOL,si-TOL)
     #ratio -> inf as t -> inf
     ratio = np.clip((si-sf)/(s-sf),1,None)
@@ -407,11 +407,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
         Vtot+=v_layer[i]
 
     #update positions
-    c=1.2/(np.abs(means-Vtot/2)+TOL)
-    c=np.clip(c,E3,30)
-    f=np.log(1+(np.exp(c)-1)*np.exp(-c*T))/c
-    B= means+(Vtot/2-means)*f
-
+    B = means+(Vtot/2-means)*g
     # Adjust variances for dissolved volumes
     sf2 = v_layer/MINVAR 
     var_layer = sf2+(si-sf2)*g

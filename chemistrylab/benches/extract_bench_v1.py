@@ -291,3 +291,49 @@ class WurtzExtractDemo_v0(GenBench):
             reward_function=e_rew,
             max_steps=500
         )
+
+
+class SeparateTest_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    def __init__(self):
+        e_rew= RewardGenerator(use_purity=True,exclude_solvents=True,include_dissolved=True)
+        shelf = VariableShelf( [
+            lambda x:wurtz_vessel(x)[0],
+            lambda x:vessel.Vessel("Beaker 1"),
+            lambda x:vessel.Vessel("Beaker 2"),
+            lambda x:make_solvent("C6H14"),
+            lambda x:make_solvent("diethyl ether"),
+            lambda x:make_solvent("H2O"),
+            lambda x:make_solvent("ethoxyethane"),
+            lambda x:make_solvent("ethyl acetate"),
+        ],[], n_working = 3)
+        amounts=np.ones([1,1])*0.02
+        pixels = [[1]]
+        actions = [
+            Action([0], pixels,              'drain by pixel',[1],  0.001, False),
+            Action([0],-amounts,             'mix',           None, 0,     False),
+            Action([1], amounts,             'pour by volume',[0],  0.001, False),
+            Action([2], amounts,             'pour by volume',[0],  0.001, False),
+            Action([0], amounts,             'pour by volume',[2],  0.001, False),
+            Action([3], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([4], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([5], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([6], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([7], amounts/2,           'pour by volume',[0],  0,    False),
+            Action([0,1,2], [[1e-3],[0.016]],'mix',           None, 0,    False),
+            Action([0], [[0]],               'mix',           None, 0,    True)
+        ]
+        
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
+
+        super(SeparateTest_v0, self).__init__(
+            shelf,
+            actions,
+            react_info,
+            ["layers","targets"],
+            reward_function=e_rew,
+            max_steps=5000
+        )

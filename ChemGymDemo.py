@@ -8,10 +8,10 @@ from gymnasium.utils.play import play
 while True:
     print("Enter 0 for Extraction, 1 For Distillation, or 2 for Reaction")
     x = input()
-    if x in ["0","1","2"]:
+    if x in ["0","1","2","3"]:
         break
 x = int(x)
-env_id = ["WurtzExtractDemo-v0","WurtzDistillDemo-v0","FictReactDemo-v0"][x]
+env_id = ["WurtzExtractDemo-v0","WurtzDistillDemo-v0","FictReactDemo-v0","ExtractTest-v0"][x]
 
 env=gym.make(env_id)
 env.metadata["render_modes"] = ["rgb_array"]
@@ -26,10 +26,10 @@ if x==2:
         arr[i]=1    
         keys[str(i+1)] = arr
 else:
-    keys = {k:i for i,k in enumerate(["1234567890","123456"][x])}
+    keys = {k:i for i,k in enumerate(["1234567890","123456","0","12345qwert890"][x])}
 
 
-noop = [7,0,np.zeros(5)][x]
+noop = [7,0,np.zeros(5),10][x]
 
 print("Controls:")
 for i,k in enumerate(keys):
