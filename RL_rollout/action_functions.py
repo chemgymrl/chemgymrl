@@ -301,8 +301,8 @@ def EXTRACT_2_3(amount,color="none"):
     
     return svg_code
 
-EXTRACT_3 = lambda x: EXTRACT_2_3(x,"#703636")
-EXTRACT_2 = lambda x: EXTRACT_2_3(x,"#71ab9c")
+EXTRACT_2 = lambda x: EXTRACT_2_3(x,"#703636")
+EXTRACT_3 = lambda x: EXTRACT_2_3(x,"#71ab9c")
 
 
 def EXTRACT_4(amount):
@@ -340,7 +340,7 @@ EXTRACT_7,EXTRACT_8 = DISTILL_3,DISTILL_4
 
 EXTRACT_ACTIONS=[EXTRACT_0,EXTRACT_1,EXTRACT_2,EXTRACT_3,EXTRACT_4,EXTRACT_5,EXTRACT_6,EXTRACT_7,EXTRACT_8]
 
-EXTRACT_NAMES = ["Drain EV to B1", "Mix EV","Pour B1 into EV","Pour B2 into EV", 
+EXTRACT_NAMES = ["Drain EV to B1", "Mix EV","Pour B2 into EV","Pour B1 into EV", 
         "Pour EV into B2", "Pour S1 into EV", "Pour S2 into EV","Wait","End Experiment"]
 
 for i,E in enumerate(EXTRACT_ACTIONS):
@@ -440,17 +440,7 @@ def show_actions_grouped(actions,N,all_actions):
                 
     return svg_code
 
-def squish_param(x):
-    k=5*np.log(10)
-    d=0.9131411
-    if x<-1:
-        return -1 - np.log(-x-d)/k+np.log(1-d)/k
-    elif x<=1:
-        return x
-    else:
-        return 1 + np.log(x-d)/k-np.log(1-d)/k
-
-def show_actions_extra_grouped(actions, N, all_actions, action_map, include_percents=False):
+def show_actions_mean_grouped(actions, N, all_actions, action_map, include_percents=False):
     
     """
     Returns an SVG code string containing visual representations of the given actions. Actions are grouped together by type, and
@@ -497,7 +487,7 @@ def show_actions_extra_grouped(actions, N, all_actions, action_map, include_perc
             """
             
             svg_code+=f'<a transform="translate({(i-offset-1)*400}, {100})">'
-            svg_code+=all_actions[prev](squish_param(seq))
+            svg_code+=all_actions[prev](seq/steps)
             svg_code+=f'<circle cx="90" cy="130" r="{R}" stroke="black" stroke-width="15" fill="none" />'
             
             svg_code += f'<svg><line x1="{R+90}" y1="{130}" x2="{400-R+90}" y2="{130}" stroke="black" stroke-width="15" /></svg>'
@@ -525,74 +515,15 @@ def show_actions_extra_grouped(actions, N, all_actions, action_map, include_perc
     <text x="{(i-offset)*400+84-len(string)*25}" y="{450}" font-family="Highway Gothic" fill="black" font-size="{100}">{string}</text>
     """
     svg_code+=f'<a transform="translate({(i-offset)*400}, {100})">'
-    svg_code+=all_actions[act](squish_param(seq))
+    svg_code+=all_actions[act](seq/steps)
     svg_code+=f'<circle cx="90" cy="130" r="{R}" stroke="black" stroke-width="15" fill="none" />'
     svg_code+="</a>"
             
     return svg_code
 
+dmap=lambda x,y:(y/10,1)
 
-
-
-def extract_v2_action_map(act,param):
-    """
-    This function takes an action and a parameter and returns a tuple containing the normalized 
-    parameter value and the number of timesteps for which the action should be performed.
-    
-    Inputs:
-    - act (int): An integer representing the action to be performed. 
-    - param (float): A float representing the parameter value for the given action.
-    
-    Returns:
-    - (normalized_param, num_timesteps) : A tuple containing the normalized parameter value and the number 
-    of timesteps for which the action should be performed.
-        - normalized_param (float): A float representing the normalized parameter value.
-        - num_timesteps (int): An integer representing the number of timesteps for which the action should be performed.
-    """
-    if act==0:
-        return param/40,1
-    elif act==1:
-        return param/5,1
-    elif act<5:
-        return param/5,1
-    elif act<7:
-        return param/10,1
-    elif act==7:
-        return 2**(param-1)/50,2**(param-1)
-    else:
-        return 1,1
-    
-def distill_action_map(act,param):
-    """
-    This function takes an action and a parameter and returns a tuple containing the normalized 
-    parameter value and the number of timesteps for which the action should be performed.
-    
-    Inputs:
-    - act (int): An integer representing the action to be performed. 
-    - param (float): A float representing the parameter value for the given action.
-    
-    Returns:
-    - (normalized_param, num_timesteps) : A tuple containing the normalized parameter value and the number 
-    of timesteps for which the action should be performed.
-        - normalized_param (float): A float representing the normalized parameter value.
-        - num_timesteps (int): An integer representing the number of timesteps for which the action should be performed.
-    """
-    if act==0:
-        return (param-5)/25,1
-    elif act==1:
-        return param/10,1
-    elif act<4:
-        return param/20,1
-    return 1,1
-
-
-
-
-
-
-
-
-
+emap=lambda x,y:(y/5 if x!= 7 else 2**(y-1)/16,1)
 
 
 
