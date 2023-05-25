@@ -121,10 +121,11 @@ class Vessel:
         self.solvents=[]
         self._layers_position = np.zeros(1, dtype=np.float32)
         self._layers_variance = np.array([self.volume/3.46], dtype=np.float32)
-        self._solvent_volumes = np.array([self.volume], dtype=np.float32)
+        self._layer_volumes = np.array([self.volume], dtype=np.float32)
         self._variance = 1e-5
         self._layers = None
         self.ignore_layout=ignore_layout
+        self._layer_mats=[]
 
     def __repr__(self):
         return self.label
@@ -169,8 +170,8 @@ class Vessel:
             if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_variance[-1]],
             dtype = np.float32)
             #copy over amounts
-            self._solvent_volumes = np.array([self._solvent_volumes[self.solvent_dict[sol]]
-            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._solvent_volumes[-1]],
+            self._layer_volumes = np.array([self._layer_volumes[self.solvent_dict[sol]]
+            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layer_volumes[-1]],
             dtype = np.float32)
             #make a new solvent dict
             self.solvent_dict,self.solute_dict = rebuild_solute_dict(
@@ -218,6 +219,20 @@ class Vessel:
 
     def get_solute_dataframe(self):
         return pd.DataFrame.from_dict(self.solute_dict, orient="index",columns = self.solvents)
+
+    def get_layer_dataframe(self):                    
+        info_dict = {mat._name:(
+            self._layers_volume[i],
+            self._layers_position[i],
+            self._lvar[i],
+            self._layer_colors[i],) for i,mat in enumerate(self._layer_mats)}
+
+        info_dict["air"] = (
+            self._layers_volume[-1],
+            self._layers_position[-1],
+            self._lvar[-1],
+            self._layer_colors[-1],)
+        return pd.DataFrame.from_dict(info_dict, orient="index",columns = ["volume","position","variance","color"])
 
     def push_event_to_queue(
             self,
@@ -429,18 +444,31 @@ class Vessel:
         t=np.float32(param[0]) #or replace dt
         # Make air layer properties
         d_air = 1.225 #in g/L
+        c_air = 0.65 #chosen color of air
 
         #This is just to ensure the order of solutes does not change
         s_names = tuple(s for s in self.solute_dict)
         #Grab solute and solvent objects
         solutes = tuple(self.material_dict[s] for s in s_names)
-        solvents = tuple(self.material_dict[s] for s in self.solvents)
+        solvents = [self.material_dict[s] for s in self.solvents]
         #Get solvent volumes
-        solvent_volume = [mat.litres for mat in solvents]
+        
+
+        solute_flag = sum(mat.mol for mat in solvents)<=1e-12
+        misc_mats = [mat for key,mat in self.material_dict.items() 
+            if (not mat.is_solvent()) and (solute_flag or not mat.is_solute())]
+
+        layer_mats=solvents+misc_mats
+
+        layer_volume = [mat.litres for mat in layer_mats]
+
+        self._layer_mats = layer_mats
+
         # Add air to the end ov the volume list s.t it fills the remainder of the vessel
-        solvent_volume = np.array(solvent_volume+[self.volume - sum(solvent_volume)], dtype=np.float32)
-        solvent_density = np.array([mat.get_density() for mat in solvents]+[d_air], dtype=np.float32)
-        #Exclude air I guess?
+        layer_volume = np.array(layer_volume+[self.volume - sum(layer_volume)], dtype=np.float32)
+        layer_density = np.array([mat.get_density() for mat in layer_mats]+[d_air], dtype=np.float32)
+        self._layer_colors = np.array([mat._color for mat in layer_mats]+[c_air], dtype=np.float32)
+        #Exclude air since it's not a solvent?
         solvent_polarity = np.array([mat.polarity for mat in solvents], dtype=np.float32)
 
         #Get solute properties
@@ -454,20 +482,20 @@ class Vessel:
         solute_svolume = np.array([mat.litres_per_mol for mat in solutes], dtype=np.float32)
         
         self._layers_position, self._layers_volume, self._layers_variance, self._variance, new_solute_amount, self._lvar = separate.mix(
-            solvent_volume,
-            self._solvent_volumes.astype(np.float32),
+            layer_volume,
+            self._layer_volumes.astype(np.float32),
             solute_svolume,
             self._layers_position.astype(np.float32),
             self._layers_variance.astype(np.float32),
             np.float32(self._variance),
-            solvent_density,
+            layer_density,
             solute_polarity,
             solvent_polarity,
             solute_amount,
             t
         )
 
-        self._solvent_volumes = solvent_volume
+        self._layer_volumes = layer_volume
 
         for i,s in enumerate(s_names):
             self.solute_dict[s] = new_solute_amount[i]
@@ -485,15 +513,12 @@ class Vessel:
         TODO: Handle solutes having a volume
         """
         _=param
-        c_air = 0.65 #chosen color of air
-        solvents = tuple(self.material_dict[s] for s in self.solvents)
-        solvent_colors = np.array([mat._color for mat in solvents]+[c_air], dtype=np.float32)
 
         self._layers,self._hashed_layers = separate.map_to_state(
             self._layers_volume.astype(np.float32),
             self._layers_position.astype(np.float32),
             self._lvar.astype(np.float32),
-            solvent_colors,
+            self._layer_colors,
             layer_values
         )
 

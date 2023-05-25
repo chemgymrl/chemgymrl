@@ -91,7 +91,7 @@ def map_to_state(A, B, C, colors, x=x):
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
     # Number of pixels available for each solvent (2.)
     n=np.zeros(A.shape,dtype=np.int32)
-    n[:]=((A / sum_A) * L.shape[0] + np.float32(0.999))
+    n[:]=((A / sum_A) * L.shape[0] + np.float32(0.95))
     # Since this agressively rounds up, fix any rounding issues
     count = np.sum(n[:-1]) - L.shape[0]
     if count>0:
@@ -129,7 +129,7 @@ def map_to_state(A, B, C, colors, x=x):
         j_min = np.argmin(B1-width)
 
         # Only need to place the least dense material
-        if j_min==j_max and n[j_max]>0:
+        if np.argmin(B1)==j_max and n[j_max]>0:
             L[l:] = colors[j_max]
             L2[l:]=j_max
             return L,L2
@@ -267,7 +267,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     max_var = Vtot/MAXVAR
     solvent_mixing=0
     #adjust variance
-    for i in range(v.shape[0]):
+    for i in range(Lpol.shape[0]):
         # Figure out how much the volume has changed
         dv = v[i] - Vprev[i]
         # Make sure variance is at least as big as fully separated variance
@@ -289,6 +289,11 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
         else:
             s[i] = min(max_var, s[i]+dv/MINVAR) 
             
+    if (s.shape[0]!=v.shape[0]):
+        s0,s=s,v/MINVAR
+        s[:Lpol.shape[0]]=s0[:Lpol.shape[0]]
+
+    
 
     #Get the mixing-time variable
     sf = v/MINVAR # final variances
@@ -299,13 +304,16 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     #Elapsed time T is [0,inf) and increases monotonely with ratio
     T = np.sqrt(np.log(ratio)/2)*Vtot
+    #Set T in line with air for non-solvents
+    T[Lpol.shape[0]:] = T[-1]/diff[-1]*diff[Lpol.shape[0]:]
+
     # Add any extra time
-    
     ratio = np.clip(v/Vtot,0,1-E3)
     dt = mixing*diff/(1-ratio)**2*SCALING
     # Do a cap on T when mixing since you should always be able to stir the vessel
     # Even if the vessel has been settling for 100 years
     if mixing< -1e-4:
+        T=np.clip(T,0,3.278)
         T_max = np.float32(3.278)*dt/dt.min()
         T = (T>T_max)*T_max+(T<=T_max)*T
 
@@ -319,10 +327,10 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     C = sf+(si-sf)*g
 
     #Math for position vs time:
-    #https://www.desmos.com/calculator/f5pyvybclv 
+    #https://www.desmos.com/calculator/imukub1xzr 
 
     # A are the volumes used for dissolving
-    A=v[:-1]
+    A=v[:Lpol.shape[0]]
 
 ##############################[Mixing / Separating Solutes]#######################################
 
@@ -392,7 +400,7 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     #Update layer volumes to include their dissolved solutes
     v_layer = v.copy()
     for i in range(S.shape[0]):
-        for j in range(v_layer.shape[0]-1):
+        for j in range(Lpol.shape[0]):
             vol = S[i][j]*v_solute[i]
             # Add solute volume to solvent volume
             v_layer[j]+=vol

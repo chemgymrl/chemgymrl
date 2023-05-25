@@ -76,9 +76,10 @@ def wurtz_vessel(add_mat):
         add_mat = 'dodecane'
         add_material = products[add_mat]()
     
-    add_material.set_solute_flag(True)
-    add_material.set_color(0.0)
-    add_material.phase = 'l'
+    if (add_mat != 'NaCl'):
+        add_material.set_solute_flag(True)
+        add_material.set_color(0.0)
+        add_material.phase = 'l'
     add_material.mol=1
 
     # material_dict
