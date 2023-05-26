@@ -22,7 +22,7 @@ setup(name='chemistrygym',
       install_requires=[
           'gymnasium',
           'numpy',
-          'matplotlib',
+          'matplotlib>=3.6',
           'cmocean',
           'pyyaml',
           'scipy',
