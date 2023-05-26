@@ -11,7 +11,6 @@ import matplotlib
 
 RES = 1/2
 matplotlib.rcParams.update({'font.size': 12*RES})
-
 import matplotlib.style as mplstyle
 mplstyle.use('fast')
 
