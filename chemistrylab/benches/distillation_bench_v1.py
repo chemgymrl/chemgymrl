@@ -78,7 +78,7 @@ def wurtz_vessel(add_mat):
     
     if (add_mat != 'NaCl'):
         add_material.set_solute_flag(True)
-        add_material.set_color(0.0)
+        #add_material.set_color(0.0)
         add_material.phase = 'l'
     add_material.mol=1
 
@@ -110,6 +110,11 @@ class GeneralWurtzDistill_v2(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
+
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
 
     def __init__(self):
         d_rew= RewardGenerator(use_purity=True,exclude_solvents=False,include_dissolved=True)
@@ -171,6 +176,10 @@ class WurtzDistillDemo_v0(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 60,
+    }
 
     def __init__(self):
         d_rew= RewardGenerator(use_purity=True,exclude_solvents=False,include_dissolved=True)
@@ -220,3 +229,9 @@ class WurtzDistillDemo_v0(GenBench):
 
         self.reaction.solver="newton"
         self.reaction.newton_steps=1000
+
+    def get_keys_to_action(self):
+        # Control with the numpad or number keys.
+        keys = {(ord(k),):i for i,k in enumerate("123456") }
+        keys[()]=0
+        return keys

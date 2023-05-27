@@ -51,7 +51,7 @@ def to_rgb(x):
   rgb, a = x[..., 1:4], x[...,0:1]
   return 255-a+rgb
 
-class Visualizer():
+class numbaVisualizer():
     def __init__(self, char_bench):
         self.char_bench = char_bench
         self.viz=dict(
@@ -255,4 +255,14 @@ class matplotVisualizer():
 
         return
 
-Visualizer = matplotVisualizer
+__backends = dict(numba=numbaVisualizer,matplotlib=matplotVisualizer)
+__backend="matplotlib"
+def set_backend(backend: str):
+    global __backend
+    if backend in __backends:
+        __backend = backend
+    else:
+        __backend = "numba"
+
+def Visualizer(char_bench):
+    return __backends[__backend](char_bench)

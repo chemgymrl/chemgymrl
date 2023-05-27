@@ -176,6 +176,11 @@ class GeneralWurtzExtract_v2(GenBench):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
+
     def __init__(self):
         e_rew= RewardGenerator(use_purity=True,exclude_solvents=True,include_dissolved=True)
         shelf = VariableShelf( [
@@ -215,6 +220,11 @@ class WaterOilExtract_v0(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
+
     def __init__(self):
         e_rew= RewardGenerator(use_purity=False, exclude_solvents=True, include_dissolved=True, exclude_mat="C6H14")
         shelf =VariableShelf( [
@@ -309,6 +319,11 @@ class SeparateTest_v0(GenBench):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 60,
+    }
+    
     def __init__(self):
         e_rew= RewardGenerator(use_purity=True,exclude_solvents=True,include_dissolved=True)
         shelf = VariableShelf( [

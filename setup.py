@@ -34,4 +34,4 @@ setup(name='chemistrygym',
       description='Implementation of extraction simulations in the OpenAI Gym environment framework.',
       author='CLEAN and UW ECE ML',
       url='https://github.com/chemgymrl/chemgymrl',
-      version='0.0')
+      version='1.5.0')

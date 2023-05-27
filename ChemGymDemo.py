@@ -2,8 +2,12 @@ import os
 import numpy as np
 import gymnasium as gym
 import chemistrylab
+from chemistrylab.benches import Visualization
+
 from gymnasium.utils.play import play
 
+
+Visualization.set_backend("numba")
 
 while True:
     print("Enter 0 for Extraction, 1 For Distillation, or 2 for Reaction")

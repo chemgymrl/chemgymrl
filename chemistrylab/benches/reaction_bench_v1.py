@@ -55,6 +55,10 @@ class GeneralWurtzReact_v2(GenBench):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
         shelf = Shelf([
@@ -90,7 +94,10 @@ class GeneralWurtzReact_v0(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
-
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
         shelf = Shelf([
@@ -127,6 +134,11 @@ class FictReact_v2(GenBench):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
+    
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
@@ -223,6 +235,11 @@ class FictReactDemo_v0(GenBench):
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
 
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 60,
+    }
+
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
@@ -259,3 +276,13 @@ class FictReactDemo_v0(GenBench):
             discrete=False,
             max_steps=500
         )
+        
+    def get_keys_to_action(self):
+        # Control with the numpad or number keys.
+        keys = dict()
+        for i in range(5):
+            arr=np.zeros(5)
+            arr[i]=1    
+            keys[str(i+1)] = arr
+        keys[()] = np.zeros(5)
+        return keys
