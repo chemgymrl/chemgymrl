@@ -230,7 +230,7 @@ class WaterOilExtract_v0(GenBench):
         shelf =VariableShelf( [
             lambda x:oil_vessel(),
             lambda x:vessel.Vessel("Beaker 1"),
-            lambda x:vessel.Vessel("Beaker 2"),
+            lambda x:vessel.Vessel("Waste Vessel"),
             lambda x:make_solvent("C6H14"),
             lambda x:make_solvent("H2O")
         ], [], n_working = 2)
