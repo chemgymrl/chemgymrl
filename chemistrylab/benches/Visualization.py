@@ -130,6 +130,10 @@ class numbaVisualizer():
 
 
 class matplotVisualizer():
+
+
+    legend_update_delay=1
+
     def __init__(self, char_bench):
         self.char_bench = char_bench
         self.viz=dict(
@@ -191,7 +195,7 @@ class matplotVisualizer():
         cmap='cubehelix'
         layers = vessel.get_layers()
 
-        first=first and self.steps%100==0
+        first=first and self.steps%matplotVisualizer.legend_update_delay==0
         if prev is None or first:ax.clear()
         if first:
             cvals = (np.array([mat._color for mat in vessel._layer_mats]+[0.65])+0.2)%1

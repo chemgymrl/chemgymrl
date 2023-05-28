@@ -7,7 +7,8 @@ from chemistrylab.benches import Visualization
 from gymnasium.utils.play import play
 
 
-Visualization.set_backend("numba")
+#Visualization.set_backend("numba")
+Visualization.matplotVisualizer.legend_update_delay=100
 
 while True:
     print("Enter 0 for Extraction, 1 For Distillation, or 2 for Reaction")
