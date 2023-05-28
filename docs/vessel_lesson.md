@@ -2,6 +2,9 @@
 
 ## Vessel: Lesson
 
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/vessel_lesson.ipynb)
+
 ### Overview
 
 In this lesson, we will be going through a class that is vital to the operation of all of our benches, the vessel class.
