@@ -166,6 +166,7 @@ class matplotVisualizer():
             self.fig,axs = fig,axs = plt.subplots(figsize=(col*self.w*RES, sum(heights)*RES), nrows=row, ncols=col, height_ratios=heights,dpi=100)
             self.axs=[axs] if row*col==1 else axs.flatten()
             self.renders=[None]*(row*col)
+            plt.close()
         else:
             self.fig.canvas.restore_region(self.bg)
 
