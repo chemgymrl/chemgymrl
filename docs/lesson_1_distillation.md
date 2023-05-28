@@ -2,7 +2,7 @@
 
 ## Distillation Bench: Lesson 1
 
-Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/distillation_lesson.ipynb) to the jupyter notebook, please use it at your pleasure.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/distillation_lesson.ipynb)
 
 ### Running the environment
 
