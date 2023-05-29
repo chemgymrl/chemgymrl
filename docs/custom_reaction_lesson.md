@@ -1,137 +1,306 @@
-[chemgymrl.com](https://chemgymrl.com/)
+## Creating a Custom Reaction
 
-## Building A Custom Reaction File
+In this tutorial, I am going to walk you through how reactions work and how to make your own custom reaction
 
-For this tutorial, we are going to be creating a very simple reaction 
-
-![image](tutorial_figures/decomp_reaction.png)
-NaCl<sub>aq</sub> ->  Na<sup>+</sup><sub>aq</sub> + Cl<sup>-</sup><sub>aq</sub>
-
-To start with creating an environment for this reaction we first have to create a reaction file that simulates
-the mechanics of this decomposition. </br></br> In the directory ```chemistrylab/reactions/available_reactions```
-
-For this case, we will create a new reaction file from the reaction template file ```template_reaction.py```,
-and let's name it ```decomp.py```.
-
-The first change we have to make is to the list of reactants, products, and solutes located at line 42
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/custom_reaction.ipynb)
 
 ```python
-REACTION_CLASS = "template reactions"
+from chemistrylab.reactions.reaction_info import ReactInfo
+from chemistrylab.reactions.reaction import Reaction
+from chemistrylab.chem_algorithms import material,vessel
 
-# names of the reactants and products in all reactions
-# a list of the names of all reactants that are to be used in a reaction
-REACTANTS = []
-# a list of all the names of the reactants that are going to be produced by the reaction
-PRODUCTS = []
-ALL_MATERIALS = REACTANTS + PRODUCTS
-# specify the solute in which the reaction is meant to take place in
-SOLVENTS = []
-```
-we change the above to the following:
-```python
-REACTION_CLASS = "NaCl decomp"
-REACTANTS = ['NaCl']
-PRODUCTS = ['Na', 'Cl']
-ALL_MATERIALS = REACTANTS + PRODUCTS
-SOLVENTS = ['H2O']
+import numpy as np
+from IPython.display import display,clear_output,JSON
+
 ```
 
-In this case, we are letting the reaction file know what reagents we are using and the desired product so that we can
-easily track and display their concentrations.
+# Adding hydronium and hydroxide materials
 
-Now we need to establish a few arrays that we use to calculate the change in concentration. The first arrays that we
-require are two n_reactions x 1 array which represents the pre-exponential coefficients and activation energy of each reaction, in this case, we only have 1
-reaction:
 
 ```python
-pre_exp_arr = np.array([1.0])
+class H3O(material.Material):
+    def __init__(self, mol=0):
+        super().__init__(
+            mol=mol,
+            name='H3O',
+            density={'s': None, 'l': 0.997, 'g': None},
+            polarity=abs(2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0))),
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=19.0,
+            color=0.2,
+            charge=0.0,
+            boiling_point=373.15,
+            solute=True,
+            specific_heat=4.1813,
+            enthalpy_vapor=40650.0,
+            index=1
+        )
+
+
+class OH(material.Material):
+    def __init__(self, mol=0):
+        super().__init__(
+            mol=mol,
+            name='OH',
+            density={'s': None, 'l': 0.997, 'g': None},
+            polarity=abs(2 * 1.24 * np.cos((109.5 / 2) * (np.pi / 180.0))),
+            temperature=298,
+            pressure=1,
+            phase='l',
+            molar_mass=19.0,
+            color=0.2,
+            charge=0.0,
+            boiling_point=373.15,
+            solute=True,
+            specific_heat=4.1813,
+            enthalpy_vapor=40650.0,
+            index=3
+        )
+        
+material.register(H3O,OH)
 ```
+
+# Setting the reactants and products
+
+$H_2O$, $H_3O^+$, and  $OH^-$ are all both reactants and products (since we are including both the forward and reverse reaction)
+
 
 ```python
-activ_energy_arr = np.array([1.0])
+name="Autoionization"
+REACTANTS = ["H2O","H3O","OH"]
+PRODUCTS = ["H2O","H3O","OH"]
+SOLVENTS = ["H2O"]
+MATERIALS=["H2O","H3O","OH"]
 ```
 
-The next array relates to the calculations of the rates of reactions, for this, we use the stoichiometric coefficients
-from the reaction to calculate the rates. Since in this reaction, there is 
+# Setting rates
+
+For each reaction we have: $k = Ae^{\frac{Ea}{RT}}$
+
+To set this we know [$OH^-$][$H_3O^+$] = $1\cdot 10^{-14}$ at equilibrium.
+
+Additionally we know [H_2O] is always 55.34
+
+
+
+```python
+# 55.34 is the concentration of water in water and 1e-14 is Keq in the autoionization reaction
+pre_exp_arr = np.array([55.34,1e-14])*1e7 
+# No idea what the activation energies are
+activ_energy_arr = np.array([1.0,1.0])
+```
+
+# Setting Stoicheometry coefficients
+
+This will be a [reactions, reactants] shape array
+
 
 ```python
 stoich_coeff_arr = np.array([
-        [1.0]
-    ])
+    [0, 1, 1], # H3O + OH -> H2O+H2O
+    [1, 0, 0] # H2O + H2O -> H3O + OH
+]).astype(np.float32)
 ```
 
-lastly we need to define which reactions are creating a material or using it up:
+# Setting concentration coefficients
+
+This will be a [materials, reactions] shape array. It represents the change in concentrations given by each reaction. (Changes in concentration will always be within the column space of this matrix)
+
 
 ```python
-conc_coeff_arr = np.array([[-1], # concentration for NaCl
-                           [1], # concentration for Na
-                           [1],  # concentration for Cl
-                           [0] # concentration for H2O
-                           ])
+
+conc_coeff_arr = np.array([
+    [2, -2],
+    [-1, 1],
+    [-1, 1]
+]).astype(np.float32)
+
+info = ReactInfo(name,REACTANTS,PRODUCTS,SOLVENTS,MATERIALS,pre_exp_arr,activ_energy_arr,stoich_coeff_arr,conc_coeff_arr)
 ```
 
-As far as the reaction file, it is now set up and ready to go. 
+# Setting up the reaction
 
-We are now onto the last 2 additions that will allow us to use this reaction environment. In this file 
-```chemistrylab/reaction_bench/reaction_bench_v1.py``` we are going to add some code that will allow us to initialize
-our new reaction environment so that we can then register it and use it.
-
-At the bottom of this file we will add the following lines of code:
 
 ```python
-class ReactionBenchEnv_1(ReactionBenchEnv):
-    '''
-    Class object to define an environment available in the reaction bench.
-    '''
-
-    def __init__(self):
-        '''
-        Constructor class for the ReactionBenchEnv_0 environment.
-        '''
-
-        super(ReactionBenchEnv_1, self).__init__(
-            reaction=_Reaction,
-            reaction_file_identifier="decomp",
-            in_vessel_path=None, # do not include an input vessel
-            out_vessel_path=os.getcwd(), # include an output vessel directory
-            materials=[ # initialize the bench with the following materials
-                {"Material": "NaCl", "Initial": 1},
-            ],
-            solutes=[ # initialize the bench with the following solutes available
-                {"Material": "H2O", "Initial": 1}
-            ],
-            n_steps=50,
-            dt=0.01,
-            overlap=False
-        )
+reaction = Reaction(info)
+v = vessel.Vessel("Water Vessel")
+H2O = material.H2O(mol=1)
+v.material_dict = {H2O._name:H2O}
+v.default_dt=0.1
 ```
 
-This code simply sets up the environment we will be using. So in this case we establish the materials that the reaction
-will use and the initial quantity of that substance in mols. We then also establish our solute, in this case, 1 mol of
-water. This takes us to the final step which is registering the environment with gym. In this file: 
-```chemistrylab/__init__.py``` we are going to add a few more lines of code.
 
 ```python
-register(
-    id='DecompReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
-    max_episode_steps=20
-)
+v.get_material_dataframe()
 ```
 
-This code simply tells gym where to find our new environment. Now we're done if you run the following code you should
-now be able to see our new environment:
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Amount</th>
+      <th>Phase</th>
+      <th>Solute</th>
+      <th>Solvent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>H2O</th>
+      <td>1</td>
+      <td>l</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
 ```python
-from gym import envs
-
-all_envs = envs.registry.all()
-env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
-print(env_ids)
-```
-```
-[..., 'DecompReact-v0', ...]
+reaction.update_concentrations(v)
+v.get_material_dataframe()
 ```
 
-Here we can see that our environment has been added!
 
-For additional examples, please check out the other reaction files already created.
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Amount</th>
+      <th>Phase</th>
+      <th>Solute</th>
+      <th>Solvent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>H2O</th>
+      <td>1.000000e+00</td>
+      <td>l</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>H3O</th>
+      <td>1.804012e-09</td>
+      <td>l</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>OH</th>
+      <td>1.804012e-09</td>
+      <td>l</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+# Looking at the pH
+
+
+```python
+pH = -np.log(v.material_dict["OH"].mol/v.material_dict["H2O"].litres)/np.log(10)
+
+print(f"pH: {pH}")
+```
+
+    pH: 7.000699771831425
+    
+
+# Saving as a json file
+
+
+```python
+info.dump_to_json("autoionization.json")
+json_text = "".join(line for line in open("autoionization.json","r"))
+print(json_text)
+```
+
+    {
+      "name": "Autoionization",
+      "REACTANTS": [
+        "H2O",
+        "H3O",
+        "OH"
+      ],
+      "PRODUCTS": [
+        "H2O",
+        "H3O",
+        "OH"
+      ],
+      "SOLVENTS": [
+        "H2O"
+      ],
+      "MATERIALS": [
+        "H2O",
+        "H3O",
+        "OH"
+      ],
+      "pre_exp_arr": [ 553400000.0, 1e-07  ],
+      "activ_energy_arr": [ 1.0, 1.0  ],
+      "stoich_coeff_arr": [
+        [ 0.0, 1.0, 1.0 ],
+        [ 1.0, 0.0, 0.0 ]
+      ],
+      "conc_coeff_arr": [
+        [ 2.0,-2.0 ],
+        [-1.0, 1.0 ],
+        [-1.0, 1.0 ]
+      ]
+    }
+    
+
+# Loading from your json file
+
+
+```python
+info_copy = ReactInfo.from_json("autoionization.json")
+
+print(info_copy.name)
+```
+
+    Autoionization
+    
