@@ -7,10 +7,8 @@ REACTION_PATH = os.path.dirname(__file__)+"/available_reactions"
 
 
 def serial(x):
-    """Turn a 1D or 2D array into a tuple"""
+    """Turn a numpy array into tuples"""
     try:return float(x)
-    except:pass
-    try:return tuple(tuple(a) for a in x)
     except:return tuple(a for a in x)
 
 
