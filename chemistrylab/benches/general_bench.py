@@ -54,11 +54,11 @@ class GenBench(gym.Env):
     Args:
     - shelf (Shelf): A shelf object to store vessels.
     - action_list (list): A list of Action objects containing information describing what each action is.
-    - reaction_info (ReactInfo): A ReactInfo object that provides information about the chemical reactions taking place.
     - observation_list (Tuple[str]): List of observations to obtain from the characteriation bench
-    - react_list (Tuple[int]): Which vessels reactions should take place in (leave empty for no reacting)
     - targets (Tuple[str]): The target materials for this bench
+    - default_events (Tuple[Event]): A list of events to be performed on all working vessels in a bench at the end of each step.
     - discrete (bool): set to True for a discrete action space and False for a continuous one
+    - reward_function (Callable): A function which accepts a target and a list of vessels and outputs a reward.
     - max_steps (int): Maximum number of steps for an episode
     Keyword Args:
     - kwargs: To be determined based on need.
@@ -68,25 +68,20 @@ class GenBench(gym.Env):
         self,
         shelf: Shelf,
         action_list: Tuple[Action],
-        reaction_info,#work in progress
         observation_list: Tuple[str],
+        targets: Tuple[str],
+        default_events: Tuple[Event] = tuple(),
         reward_function: Callable = default_reward,
-        react_list: Optional[Tuple[int]] = None,
-        targets: Optional[Tuple[str]] = None,
         discrete=True,
         max_steps=50,
         **kwargs
     ):
         
-        
-        #set up reactions
-        self.react_list = [] if react_list is None else react_list
-        self.reaction=Reaction(reaction_info)
-        
+                
         # store bench information
         self.shelf=shelf
+        self.default_events=default_events
         self.action_list=action_list
-        self.reaction_info=reaction_info
         self.reward_function=reward_function
         self.max_steps=max_steps
         #Making sure targets are populated
@@ -220,9 +215,10 @@ class GenBench(gym.Env):
         else:
             done,reward = self._perform_continuous_action(action)
             
-        #perform any reactions
-        for v in self.react_list:
-            self.reaction.update_concentrations(self.shelf[v])
+        #perform any default events
+        if self.default_events:
+          for vessel in self.shelf.get_working_vessels():
+            vessel.push_event_to_queue(self.default_events, update_layers=False)
             
         #Increment the step counter and check if you are done
         self.steps+=1

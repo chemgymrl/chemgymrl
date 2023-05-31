@@ -81,11 +81,10 @@ class GeneralWurtzReact_v2(GenBench):
         super(GeneralWurtzReact_v2, self).__init__(
             shelf,
             actions,
-            react_info,
             ["PVT","spectra","targets"],
+            targets=react_info.PRODUCTS,
+            default_events = (Event("react", Reaction(react_info), None),),
             reward_function=r_rew,
-            react_list=[0],
-            targets=None,
             discrete=False,
             max_steps=20
         )
@@ -120,11 +119,10 @@ class GeneralWurtzReact_v0(GenBench):
         super(GeneralWurtzReact_v0, self).__init__(
             shelf,
             actions,
-            react_info,
             ["PVT","spectra","targets"],
-            reward_function=r_rew,
-            react_list=[0],
             targets=react_info.PRODUCTS[:-1],
+            default_events = (Event("react", Reaction(react_info), None),),
+            reward_function=r_rew,
             discrete=False,
             max_steps=20
         )
@@ -164,11 +162,10 @@ class FictReact_v2(GenBench):
         super(FictReact_v2, self).__init__(
             shelf,
             actions,
-            react_info,
             ["PVT","spectra","targets"],
-            reward_function=r_rew,
-            react_list=[0],
             targets=targets,
+            default_events = (Event("react", Reaction(react_info), None),),
+            reward_function=r_rew,
             discrete=False,
             max_steps=20
         )
@@ -204,11 +201,10 @@ class FictReactBandit_v0(GenBench):
         super().__init__(
             shelf,
             actions,
-            react_info,
             ["targets"],
-            reward_function=r_rew,
-            react_list=[0],
             targets=targets,
+            default_events = (Event("react", Reaction(react_info), None),),
+            reward_function=r_rew,
             discrete=False,
             max_steps=20
         )
@@ -268,13 +264,12 @@ class FictReactDemo_v0(GenBench):
         super(FictReactDemo_v0, self).__init__(
             shelf,
             actions,
-            react_info,
             ["PVT","spectra","targets"],
-            reward_function=r_rew,
-            react_list=[0],
             targets=targets,
+            default_events = (Event("react", Reaction(react_info), None),),
+            reward_function=r_rew,
             discrete=False,
-            max_steps=500
+            max_steps=20
         )
         
     def get_keys_to_action(self):

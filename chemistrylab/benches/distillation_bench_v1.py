@@ -155,19 +155,19 @@ class GeneralWurtzDistill_v2(GenBench):
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"/precipitation.json")
+
+        reaction = Reaction(react_info)
+        reaction.solver="newton"
+        reaction.newton_steps=100
         
         super(GeneralWurtzDistill_v2, self).__init__(
             shelf,
             actions,
-            react_info,
             ["layers","PVT","targets"],
+            targets=targets,
+            default_events = (Event("react", reaction, None),),
             reward_function=d_rew,
-            react_list=[0],
-            targets=targets
         )
-
-        self.reaction.solver="newton"
-        self.reaction.newton_steps=1000
 
 
 
@@ -215,20 +215,21 @@ class WurtzDistillDemo_v0(GenBench):
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"/precipitation.json")
-        
+        reaction = Reaction(react_info)
+        reaction.solver="newton"
+        reaction.newton_steps=100
+
         super(WurtzDistillDemo_v0, self).__init__(
             shelf,
             actions,
-            react_info,
             ["layers","PVT","targets"],
-            reward_function=d_rew,
-            react_list=[0],
             targets=targets,
+            default_events = (Event("react", reaction, None),),
+            reward_function=d_rew,
             max_steps=500
         )
 
-        self.reaction.solver="newton"
-        self.reaction.newton_steps=1000
+
 
     def get_keys_to_action(self):
         # Control with the numpad or number keys.

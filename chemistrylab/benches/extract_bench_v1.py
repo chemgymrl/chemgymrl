@@ -205,13 +205,13 @@ class GeneralWurtzExtract_v2(GenBench):
             Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
-        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
+        targets = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json").PRODUCTS
 
         super(GeneralWurtzExtract_v2, self).__init__(
             shelf,
             actions,
-            react_info,
             ["layers","targets"],
+            targets,
             reward_function=e_rew
         )
 
@@ -249,15 +249,13 @@ class WaterOilExtract_v0(GenBench):
             Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
-        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
 
         super(WaterOilExtract_v0, self).__init__(
             shelf,
             actions,
-            react_info,
             ["layers","targets"],
+            targets=["NaCl"],
             reward_function=e_rew,
-            targets=["NaCl"]
         )
 
 
@@ -297,13 +295,13 @@ class WurtzExtractDemo_v0(GenBench):
             Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
-        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
+        targets = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json").PRODUCTS
 
         super(WurtzExtractDemo_v0, self).__init__(
             shelf,
             actions,
-            react_info,
             ["layers","targets"],
+            targets,
             reward_function=e_rew,
             max_steps=500
         )
@@ -353,13 +351,13 @@ class SeparateTest_v0(GenBench):
             Action([0], [[0]],               'mix',           None, 0,    True)
         ]
         
-        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
+        targets = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json").PRODUCTS
 
         super(SeparateTest_v0, self).__init__(
             shelf,
             actions,
-            react_info,
             ["layers","targets"],
+            targets,
             reward_function=e_rew,
             max_steps=5000
         )

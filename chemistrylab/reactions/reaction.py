@@ -24,7 +24,7 @@ def set_amounts(materials,solvents, material_classes, n, vessel):
 import numpy as np
 import numba
 from scipy.integrate import solve_ivp
-from chemistrylab.chem_algorithms import material
+from chemistrylab.chem_algorithms import material,vessel
 
 
 
@@ -144,7 +144,7 @@ class Reaction():
         self.conc_coeff_arr = react_info.conc_coeff_arr
         self.num_reagents = len(self.reactants)
 
-    def update_concentrations(self,vessel):
+    def update_concentrations(self,vessel, dt):
         """
         Takes in a vessel and applies the reaction to it, updating the material and solvent dicts in the process
         """
@@ -154,7 +154,9 @@ class Reaction():
         if n.sum() < 1e-12:return
         temperature = vessel.temperature
         current_volume = vessel.filled_volume()
-        dt = vessel.default_dt
+        
+        if dt==0:
+            dt = vessel.default_dt
         
         #update concentrations
         new_n = self.react(n, temperature, current_volume, dt)
@@ -200,4 +202,9 @@ class Reaction():
                          self.num_reagents, self.temp, conc)
     
     
-  
+
+def react(vessel, reaction, dt):
+    reaction.update_concentrations(vessel , dt)
+    return 0
+
+vessel.Vessel.register(func = react, name = 'react')

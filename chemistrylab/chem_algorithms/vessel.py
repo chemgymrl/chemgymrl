@@ -223,6 +223,7 @@ class Vessel:
             self,
             events: Tuple[Event] = tuple(), 
             dt: float= 0,
+            update_layers: bool = True,
         ) -> Tuple[int]:
         """
         This function calls a set of event functions in sequence specified by `events`, then returns
@@ -231,7 +232,7 @@ class Vessel:
         Params:
         - events (Tuple[Event]): The sequence of events to be executed
         - dt (float): The amount of time elapsed (defaults to 0)
-
+        - update_layers (bool): Whether or not to update layer information at the end of the queue
         Returns:
         - status (Tuple[int]) - A sequence of status codes for each event. At the moment 0 represents normal execution, and
                                 -1 represents an illegal state reached (like a vessel overflow or boiling an empty vessel).
@@ -245,7 +246,7 @@ class Vessel:
             else:
                 status.append(Vessel._event_dict[event.name](self,event.parameter, dt))
 
-        if not self.ignore_layout:
+        if (not self.ignore_layout) and update_layers:
             self._mix((dt,),0)
             self._update_layers(0,0)
         return status
