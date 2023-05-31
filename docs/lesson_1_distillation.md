@@ -18,8 +18,7 @@ from matplotlib import pyplot as plt
 from chemistrylab.benches import Visualization
 from IPython.display import display,clear_output
 
-Visualization.RES = 2
-matplotlib.rcParams.update({'font.size': 12*Visualization.RES, 'figure.figsize': (15,8)})
+Visualization.use_mpl_dark(size=2)
 
 ```
 
