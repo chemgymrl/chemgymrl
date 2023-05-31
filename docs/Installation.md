@@ -21,4 +21,17 @@ Then you can play the benches with the following command:
 ```commandline
 python -c "import gymnasium,chemistrylab;from gymnasium.utils.play import play;play(gymnasium.make('WurtzExtractDemo-v0'))"
 ```
-In this demo, the controls are set to the number keys. There are 10 actions in total mapped to keys 1,2,3,4,5,6,7,8,9,0.
+
+```
+Controls (Use the numpad or number row):
+1: extraction_vessel performs Event(name='drain by pixel', parameter=[1], other_vessel=Beaker 1)
+2: extraction_vessel performs Event(name='mix', parameter=array([-0.02]), other_vessel=None)
+3: Beaker 1 performs Event(name='pour by volume', parameter=array([0.02]), other_vessel=extraction_vessel)
+4: Beaker 2 performs Event(name='pour by volume', parameter=array([0.02]), other_vessel=extraction_vessel)
+5: extraction_vessel performs Event(name='pour by volume', parameter=array([0.02]), other_vessel=Beaker 2)
+6: C6H14 Vessel performs Event(name='pour by volume', parameter=array([0.01]), other_vessel=extraction_vessel)
+7: diethyl ether Vessel performs Event(name='pour by volume', parameter=array([0.01]), other_vessel=extraction_vessel)
+8: extraction_vessel performs Event(name='mix', parameter=[0.001], other_vessel=None)
+9: extraction_vessel performs Event(name='mix', parameter=[0.016], other_vessel=None)
+0: end experiment
+```
