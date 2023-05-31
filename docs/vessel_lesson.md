@@ -148,7 +148,7 @@ push_event_to_queue()|used to pass event into the vessel
 validate_solvents()| Call when manually updating the material dict in order to update the solvent list
 validate_solutes()| Call when manually updating the material dict in order to update the solute_dict
 
-From the list above, the most important function is push_event_to_que(). The rest of the functions are generally handeled in the backend.
+From the list above, the most important function is push_event_to_queue(). The rest of the functions are generally handeled in the backend.
 
 #### Event Functions
 Function Name|Description
