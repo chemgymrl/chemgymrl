@@ -18,7 +18,7 @@ from matplotlib import pyplot as plt
 from chemistrylab.benches import Visualization
 from IPython.display import display,clear_output
 
-Visualization.use_mpl_dark(size=2)
+Visualization.use_mpl_light(size=2)
 
 ```
 

@@ -29,6 +29,14 @@ solute_dict|{str(solute): array[len(solvents)] , ...}| dictionary that represent
 
 
 ```python
+
+from chemistrylab.chem_algorithms import vessel,material
+from chemistrylab.benches import Visualization
+from IPython.display import display,clear_output,HTML
+from copy import deepcopy
+Visualization.use_mpl_light(size=1)
+
+
 v=vessel.Vessel("A")
 H2O = material.H2O(mol=1)
 Na,Cl = material.NaCl().dissolve().keys()
@@ -42,7 +50,7 @@ v.material_dict={str(Na):Na,str(Cl):Cl,str(C6H14):C6H14,str(H2O):H2O,str(dodecan
 v.validate_solvents()
 v.validate_solutes()
 
-display_side_by_side(Materials = v.get_material_dataframe(), Solutes = v.get_solute_dataframe())
+display(v.get_material_dataframe(), v.get_solute_dataframe())
 ```
 
 
@@ -157,17 +165,18 @@ Function Name|Description
 
 ```python
 v2,v3 = deepcopy(v),deepcopy(v)
+v.label,v2.label,v3.label = "Fully Mixed","Partially Mixed", "Settled"
 v.push_event_to_queue([vessel.Event('mix',[-1],None)],0)
 v2.push_event_to_queue([vessel.Event('mix',[0.02],None)])
 v3.push_event_to_queue([vessel.Event('mix',[0.5],None)])
 
 
-plot_layers([v,v2,v3])
+Visualization.matplotVisualizer.display_vessels([v,v2,v3],["layers"])
 
-display_side_by_side(
-    Mixed            = v.get_solute_dataframe(), 
-    Partially_settled= v2.get_solute_dataframe(), 
-    Fully_Settled    = v3.get_solute_dataframe())
+display(
+    v.get_solute_dataframe(), 
+    v2.get_solute_dataframe(), 
+    v3.get_solute_dataframe())
 ```
 
 
