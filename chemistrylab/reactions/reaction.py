@@ -144,7 +144,7 @@ class Reaction():
         self.conc_coeff_arr = react_info.conc_coeff_arr
         self.num_reagents = len(self.reactants)
 
-    def update_concentrations(self,vessel, dt):
+    def update_concentrations(self,vessel, dt = 0):
         """
         Takes in a vessel and applies the reaction to it, updating the material and solvent dicts in the process
         """
