@@ -140,10 +140,8 @@ Since we just want to get the salt out of the oil, we have our reward function d
 
 ```python
 e_rew= RewardGenerator(use_purity=False, exclude_solvents=True, include_dissolved=True, exclude_mat="C6H14")
+#We are trying to extract salt
 targets = ["NaCl"]
-
-# Mostly unused in this case as reactions don't really need to be modelled
-react_info = ReactInfo.from_json(REACTION_PATH+"\\chloro_wurtz.json")
 
 #Just show layer info
 observations = ["layers"]
@@ -160,10 +158,9 @@ class WaterOilExtract_v1(GenBench):
         super().__init__(
             shelf,
             actions,
-            react_info,
             observations,
-            reward_function=e_rew,
             targets=targets
+            reward_function=e_rew,
         )
 
 ```
