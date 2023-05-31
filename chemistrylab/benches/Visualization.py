@@ -5,8 +5,6 @@ from numba import jit
 from matplotlib import pyplot as plt
 import io
 import matplotlib.patches as mpatches
-
-
 import matplotlib
 
 RES = 1/2
@@ -131,7 +129,6 @@ class numbaVisualizer():
 
 class matplotVisualizer():
 
-
     legend_update_delay=1
 
     def __init__(self, char_bench):
@@ -140,22 +137,23 @@ class matplotVisualizer():
             spectra=self.render_spectra,
             layers=self.render_layers,
             PVT=self.render_PVT,
+            targets=self.render_target,
         )
 
         self.heights = dict(
             spectra=2,
             layers=6,
-            PVT=1
+            PVT=1,
+            targets=0.25,
         )
 
         self.renders=[]
         self.w=4
-        self.targets = {t:self.render_target(t) for t in char_bench.targets}
         self.steps=0
 
     def get_rgb(self, vessels):
         obs_list = self.char_bench.observation_list
-        info = [a for a in obs_list if a!="targets"]
+        info = obs_list#[a for a in obs_list if a!="targets"]
         heights = [self.heights[a] for a in info]
         row = len(info)
         col=len(vessels)
@@ -191,7 +189,22 @@ class matplotVisualizer():
         self.steps+=1
 
         return im[...,:3]#to_rgb(im)
-            
+
+    def render_target(self, vessel, ax, first = False, prev = None):
+        if not first:
+            ax.axis("off")
+            return None
+        if prev is None:
+            ax.clear()
+            ax.axis("off")
+            text = ax.text(0,0,'Target: '+self.char_bench.target)
+        else:
+            text=prev
+            newtext = 'Target: '+self.char_bench.target
+            if newtext!=prev.get_text():
+                prev.set_text(newtext)
+        return text
+
     def render_layers(self,vessel,ax, first = False,prev=None):
         cmap='cubehelix'
         layers = vessel.get_layers()
@@ -255,10 +268,21 @@ class matplotVisualizer():
             bp.set_width(p)
         
         return prev
-    
-    def render_target(self,target):
 
-        return
+    @staticmethod
+    def display_vessels(vessels,observation_list):
+        characterization_bench = CharacterizationBench(observation_list,[""],len(vessels))        
+        visual = Visualizer(characterization_bench)    
+        heights = [visual.heights[a] for a in observation_list]
+        row = len(observation_list)
+        col=len(vessels)
+        fig,axs = plt.subplots(figsize=(col*visual.w*RES, sum(heights)*RES), nrows=row, ncols=col, height_ratios=heights,dpi=100)
+        axs=[axs] if row*col==1 else axs.flatten()
+        for j,v in enumerate(vessels):
+          for i,func in enumerate(observation_list):
+            visual.viz[func](v,axs[i*col+j], first = j==0)
+        fig.tight_layout()
+        plt.show()
 
 __backends = dict(numba=numbaVisualizer,matplotlib=matplotVisualizer)
 __backend="matplotlib"
@@ -268,6 +292,30 @@ def set_backend(backend: str):
         __backend = backend
     else:
         __backend = "numba"
+
+
+
+
+def use_mpl_dark(size=2):
+    global RES
+    set_backend("matplotlib")
+    RES = size
+    matplotlib.rcParams.update(
+        {'figure.facecolor': "#383838", 'axes.facecolor':'#383838',
+        'axes.edgecolor':'white', 'axes.labelcolor':'white',
+        'text.color':'white','xtick.color':'white',
+        'ytick.color':'white','font.size': 12*RES, 'figure.figsize': (size*8,size*4)})
+
+def use_mpl_light(size=2):
+    global RES
+    set_backend("matplotlib")
+    RES = size
+    matplotlib.rcParams.update(
+        {'figure.facecolor': "white", 'axes.facecolor':'white',
+        'axes.edgecolor':'black', 'axes.labelcolor':'black',
+        'text.color':'black','xtick.color':'black',
+        'ytick.color':'black','font.size': 12*RES, 'figure.figsize': (size*8,size*4)})
+
 
 def Visualizer(char_bench):
     return __backends[__backend](char_bench)
