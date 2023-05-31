@@ -96,21 +96,6 @@ class Vessel:
         
         """
         #Functions to implement
-        self._event_dict = {
-            'pour by volume': self._pour_by_volume,
-            'pour by percent':self._pour_by_percent,
-            'drain by pixel': self._drain_by_pixel,
-            'mix': self._mix,
-            'update layer': self._update_layers,
-            'change heat': self._change_heat,
-            'heat contact': self._heat_contact,
-            #The ones below are in the original vessel but I'm not convinced they should
-            # exist/do the same thing
-            #'update material dict': self._update_material_dict,
-            #'update solute dict': self._update_solute_dict,
-            #'update temperature': self._update_temperature,
-            #'wait': self._wait
-        }
         self.label=label
         self.default_dt=0.01
         self.temperature=temperature
@@ -237,26 +222,35 @@ class Vessel:
     def push_event_to_queue(
             self,
             events: Tuple[Event] = tuple(), 
-            dt: Optional[float] = None,
+            dt: float= 0,
         ) -> Tuple[int]:
-        # I intend the int returned to be something of a status code
-        # Ex: 0 could be regular operation, -1 is a spill, etc
-        # This function is set to call a set of event functions in sequence specified by `events`
-        # It would then return some status code corresponding to the completed events
-        out=[]
-        if dt is None:dt=0
+        """
+        This function calls a set of event functions in sequence specified by `events`, then returns
+        a tuple of status codes (one for each event).
+
+        Params:
+        - events (Tuple[Event]): The sequence of events to be executed
+        - dt (float): The amount of time elapsed (defaults to 0)
+
+        Returns:
+        - status (Tuple[int]) - A sequence of status codes for each event. At the moment 0 represents normal execution, and
+                                -1 represents an illegal state reached (like a vessel overflow or boiling an empty vessel).
+
+        """
+
+        status=[]
         for event in events:
             if event.other_vessel!=None:
-                out.append(self._event_dict[event.name](event.parameter,event.other_vessel,dt))
+                status.append(Vessel._event_dict[event.name](self,event.parameter, dt, event.other_vessel))
             else:
-                out.append(self._event_dict[event.name](event.parameter,dt))
+                status.append(Vessel._event_dict[event.name](self,event.parameter, dt))
 
         if not self.ignore_layout:
             self._mix((dt,),0)
             self._update_layers(0,0)
-        return out
+        return status
 
-    def _heat_contact(self,param,other_vessel,dt):
+    def _heat_contact(self, param, dt, other_vessel) -> int:
         """
         Rough Estimate of heat transfer so we can simulate putting something on a bunson burner
         or in a water bath.
@@ -337,14 +331,14 @@ class Vessel:
 
         return other_vessel.handle_overflow()
         
-    def _change_heat(self, param, other_vessel, dt) -> int:
+    def _change_heat(self, param, dt, other_vessel) -> int:
         """
         Depricated function, consider using heat contact instead.
         """
         dQ=param[0]
-        return self._heat_contact([None,dQ],other_vessel,dt)
+        return self._heat_contact([None,dQ], dt, other_vessel)
     
-    def _pour_by_percent(self, param, other_vessel, dt ) -> int:
+    def _pour_by_percent(self, param, dt, other_vessel) -> int:
         """
         - Take each material in this vessel and transfer it's amount * fraction
             to other_vessel
@@ -373,7 +367,7 @@ class Vessel:
         other_vessel.validate_solutes()
         return other_vessel.handle_overflow()
 
-    def _pour_by_volume(self, param, other_vessel, dt) -> int:
+    def _pour_by_volume(self, param, dt, other_vessel) -> int:
         """
         Pour the same as _pour_by_percent but the fraction is determined by how much volume you want
         to pour vs how much of the vessel is filled.
@@ -382,9 +376,9 @@ class Vessel:
         filled_volume=self.filled_volume()
         if filled_volume<1e-12: return 0
         fraction = np.clip(volume/filled_volume,0,1)
-        return self._pour_by_percent([fraction], other_vessel, dt)
+        return self._pour_by_percent([fraction], dt, other_vessel)
     
-    def _drain_by_pixel(self, param, other_vessel, dt) -> int:
+    def _drain_by_pixel(self, param, dt, other_vessel) -> int:
         """
         This uses layer information to drain out the bottom N layers
         For each solvent:
@@ -499,9 +493,6 @@ class Vessel:
 
         for i,s in enumerate(s_names):
             self.solute_dict[s] = new_solute_amount[i]
-        
-
-        
 
         return 0
    
@@ -527,3 +518,26 @@ class Vessel:
             self._mix((0,),0)
             self._update_layers(0,0)
         return self._layers
+
+    @classmethod
+    def register(self, func: Callable, name: str):
+        """
+        The method to register an event function which updates a vessel instance
+        Param:
+        - func (Callable[[Vessel, Tuple, Optional[Vessel]], int]) - An event function which acts on one or two vessels.
+        - name (str): The name of the event function for registration
+        
+        """
+        if name in self._event_dict:
+            raise Exception(f"Cannot register the same Event ({name}) Twice!")
+        self._event_dict[name]=func
+    
+    _event_dict = {
+            'pour by volume': _pour_by_volume,
+            'pour by percent':_pour_by_percent,
+            'drain by pixel': _drain_by_pixel,
+            'mix': _mix,
+            'update layer': _update_layers,
+            'change heat': _change_heat,
+            'heat contact': _heat_contact,
+        }
