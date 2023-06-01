@@ -31,7 +31,7 @@ class Shelf:
         """
         TODO: Allow the starting vessels to be given as arguments.
         """
-        self._orig_vessels=vessels
+        self._orig_vessels=[v for v in vessels]
         assert n_working<=len(self._orig_vessels)
         self.n_working = n_working
         self.reset()
@@ -45,6 +45,8 @@ class Shelf:
         return self.vessels.pop(index)
     def __getitem__(self, slice):
         return self.vessels[slice]
+    def __setitem__(self, slice, item):
+        self.vessels[slice] = item
     def __delitem__(self, slice):
         del self.vessels[slice]
     def __len__(self):
