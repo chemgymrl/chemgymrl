@@ -159,7 +159,7 @@ class WaterOilExtract_v1(GenBench):
             shelf,
             actions,
             observations,
-            targets=targets
+            targets=targets,
             reward_function=e_rew,
         )
 

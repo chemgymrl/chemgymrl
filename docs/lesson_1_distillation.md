@@ -22,15 +22,15 @@ Visualization.use_mpl_light(size=2)
 
 ```
 
-We can see all the possible variations of the distillation bench environment which can vary depending on the input vessel, which is loaded into the boil vessel, as well as the target material. In this and following tutorials our target material will be dodecane
-
-We then get prompted with a message asking us to choose the environment we want to run. This is based off the indexing in the environment array we saw from the last cell.
+In this tutorial we will be looking at distillation and use GenWurtzDistill-v2 environment. The overall goal of this bench is to separate out a solute dissolved in oil by boiling off the oil. (We also want to separate the solute from any salt if present).
 
 
 ```python
 env = gym.make('GenWurtzDistill-v2')
 env.reset()
-_ = env.render()
+rgb = env.render()
+plt.imshow(rgb)
+plt.axis("off")
 plt.show()
 ```
 
