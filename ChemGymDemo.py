@@ -8,6 +8,7 @@ from gymnasium.utils.play import play
 
 
 #Visualization.set_backend("numba")
+Visualization.set_backend("pygame")
 Visualization.matplotVisualizer.legend_update_delay=100
 
 while True:

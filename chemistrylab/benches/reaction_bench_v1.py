@@ -269,7 +269,7 @@ class FictReactDemo_v0(GenBench):
             default_events = (Event("react", Reaction(react_info), None),),
             reward_function=r_rew,
             discrete=False,
-            max_steps=20
+            max_steps=500
         )
         
     def get_keys_to_action(self):

@@ -42,7 +42,6 @@ def fill_line(arr,x1,y1,x2,y2,lw):
                 A=min(A,max(-3*d/lw,1-(lw/3.2-(X*X+Y*Y)**0.5)/0.4))
             arr[i][j] = max(A,0)*255
 
-
 def to_rgb(x):
   """Converts a 4-channel rgba image into a 3-channel rgb image"""
   # assume rgb premultiplied by alpha
@@ -125,7 +124,6 @@ class numbaVisualizer():
         font = ImageFont.truetype("arial.ttf", h//10)
         draw.text((5, -2), target, (0,0,0), font=font)
         return np.asarray(image).transpose(1,0,2)[:,::-1,:3]
-
 
 class matplotVisualizer():
 
@@ -284,17 +282,196 @@ class matplotVisualizer():
         fig.tight_layout()
         plt.show()
 
-__backends = dict(numba=numbaVisualizer,matplotlib=matplotVisualizer)
-__backend="matplotlib"
+class pygameVisualizer():
+    """
+    Class to visualize the chemistry benches.
+    
+    The dictionary viz gives a list of observations the class can visualize. These should correspond
+    to observations which come from the characterization bench.
+
+    Call get_rgb(vessels) to get an rgb image of your vessel observations (which visualize all observations set in the
+    characterization bench)
+
+    The resultant image is tiled such that every row has one type of observation, and every column contains all observations
+    for a single vessel.
+
+    """
+    def __init__(self, char_bench):
+        """
+        Args:
+        - char_bench (CharacterizationBench): Characterization bench with info on what observations we need.
+        """
+        self.char_bench = char_bench
+        self.viz=dict(
+            spectra=self.render_spectra,
+            layers=self.render_layers,
+            PVT=self.render_PVT,
+            targets=self.render_target,
+        )
+
+        self.heights = dict(
+            spectra=0.5,
+            layers=1,
+            PVT=0.25,
+            targets=0.125,
+        )
+        self.w=480
+        self.screen_height = sum(self.heights[a] for a in self.char_bench.observation_list if a in self.heights)*self.w
+        global pygame, gfxdraw
+        try:
+            import pygame
+            from pygame import gfxdraw
+        except ImportError:
+            raise DependencyNotInstalled(
+                "pygame is not installed, run `pip install gym[classic_control]`"
+            )
+        pygame.init()
+
+        self.targets = {t:self._prerender_text('Target: '+t,self.w/10) for t in char_bench.targets}
+        self.misc_text = {x: self._prerender_text(x,self.w/20) for x in ["Wavelength","Absorbance"]}
+        self.misc_text["Absorbance"] = pygame.transform.rotate(self.misc_text["Absorbance"],90)
+
+    def get_rgb(self,vessels):
+
+        """
+        Create an rgb image corresponding to the observations of each vessel.
+        """
+
+        obs_list = [a for a in self.char_bench.observation_list if a in self.viz]
+
+        self.surf = pygame.Surface((self.w*len(vessels), self.screen_height))
+        self.surf.fill((255, 255, 255))
+
+        for j,v in enumerate(vessels):
+          cur_height = 0
+          for i,func in enumerate(obs_list):
+            self.viz[func](v, j*self.w, cur_height)
+            cur_height += self.heights[func]*self.w
+        
+        return np.transpose(
+                np.array(pygame.surfarray.pixels3d(self.surf)), axes=(1, 0, 2)
+            )
+
+
+    def render_spectra(self,vessel, x, y):
+        """
+        Method to visualize the spectral information of a vessel.
+
+        Args:
+        - vessel (Vessel): The vessel inputted for spectroscopic analysis.
+        - x (int): Position of the top left corner of this image tile
+        - y (int): Position of the top right corner of ths image tile
+        """
+        spectrum = np.clip( y + self.w*5/12*(1 - self.char_bench.get_spectra(vessel)), y+1, y+self.w*5/12-2)
+        xs = np.linspace(0, 1, 100) * self.w*5/6 + x +self.w/12
+        xys = list(zip(xs, spectrum))
+        pygame.draw.aalines(self.surf, points=xys, closed=False, color=(30, 30, 255))
+
+        bbox = [(self.w/12+x,y),(self.w/12+x,y+self.w*5/12-1),(self.w*11/12+x,y+self.w*5/12-1),(self.w*11/12+x,y)]
+
+        pygame.draw.lines(self.surf, points=bbox, closed=True, color=(0, 0, 0))
+
+        self.surf.blit(self.misc_text["Wavelength"],(x+self.w*5/12, y+self.w*5/12))
+        self.surf.blit(self.misc_text["Absorbance"],(x+self.w/24, y+self.w/12))
+
+    def _prerender_text(self, text, fs):
+        """
+        Returns a render of the input text
+        
+        Args:
+        - text (str): The text to render
+        - fs (float): The font size of the text
+        """
+        font = pygame.font.SysFont(None, int(fs))
+        img = font.render(text, True, (0, 0, 0))
+        return img
+    def render_target(self, vessel, x, y):
+        """
+        Method to display the benches target.
+
+        Args:
+        - vessel (Vessel): A vessel
+        - x (int): The target will only be rendered if x=0
+        - y (int): Position of the top right corner of ths image tile
+        """
+        if x>0:return
+        img = self.targets[self.char_bench.target]
+        self.surf.blit(img, (0, y))
+
+    def render_layers(self,vessel, x, y):
+        """
+        Method to visualize the layer information of a vessel.
+
+        Args:
+        - vessel (Vessel): The vessel inputted for layer analysis.
+        - x (int): Position of the top left corner of this image tile
+        - y (int): Position of the top right corner of ths image tile
+        """
+
+        cvals = np.array([mat._color for mat in vessel._layer_mats]+[0.65])
+        cnames = [mat._name for mat in vessel._layer_mats]+["air"]
+        for i,name in enumerate(cnames):
+            #cache the rendered text to save time
+            if not name in self.misc_text:
+                color = (255*cvals[i],178*cvals[i]+60,178*cvals[i]+60)
+                # Drawing Rectangle
+                im = self._prerender_text("     "+name,self.w/20)
+                pygame.draw.rect(im, color, pygame.Rect(self.w/100, self.w/240, self.w/40, self.w/40))
+                self.misc_text[name] = im
+
+            self.surf.blit(self.misc_text[name], (x+self.w*2/3, y+i*20+self.w/12))
+
+
+        im = np.zeros([1,100,3],dtype=np.uint8)
+
+        im[:] = vessel.get_layers()[None,::-1,None]*255
+        im[:,:,1:] = im[:,:,1:]*0.7
+        im[:,:,1:]+=60
+
+        surf = pygame.surfarray.make_surface(im)
+        surf = pygame.transform.scale(surf,(self.w/2,self.w*5/6))
+        self.surf.blit(surf, (x+self.w/6, y+self.w/12))
+
+        bbox = [(self.w/6+x,y+self.w/12),(self.w/6+x,y+self.w*11/12),(self.w*2/3+x,y+self.w*11/12),(self.w*2/3+x,+self.w/12)]
+
+        pygame.draw.lines(self.surf, points=bbox, closed=False, color=(0, 0, 0),width=int(self.w/120))
+
+
+    def render_PVT(self, vessel, x, y):
+        """
+        Method to create a bar graph of the pressure,volume, and temperature of a vessel
+
+        Args:
+        - vessel (Vessel): Vessel we want pvt info from.
+        - x (int): Position of the top left corner of this image tile
+        - y (int): Position of the top right corner of ths image tile
+        """
+        if not "PVT" in self.misc_text:
+            self.misc_text["PVT"] = pygame.Surface((self.w/4,self.w/4))
+            self.misc_text["PVT"].fill((255, 255, 255))
+            self.misc_text["PVT"].blit(self._prerender_text("Temperature",self.w/20), (0,self.w/36))
+            self.misc_text["PVT"].blit(self._prerender_text("Volume",self.w/20), (0,self.w*4/36))
+            self.misc_text["PVT"].blit(self._prerender_text("Pressure",self.w/20), (0,self.w*7/36   ))
+        t,v,p = self.char_bench.encode_PVT(vessel)
+        pygame.draw.rect(self.surf, (255,0,0), pygame.Rect(x+self.w/4, y,             self.w*t*0.75, self.w/12))
+        pygame.draw.rect(self.surf, (0,0,255), pygame.Rect(x+self.w/4, y+self.w/12,   self.w*v*0.75, self.w/12))
+        pygame.draw.rect(self.surf, (255,30,255), pygame.Rect(x+self.w/4, y+self.w/6, self.w*p*0.75, self.w/12))
+
+        self.surf.blit(self.misc_text["PVT"],(x, y))
+
+__backends = dict(numba=numbaVisualizer,matplotlib=matplotVisualizer, pygame=pygameVisualizer)
+try:
+    import pygame
+    __backend="pygame"
+except:
+    __backend="matplotlib"
+
 def set_backend(backend: str):
     global __backend
     if backend in __backends:
         __backend = backend
     else:
         __backend = "numba"
-
-
-
 
 def use_mpl_dark(size=2):
     global RES
@@ -315,7 +492,6 @@ def use_mpl_light(size=2):
         'axes.edgecolor':'black', 'axes.labelcolor':'black',
         'text.color':'black','xtick.color':'black',
         'ytick.color':'black','font.size': 12*RES, 'figure.figsize': (size*8,size*4)})
-
 
 def Visualizer(char_bench):
     return __backends[__backend](char_bench)
