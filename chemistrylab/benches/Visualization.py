@@ -413,10 +413,10 @@ class pygameVisualizer():
         for i,name in enumerate(cnames):
             #cache the rendered text to save time
             if not name in self.misc_text:
-                color = (255*cvals[i],178*cvals[i]+60,178*cvals[i]+60)
+                color = (255*cvals[i],128*cvals[i]+100,128*cvals[i]+100)
                 # Drawing Rectangle
-                im = self._prerender_text("     "+name,self.w/20)
-                pygame.draw.rect(im, color, pygame.Rect(self.w/100, self.w/240, self.w/40, self.w/40))
+                im = self._prerender_text(" "*6+name,self.w/20)
+                pygame.draw.rect(im, color, pygame.Rect(self.w/50, self.w/240, self.w/40, self.w/40))
                 self.misc_text[name] = im
 
             self.surf.blit(self.misc_text[name], (x+self.w*2/3, y+i*20+self.w/12))
@@ -425,8 +425,8 @@ class pygameVisualizer():
         im = np.zeros([1,100,3],dtype=np.uint8)
 
         im[:] = vessel.get_layers()[None,::-1,None]*255
-        im[:,:,1:] = im[:,:,1:]*0.7
-        im[:,:,1:]+=60
+        im[:,:,1:] = im[:,:,1:]/2
+        im[:,:,1:]+=100
 
         surf = pygame.surfarray.make_surface(im)
         surf = pygame.transform.scale(surf,(self.w/2,self.w*5/6))
@@ -449,15 +449,18 @@ class pygameVisualizer():
         if not "PVT" in self.misc_text:
             self.misc_text["PVT"] = pygame.Surface((self.w/4,self.w/4))
             self.misc_text["PVT"].fill((255, 255, 255))
-            self.misc_text["PVT"].blit(self._prerender_text("Temperature",self.w/20), (0,self.w/36))
-            self.misc_text["PVT"].blit(self._prerender_text("Volume",self.w/20), (0,self.w*4/36))
-            self.misc_text["PVT"].blit(self._prerender_text("Pressure",self.w/20), (0,self.w*7/36   ))
+            self.misc_text["PVT"].blit(self._prerender_text(" Temperature",self.w/20), (0,self.w/36))
+            self.misc_text["PVT"].blit(self._prerender_text(" "*11+"Volume",self.w/20), (0,self.w*4/36))
+            self.misc_text["PVT"].blit(self._prerender_text(" "*8+"Pressure",self.w/20), (0,self.w*7/36   ))
         t,v,p = self.char_bench.encode_PVT(vessel)
         pygame.draw.rect(self.surf, (255,0,0), pygame.Rect(x+self.w/4, y,             self.w*t*0.75, self.w/12))
         pygame.draw.rect(self.surf, (0,0,255), pygame.Rect(x+self.w/4, y+self.w/12,   self.w*v*0.75, self.w/12))
         pygame.draw.rect(self.surf, (255,30,255), pygame.Rect(x+self.w/4, y+self.w/6, self.w*p*0.75, self.w/12))
-
         self.surf.blit(self.misc_text["PVT"],(x, y))
+
+        bbox = [(self.w/4+x,y),(self.w/4+x,y+self.w/4),(self.w+x-1,y+self.w/4),(self.w+x-1,y)]
+
+        pygame.draw.lines(self.surf, points=bbox, closed=True, color=(0, 0, 0))
 
 __backends = dict(numba=numbaVisualizer,matplotlib=matplotVisualizer, pygame=pygameVisualizer)
 try:
