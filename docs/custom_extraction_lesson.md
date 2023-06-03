@@ -154,7 +154,7 @@ observations = ["layers"]
 ```python
 
 class WaterOilExtract_v1(GenBench):
-    def __init__():
+    def __init__(self):
         super().__init__(
             shelf,
             actions,
@@ -170,12 +170,16 @@ Now we just have to add some code to allow the new environment to be recognized 
 
 ```python
 
+import gymnasium as gym
 from gymnasium.envs.registration import register
 
 register(
     id='WaterOilExtract-v1',
-    entry_point='chemistrylab.extract_bench.methyl_red:WaterOilExtract_v1',
-    max_episode_steps=100
+    entry_point=__name__+':WaterOilExtract_v1',
 )
+
+env = gym.make("WaterOilExtract-v1")
+
+print(env.action_space)
 ```
 
