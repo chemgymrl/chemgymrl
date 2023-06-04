@@ -275,6 +275,61 @@ display(
 </table>
    
 
+# Customizing the event queue
+
+You can add custom events to the Vessel class by registering them with `Vessel.register(f: Callable, f_id: str)`. Functions must be of the following form:
+```python
+f(vessel: Vessel, dt: float, other_vessel: Optional[Vessel], *args)
+```
+This will correspond to an Event of the form
+```python
+Event(f_id, args, other_vessel)
+```
+
+Below is an example of how to register a custom function:
+
+```python
+
+from chemistrylab.chem_algorithms.vessel import Vessel,Event
+from chemistrylab.chem_algorithms.material import Material,H2O
+from typing import NamedTuple, Tuple, Callable, Optional
+
+def add_material(vessel: Vessel, dt: float, other_vessel: Optional[Vessel], material: Material):
+    """
+    Custom method to add a material to the vessel's material dict
+    
+    Args:
+    - vessel (Vessel): The vessel you want to put the material in
+    - dt (unused): How much time has passed
+    - other_vessel (unused): A second affected vessel
+    - material (Material): The material to add
+    
+    """
+    assert other_vessel is None
+    key = str(material)
+    materials=vessel.material_dict
+    if key in materials:
+        materials[key].mol+=material.mol
+    else:
+        # Create a new material with the same class and number of mols
+        materials[key] = material.ration(1)
+
+    # Rebuild the vessel's solute dict if new solvents have been added
+    vessel.validate_solvents()
+    vessel.validate_solutes()
+    return vessel.handle_overflow()
+
+Vessel.register(add_material,"add material")
+
+
+v = Vessel("Test Vessel")
+event = Event("add material",(H2O(mol=1),),None)
+v.push_event_to_queue([event])
+
+display(v.get_material_dataframe())
+```
+
+
 
 #### The Workflow
   
