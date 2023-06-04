@@ -203,7 +203,7 @@ class Reaction():
     
     
 
-def react(vessel, reaction, dt):
+def react(vessel, dt, other_vessel, reaction):
     reaction.update_concentrations(vessel , dt)
     return 0
 

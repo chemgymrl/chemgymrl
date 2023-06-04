@@ -124,7 +124,7 @@ def wurtz_vessel(add_mat=""):
     extraction_vessel.validate_solvents()
     extraction_vessel.validate_solutes()
 
-    extraction_vessel._mix((-1000,),-1000)
+    extraction_vessel._mix(-1000,None,-1000)
 
     return extraction_vessel, add_mat
 

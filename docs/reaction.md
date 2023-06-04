@@ -17,7 +17,7 @@ When the agent performs enough positive actions and is satisfied with the amount
 The input to the reaction bench is initialized in the `reaction_bench_v1.py` file. 
 
 ```python
-class GeneralWurtzReact_v0(GenBench):
+class GeneralWurtzReact_v2(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
     """
@@ -35,21 +35,21 @@ class GeneralWurtzReact_v0(GenBench):
             get_mat("Na",3),
         ])
         actions = [
-            Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',   [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
         
-        super(GeneralWurtzReact_v0, self).__init__(
+        super(GeneralWurtzReact_v2, self).__init__(
             shelf,
             actions,
             ["PVT","spectra","targets"],
-            targets=react_info.PRODUCTS[:-1],
-            default_events = (Event("react", Reaction(react_info), None),),
+            targets=react_info.PRODUCTS,
+            default_events = (Event("react", (Reaction(react_info),), None),),
             reward_function=r_rew,
             discrete=False,
             max_steps=20

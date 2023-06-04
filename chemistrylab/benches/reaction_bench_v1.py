@@ -69,11 +69,11 @@ class GeneralWurtzReact_v2(GenBench):
             get_mat("Na",3),
         ])
         actions = [
-            Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',   [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
@@ -83,7 +83,7 @@ class GeneralWurtzReact_v2(GenBench):
             actions,
             ["PVT","spectra","targets"],
             targets=react_info.PRODUCTS,
-            default_events = (Event("react", Reaction(react_info), None),),
+            default_events = (Event("react", (Reaction(react_info),), None),),
             reward_function=r_rew,
             discrete=False,
             max_steps=20
@@ -107,11 +107,11 @@ class GeneralWurtzReact_v0(GenBench):
             get_mat("Na",3),
         ])
         actions = [
-            Action([0],    [ContinuousParam(156,307,0,500)],   'heat contact',   [0],  0.01,  False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0.01,  False),
+            Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',     [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
 
         react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
@@ -121,7 +121,7 @@ class GeneralWurtzReact_v0(GenBench):
             actions,
             ["PVT","spectra","targets"],
             targets=react_info.PRODUCTS[:-1],
-            default_events = (Event("react", Reaction(react_info), None),),
+            default_events = (Event("react", (Reaction(react_info),), None),),
             reward_function=r_rew,
             discrete=False,
             max_steps=20
@@ -149,11 +149,11 @@ class FictReact_v2(GenBench):
         ])
 
         actions = [
-            Action([0],    [ContinuousParam(273,373,0,300)],   'heat contact',    [0],   0.01,   False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([0],    [ContinuousParam(273,373,0,(300,))],  'heat contact',     [0],   0.01,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
         
         targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
@@ -164,7 +164,7 @@ class FictReact_v2(GenBench):
             actions,
             ["PVT","spectra","targets"],
             targets=targets,
-            default_events = (Event("react", Reaction(react_info), None),),
+            default_events = (Event("react", (Reaction(react_info),), None),),
             reward_function=r_rew,
             discrete=False,
             max_steps=20
@@ -188,11 +188,11 @@ class FictReactBandit_v0(GenBench):
         ])
 
         actions = [
-            Action([0],    [ContinuousParam(273,373,0,300)],   'heat contact',    [0],   0.01,   False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],   0.01,   False),
+            Action([0],    [ContinuousParam(273,373,0,(300,))],  'heat contact',     [0],   0.01,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
         if targets is None:
             targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
@@ -203,7 +203,7 @@ class FictReactBandit_v0(GenBench):
             actions,
             ["targets"],
             targets=targets,
-            default_events = (Event("react", Reaction(react_info), None),),
+            default_events = (Event("react", (Reaction(react_info),), None),),
             reward_function=r_rew,
             discrete=False,
             max_steps=20
@@ -251,11 +251,11 @@ class FictReactDemo_v0(GenBench):
         ])
 
         actions = [
-            Action([0],    [ContinuousParam(273,373,0,12)],    'heat contact',     [0],  0,   False),
-            Action([1],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
-            Action([2],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
-            Action([3],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
-            Action([4],    [ContinuousParam(0,1,1e-3,None)],   'pour by percent',  [0],  0,   False),
+            Action([0],    [ContinuousParam(273,373,0,(12,))],  'heat contact',     [0],  0,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
         ]
         
         targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
@@ -266,7 +266,7 @@ class FictReactDemo_v0(GenBench):
             actions,
             ["PVT","spectra","targets"],
             targets=targets,
-            default_events = (Event("react", Reaction(react_info), None),),
+            default_events = (Event("react", (Reaction(react_info),), None),),
             reward_function=r_rew,
             discrete=False,
             max_steps=500

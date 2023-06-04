@@ -33,7 +33,7 @@ class ContinuousParam(NamedTuple):
     min_val: float
     max_val: float
     thresh: float
-    other: object
+    other: tuple
 
 def default_reward(vessels,targ):
     sum_=0
@@ -167,7 +167,7 @@ class GenBench(gym.Env):
                 activ=val*(val>thresh)
                 rescaled = activ*(max_val-min_val)+min_val
                 #create a new event with this
-                param=(rescaled,other)
+                param=(rescaled,*other)
                 derived_event = Event(event.name,param,event.other_vessel)
                 #perform the new event
                 self.shelf[v].push_event_to_queue(events=[derived_event], dt=0.0)

@@ -238,25 +238,21 @@ class Vessel:
                                 -1 represents an illegal state reached (like a vessel overflow or boiling an empty vessel).
 
         """
-
+        event_dict = type(self)._event_dict
         status=[]
         for event in events:
-            if event.other_vessel!=None:
-                status.append(Vessel._event_dict[event.name](self,event.parameter, dt, event.other_vessel))
-            else:
-                status.append(Vessel._event_dict[event.name](self,event.parameter, dt))
-
+            status.append(event_dict[event.name](self, dt, event.other_vessel, *event.parameter))
         if (not self.ignore_layout) and update_layers:
-            self._mix((dt,),0)
-            self._update_layers(0,0)
+            self._mix(0,None,dt)
+            self._update_layers(0,None)
         return status
 
-    def _heat_contact(self, param, dt, other_vessel) -> int:
+    def _heat_contact(self, dt, other_vessel, Tf, ht) -> int:
         """
         Rough Estimate of heat transfer so we can simulate putting something on a bunson burner
         or in a water bath.
         Param:
-        - T (Optional[float]): The temperature of the heat source
+        - Tf (Optional[float]): The temperature of the heat source
         - ht (float): heat transfer coeff multiplied by how long you have
         
         Note: When T is None, ht will be used as heat Q
@@ -271,7 +267,6 @@ class Vessel:
             4. set vessel temperature to T
 
         """
-        Tf,ht=param
         use_dQ = (Tf is None)
         if use_dQ:
             # Adding heat (dQ) is the same as linearly approximating the exponential and log functions and setting
@@ -332,14 +327,13 @@ class Vessel:
 
         return other_vessel.handle_overflow()
         
-    def _change_heat(self, param, dt, other_vessel) -> int:
+    def _change_heat(self, dt, other_vessel, dQ) -> int:
         """
         Depricated function, consider using heat contact instead.
         """
-        dQ=param[0]
-        return self._heat_contact([None,dQ], dt, other_vessel)
+        return self._heat_contact(dt, other_vessel, None, dQ)
     
-    def _pour_by_percent(self, param, dt, other_vessel) -> int:
+    def _pour_by_percent(self, dt, other_vessel, fraction) -> int:
         """
         - Take each material in this vessel and transfer it's amount * fraction
             to other_vessel
@@ -348,8 +342,8 @@ class Vessel:
 
         TODO: Consider making this call a theoretical _add_materials function
         """
-        if param[0]<1e-16:return 0
-        fraction = np.clip(param[0],0,1)
+        if fraction<1e-16:return 0
+        fraction = np.clip(fraction,0,1)
         other_mats=other_vessel.material_dict
         #Iterate through each material in the vessel
         for key,mat in self.material_dict.items():
@@ -368,18 +362,17 @@ class Vessel:
         other_vessel.validate_solutes()
         return other_vessel.handle_overflow()
 
-    def _pour_by_volume(self, param, dt, other_vessel) -> int:
+    def _pour_by_volume(self, dt, other_vessel, volume) -> int:
         """
         Pour the same as _pour_by_percent but the fraction is determined by how much volume you want
         to pour vs how much of the vessel is filled.
         """
-        volume=param[0]
         filled_volume=self.filled_volume()
         if filled_volume<1e-12: return 0
         fraction = np.clip(volume/filled_volume,0,1)
-        return self._pour_by_percent([fraction], dt, other_vessel)
+        return self._pour_by_percent(dt, other_vessel, fraction)
     
-    def _drain_by_pixel(self, param, dt, other_vessel) -> int:
+    def _drain_by_pixel(self, dt, other_vessel, n_pixel) -> int:
         """
         This uses layer information to drain out the bottom N layers
         For each solvent:
@@ -388,8 +381,6 @@ class Vessel:
         
         """
         if self.ignore_layout:return -2
-
-        n_pixel = param[0]
 
         other_mats=other_vessel.material_dict
 
@@ -429,14 +420,14 @@ class Vessel:
         other_vessel.validate_solutes()
         return other_vessel.handle_overflow()
 
-    def _mix(self, param, dt) -> int:
+    def _mix(self, dt, other_vessel, t) -> int:
         """
         Realistically just a wrapper for separate.mix
 
         This updates the amounts dissolved, layer positions and layer variances  
         """
         if self.ignore_layout:return -2
-        t=np.float32(param[0]) #or replace dt
+        t=np.float32(t) #or replace dt
         # Make air layer properties
         d_air = 1.225 #in g/L
         c_air = 0.65 #chosen color of air
@@ -497,14 +488,13 @@ class Vessel:
 
         return 0
    
-    def _update_layers(self, param, dt) -> int:
+    def _update_layers(self, dt, other_vessel) -> int:
 
         """
         This wraps separate.map_to_state
         It's used to get a layer image as well as layer information
         TODO: Handle solutes having a volume
         """
-        _=param
 
         self._layers,self._hashed_layers = separate.map_to_state(
             self._layers_volume.astype(np.float32),
@@ -516,8 +506,8 @@ class Vessel:
 
     def get_layers(self):
         if self._layers is None:
-            self._mix((0,),0)
-            self._update_layers(0,0)
+            self._mix(0,None,0)
+            self._update_layers(0,None)
         return self._layers
 
     @classmethod
@@ -533,6 +523,7 @@ class Vessel:
             raise Exception(f"Cannot register the same Event ({name}) Twice!")
         self._event_dict[name]=func
     
+    #ANY SUBCLASSES SHOULD DEFINE THIS EXPLICITLY!!!
     _event_dict = {
             'pour by volume': _pour_by_volume,
             'pour by percent':_pour_by_percent,

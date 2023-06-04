@@ -165,7 +165,7 @@ class GeneralWurtzDistill_v2(GenBench):
             actions,
             ["layers","PVT","targets"],
             targets=targets,
-            default_events = (Event("react", reaction, None),),
+            default_events = (Event("react", (reaction,), None),),
             reward_function=d_rew,
         )
 
@@ -224,7 +224,7 @@ class WurtzDistillDemo_v0(GenBench):
             actions,
             ["layers","PVT","targets"],
             targets=targets,
-            default_events = (Event("react", reaction, None),),
+            default_events = (Event("react", (reaction,), None),),
             reward_function=d_rew,
             max_steps=500
         )
