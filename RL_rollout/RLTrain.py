@@ -141,11 +141,10 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
 from stable_baselines3.common.env_util import make_vec_env
 #from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
-import gym
+import gymnasium as gym
 #from wandb.integration.sb3 import WandbCallback
 #import wandb
 import sys
-sys.path.append('../')
 import chemistrylab
 import numpy as np
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm

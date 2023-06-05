@@ -30,26 +30,25 @@ Example call:
 """
 
 
-import sys
-
-sys.path.append("../")
 
 from RLTrain import *
 import pandas as pd
 import numpy as np
-print(ALGO)
+
 from Heuristic_Policies import *
 
 
     
 
-HEURISTICS = {"WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,"WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic,
-             "FR1H":FictReact1Heuristic
-             
+HEURISTICS = {
+                "WRH":WurtzReactHeuristic,"FR2H":FictReact2Heuristic,
+                "WDH":WurtzDistillHeuristic,"WEH":WurtzExtractHeuristic
              }
 
 
-
+def salt_check(env):
+    return any([(mat in vessel.material_dict) and (vessel.material_dict[mat].mol>1e-3)
+                for vessel in env.shelf[:3] for mat in ["Na","Cl","NaCl"]])
 
 
 if __name__=="__main__":
@@ -85,19 +84,15 @@ if __name__=="__main__":
     else:
         model = ALGO[op.algorithm].load(sys.argv[1]+"/best_model")
         print("Best:",model)
-        
-    
-    
-
-
     
     rollout = {"InState":[],"Action":[],"Reward":[],"OutState":[],"Done":[],"Info":[],"Step":[]}
-    obs=env.reset()
+    obs,*_=env.reset()
+    print(obs.shape)
     i=0
     for x in range(op.steps):
         #testing taking actions
         act,_=model.predict(obs)
-        newobs,rew,done,info = env.step(act)
+        newobs,rew,done,info,*_ = env.step(act)
         rollout["InState"]+=[obs]
         rollout["Action"]+=[act]
         rollout["Reward"]+=[rew]
@@ -111,7 +106,7 @@ if __name__=="__main__":
         obs=newobs
         if done:
             i=0
-            obs = env.reset()
+            obs,*_ = env.reset()
             
     table = pd.DataFrame.from_dict(rollout, orient="columns")#,columns = ["S","A","R","S","D","I"])
     

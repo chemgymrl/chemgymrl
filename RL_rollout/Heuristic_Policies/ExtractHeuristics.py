@@ -3,8 +3,8 @@ from Heuristic import Heuristic
 
 
 class WurtzExtractHeuristic(Heuristic):
-    level_2 = "501474010404040480"
-    level_3 = "5074700004040404647472040404040480"
+    level_2 = "501474020404040480"
+    level_3 = "5074740204040404647474040404040480"
     
     def mix_check(self,o):
         if self.step==0:
