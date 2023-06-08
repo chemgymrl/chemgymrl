@@ -1,9 +1,3 @@
-"""
-The aim of this bench is to replace extraction and distillation benches with one where
-you can set the actions using a dictionary or json file.
-
-"""
-
 #useful imports
 from typing import NamedTuple, Tuple, Callable, Optional
 import gymnasium as gym
@@ -11,11 +5,10 @@ import numpy as np
 
 #Imports which need to go soon
 import sys
-sys.path.append("../../") # to access chemistrylab
-from chemistrylab.chem_algorithms import vessel
+from chemistrylab import vessel
 from chemistrylab.reactions.reaction import Reaction
 from chemistrylab.benches.characterization_bench import CharacterizationBench
-from chemistrylab.benches.Visualization import Visualizer
+from chemistrylab.util.Visualization import Visualizer
 
 from chemistrylab.lab.shelf import Shelf
 
@@ -47,21 +40,20 @@ def default_reward(vessels,targ):
 class GenBench(gym.Env):
     """A class representing an bench setup for conducting experiments.
 
-    This class represents a bench setup. The setup consists of a
-    set of vessels, an action list that describes the actions to be performed on
-    the vessels, and a Reaction class simulating the chemical reactions taking place.
+    This class represents a bench setup. The setup consists of a shelf with vessels, 
+    an action list that describes the actions that can be performed on the vessels by the agent, and 
+    a set of events which are performed on the vessels at the end of each step to update it's state 
+    (ex. a chemical reaction).
 
     Args:
-    - shelf (Shelf): A shelf object to store vessels.
-    - action_list (list): A list of Action objects containing information describing what each action is.
-    - observation_list (Tuple[str]): List of observations to obtain from the characteriation bench
-    - targets (Tuple[str]): The target materials for this bench
-    - default_events (Tuple[Event]): A list of events to be performed on all working vessels in a bench at the end of each step.
-    - discrete (bool): set to True for a discrete action space and False for a continuous one
-    - reward_function (Callable): A function which accepts a target and a list of vessels and outputs a reward.
-    - max_steps (int): Maximum number of steps for an episode
-    Keyword Args:
-    - kwargs: To be determined based on need.
+        shelf (Shelf): A shelf object to store vessels.
+        action_list (list): A list of Action objects containing information describing what each action is.
+        observation_list (Tuple[str]): List of observations to obtain from the characteriation bench
+        targets (Tuple[str]): The target materials for this bench
+        default_events (Tuple[Event]): A list of events to be performed on all working vessels in a bench at the end of each step.
+        reward_function (Callable): A function which accepts a target and a list of vessels and outputs a reward.
+        discrete (bool): set to True for a discrete action space and False for a continuous one
+        max_steps (int): Maximum number of steps for an episode
 
     """
     def __init__(
@@ -74,7 +66,6 @@ class GenBench(gym.Env):
         reward_function: Callable = default_reward,
         discrete=True,
         max_steps=50,
-        **kwargs
     ):
         
                 
@@ -121,15 +112,14 @@ class GenBench(gym.Env):
         
     def build_event(self,action,param):
         """
-        Builds a list of (index, Event) tuples where index is the index of the vessel the Event will occur in.
+        Builds a list of (index, :class:`~chemistrylab.vessel.Event`) tuples where index is the index of the vessel the Event will occur in.
 
         Args:
-        - action (Action): An action containing information about the vessels and parameters
-                involved in the event.
-        - param (tuple): A tuple containing parameters for the event.
+            action (Action): An action containing information about the vessels and parameters involved in the event.
+            param (tuple): A tuple containing parameters for the event.
 
         Returns:
-        - events (List[Tuple]): A list of (index, Event) tuples, where index is the index of the vessel the Event will occur in.
+            List[Tuple]: A list of (index, Event) tuples, where index is the index of the vessel the Event will occur in.
         """
         #watch out for null case
         if action.affected_vessels is None:
@@ -150,9 +140,8 @@ class GenBench(gym.Env):
         (May create a variable to replace 0.01)
 
         Returns:
-        - done (bool): Whether or not the episode is done.
-        - reward (bool): A reward associated with taking the action  (UNUSED)
-            (ex if it causes a spill you may get a reward of -0.1).
+            done (bool): Whether or not the episode is done.
+            reward (bool): A reward associated with taking the action  (unused).
         """
         for i,(events,_action) in enumerate(self.actions):
             val=action[i]
@@ -182,9 +171,8 @@ class GenBench(gym.Env):
         other visible vessels are fed an empty event with the same dt.
 
         Returns:
-        - done (bool): Whether or not the episode is done.
-        - reward (bool): A reward associated with taking the action 
-            (ex if it causes a spill you may get a reward of -0.1).
+            done (bool): Whether or not the episode is done.
+            reward (bool): A reward associated with taking the action (ex if it causes a spill you may get a reward of -0.1).
         """
         reward = 0
         events,_action = self.actions[action]
@@ -208,7 +196,7 @@ class GenBench(gym.Env):
         is used to generate an observation, and a reward function provides a reward (if a terminal state was reached).
         
         Args:
-        - action (int or 1D array): The action to be performed
+            action (int or 1D array): The action to be performed
         """
         if self.discrete:
             done,reward = self._perform_discrete_action(action)

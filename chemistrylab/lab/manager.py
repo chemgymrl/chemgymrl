@@ -30,11 +30,10 @@ import os
 import sys
 
 import numpy as np
-sys.path.append("../../") # to access `chemistrylab`
-from chemistrylab.lab.lab import Lab
-from chemistrylab.lab.agent import RandomAgent, Agent
+import chemistrylab
 import datetime as dt
 
+Agent = object #TODO: add this actually
 
 class Manager:
     def __init__(self, mode='custom', agent=None):

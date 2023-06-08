@@ -1,30 +1,7 @@
 '''
 This file is part of ChemGymRL.
 
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
 
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
-
-Materials File
-
-:title: material.py
-
-:author:
-
-:history: 2021-02-18
-
-This file is intended to define the Material class, where materials and their properties can be
-defined, and numerous, already defined materials available for use. For consistency, the material
-properties must be consistent. The properties and their intended units are included below.
 
 Property : Intended Units -- Object Type -- Brief Description
     - `name` : N/A -- `str` -- The name of the material, used for identification purposes.
@@ -49,14 +26,14 @@ Property : Intended Units -- Object Type -- Brief Description
     - litres: volume in litres
     - vapour_enthalpy: heat to vaporize in J
 
-Moreover, the `get_materials` function gives a list of the already available materials.
+Moreover, the `REGISTRY` variable gives a dictionary of available materials.
 '''
 
 import inspect
 import numpy as np
 import math
 import sys
-from chemistrylab.ode_algorithms.spectra import diff_spectra as spec
+from chemistrylab.util.spectra import diff_spectra as spec
 
 REGISTRY = dict()
 def register(*material_classes):

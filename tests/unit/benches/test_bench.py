@@ -7,7 +7,7 @@ import time
 import pandas as pd
 import chemistrylab
 import numpy as np
-from chemistrylab.chem_algorithms import vessel, material
+from chemistrylab import vessel, material
 from copy import deepcopy
 from unittest import TestCase
 

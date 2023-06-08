@@ -24,7 +24,7 @@ def set_amounts(materials,solvents, material_classes, n, vessel):
 import numpy as np
 import numba
 from scipy.integrate import solve_ivp
-from chemistrylab.chem_algorithms import material,vessel
+from chemistrylab import material,vessel
 
 
 

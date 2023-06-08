@@ -16,9 +16,8 @@ along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 """
 import sys
 import numpy as np
-sys.path.append("../../") # to access `chemistrylab`
-from chemistrylab.chem_algorithms import material
-from chemistrylab.chem_algorithms.vessel import Vessel
+from chemistrylab import material
+from chemistrylab.vessel import Vessel
 from copy import deepcopy
 
 class Shelf:

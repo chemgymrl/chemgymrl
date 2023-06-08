@@ -9,16 +9,22 @@ class Event(NamedTuple):
     parameter: tuple
     other_vessel: Optional[object]
 
-def rebuild_solute_dict(solvent_dict, solute_dict, solvents):
+#Apparently documenting this isn't trivial :(
+Event.name.__doc__ = "The registered name of the event function."
+Event.parameter.__doc__ = "The parameters of the registered event function"
+Event.other_vessel.__doc__ = "The other vessel needed for this event if requred (ex the target vessel when pouring)."
+
+
+def _rebuild_solute_dict(solvent_dict, solute_dict, solvents):
     """
     Recreates the solute and solvent dict in the case where the solvents have changed.
     Args:
-    - solvent_dict (dict): The old solvent dict of (key,index) pairs
-    - solute_dict (dict): The old solute dict of (key,arr) pairs
-    - solvents (dict): The new list of solvents
+        solvent_dict (dict): The old solvent dict of (key,index) pairs
+        solute_dict (dict): The old solute dict of (key,arr) pairs
+        solvents (dict): The new list of solvents
     Returns:
-    - new_solvent_dict (dict): New set of (key,index) pairs
-    - new_solute_dict (dict): New set of (key,arr) pairs
+        new_solvent_dict (dict): New set of (key,index) pairs
+        new_solute_dict (dict): New set of (key,arr) pairs
     
     Note: This can be called less frequently if you allow solvents with zero amount to persist
     in the materials dict.
@@ -33,21 +39,21 @@ def rebuild_solute_dict(solvent_dict, solute_dict, solvents):
     return new_solvent_dict, new_solute_dict
 
 @numba.jit(nopython=True)
-def validate_solute_amounts(mol_solute, mol_solvent, mol_dissolved):
+def _validate_solute_amounts(mol_solute, mol_solvent, mol_dissolved):
     """
     Performs a series of consistency checks on the mol_dissolved array.
 
     Args:
-    - mol_solute (array): The total amount of each solute in the vessel (1D, size N)
-    - mol_solvent (array): The total amount of each solvent in the vessel (1D, size M)
-    - mol_dissolved (array) The amount of solute dissolved in each solvent (2D, shape [N,M])
+        mol_solute (array): The total amount of each solute in the vessel (1D, size N)
+        mol_solvent (array): The total amount of each solvent in the vessel (1D, size M)
+        mol_dissolved (array) The amount of solute dissolved in each solvent (2D, shape [N,M])
     
     Checks:
     - Make sure the sum of each row in mol_dissolved is equal to the value in mol_solute
-        - Strategies: Increase proportional to how much solvent there is
+    - Strategies: Increase proportional to how much solvent there is
                       Decrease proportional to how much is already dissolved
     - Make sure each column of mol_dissolved if the corresponding value in mol_solvent is 0
-        - Strategies: Set columns to 0 before doing the sum check if there is no solvent
+    - Strategies: Set columns to 0 before doing the sum check if there is no solvent
     """
     # First make sure there are solvents
     tot_solvent=mol_solvent.sum()
@@ -78,22 +84,50 @@ layer_values=np.linspace(0, 1, 100, endpoint=True, dtype=np.float32)-1.9e-2
 
 class Vessel:
     """
-    Class defining the Vessel object.
+    The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. 
+    It simulates actions performed within a lab, such as draining contents, performing reactions, 
+    mixing, pouring, etc. 
+
+    The most important method is :meth:`~Vessel.push_event_to_queue` . The rest of the functions are
+    either handeled in the backend or getter methods.
+
+    These are the default :class:`Event` functions:
+
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    | Event Name       | Event Description                                   | Event Parameters                        |
+    +==================+=====================================================+=========================================+
+    |  pour by volume  | Pour from self vessel to target vessel by certain   |   volume (:class:`python:float`)        |
+    |                  | volume                                              |                                         |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    |  pour by percent | Pour a fraction of all contents in one vessel into  |   fraction (:class:`python:float`)      |
+    |                  | another                                             |                                         |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    |  drain by pixel  | Drain from self vessel to target vessel by certain  |   n_pixel (:class:`python:int`)         |
+    |                  | pixel                                               |                                         |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    |  mix             | Shake the vessel or let it settle                   |   t (:class:`python:float`)             |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    |  update_layer    | Update self vessel's layer representation           |                                         |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    |  change heat     | Add or remove heat from the vessel                  |   dQ (:class:`python:float`)            |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+    |  heat contact    | Connect the vessel to a reservoir for heat transfer | Tf (float), ht (float)                  |
+    +------------------+-----------------------------------------------------+-----------------------------------------+
+
     """
 
     def __init__(
-            self,
-            label,
-            temperature=297.0,
-            volume=1.0,
-            ignore_layout=False
+            self, 
+            label: str, 
+            temperature: float = 297.0, 
+            volume: float = 1.0, 
+            ignore_layout: bool = False
         ):
         """
         Args:
-        - label (str): Name for the vessel
-        - temperature (float): Temperature of the vessel in Kelvin
-        - volume (float): Volume of the vessel in Litres
-        
+            label (str): Name for the vessel
+            temperature (float): Temperature of the vessel in Kelvin
+            volume (float): Volume of the vessel in Litres
         """
         #Functions to implement
         self.label=label
@@ -115,11 +149,11 @@ class Vessel:
     def __repr__(self):
         return self.label
 
-    def validate_solutes(self,checksum=True):
+    def validate_solutes(self, checksum: bool = True):
         """
         Turns the solute dict into a 2D array, gets a 1D array
         of solute amounts, as well as a 1D array of solvent amounts, then
-        performs consistency checks with validate_solute_amounts.
+        performs consistency checks with _validate_solute_amounts.
         """
         if self.ignore_layout:return
         n_solvents=len(self.solvents)
@@ -135,7 +169,7 @@ class Vessel:
         old_dict=self.solute_dict
         mol_dissolved=np.stack([old_dict[key] if key in old_dict else null for key in solutes])
         #run the validation
-        validate_solute_amounts(solute_mols, solvent_mols, mol_dissolved)
+        _validate_solute_amounts(solute_mols, solvent_mols, mol_dissolved)
         #set the new solute dict
         self.solute_dict={key:mol_dissolved[i] for i,key in enumerate(solutes)}
 
@@ -159,7 +193,7 @@ class Vessel:
             if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layer_volumes[-1]],
             dtype = np.float32)
             #make a new solvent dict
-            self.solvent_dict,self.solute_dict = rebuild_solute_dict(
+            self.solvent_dict,self.solute_dict = _rebuild_solute_dict(
                 self.solvent_dict, self.solute_dict, new_solvents
             )
             
@@ -173,7 +207,7 @@ class Vessel:
             #last entry is for air
             self._layers_position = np.zeros(n_solvents+1, dtype=np.float32)
 
-    def handle_overflow(self):
+    def _handle_overflow(self):
         """
         Uses flled_volume() to determine if there is an overflow, if yes, it dumps a proportion
         of the vessel contents in order to have filled_volume <= volume.
@@ -198,14 +232,26 @@ class Vessel:
         return sum(mat.litres for a,mat in self.material_dict.items())
 
     def get_material_dataframe(self):
+        """
+        Returns:
+            :class:`~pandas.DataFrame`: A DataFrame detailing all materials present in the Vessel.  
+        """
         info_dict = {key:(mat.mol,mat.phase,mat.is_solute(),mat.is_solvent()) for key,mat in self.material_dict.items()}
     
         return pd.DataFrame.from_dict(info_dict, orient="index",columns = ["Amount","Phase","Solute","Solvent"])
 
     def get_solute_dataframe(self):
+        """
+        Returns:
+            :class:`~pandas.DataFrame`: A [solutes, solvents] DataFrame detailing how much solute is dissolved in each solvent.  
+        """
         return pd.DataFrame.from_dict(self.solute_dict, orient="index",columns = self.solvents)
 
-    def get_layer_dataframe(self):                    
+    def get_layer_dataframe(self):
+        """
+        Returns:
+            :class:`~pandas.DataFrame`: A DataFrame containing the layer information of the vessel.  
+        """                    
         info_dict = {mat._name:(
             self._layers_volume[i],
             self._layers_position[i],
@@ -229,14 +275,14 @@ class Vessel:
         This function calls a set of event functions in sequence specified by `events`, then returns
         a tuple of status codes (one for each event).
 
-        Params:
-        - events (Tuple[Event]): The sequence of events to be executed
-        - dt (float): The amount of time elapsed (defaults to 0)
-        - update_layers (bool): Whether or not to update layer information at the end of the queue
-        Returns:
-        - status (Tuple[int]) - A sequence of status codes for each event. At the moment 0 represents normal execution, and
-                                -1 represents an illegal state reached (like a vessel overflow or boiling an empty vessel).
+        Args:
+            events (Tuple[Event]): The sequence of events to be executed.
+            dt (float): The amount of time elapsed (defaults to 0).
+            update_layers (bool): Whether or not to update layer information at the end of the queue.
 
+        Returns:
+            Tuple[int]: A sequence of status codes for each event. At the moment, 0 represents normal execution,
+            and -1 represents an illegal state reached (like a vessel overflow or boiling an empty vessel).
         """
         event_dict = type(self)._event_dict
         status=[]
@@ -325,7 +371,7 @@ class Vessel:
         other_vessel.validate_solvents()
         other_vessel.validate_solutes()
 
-        return other_vessel.handle_overflow()
+        return other_vessel._handle_overflow()
         
     def _change_heat(self, dt, other_vessel, dQ) -> int:
         """
@@ -360,7 +406,7 @@ class Vessel:
         # Rebuild the other vessel's solute dict if new solvents have been added
         other_vessel.validate_solvents()
         other_vessel.validate_solutes()
-        return other_vessel.handle_overflow()
+        return other_vessel._handle_overflow()
 
     def _pour_by_volume(self, dt, other_vessel, volume) -> int:
         """
@@ -418,7 +464,7 @@ class Vessel:
                     other_mats[u_key] = u_mat.ration(removed_amount/u_mat.mol)
         other_vessel.validate_solvents()
         other_vessel.validate_solutes()
-        return other_vessel.handle_overflow()
+        return other_vessel._handle_overflow()
 
     def _mix(self, dt, other_vessel, t) -> int:
         """
@@ -513,11 +559,11 @@ class Vessel:
     @classmethod
     def register(self, func: Callable, name: str):
         """
-        The method to register an event function which updates a vessel instance
-        Param:
-        - func (Callable[[Vessel, Tuple, Optional[Vessel]], int]) - An event function which acts on one or two vessels.
-        - name (str): The name of the event function for registration
-        
+        The method to register an event function which updates a vessel instance.
+
+        Args:
+            func (Callable[[Vessel, Tuple, Optional[Vessel]], int]): An event function which acts on one or two vessels.
+            name (str): The name of the event function for registration.
         """
         if name in self._event_dict:
             raise Exception(f"Cannot register the same Event ({name}) Twice!")

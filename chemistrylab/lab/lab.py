@@ -16,17 +16,11 @@ along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 """
 import sys
 from abc import ABC
-
-sys.path.append("../../") # to access `chemistrylab`
-sys.path.append('../../chemistrylab/reactions')
-from chemistrylab.lab.agent import RandomAgent, Agent
-from chemistrylab.lab.shelf import Shelf
-import gym
+import gymnasium as gym
 import chemistrylab
 import numpy as np
-from gym import envs
-from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 
+Agent = object
 
 class Lab(gym.Env, ABC):
     """

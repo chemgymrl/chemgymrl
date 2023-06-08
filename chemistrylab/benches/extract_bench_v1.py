@@ -1,28 +1,3 @@
-"""
-This file is part of ChemGymRL.
-
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
-
-Module to access and execute the ExtractWorld Engine
-
-:title: extractworld_v1.py
-
-:author: Chris Beeler and Mitchell Shahen
-
-:history: 2020-06-24
-"""
-
 # pylint: disable=invalid-name
 # pylint: disable=wrong-import-position
 
@@ -33,12 +8,10 @@ import sys
 from random import choice
 from copy import deepcopy
 
-# import local modules
-sys.path.append("../../") # to access `chemistrylab`
-from chemistrylab.chem_algorithms import material, vessel
+from chemistrylab.util.reward import RewardGenerator
+from chemistrylab import material, vessel
 from chemistrylab.benches.general_bench import *
 
-from chemistrylab.chem_algorithms.reward import RewardGenerator
 import importlib
 
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH

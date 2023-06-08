@@ -22,8 +22,7 @@ import math
 import numpy as np
 import sys
 
-sys.path.append("../../")
-from chemistrylab.chem_algorithms import material
+from chemistrylab import material
 
 
 def get_dissolved_amounts(vessel, desired_material):
