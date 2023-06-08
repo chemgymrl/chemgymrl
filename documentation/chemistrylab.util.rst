@@ -12,6 +12,14 @@ chemistrylab.util.Visualization module
    :undoc-members:
    :show-inheritance:
 
+chemistrylab.util.diff\_spectra module
+--------------------------------------
+
+.. automodule:: chemistrylab.util.diff_spectra
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 chemistrylab.util.reward module
 -------------------------------
 

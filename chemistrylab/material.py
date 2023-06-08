@@ -33,7 +33,7 @@ import inspect
 import numpy as np
 import math
 import sys
-from chemistrylab.util.spectra import diff_spectra as spec
+from chemistrylab.util import diff_spectra as spec
 
 REGISTRY = dict()
 def register(*material_classes):

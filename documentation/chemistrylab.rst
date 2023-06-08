@@ -1,17 +1,16 @@
 chemistrylab package
 ====================
 
-Package Tree
+Subpackages
 -----------
 
 .. toctree::
    :maxdepth: 4
 
-   chemistrylab.vessel   
+   chemistrylab.vessel
    chemistrylab.benches
    chemistrylab.extract_algorithms
    chemistrylab.lab
-   chemistrylab.ode_algorithms
    chemistrylab.reactions
    chemistrylab.util
    chemistrylab.material
