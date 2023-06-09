@@ -1,20 +1,5 @@
 '''
-This file is part of ChemGymRL.
-
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
-
-Module to define a universal reward function.
+This module provides a default set of reward functions.
 '''
 
 import copy
@@ -23,14 +8,14 @@ import numpy as np
 import sys
 
 from chemistrylab import material
+from chemistrylab.vessel import Vessel
 
-
-def get_dissolved_amounts(vessel, desired_material):
+def get_dissolved_amounts(vessel: Vessel, desired_material: str):
     """    
     Returns:
-    - min_amount (float): The amount material that could be produced if you removed the solvent
-        This is the minimum of (quantity/stoich_coeff) for each dissolved component
-    - contributions (float): Amount of mols of solutes to subtract from the total material amount
+        Tuple[float,float]: 
+            - The amount material that could be produced if you removed the solvent. This is the minimum of (quantity/stoich_coeff) for each dissolved component
+            - The amount of mols of solutes to subtract from the total material amount
     """
     material_amounts = []
     dis_mats = material.REGISTRY[desired_material]().dissolve()
@@ -55,10 +40,10 @@ class RewardGenerator():
     RewardGenerator class generates rewards for a given set of vessels and desired materials.
 
     Args:
-    - use_purity (bool): True if reward is based on purity, False if reward is based on the amount of desired material.
-    - exclude_solvents (bool): True if solvents should be excluded from the total amount of materials for purity calculations.
-    - include_dissolved (bool): True if reward should include dissolved material components in the vessels as the desired material.
-    - exclude_mat (str, optional): A string representing a material which gives a negative reward.
+        use_purity (bool): True if reward is based on purity, False if reward is based on the amount of desired material.
+        exclude_solvents (bool): True if solvents should be excluded from the total amount of materials for purity calculations.
+        include_dissolved (bool): True if reward should include dissolved material components in the vessels as the desired material.
+        exclude_mat (str, optional): A string representing a material which gives a negative reward.
     
     This class returns callable objects, which serve as reward functions
     """
@@ -72,12 +57,12 @@ class RewardGenerator():
         Assign a reward to a set of vessels based off of what is desired/undesired
 
         Args:
-        - vessels (list[Vessel]): A list of Vessel objects.
-        - desired_material (str): A string representing the desired material for which the reward should be calculated.
-        - exclude_material (str, optional): Currently unused
+            vessels (list[Vessel]): A list of Vessel objects.
+            desired_material (str): A string representing the desired material for which the reward should be calculated.
+            exclude_material (str, optional): Currently unused
     
         Returns:
-        - reward (float): A floating point number representing the calculated reward.
+            float: A floating point number representing the calculated reward.
 
         """
         reward=0

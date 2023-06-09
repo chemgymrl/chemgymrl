@@ -1,4 +1,7 @@
 from chemistrylab.benches.characterization_bench import CharacterizationBench
+from chemistrylab.vessel import Vessel
+from typing import NamedTuple, Tuple, Callable, Optional, List
+
 import numpy as np
 from numba import jit
 
@@ -68,13 +71,13 @@ class numbaVisualizer():
         self.i=0
         self.pvt=[np.asarray(pvt)[:,:,:3].copy() for k in range(char_bench.n_vessels)]
         
-    def get_rgb(self, vessels):
+    def get_rgb(self, vessels: Tuple[Vessel]):
         obs_list = self.char_bench.observation_list
         info = [self.targets[self.char_bench.target]] if "targets" in obs_list else []
         for v in vessels:
             info+= [self.viz[s](v) for s in obs_list if s in self.viz]
         return np.concatenate(info,axis=1)
-    def render_layers(self,vessel):
+    def render_layers(self, vessel: Vessel):
         im = np.zeros([120,60,3],dtype=np.uint8)+255
 
         im[10:115,5:55] = 0
@@ -86,7 +89,7 @@ class numbaVisualizer():
         div = self.h//120
         return im.repeat(div, axis=0).repeat(div, axis=1)
 
-    def render_spectra(self,vessel):
+    def render_spectra(self, vessel: Vessel):
         spectrum = np.clip(self.char_bench.get_spectra(vessel),0,0.99)
 
         im = np.zeros([self.h,self.h,3],dtype=np.uint8)+255
@@ -102,7 +105,7 @@ class numbaVisualizer():
         #fill_line(im[:,:,:2],20,20,self.h-20,20,4)
         return im
 
-    def render_PVT(self,vessel):
+    def render_PVT(self, vessel: Vessel):
         
         im = self.pvt[self.i]
         self.i=(self.i+1)%self.char_bench.n_vessels
@@ -149,7 +152,7 @@ class matplotVisualizer():
         self.w=4
         self.steps=0
 
-    def get_rgb(self, vessels):
+    def get_rgb(self, vessels: Tuple[Vessel]):
         obs_list = self.char_bench.observation_list
         info = obs_list#[a for a in obs_list if a!="targets"]
         heights = [self.heights[a] for a in info]
@@ -188,7 +191,7 @@ class matplotVisualizer():
 
         return im[...,:3]#to_rgb(im)
 
-    def render_target(self, vessel, ax, first = False, prev = None):
+    def render_target(self, vessel: Vessel, ax, first = False, prev = None):
         if not first:
             ax.axis("off")
             return None
@@ -203,7 +206,7 @@ class matplotVisualizer():
                 prev.set_text(newtext)
         return text
 
-    def render_layers(self,vessel,ax, first = False,prev=None):
+    def render_layers(self, vessel: Vessel, ax, first = False,prev=None):
         cmap='cubehelix'
         layers = vessel.get_layers()
 
@@ -227,7 +230,7 @@ class matplotVisualizer():
 
         return prev
 
-    def render_spectra(self,vessel,ax, first = False, prev=None):
+    def render_spectra(self, vessel: Vessel, ax, first = False, prev=None):
 
         
         spectrum = np.clip(self.char_bench.get_spectra(vessel),0,0.99)
@@ -246,7 +249,7 @@ class matplotVisualizer():
             prev[0].set_ydata(spectrum)
         return prev
 
-    def render_PVT(self,vessel,ax, first = False , prev=None):
+    def render_PVT(self, vessel: Vessel, ax, first = False , prev=None):
 
         t,v,p = self.char_bench.encode_PVT(vessel)
         if prev is None:
@@ -268,7 +271,7 @@ class matplotVisualizer():
         return prev
 
     @staticmethod
-    def display_vessels(vessels,observation_list):
+    def display_vessels(vessels: Tuple[Vessel],observation_list: Tuple[str]):
         characterization_bench = CharacterizationBench(observation_list,[""],len(vessels))        
         visual = Visualizer(characterization_bench)    
         heights = [visual.heights[a] for a in observation_list]
@@ -299,7 +302,7 @@ class pygameVisualizer():
     def __init__(self, char_bench):
         """
         Args:
-        - char_bench (CharacterizationBench): Characterization bench with info on what observations we need.
+            char_bench (CharacterizationBench): Characterization bench with info on what observations we need.
         """
         self.char_bench = char_bench
         self.viz=dict(
@@ -331,7 +334,7 @@ class pygameVisualizer():
         self.misc_text = {x: self._prerender_text(x,self.w/20) for x in ["Wavelength","Absorbance"]}
         self.misc_text["Absorbance"] = pygame.transform.rotate(self.misc_text["Absorbance"],90)
 
-    def get_rgb(self,vessels):
+    def get_rgb(self,vessels: Tuple[Vessel]):
 
         """
         Create an rgb image corresponding to the observations of each vessel.
@@ -353,14 +356,14 @@ class pygameVisualizer():
             )
 
 
-    def render_spectra(self,vessel, x, y):
+    def render_spectra(self, vessel: Vessel,  x: int, y:int):
         """
         Method to visualize the spectral information of a vessel.
 
         Args:
-        - vessel (Vessel): The vessel inputted for spectroscopic analysis.
-        - x (int): Position of the top left corner of this image tile
-        - y (int): Position of the top right corner of ths image tile
+            vessel (Vessel): The vessel inputted for spectroscopic analysis.
+            x (int): Position of the top left corner of this image tile
+            y (int): Position of the top right corner of ths image tile
         """
         spectrum = np.clip( y + self.w*5/12*(1 - self.char_bench.get_spectra(vessel)), y+1, y+self.w*5/12-2)
         xs = np.linspace(0, 1, 100) * self.w*5/6 + x +self.w/12
@@ -379,33 +382,33 @@ class pygameVisualizer():
         Returns a render of the input text
         
         Args:
-        - text (str): The text to render
-        - fs (float): The font size of the text
+            text (str): The text to render
+            fs (float): The font size of the text
         """
         font = pygame.font.SysFont(None, int(fs))
         img = font.render(text, True, (0, 0, 0))
         return img
-    def render_target(self, vessel, x, y):
+    def render_target(self, vessel: Vessel, x: int, y:int):
         """
         Method to display the benches target.
 
         Args:
-        - vessel (Vessel): A vessel
-        - x (int): The target will only be rendered if x=0
-        - y (int): Position of the top right corner of ths image tile
+            vessel (Vessel): A vessel
+            x (int): The target will only be rendered if x=0
+            y (int): Position of the top right corner of ths image tile
         """
         if x>0:return
         img = self.targets[self.char_bench.target]
         self.surf.blit(img, (0, y))
 
-    def render_layers(self,vessel, x, y):
+    def render_layers(self, vessel: Vessel,  x: int, y:int):
         """
         Method to visualize the layer information of a vessel.
 
         Args:
-        - vessel (Vessel): The vessel inputted for layer analysis.
-        - x (int): Position of the top left corner of this image tile
-        - y (int): Position of the top right corner of ths image tile
+            vessel (Vessel): The vessel inputted for layer analysis.
+            x (int): Position of the top left corner of this image tile
+            y (int): Position of the top right corner of ths image tile
         """
 
         cvals = np.array([mat._color for mat in vessel._layer_mats]+[0.65])
@@ -437,14 +440,14 @@ class pygameVisualizer():
         pygame.draw.lines(self.surf, points=bbox, closed=False, color=(0, 0, 0),width=int(self.w/120))
 
 
-    def render_PVT(self, vessel, x, y):
+    def render_PVT(self, vessel: Vessel, x: int, y:int):
         """
         Method to create a bar graph of the pressure,volume, and temperature of a vessel
 
         Args:
-        - vessel (Vessel): Vessel we want pvt info from.
-        - x (int): Position of the top left corner of this image tile
-        - y (int): Position of the top right corner of ths image tile
+            vessel (Vessel): Vessel we want pvt info from.
+            x (int): Position of the top left corner of this image tile
+            y (int): Position of the top right corner of ths image tile
         """
         if not "PVT" in self.misc_text:
             self.misc_text["PVT"] = pygame.Surface((self.w/4,self.w/4))

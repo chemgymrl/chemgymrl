@@ -1,4 +1,4 @@
-from typing import NamedTuple, Tuple, Callable, Optional
+from typing import NamedTuple, Tuple, Callable, Optional, List
 import numpy as np
 import numba
 import pandas as pd
@@ -224,11 +224,19 @@ class Vessel:
         return 0
 
     def heat_capacity(self):
+        """
+        Returns:
+            float: The sum of the heat capacities of all materials in the vessel (in J/K)
+        """
         C_air = 1.2292875 #Heat capacity of air in J/L*K (near STP)
         #Adding in an approximate heat capacity for the air
         return self.volume*C_air+sum(mat.heat_capacity for a,mat in self.material_dict.items())
 
     def filled_volume(self):
+        """
+        Returns:
+            float: The volume of all non-gas phase materials in the vessel (in Litres).
+        """
         return sum(mat.litres for a,mat in self.material_dict.items())
 
     def get_material_dataframe(self):
@@ -551,6 +559,10 @@ class Vessel:
         )
 
     def get_layers(self):
+        """
+        Returns:
+            List[float]: The color of each vessel layer.
+        """
         if self._layers is None:
             self._mix(0,None,0)
             self._update_layers(0,None)
