@@ -9,6 +9,27 @@
 
 import sys
 sys.path.append("../")
+
+
+######################### Adding Some extra documentation #################
+from chemistrylab.util.ActionDoc import append_doc
+from chemistrylab.benches.general_bench import GenBench
+import importlib
+import gymnasium as gym
+doc = set()
+for env,reg in gym.registry.items():
+    try:
+        mod_name, attr_name = reg.entry_point.split(":")
+        mod = importlib.import_module(mod_name)
+        bench = getattr(mod, attr_name)
+    except:
+        bench = type(None)
+    if issubclass(bench,GenBench) and not bench in doc:
+        append_doc(bench)
+        doc.add(bench)
+
+############################################################################
+
 #sys.path.append("C:\\Users\\sprag\\Documents\\Python Scripts\\ResearchF2022\\CHEMGYM\\chemgymrl")
 
 project = 'chemistrygym'

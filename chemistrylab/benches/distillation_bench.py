@@ -21,10 +21,10 @@ def wurtz_vessel(add_mat):
     Function to generate an input vessel for the wurtz distillation experiment.
 
     Args:
-    - add_mat (str): The target material to include in the vessel
+        add_mat (str): The target material to include in the vessel
 
     Returns:
-    - extract_vessel (Vessel): A vessel containing add_mat and some undesired materials
+        Vessel: A vessel containing add_mat and some undesired materials
     """
 
     # initialize extraction vessel

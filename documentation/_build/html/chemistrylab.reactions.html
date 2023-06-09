@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.reactions package &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="chemistrylab.util package" href="chemistrylab.util.html" />
+    <link rel="prev" title="chemistrylab.lab package" href="chemistrylab.lab.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="chemistrylab.html">chemistrylab package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="chemistrylab.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.vessel.html">chemistrylab.vessel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.benches.html">chemistrylab.benches package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.extract_algorithms.html">chemistrylab.extract_algorithms package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.lab.html">chemistrylab.lab package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">chemistrylab.reactions package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.reactions.reaction">chemistrylab.reactions.reaction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.reactions.reaction_info">chemistrylab.reactions.reaction_info module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.reactions">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.util.html">chemistrylab.util package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.material.html">chemistrylab.material module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chemistrylab.html#module-chemistrylab">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chemistrylab.html">chemistrylab package</a></li>
+      <li class="breadcrumb-item active">chemistrylab.reactions package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/chemistrylab.reactions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chemistrylab-reactions-package">
+<h1>chemistrylab.reactions package<a class="headerlink" href="#chemistrylab-reactions-package" title="Permalink to this heading"></a></h1>
+<section id="module-chemistrylab.reactions.reaction">
+<span id="chemistrylab-reactions-reaction-module"></span><h2>chemistrylab.reactions.reaction module<a class="headerlink" href="#module-chemistrylab.reactions.reaction" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction.Reaction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction.</span></span><span class="sig-name descname"><span class="pre">Reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#chemistrylab.reactions.reaction_info.ReactInfo" title="chemistrylab.reactions.reaction_info.ReactInfo"><span class="pre">ReactInfo</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RK45'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newton_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction.html#Reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction.Reaction" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction.Reaction.react">
+<span class="sig-name descname"><span class="pre">react</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction.html#Reaction.react"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction.Reaction.react" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>np.array</em>) – An array containing the amounts of each material in the vessel.</p></li>
+<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The temperature of the system in Kelvin.</p></li>
+<li><p><strong>volume</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The volume of the system in Litres.</p></li>
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The time-step demarcating separate steps in seconds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new amounts of each material in the vessel</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction.Reaction.update_concentrations">
+<span class="sig-name descname"><span class="pre">update_concentrations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction.html#Reaction.update_concentrations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction.Reaction.update_concentrations" title="Permalink to this definition"></a></dt>
+<dd><p>Takes in a vessel and applies the reaction to it, updating the material and solvent dicts in the process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessel</strong> (<a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a>) – The vessel to perform the reaction on</p></li>
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of time passed during the reaction</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction.get_rates">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction.</span></span><span class="sig-name descname"><span class="pre">get_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stoich_coeff_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_exp_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activ_energy_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc_coeff_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_reagents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction.html#get_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction.get_rates" title="Permalink to this definition"></a></dt>
+<dd><p>Finds the rate of reaction <span class="math notranslate nohighlight">\(\frac{dy}{dt}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_reagents</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of reactants involved in the reaction</p></li>
+<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The temperature of the reactions</p></li>
+<li><p><strong>conc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The initial concentrations of the materials</p></li>
+<li><p><strong>*_arr</strong> (<em>np.array</em>) – See <a class="reference internal" href="#chemistrylab.reactions.reaction_info.ReactInfo" title="chemistrylab.reactions.reaction_info.ReactInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReactInfo</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rates of change in concentration <span class="math notranslate nohighlight">\(\frac{dy}{dt}\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction.newton_solve">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction.</span></span><span class="sig-name descname"><span class="pre">newton_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stoich_coeff_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_exp_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activ_energy_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc_coeff_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_reagents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction.html#newton_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction.newton_solve" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_reagents</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of reactants involved in the reaction</p></li>
+<li><p><strong>temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The temperature of the reactions</p></li>
+<li><p><strong>conc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The initial concentrations of the materials</p></li>
+<li><p><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of time to pass</p></li>
+<li><p><strong>N</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The minimum number of time-steps to break dt into</p></li>
+<li><p><strong>*_arr</strong> (<em>np.array</em>) – See <a class="reference internal" href="#chemistrylab.reactions.reaction_info.ReactInfo" title="chemistrylab.reactions.reaction_info.ReactInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReactInfo</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The final concentrations y(dt)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+<p>Solves the initial value problem <span class="math notranslate nohighlight">\(\frac{dy}{dt} = f(y)\)</span> specifically in the case where f(y) is chemical a rate calculation</p>
+<p>(The problem is that we have <span class="math notranslate nohighlight">\(y(t_0)\)</span> and need <span class="math notranslate nohighlight">\(y(t_0+dt))\)</span></p>
+<dl>
+<dt>This solver uses newton’s method:</dt><dd><p>set <span class="math notranslate nohighlight">\(T = \frac{dt}{N}\)</span></p>
+<p>set <span class="math notranslate nohighlight">\(y_0 = y(t_0)\)</span></p>
+<dl class="simple">
+<dt>for n = 1,2,3,…N:</dt><dd><p><span class="math notranslate nohighlight">\(y_n = y_{n-1} + f(y_{n-1})*T\)</span></p>
+</dd>
+</dl>
+<p><span class="math notranslate nohighlight">\(y(dt) \leftarrow y_N\)</span></p>
+</dd>
+</dl>
+<p>Intuitively, it is like taking a Riemann sum of dy/dt (but you get dy/dt by bootstrapping your current sum for y(t))
+This implementation uses a variable step size in order to account for super fast-changing concentrations (wurtz distill)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction.react">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction.</span></span><span class="sig-name descname"><span class="pre">react</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#chemistrylab.reactions.reaction.Reaction" title="chemistrylab.reactions.reaction.Reaction"><span class="pre">Reaction</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction.html#react"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction.react" title="Permalink to this definition"></a></dt>
+<dd><p><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Event" title="chemistrylab.vessel.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a> function to perform a reaction</p>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.reactions.reaction_info">
+<span id="chemistrylab-reactions-reaction-info-module"></span><h2>chemistrylab.reactions.reaction_info module<a class="headerlink" href="#module-chemistrylab.reactions.reaction_info" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction_info.</span></span><span class="sig-name descname"><span class="pre">ReactInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">REACTANTS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PRODUCTS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SOLVENTS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MATERIALS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_exp_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activ_energy_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stoich_coeff_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc_coeff_arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction_info.html#ReactInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NamedTuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.MATERIALS">
+<span class="sig-name descname"><span class="pre">MATERIALS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.MATERIALS" title="Permalink to this definition"></a></dt>
+<dd><p>All materials or substances involved in the reaction(s) (a union of reactants products and solvents)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.PRODUCTS">
+<span class="sig-name descname"><span class="pre">PRODUCTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.PRODUCTS" title="Permalink to this definition"></a></dt>
+<dd><p>Any products formed in the reaction(s)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.REACTANTS">
+<span class="sig-name descname"><span class="pre">REACTANTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.REACTANTS" title="Permalink to this definition"></a></dt>
+<dd><p>The reactants involved in the reaction(s)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.SOLVENTS">
+<span class="sig-name descname"><span class="pre">SOLVENTS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.SOLVENTS" title="Permalink to this definition"></a></dt>
+<dd><p>Any solvents used in the reaction(s)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.activ_energy_arr">
+<span class="sig-name descname"><span class="pre">activ_energy_arr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.activ_energy_arr" title="Permalink to this definition"></a></dt>
+<dd><p>The activation energies for the reaction(s)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.conc_coeff_arr">
+<span class="sig-name descname"><span class="pre">conc_coeff_arr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.conc_coeff_arr" title="Permalink to this definition"></a></dt>
+<dd><p>The concentration coefficients of all involved materials in each reaction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.dump_to_json">
+<span class="sig-name descname"><span class="pre">dump_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction_info.html#ReactInfo.dump_to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.dump_to_json" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the reaction information to a json file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The filename to save as.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.from_json">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction_info.html#ReactInfo.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.from_json" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a new ReactInfo object from a json file
+:param fn: The filename to load from
+:type fn: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The ReactInfo object parameterized by the json file</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#chemistrylab.reactions.reaction_info.ReactInfo" title="chemistrylab.reactions.reaction_info.ReactInfo">ReactInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the reaction</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.pre_exp_arr">
+<span class="sig-name descname"><span class="pre">pre_exp_arr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.pre_exp_arr" title="Permalink to this definition"></a></dt>
+<dd><p>The pre-exponential factors for the reaction(s)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.ReactInfo.stoich_coeff_arr">
+<span class="sig-name descname"><span class="pre">stoich_coeff_arr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#chemistrylab.reactions.reaction_info.ReactInfo.stoich_coeff_arr" title="Permalink to this definition"></a></dt>
+<dd><p>Stoichiometric coefficients of the reactants in each reaction</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.format_2d_array_string">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction_info.</span></span><span class="sig-name descname"><span class="pre">format_2d_array_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction_info.html#format_2d_array_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction_info.format_2d_array_string" title="Permalink to this definition"></a></dt>
+<dd><p>Special json formatting function to create pretty arrays</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The json string</p></li>
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The amount of indentation in the json string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A prettier version of the json string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.reactions.reaction_info.serial">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.reactions.reaction_info.</span></span><span class="sig-name descname"><span class="pre">serial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/reactions/reaction_info.html#serial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.reactions.reaction_info.serial" title="Permalink to this definition"></a></dt>
+<dd><p>Turn a numpy array into tuples</p>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.reactions">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chemistrylab.reactions" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chemistrylab.lab.html" class="btn btn-neutral float-left" title="chemistrylab.lab package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chemistrylab.util.html" class="btn btn-neutral float-right" title="chemistrylab.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

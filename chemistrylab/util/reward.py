@@ -9,6 +9,9 @@ import sys
 
 from chemistrylab import material
 from chemistrylab.vessel import Vessel
+from typing import NamedTuple, Tuple, Callable, Optional, List
+
+
 
 def get_dissolved_amounts(vessel: Vessel, desired_material: str):
     """    
@@ -52,14 +55,14 @@ class RewardGenerator():
         self.include_dissolved=include_dissolved
         self.use_purity=use_purity
         self.exclude_mat=exclude_mat
-    def __call__(self,vessels,desired_material,exclude_material = None):
+    def __call__(self,vessels: Tuple[Vessel], desired_material: str, exclude_material: Optional[str] = None):
         """
         Assign a reward to a set of vessels based off of what is desired/undesired
 
         Args:
-            vessels (list[Vessel]): A list of Vessel objects.
+            vessels (Tuple[Vessel]): A list of Vessel objects.
             desired_material (str): A string representing the desired material for which the reward should be calculated.
-            exclude_material (str, optional): Currently unused
+            exclude_material (Optional[str]): Currently unused
     
         Returns:
             float: A floating point number representing the calculated reward.

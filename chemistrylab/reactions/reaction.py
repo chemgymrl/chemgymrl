@@ -1,5 +1,13 @@
+import numpy as np
+import numba
+from scipy.integrate import solve_ivp
+from chemistrylab import material,vessel
+from typing import NamedTuple, Tuple, Callable, Optional, List
 
-def get_amounts(materials, vessel):
+from chemistrylab.reactions.reaction_info import ReactInfo
+
+
+def _get_amounts(materials: Tuple[str], vessel: vessel.Vessel):
     n=np.zeros(len(materials))
     for i,key in enumerate(materials):
         if key in vessel.material_dict:
@@ -8,7 +16,7 @@ def get_amounts(materials, vessel):
             n[i] = 0
     return n
 
-def set_amounts(materials,solvents, material_classes, n, vessel):
+def _set_amounts(materials, solvents, material_classes, n, vessel):
     for i,key in enumerate(materials):
         amount = n[i]
         if key in vessel.material_dict:
@@ -21,15 +29,26 @@ def set_amounts(materials,solvents, material_classes, n, vessel):
     vessel.validate_solutes()
         
 #####################################################################################################################################
-import numpy as np
-import numba
-from scipy.integrate import solve_ivp
-from chemistrylab import material,vessel
+
 
 
 
 @numba.jit(nopython=True)
 def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc):
+    """
+    Finds the rate of reaction :math:`\\frac{dy}{dt}`
+
+    Args:
+        num_reagents (int): The number of reactants involved in the reaction
+        temp (float): The temperature of the reactions
+        conc (float): The initial concentrations of the materials
+        *_arr (np.array): See :class:`~chemistrylab.reactions.reaction_info.ReactInfo`
+
+    Returns:
+        np.array: Rates of change in concentration :math:`\\frac{dy}{dt}`.
+    """
+
+    
     R = 8.314462619
     
     conc = np.clip(conc, 0, None)
@@ -52,17 +71,31 @@ def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, n
 @numba.jit(nopython=True)
 def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc, dt, N):
     """
-    Solves the initial value problem dy/dt = f(y) specifically in the case where f(y) is chemical a rate calculation
+
+    Args:
+        num_reagents (int): The number of reactants involved in the reaction
+        temp (float): The temperature of the reactions
+        conc (float): The initial concentrations of the materials
+        dt (float): The amount of time to pass
+        N (int): The minimum number of time-steps to break dt into
+        *_arr (np.array): See :class:`~chemistrylab.reactions.reaction_info.ReactInfo`
+
+    Returns:
+        np.array: The final concentrations y(dt)
+
+    Solves the initial value problem :math:`\\frac{dy}{dt} = f(y)` specifically in the case where f(y) is chemical a rate calculation
     
-    (The problem is that we have y(t0) and need y(t0+dt))
+    (The problem is that we have :math:`y(t_0)` and need :math:`y(t_0+dt))`
     
     This solver uses newton's method:
-        set T = dt/N
-        set y_0 = y(t0)
+        set :math:`T = \\frac{dt}{N}`
+
+        set :math:`y_0 = y(t_0)`
+
         for n = 1,2,3,...N:
-            y_n = y_(n-1) + f(y_(n-1))*T
+            :math:`y_n = y_{n-1} + f(y_{n-1})*T`
         
-        y(dt) <- y_N 
+        :math:`y(dt) \\leftarrow y_N`
    
     Intuitively, it is like taking a Riemann sum of dy/dt (but you get dy/dt by bootstrapping your current sum for y(t))
     This implementation uses a variable step size in order to account for super fast-changing concentrations (wurtz distill)
@@ -113,12 +146,15 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
    
 
 class Reaction():
-    def __init__(self,react_info,solver='RK45',newton_steps=100):
+    def __init__(self,react_info: ReactInfo, solver: str = 'RK45', newton_steps: int = 100):
         """
+
+        A class to update concentrations of the materials in a vessel according to a reaction.
+
         Args:
-        - react_info (ReactInfo): Named Tuple containing all necessary reaction information
-        - solver (str): Which solver to use
-        - newton_steps (int): How many steps to use when the solver is 'newton'
+            react_info (ReactInfo): Named Tuple containing all necessary reaction information
+            solver (str): Which solver to use
+            newton_steps (int): How many steps to use when the solver is 'newton'
         """
         
         if not solver in {'RK45', 'RK23', 'DOP853', 'DBF', 'LSODA','newton'}:
@@ -144,13 +180,17 @@ class Reaction():
         self.conc_coeff_arr = react_info.conc_coeff_arr
         self.num_reagents = len(self.reactants)
 
-    def update_concentrations(self,vessel, dt = 0):
+    def update_concentrations(self,vessel: vessel.Vessel, dt: float = 0):
         """
         Takes in a vessel and applies the reaction to it, updating the material and solvent dicts in the process
+
+        Args:
+            vessel (Vessel): The vessel to perform the reaction on
+            dt (float): The amount of time passed during the reaction
+
         """
         
-        
-        n = get_amounts(self.materials, vessel)
+        n = _get_amounts(self.materials, vessel)
         if n.sum() < 1e-12:return
         temperature = vessel.temperature
         current_volume = vessel.filled_volume()
@@ -161,17 +201,17 @@ class Reaction():
         #update concentrations
         new_n = self.react(n, temperature, current_volume, dt)
         #set the updated concentrations
-        set_amounts(self.materials, self.solvents, self.material_classes, new_n, vessel)
+        _set_amounts(self.materials, self.solvents, self.material_classes, new_n, vessel)
         
-    def react(self, n, temp, volume, dt):
+    def react(self, n: np.array, temp: float, volume: float, dt: float):
         """
         Args:
-        - n (np.array): An array containing the amounts of each material in the vessel.
-        - temp (float): The temperature of the system in Kelvin.
-        - volume (float): The volume of the system in Litres.
-        - dt (float): The time-step demarcating separate steps in seconds.
+            n (np.array): An array containing the amounts of each material in the vessel.
+            temp (float): The temperature of the system in Kelvin.
+            volume (float): The volume of the system in Litres.
+            dt (float): The time-step demarcating separate steps in seconds.
         Returns:
-        - new_n (np.array): The new amounts of each material in the vessel
+            np.array: The new amounts of each material in the vessel
         """
         # set the intended vessel temperature in the differential equation module
         self.temp = temp
@@ -202,8 +242,12 @@ class Reaction():
                          self.num_reagents, self.temp, conc)
     
     
-
-def react(vessel, dt, other_vessel, reaction):
+NoneType = type(None)
+def react(vessel: vessel.Vessel, dt: float, other_vessel: NoneType, reaction: Reaction):
+    """
+    :class:`~chemistrylab.vessel.Event` function to perform a reaction
+    
+    """
     reaction.update_concentrations(vessel , dt)
     return 0
 

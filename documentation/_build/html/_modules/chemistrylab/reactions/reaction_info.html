@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.reactions.reaction_info &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../chemistrylab.html">chemistrylab package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chemistrylab.reactions.reaction_info</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chemistrylab.reactions.reaction_info</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">REACTION_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/available_reactions&quot;</span>
+
+
+<div class="viewcode-block" id="serial"><a class="viewcode-back" href="../../../chemistrylab.reactions.html#chemistrylab.reactions.reaction_info.serial">[docs]</a><span class="k">def</span> <span class="nf">serial</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a numpy array into tuples&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span><span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span><span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="format_2d_array_string"><a class="viewcode-back" href="../../../chemistrylab.reactions.html#chemistrylab.reactions.reaction_info.format_2d_array_string">[docs]</a><span class="k">def</span> <span class="nf">format_2d_array_string</span><span class="p">(</span><span class="n">array_str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Special json formatting function to create pretty arrays</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        array_str (str): The json string</span>
+<span class="sd">        indent (int): The amount of indentation in the json string</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: A prettier version of the json string</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ind</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">*</span><span class="n">indent</span>
+    <span class="c1"># Replace all newlines after numbers with spaces</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, &quot;</span><span class="p">)</span>
+        <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># replace newlines after opening brackets with spaces</span>
+    <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[ &quot;</span><span class="p">)</span>
+    
+    <span class="c1">#add back in newlines if there was a string after</span>
+    <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;: [ </span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;: [</span><span class="se">\n</span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+    <span class="c1">#same thing if there was another opening bracket after</span>
+    <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;: [ </span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">[&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;: [</span><span class="se">\n</span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">[&#39;</span><span class="p">)</span>
+    <span class="c1"># adjust spacing for negative signs</span>
+    <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">3</span><span class="si">}</span><span class="s1"> -&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+    
+    <span class="c1">#adjust spacing of array numbers</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">3</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}{</span><span class="n">ind</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+        <span class="n">array_str</span> <span class="o">=</span> <span class="n">array_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ind</span><span class="o">*</span><span class="mi">2</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array_str</span></div>
+
+
+<div class="viewcode-block" id="ReactInfo"><a class="viewcode-back" href="../../../chemistrylab.reactions.html#chemistrylab.reactions.reaction_info.ReactInfo">[docs]</a><span class="k">class</span> <span class="nc">ReactInfo</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">REACTANTS</span><span class="p">:</span>        <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">PRODUCTS</span><span class="p">:</span>         <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">SOLVENTS</span><span class="p">:</span>         <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">MATERIALS</span><span class="p">:</span>        <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">pre_exp_arr</span><span class="p">:</span>      <span class="n">np</span><span class="o">.</span><span class="n">array</span>
+    <span class="n">activ_energy_arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span>
+    <span class="n">stoich_coeff_arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span>
+    <span class="n">conc_coeff_arr</span><span class="p">:</span>   <span class="n">np</span><span class="o">.</span><span class="n">array</span>
+        
+<div class="viewcode-block" id="ReactInfo.dump_to_json"><a class="viewcode-back" href="../../../chemistrylab.reactions.html#chemistrylab.reactions.reaction_info.ReactInfo.dump_to_json">[docs]</a>    <span class="k">def</span> <span class="nf">dump_to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the reaction information to a json file</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            fn (str): The filename to save as.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="n">format_2d_array_string</span><span class="p">(</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">serial</span><span class="p">),</span>
+                <span class="n">indent</span><span class="o">=</span><span class="mi">2</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+<div class="viewcode-block" id="ReactInfo.from_json"><a class="viewcode-back" href="../../../chemistrylab.reactions.html#chemistrylab.reactions.reaction_info.ReactInfo.from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new ReactInfo object from a json file</span>
+<span class="sd">        Args:</span>
+<span class="sd">            fn (str): The filename to load from</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ReactInfo: The ReactInfo object parameterized by the json file</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">modified_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">if</span> <span class="s2">&quot;_arr&quot;</span> <span class="ow">in</span> <span class="n">i</span> <span class="k">else</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">ReactInfo</span><span class="p">(</span><span class="o">**</span><span class="n">modified_kwargs</span><span class="p">)</span></div></div>
+
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;The name of the reaction&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">REACTANTS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;The reactants involved in the reaction(s)&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">PRODUCTS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;Any products formed in the reaction(s)&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">SOLVENTS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;Any solvents used in the reaction(s)&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">MATERIALS</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;All materials or substances involved in the reaction(s) (a union of reactants products and solvents)&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">pre_exp_arr</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;The pre-exponential factors for the reaction(s)&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">activ_energy_arr</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;The activation energies for the reaction(s)&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">stoich_coeff_arr</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;Stoichiometric coefficients of the reactants in each reaction&quot;</span>
+<span class="n">ReactInfo</span><span class="o">.</span><span class="n">conc_coeff_arr</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;The concentration coefficients of all involved materials in each reaction&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

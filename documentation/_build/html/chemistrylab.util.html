@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.util package &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="chemistrylab.material module" href="chemistrylab.material.html" />
+    <link rel="prev" title="chemistrylab.reactions package" href="chemistrylab.reactions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="chemistrylab.html">chemistrylab package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="chemistrylab.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.vessel.html">chemistrylab.vessel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.benches.html">chemistrylab.benches package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.extract_algorithms.html">chemistrylab.extract_algorithms package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.lab.html">chemistrylab.lab package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.reactions.html">chemistrylab.reactions package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">chemistrylab.util package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.util.Visualization">chemistrylab.util.Visualization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.util.reward">chemistrylab.util.reward module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.util">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.material.html">chemistrylab.material module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chemistrylab.html#module-chemistrylab">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chemistrylab.html">chemistrylab package</a></li>
+      <li class="breadcrumb-item active">chemistrylab.util package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/chemistrylab.util.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chemistrylab-util-package">
+<h1>chemistrylab.util package<a class="headerlink" href="#chemistrylab-util-package" title="Permalink to this heading"></a></h1>
+<section id="module-chemistrylab.util.Visualization">
+<span id="chemistrylab-util-visualization-module"></span><h2>chemistrylab.util.Visualization module<a class="headerlink" href="#module-chemistrylab.util.Visualization" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.Visualizer">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">Visualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_bench</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#Visualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.Visualizer" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.fill_line">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">fill_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#fill_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.fill_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">matplotVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_bench</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.display_vessels">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_vessels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer.display_vessels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.display_vessels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.get_rgb">
+<span class="sig-name descname"><span class="pre">get_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer.get_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.get_rgb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.legend_update_delay">
+<span class="sig-name descname"><span class="pre">legend_update_delay</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.legend_update_delay" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.render_PVT">
+<span class="sig-name descname"><span class="pre">render_PVT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer.render_PVT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.render_PVT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.render_layers">
+<span class="sig-name descname"><span class="pre">render_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer.render_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.render_layers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.render_spectra">
+<span class="sig-name descname"><span class="pre">render_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer.render_spectra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.render_spectra" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.matplotVisualizer.render_target">
+<span class="sig-name descname"><span class="pre">render_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#matplotVisualizer.render_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.matplotVisualizer.render_target" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.numbaVisualizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">numbaVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_bench</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#numbaVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.numbaVisualizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.numbaVisualizer.get_rgb">
+<span class="sig-name descname"><span class="pre">get_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#numbaVisualizer.get_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.numbaVisualizer.get_rgb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.numbaVisualizer.render_PVT">
+<span class="sig-name descname"><span class="pre">render_PVT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#numbaVisualizer.render_PVT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.numbaVisualizer.render_PVT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.numbaVisualizer.render_layers">
+<span class="sig-name descname"><span class="pre">render_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#numbaVisualizer.render_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.numbaVisualizer.render_layers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.numbaVisualizer.render_spectra">
+<span class="sig-name descname"><span class="pre">render_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#numbaVisualizer.render_spectra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.numbaVisualizer.render_spectra" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.numbaVisualizer.render_target">
+<span class="sig-name descname"><span class="pre">render_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#numbaVisualizer.render_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.numbaVisualizer.render_target" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.pygameVisualizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">pygameVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_bench</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#pygameVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.pygameVisualizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to visualize the chemistry benches.</p>
+<p>The dictionary viz gives a list of observations the class can visualize. These should correspond
+to observations which come from the characterization bench.</p>
+<p>Call get_rgb(vessels) to get an rgb image of your vessel observations (which visualize all observations set in the
+characterization bench)</p>
+<p>The resultant image is tiled such that every row has one type of observation, and every column contains all observations
+for a single vessel.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.pygameVisualizer.get_rgb">
+<span class="sig-name descname"><span class="pre">get_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#pygameVisualizer.get_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.pygameVisualizer.get_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Create an rgb image corresponding to the observations of each vessel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.pygameVisualizer.render_PVT">
+<span class="sig-name descname"><span class="pre">render_PVT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#pygameVisualizer.render_PVT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.pygameVisualizer.render_PVT" title="Permalink to this definition"></a></dt>
+<dd><p>Method to create a bar graph of the pressure,volume, and temperature of a vessel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessel</strong> (<a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a>) – Vessel we want pvt info from.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top left corner of this image tile</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top right corner of ths image tile</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.pygameVisualizer.render_layers">
+<span class="sig-name descname"><span class="pre">render_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#pygameVisualizer.render_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.pygameVisualizer.render_layers" title="Permalink to this definition"></a></dt>
+<dd><p>Method to visualize the layer information of a vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessel</strong> (<a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a>) – The vessel inputted for layer analysis.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top left corner of this image tile</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top right corner of ths image tile</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.pygameVisualizer.render_spectra">
+<span class="sig-name descname"><span class="pre">render_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#pygameVisualizer.render_spectra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.pygameVisualizer.render_spectra" title="Permalink to this definition"></a></dt>
+<dd><p>Method to visualize the spectral information of a vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessel</strong> (<a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a>) – The vessel inputted for spectroscopic analysis.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top left corner of this image tile</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top right corner of ths image tile</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.pygameVisualizer.render_target">
+<span class="sig-name descname"><span class="pre">render_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#pygameVisualizer.render_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.pygameVisualizer.render_target" title="Permalink to this definition"></a></dt>
+<dd><p>Method to display the benches target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessel</strong> (<a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a>) – A vessel</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The target will only be rendered if x=0</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Position of the top right corner of ths image tile</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.set_backend">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">set_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#set_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.set_backend" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.to_rgb">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">to_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#to_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.to_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Converts a 4-channel rgba image into a 3-channel rgb image</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.use_mpl_dark">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">use_mpl_dark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#use_mpl_dark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.use_mpl_dark" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.Visualization.use_mpl_light">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.Visualization.</span></span><span class="sig-name descname"><span class="pre">use_mpl_light</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/Visualization.html#use_mpl_light"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.Visualization.use_mpl_light" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-chemistrylab.util.reward">
+<span id="chemistrylab-util-reward-module"></span><h2>chemistrylab.util.reward module<a class="headerlink" href="#module-chemistrylab.util.reward" title="Permalink to this heading"></a></h2>
+<p>This module provides a default set of reward functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.util.reward.RewardGenerator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.util.reward.</span></span><span class="sig-name descname"><span class="pre">RewardGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_purity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_solvents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dissolved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/reward.html#RewardGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.reward.RewardGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>RewardGenerator class generates rewards for a given set of vessels and desired materials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_purity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – True if reward is based on purity, False if reward is based on the amount of desired material.</p></li>
+<li><p><strong>exclude_solvents</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – True if solvents should be excluded from the total amount of materials for purity calculations.</p></li>
+<li><p><strong>include_dissolved</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – True if reward should include dissolved material components in the vessels as the desired material.</p></li>
+<li><p><strong>exclude_mat</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – A string representing a material which gives a negative reward.</p></li>
+</ul>
+</dd>
+</dl>
+<p>This class returns callable objects, which serve as reward functions</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.util.reward.RewardGenerator.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_material</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_material</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/reward.html#RewardGenerator.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.reward.RewardGenerator.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Assign a reward to a set of vessels based off of what is desired/undesired</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessels</strong> (<em>Tuple</em><em>[</em><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a><em>]</em>) – A list of Vessel objects.</p></li>
+<li><p><strong>desired_material</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A string representing the desired material for which the reward should be calculated.</p></li>
+<li><p><strong>exclude_material</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – Currently unused</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A floating point number representing the calculated reward.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.util.reward.get_dissolved_amounts">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.util.reward.</span></span><span class="sig-name descname"><span class="pre">get_dissolved_amounts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_material</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/util/reward.html#get_dissolved_amounts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.util.reward.get_dissolved_amounts" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>The amount material that could be produced if you removed the solvent. This is the minimum of (quantity/stoich_coeff) for each dissolved component</p></li>
+<li><p>The amount of mols of solutes to subtract from the total material amount</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a>,<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.util">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chemistrylab.util" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chemistrylab.reactions.html" class="btn btn-neutral float-left" title="chemistrylab.reactions package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chemistrylab.material.html" class="btn btn-neutral float-right" title="chemistrylab.material module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

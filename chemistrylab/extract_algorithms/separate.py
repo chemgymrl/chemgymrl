@@ -1,18 +1,5 @@
 """
-This file is part of ChemGymRL.
 
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 """
 import numpy as np
 from math import ceil
@@ -35,18 +22,20 @@ x = np.linspace(0, 1, 100, endpoint=True, dtype=np.float32)
 def map_to_state(A, B, C, colors, x=x):
     """
     Uses the position and variance of each solvent to stochastically create a layer-view of the vessel
-    TODO: Generalize to solvents who's volume changes due to dissolved solutes?
+    
     Args:
-    - A (np.ndarray): The volume of each solvent
-    - B (np.ndarray): The current positions of the solvent layers in the vessel
-    - C (float): The current variance of the solvent layers in the vessel
-    - colors (np.ndarray): The color of each solvent
+        A (np.ndarray): The volume of each solvent
+        B (np.ndarray): The current positions of the solvent layers in the vessel
+        C (float): The current variance of the solvent layers in the vessel
+        colors (np.ndarray): The color of each solvent
 
     Returns:
-    - L (np.ndarray): The solvent at each layer position (0.65 for air)
-    - L2 (np.ndarray): The index of the solvent at each position (len(B)-1 for air)
+        Tuple[np.ndarray]: 
+            - The solvent at each layer position (0.65 for air)
+            - The index of the solvent at each position (len(B)-1 for air)
 
     Algorithm:
+
     1. Discretize the vessel into 100 layers each with one unit of volume
     2. Quantize the volumes into units of size sum(v)/100. (Round up agressively)
     3. Do a checksum to make sure these quantized volumes sum to 100
@@ -56,11 +45,8 @@ def map_to_state(A, B, C, colors, x=x):
     5. For each of the quantized layers, gather the height of each gaussian at that layer position and sample a solvent proportional to this height
         i. This is approximately the same as doing an integral of the solvents distribution over the layer
         ii. Unfortunately, the solvent distributions don't add up to 1 so you have to normalize.
-        iii. The distributions are more ballparks so you have to keep track of how many units you placed, and 
-                set the probability of the layer having a solvent to zero if all the units have already been placed
-        iv: This also means you may not have placed all of your units by the time you are way outside the variance of your
-                gaussian, so you should keep track of the lowest layer that still has units to place, and make sure those
-                units are all placed once you start to go way past it.
+        iii. The distributions are more ballparks so you have to keep track of how many units you placed, and set the probability of the layer having a solvent to zero if all the units have already been placed
+        iv. This also means you may not have placed all of your units by the time you are way outside the variance of your gaussian, so you should keep track of the lowest layer that still has units to place, and make sure those units are all placed once you start to go way past it.
     """
     # Create a copy of B for temporary changes
     B1 = np.copy(B)
@@ -193,40 +179,39 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
 
     Args:
-    - v (np.ndarray): The volume of each solvent
-    - Vprev (np.ndarray): The volume of each solvent on the previous iteration
-    - v_solute (np.ndarray): The specific volume of each solute (litres per mol)
-    - B (np.ndarray): The current positions of the solvent layers in the vessel
-    - C (np.ndarray): The current variances of the solvent layers in the vessel
-    - C0 (float) The current variance of solutes in the vessel
-    - D (np.ndarray): The density of each solvent
-    - Spol (np.ndarray): The relative polarities of the solutes
-    - Lpol (np.ndarray): The relative polarities of the solvents
-    - S (np.ndarray): The current amounts of solutes in each solvent layer (2D array)
-    - mixing (float): The time value assigned to a fully mixed solution
+        v (np.ndarray): The volume of each solvent
+        Vprev (np.ndarray): The volume of each solvent on the previous iteration
+        v_solute (np.ndarray): The specific volume of each solute (litres per mol)
+        B (np.ndarray): The current positions of the solvent layers in the vessel
+        C (np.ndarray): The current variances of the solvent layers in the vessel
+        C0 (float) The current variance of solutes in the vessel
+        D (np.ndarray): The density of each solvent
+        Spol (np.ndarray): The relative polarities of the solutes
+        Lpol (np.ndarray): The relative polarities of the solvents
+        S (np.ndarray): The current amounts of solutes in each solvent layer (2D array)
+        mixing (float): The time value assigned to a fully mixed solution
 
     Returns:
-    - layers_position (np.ndarray): An array of floats representing the new positions of the solvent layers in the vessel
-    - layers_variance (np.ndarray): An array of floats representing the new variances of the solvent layers in the vessel
-    - new_solute_amount (np.ndarray): An array of floats representing the new amounts of solutes in each solvent layer
-    - var_layer (np.ndarray): Modified layer variances which account for the extra volume due to dissolved solutes
+        Tuple[np.ndarray]:
+            - layers_position: An array of floats representing the new positions of the solvent layers in the vessel
+            - layers_variance: An array of floats representing the new variances of the solvent layers in the vessel
+            - new_solute_amount: An array of floats representing the new amounts of solutes in each solvent layer
+            - var_layer: Modified layer variances which account for the extra volume due to dissolved solutes
 
     Algorithm (Solvent):
+
     1. Using the volumes and densities of each solvent, determine where each solvent's center of mass should be at t-> inf
     2. Determine the speed in which each solvent should separate out using the densities
     3. Handle any external changes to the solving (pouring in/out) using v and Vprev
         i. Since there is an injective map between variance and time, it is easier to work with variance
             a) Initial variance is sum(v)/sqrt(12) [gaussian approximation of a uniform distribution]
             b) Final variance is vi/MINVAR -> MINVAR should probably be around sqrt(12) still (but be <=)
-        ii. Pouring in a solvent should kind of mix around the solution, and since the max variance is sum(v)/sqrt(12)
-            adding in dv/sqrt(12) seems reasonable
-        iii. For the solvent actually being added, we can assume you are pouring into the top, so it should be mixed
-            the closer to the bottom the solvent layer is. It should also be mixed more depending on how much you are adding.
+        ii. Pouring in a solvent should kind of mix around the solution, and since the max variance is sum(v)/sqrt(12) adding in dv/sqrt(12) seems reasonable
+        iii. For the solvent actually being added, we can assume you are pouring into the top, so it should be mixed the closer to the bottom the solvent layer is. It should also be mixed more depending on how much you are adding.
         iv. If adding a solvent causes things to be mixed around a bunch, it should end up mixing the solutes too
     4. Get a time-like variable saying much each solvent is settled using the current variance (Recall the map is injective)
     5. Increment this by the mixing parameter
-        i. If time is being decreased by the mixing parameter, we first set T<= Tmax so something which settled for a long time
-            still mixes reasonably fast (and also as T->inf the map between variance and time gets sus cuz of floats)
+        i. If time is being decreased by the mixing parameter, we first set T<= Tmax so something which settled for a long time still mixes reasonably fast (and also as T->inf the map between variance and time gets sus cuz of floats)
     6. Use this incremented time to update your layer positions, as well as layer variances
 
     Algorithm (Solute):

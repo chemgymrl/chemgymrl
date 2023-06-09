@@ -14,29 +14,29 @@ from gymnasium.envs.registration import register
 
 register(
     id='GenWurtzExtract-v2',
-    entry_point='chemistrylab.benches.extract_bench_v1:GeneralWurtzExtract_v2',
+    entry_point='chemistrylab.benches.extract_bench:GeneralWurtzExtract_v2',
 )
 
 register(
     id='WaterOilExtract-v0',
-    entry_point='chemistrylab.benches.extract_bench_v1:WaterOilExtract_v0',
+    entry_point='chemistrylab.benches.extract_bench:WaterOilExtract_v0',
 )
 
 ############################ ReactBench ####################################
 
 register(
     id='GenWurtzReact-v2',
-    entry_point='chemistrylab.benches.reaction_bench_v1:GeneralWurtzReact_v2'
+    entry_point='chemistrylab.benches.reaction_bench:GeneralWurtzReact_v2'
 )
 
 register(
     id='GenWurtzReact-v0',
-    entry_point='chemistrylab.benches.reaction_bench_v1:GeneralWurtzReact_v0'
+    entry_point='chemistrylab.benches.reaction_bench:GeneralWurtzReact_v0'
 )
 
 register(
     id='FictReact-v2',
-    entry_point='chemistrylab.benches.reaction_bench_v1:FictReact_v2'
+    entry_point='chemistrylab.benches.reaction_bench:FictReact_v2'
 )
 
 
@@ -44,7 +44,7 @@ register(
 
 register(
     id='GenWurtzDistill-v2',
-    entry_point='chemistrylab.benches.distillation_bench_v1:GeneralWurtzDistill_v2',
+    entry_point='chemistrylab.benches.distillation_bench:GeneralWurtzDistill_v2',
     max_episode_steps=100
 )
 
@@ -52,7 +52,7 @@ register(
 
 register(
     id='LabManager-v0',
-    entry_point='chemistrylab.manager.manager_v1:LabManager',
+    entry_point='chemistrylab.manager.manager:LabManager',
     max_episode_steps=100
 )
 
@@ -61,12 +61,12 @@ register(
 
 register(
     id='FictReactBandit-v0',
-    entry_point='chemistrylab.benches.reaction_bench_v1:FictReactBandit_v0'
+    entry_point='chemistrylab.benches.reaction_bench:FictReactBandit_v0'
 )
 
 register(
     id='FictReactBandit-v1',
-    entry_point='chemistrylab.benches.reaction_bench_v1:FictReactBandit_v0',
+    entry_point='chemistrylab.benches.reaction_bench:FictReactBandit_v0',
     kwargs = dict(targets=["fict_I"])
 )
 
@@ -75,24 +75,24 @@ register(
 
 register(
     id='WurtzExtractDemo-v0',
-    entry_point='chemistrylab.benches.extract_bench_v1:WurtzExtractDemo_v0',
+    entry_point='chemistrylab.benches.extract_bench:WurtzExtractDemo_v0',
 )
 
 
 register(
     id='FictReactDemo-v0',
-    entry_point='chemistrylab.benches.reaction_bench_v1:FictReactDemo_v0',
+    entry_point='chemistrylab.benches.reaction_bench:FictReactDemo_v0',
 
 )
 
 register(
     id='WurtzDistillDemo-v0',
-    entry_point='chemistrylab.benches.distillation_bench_v1:WurtzDistillDemo_v0',
+    entry_point='chemistrylab.benches.distillation_bench:WurtzDistillDemo_v0',
 )
 
 
 register(
     id='ExtractTest-v0',
-    entry_point='chemistrylab.benches.extract_bench_v1:SeparateTest_v0',
+    entry_point='chemistrylab.benches.extract_bench:SeparateTest_v0',
 )
 

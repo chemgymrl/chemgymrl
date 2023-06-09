@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.benches package &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="chemistrylab.extract_algorithms package" href="chemistrylab.extract_algorithms.html" />
+    <link rel="prev" title="chemistrylab.vessel module" href="chemistrylab.vessel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="chemistrylab.html">chemistrylab package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="chemistrylab.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.vessel.html">chemistrylab.vessel module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">chemistrylab.benches package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.benches.characterization_bench">chemistrylab.benches.characterization_bench module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.benches.distillation_bench">chemistrylab.benches.distillation_bench_v1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.benches.extract_bench">chemistrylab.benches.extract_bench_v1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.benches.general_bench">chemistrylab.benches.general_bench module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.benches.reaction_bench">chemistrylab.benches.reaction_bench_v1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.benches">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.extract_algorithms.html">chemistrylab.extract_algorithms package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.lab.html">chemistrylab.lab package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.reactions.html">chemistrylab.reactions package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.util.html">chemistrylab.util package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.material.html">chemistrylab.material module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chemistrylab.html">chemistrylab package</a></li>
+      <li class="breadcrumb-item active">chemistrylab.benches package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/chemistrylab.benches.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chemistrylab-benches-package">
+<h1>chemistrylab.benches package<a class="headerlink" href="#chemistrylab-benches-package" title="Permalink to this heading"></a></h1>
+<section id="module-chemistrylab.benches.characterization_bench">
+<span id="chemistrylab-benches-characterization-bench-module"></span><h2>chemistrylab.benches.characterization_bench module<a class="headerlink" href="#module-chemistrylab.benches.characterization_bench" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.CharacterizationBench">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.characterization_bench.</span></span><span class="sig-name descname"><span class="pre">CharacterizationBench</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_vessels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#CharacterizationBench"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.CharacterizationBench" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A set of methods made available to inspect an inputted vessel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation_list</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – Ordered list of observations to make (see Method Map)</p></li>
+<li><p><strong>targets</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – A list of target materials</p></li>
+<li><p><strong>n_vessels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The (maximum) number of vessels included in an observation</p></li>
+</ul>
+</dd>
+</dl>
+<p>Method Map:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>‘spectra’</p></td>
+<td><p>get_spectra</p></td>
+</tr>
+<tr class="row-odd"><td><p>‘layers’</p></td>
+<td><p>get_layers</p></td>
+</tr>
+<tr class="row-even"><td><p>‘targets’</p></td>
+<td><p>encode_target</p></td>
+</tr>
+<tr class="row-odd"><td><p>‘PVT’</p></td>
+<td><p>encode_PVT</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.CharacterizationBench.encode_PVT">
+<span class="sig-name descname"><span class="pre">encode_PVT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#CharacterizationBench.encode_PVT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.CharacterizationBench.encode_PVT" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a size 3 array containing [temperature,volume,pressure]</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.CharacterizationBench.encode_target">
+<span class="sig-name descname"><span class="pre">encode_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#CharacterizationBench.encode_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.CharacterizationBench.encode_target" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a 1D one-hot encoding of the target material (note self.target must be set before doing this)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.CharacterizationBench.get_layers">
+<span class="sig-name descname"><span class="pre">get_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#CharacterizationBench.get_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.CharacterizationBench.get_layers" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a 1D array of vessel layer information</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.CharacterizationBench.get_observation">
+<span class="sig-name descname"><span class="pre">get_observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#CharacterizationBench.get_observation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.CharacterizationBench.get_observation" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a concatenation of observations of the vessels provided, using the list of observations provided
+in __init__</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessels</strong> (<em>Tuple</em><em>[</em><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a><em>]</em>) – A list of vessels you want an observtation of.</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The current target material</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.CharacterizationBench.get_spectra">
+<span class="sig-name descname"><span class="pre">get_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><span class="pre">Vessel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">materials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="chemistrylab.material.html#chemistrylab.material.Material" title="chemistrylab.material.Material"><span class="pre">Material</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#CharacterizationBench.get_spectra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.CharacterizationBench.get_spectra" title="Permalink to this definition"></a></dt>
+<dd><p>Class method to generate total spectral data using a gaussian decay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vessel</strong> (<a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel"><em>Vessel</em></a>) – The vessel inputted for spectroscopic analysis.</p></li>
+<li><p><strong>materials</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><a class="reference internal" href="chemistrylab.material.html#chemistrylab.material.Material" title="chemistrylab.material.Material"><em>material.Material</em></a><em>]</em><em>]</em>) – List of materials to get the spectra from</p></li>
+<li><p><strong>overlap</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Indicates if the spectral plots show overlapping signatures.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 1D array containing the absorption data of the present materials.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.characterization_bench.calc_absorb3">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.characterization_bench.</span></span><span class="sig-name descname"><span class="pre">calc_absorb3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/characterization_bench.html#calc_absorb3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.characterization_bench.calc_absorb3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-chemistrylab.benches.distillation_bench">
+<span id="chemistrylab-benches-distillation-bench-v1-module"></span><h2>chemistrylab.benches.distillation_bench_v1 module<a class="headerlink" href="#module-chemistrylab.benches.distillation_bench" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.distillation_bench.GeneralWurtzDistill_v2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.distillation_bench.</span></span><span class="sig-name descname"><span class="pre">GeneralWurtzDistill_v2</span></span><a class="reference internal" href="_modules/chemistrylab/benches/distillation_bench.html#GeneralWurtzDistill_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.distillation_bench.GeneralWurtzDistill_v2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 270.0, ht: 200.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 277.5, ht: 200.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 285.0, ht: 200.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 292.5, ht: 200.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 300.0, ht: 200.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 370.0, ht: 30.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 527.5, ht: 30.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 685.0, ht: 30.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 842.5, ht: 30.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 1000.0, ht: 30.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.1111111111111111</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2222222222222222</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.3333333333333333</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4444444444444444</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.5555555555555556</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6666666666666666</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.7777777777777777</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8888888888888888</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.0</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.1111111111111111</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2222222222222222</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.3333333333333333</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4444444444444444</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.5555555555555556</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6666666666666666</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.7777777777777777</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8888888888888888</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p>N/A</p></td>
+<td><p>End Experiment</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.distillation_bench.GeneralWurtzDistill_v2.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">10,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.distillation_bench.GeneralWurtzDistill_v2.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.distillation_bench.</span></span><span class="sig-name descname"><span class="pre">WurtzDistillDemo_v0</span></span><a class="reference internal" href="_modules/chemistrylab/benches/distillation_bench.html#WurtzDistillDemo_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 300, ht: 20</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 270, ht: 20</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: 1000, ht: 3</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>boil_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>N/A</p></td>
+<td><p>End Experiment</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0.get_keys_to_action">
+<span class="sig-name descname"><span class="pre">get_keys_to_action</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/distillation_bench.html#WurtzDistillDemo_v0.get_keys_to_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0.get_keys_to_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">60,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.distillation_bench.wurtz_vessel">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.distillation_bench.</span></span><span class="sig-name descname"><span class="pre">wurtz_vessel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">add_mat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/distillation_bench.html#wurtz_vessel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.distillation_bench.wurtz_vessel" title="Permalink to this definition"></a></dt>
+<dd><p>Function to generate an input vessel for the wurtz distillation experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>add_mat</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The target material to include in the vessel</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A vessel containing add_mat and some undesired materials</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Vessel" title="chemistrylab.vessel.Vessel">Vessel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.benches.extract_bench">
+<span id="chemistrylab-benches-extract-bench-v1-module"></span><h2>chemistrylab.benches.extract_bench_v1 module<a class="headerlink" href="#module-chemistrylab.benches.extract_bench" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.GeneralWurtzExtract_v2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">GeneralWurtzExtract_v2</span></span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#GeneralWurtzExtract_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.GeneralWurtzExtract_v2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 2</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 4</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 6</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 8</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 10</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.2</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.4</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.6000000000000001</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.8</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -1.0</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6000000000000001</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6000000000000001</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6000000000000001</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.1</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.30000000000000004</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.5</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.1</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>31</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>32</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.30000000000000004</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>33</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>34</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.5</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>35</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.01</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>36</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.02</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>37</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.04000000000000001</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>38</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.08000000000000002</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>39</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.16</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>40</p></td>
+<td><p>N/A</p></td>
+<td><p>End Experiment</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.GeneralWurtzExtract_v2.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">10,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.extract_bench.GeneralWurtzExtract_v2.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.SeparateTest_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">SeparateTest_v0</span></span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#SeparateTest_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.SeparateTest_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 1</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.02</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>H2O Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>ethoxyethane Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>ethyl acetate Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.001</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.016</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>N/A</p></td>
+<td><p>End Experiment</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.SeparateTest_v0.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">60,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.extract_bench.SeparateTest_v0.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.WaterOilExtract_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">WaterOilExtract_v0</span></span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#WaterOilExtract_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.WaterOilExtract_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 2</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 4</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 6</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 8</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 10</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.2</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.4</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.6000000000000001</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.8</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -1.0</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6000000000000001</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>Waste Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>Waste Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p>Waste Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6000000000000001</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p>Waste Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p>Waste Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>Waste Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>Waste Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.6000000000000001</p></td>
+<td><p>Waste Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.8</p></td>
+<td><p>Waste Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 1.0</p></td>
+<td><p>Waste Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.1</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.30000000000000004</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.5</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p>H2O Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.1</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>31</p></td>
+<td><p>H2O Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.2</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>32</p></td>
+<td><p>H2O Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.30000000000000004</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>33</p></td>
+<td><p>H2O Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.4</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>34</p></td>
+<td><p>H2O Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.5</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>35</p></td>
+<td><p>extraction_vessel, Beaker 1, Waste Vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.01</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>36</p></td>
+<td><p>extraction_vessel, Beaker 1, Waste Vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.02</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>37</p></td>
+<td><p>extraction_vessel, Beaker 1, Waste Vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.04000000000000001</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>38</p></td>
+<td><p>extraction_vessel, Beaker 1, Waste Vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.08000000000000002</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>39</p></td>
+<td><p>extraction_vessel, Beaker 1, Waste Vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.16</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>40</p></td>
+<td><p>N/A</p></td>
+<td><p>End Experiment</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.WaterOilExtract_v0.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">10,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.extract_bench.WaterOilExtract_v0.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.WurtzExtractDemo_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">WurtzExtractDemo_v0</span></span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#WurtzExtractDemo_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.WurtzExtractDemo_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>drain by pixel</p></td>
+<td><p>n_pixel: 1</p></td>
+<td><p>Beaker 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>mix</p></td>
+<td><p>t: -0.02</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>Beaker 1</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>Beaker 2</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>extraction_vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.02</p></td>
+<td><p>Beaker 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>C6H14 Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>diethyl ether Vessel</p></td>
+<td><p>pour by volume</p></td>
+<td><p>volume: 0.01</p></td>
+<td><p>extraction_vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.001</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>extraction_vessel, Beaker 1, Beaker 2</p></td>
+<td><p>mix</p></td>
+<td><p>t: 0.016</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>N/A</p></td>
+<td><p>End Experiment</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.WurtzExtractDemo_v0.get_keys_to_action">
+<span class="sig-name descname"><span class="pre">get_keys_to_action</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#WurtzExtractDemo_v0.get_keys_to_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.WurtzExtractDemo_v0.get_keys_to_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.WurtzExtractDemo_v0.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">60,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.extract_bench.WurtzExtractDemo_v0.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.make_solvent">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">make_solvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#make_solvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.make_solvent" title="Permalink to this definition"></a></dt>
+<dd><p>Makes a Vessel with a single material</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.oil_vessel">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">oil_vessel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#oil_vessel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.oil_vessel" title="Permalink to this definition"></a></dt>
+<dd><p>Function to generate an input vessel for the oil extraction bench.</p>
+<p>Returns:
+- extract_vessel (Vessel): A vessel containing oil and NaCl</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.extract_bench.wurtz_vessel">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.extract_bench.</span></span><span class="sig-name descname"><span class="pre">wurtz_vessel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">add_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/extract_bench.html#wurtz_vessel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.extract_bench.wurtz_vessel" title="Permalink to this definition"></a></dt>
+<dd><p>Function to generate an input vessel for the wurtz extraction bench.</p>
+<p>Args:
+- add_mat (str): The target material to include in the vessel</p>
+<p>Returns:
+- extract_vessel (Vessel): A vessel containing add_mat and some undesired materials</p>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.benches.general_bench">
+<span id="chemistrylab-benches-general-bench-module"></span><h2>chemistrylab.benches.general_bench module<a class="headerlink" href="#module-chemistrylab.benches.general_bench" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.general_bench.</span></span><span class="sig-name descname"><span class="pre">Action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">affected_vessels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#Action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.Action" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NamedTuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action.affected_vessels">
+<span class="sig-name descname"><span class="pre">affected_vessels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.Action.affected_vessels" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.Action.dt" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action.event_name">
+<span class="sig-name descname"><span class="pre">event_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.Action.event_name" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chemistrylab.benches.general_bench.Action.parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action.terminal">
+<span class="sig-name descname"><span class="pre">terminal</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.Action.terminal" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.Action.vessels">
+<span class="sig-name descname"><span class="pre">vessels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chemistrylab.benches.general_bench.Action.vessels" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.ContinuousParam">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.general_bench.</span></span><span class="sig-name descname"><span class="pre">ContinuousParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#ContinuousParam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.ContinuousParam" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NamedTuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.ContinuousParam.max_val">
+<span class="sig-name descname"><span class="pre">max_val</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.ContinuousParam.max_val" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.ContinuousParam.min_val">
+<span class="sig-name descname"><span class="pre">min_val</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.ContinuousParam.min_val" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.ContinuousParam.other">
+<span class="sig-name descname"><span class="pre">other</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.ContinuousParam.other" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.ContinuousParam.thresh">
+<span class="sig-name descname"><span class="pre">thresh</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><span class="pre">float</span></a></em><a class="headerlink" href="#chemistrylab.benches.general_bench.ContinuousParam.thresh" title="Permalink to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.general_bench.</span></span><span class="sig-name descname"><span class="pre">GenBench</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">shelf:</span> <span class="pre">~chemistrylab.lab.shelf.Shelf,</span> <span class="pre">action_list:</span> <span class="pre">~typing.Tuple[~chemistrylab.benches.general_bench.Action],</span> <span class="pre">observation_list:</span> <span class="pre">~typing.Tuple[str],</span> <span class="pre">targets:</span> <span class="pre">~typing.Tuple[str],</span> <span class="pre">default_events:</span> <span class="pre">~typing.Tuple[~chemistrylab.vessel.Event]</span> <span class="pre">=</span> <span class="pre">(),</span> <span class="pre">reward_function:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">default_reward&gt;,</span> <span class="pre">discrete=True,</span> <span class="pre">max_steps=50</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Env</span></code></p>
+<p>A class representing an bench setup for conducting experiments.</p>
+<p>This class represents a bench setup. The setup consists of a shelf with vessels,
+an action list that describes the actions that can be performed on the vessels by the agent, and
+a set of events which are performed on the vessels at the end of each step to update it’s state
+(ex. a chemical reaction).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shelf</strong> (<a class="reference internal" href="chemistrylab.lab.html#chemistrylab.lab.shelf.Shelf" title="chemistrylab.lab.shelf.Shelf"><em>Shelf</em></a>) – A shelf object to store vessels.</p></li>
+<li><p><strong>action_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – A list of Action objects containing information describing what each action is.</p></li>
+<li><p><strong>observation_list</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – List of observations to obtain from the characteriation bench</p></li>
+<li><p><strong>targets</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – The target materials for this bench</p></li>
+<li><p><strong>default_events</strong> (<em>Tuple</em><em>[</em><a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Event" title="chemistrylab.vessel.Event"><em>Event</em></a><em>]</em>) – A list of events to be performed on all working vessels in a bench at the end of each step.</p></li>
+<li><p><strong>reward_function</strong> (<em>Callable</em>) – A function which accepts a target and a list of vessels and outputs a reward.</p></li>
+<li><p><strong>discrete</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – set to True for a discrete action space and False for a continuous one</p></li>
+<li><p><strong>max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Maximum number of steps for an episode</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench.build_event">
+<span class="sig-name descname"><span class="pre">build_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench.build_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench.build_event" title="Permalink to this definition"></a></dt>
+<dd><p>Builds a list of (index, <a class="reference internal" href="chemistrylab.vessel.html#chemistrylab.vessel.Event" title="chemistrylab.vessel.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a>) tuples where index is the index of the vessel the Event will occur in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action</strong> (<a class="reference internal" href="#chemistrylab.benches.general_bench.Action" title="chemistrylab.benches.general_bench.Action"><em>Action</em></a>) – An action containing information about the vessels and parameters involved in the event.</p></li>
+<li><p><strong>param</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a>) – A tuple containing parameters for the event.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of (index, Event) tuples, where index is the index of the vessel the Event will occur in.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench.get_vessels">
+<span class="sig-name descname"><span class="pre">get_vessels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench.get_vessels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench.get_vessels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench.render" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the render frames as specified by <code class="xref py py-attr docutils literal notranslate"><span class="pre">render_mode</span></code> during the initialization of the environment.</p>
+<p>The environment’s <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> render modes (<cite>env.metadata[“render_modes”]</cite>) should contain the possible
+ways to implement the render modes. In addition, list versions for most render modes is achieved through
+<cite>gymnasium.make</cite> which automatically applies a wrapper to collect rendered frames.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As the <code class="xref py py-attr docutils literal notranslate"><span class="pre">render_mode</span></code> is known during <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, the objects used to render the environment state
+should be initialised in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p>
+</div>
+<p>By convention, if the <code class="xref py py-attr docutils literal notranslate"><span class="pre">render_mode</span></code> is:</p>
+<ul class="simple">
+<li><p>None (default): no render is computed.</p></li>
+<li><p>“human”: The environment is continuously rendered in the current display or terminal, usually for human consumption.
+This rendering should occur during <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.step" title="chemistrylab.benches.general_bench.GenBench.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code></a> and <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.render" title="chemistrylab.benches.general_bench.GenBench.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code></a> doesn’t need to be called. Returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p>“rgb_array”: Return a single frame representing the current state of the environment.
+A frame is a <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> with shape <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">3)</span></code> representing RGB values for an x-by-y pixel image.</p></li>
+<li><p>“ansi”: Return a strings (<code class="docutils literal notranslate"><span class="pre">str</span></code>) or <code class="docutils literal notranslate"><span class="pre">StringIO.StringIO</span></code> containing a terminal-style text representation
+for each time step. The text can include newlines and ANSI escape sequences (e.g. for colors).</p></li>
+<li><p>“rgb_array_list” and “ansi_list”: List based version of render modes are possible (except Human) through the
+wrapper, <code class="xref py py-class docutils literal notranslate"><span class="pre">gymnasium.wrappers.RenderCollection</span></code> that is automatically applied during <code class="docutils literal notranslate"><span class="pre">gymnasium.make(...,</span> <span class="pre">render_mode=&quot;rgb_array_list&quot;)</span></code>.
+The frames collected are popped after <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.render" title="chemistrylab.benches.general_bench.GenBench.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code></a> is called or <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.reset" title="chemistrylab.benches.general_bench.GenBench.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that your class’s <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;render_modes&quot;</span></code> key includes the list of supported modes.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.25.0: </span>The render function was changed to no longer accept parameters, rather these parameters should be specified
+in the environment initialised, i.e., <code class="docutils literal notranslate"><span class="pre">gymnasium.make(&quot;CartPole-v1&quot;,</span> <span class="pre">render_mode=&quot;human&quot;)</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Resets the environment to an initial internal state, returning an initial observation and info.</p>
+<p>This method generates a new starting state often with some randomness to ensure that the agent explores the
+state space and learns a generalised policy about the environment. This randomness can be controlled
+with the <code class="docutils literal notranslate"><span class="pre">seed</span></code> parameter otherwise if the environment already has a random number generator and
+<a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.reset" title="chemistrylab.benches.general_bench.GenBench.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> is called with <code class="docutils literal notranslate"><span class="pre">seed=None</span></code>, the RNG is not reset.</p>
+<p>Therefore, <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.reset" title="chemistrylab.benches.general_bench.GenBench.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> should (in the typical use case) be called with a seed right after initialization and then never again.</p>
+<p>For Custom environments, the first line of <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.reset" title="chemistrylab.benches.general_bench.GenBench.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> should be <code class="docutils literal notranslate"><span class="pre">super().reset(seed=seed)</span></code> which implements
+the seeding correctly.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version v0.25: </span>The <code class="docutils literal notranslate"><span class="pre">return_info</span></code> parameter was removed and now info is expected to be returned.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>optional int</em>) – The seed that is used to initialize the environment’s PRNG (<cite>np_random</cite>).
+If the environment does not already have a PRNG and <code class="docutils literal notranslate"><span class="pre">seed=None</span></code> (the default option) is passed,
+a seed will be chosen from some source of entropy (e.g. timestamp or /dev/urandom).
+However, if the environment already has a PRNG and <code class="docutils literal notranslate"><span class="pre">seed=None</span></code> is passed, the PRNG will <em>not</em> be reset.
+If you pass an integer, the PRNG will be reset even if it already exists.
+Usually, you want to pass an integer <em>right after the environment has been initialized and then never again</em>.
+Please refer to the minimal example above to see this paradigm in action.</p></li>
+<li><p><strong>options</strong> (<em>optional dict</em>) – Additional information to specify how the environment is reset (optional,
+depending on the specific environment)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Observation of the initial state. This will be an element of <code class="xref py py-attr docutils literal notranslate"><span class="pre">observation_space</span></code></dt><dd><p>(typically a numpy array) and is analogous to the observation returned by <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.step" title="chemistrylab.benches.general_bench.GenBench.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
+</dd>
+<dt>info (dictionary):  This dictionary contains auxiliary information complementing <code class="docutils literal notranslate"><span class="pre">observation</span></code>. It should be analogous to</dt><dd><p>the <code class="docutils literal notranslate"><span class="pre">info</span></code> returned by <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench.step" title="chemistrylab.benches.general_bench.GenBench.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code></a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>observation (ObsType)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench.step" title="Permalink to this definition"></a></dt>
+<dd><p>Here, actions are performed by ‘_perform_discrete_action’ or ‘_perform_continuous_action’. Afterwards, all vessels in
+react_list have their concentrations updated by a reaction (specified in __init__). Finally, a CharacterizationBench
+is used to generate an observation, and a reward function provides a reward (if a terminal state was reached).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>1D array</em>) – The action to be performed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.GenBench.update_vessels">
+<span class="sig-name descname"><span class="pre">update_vessels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_vessels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#GenBench.update_vessels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.GenBench.update_vessels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.general_bench.default_reward">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.general_bench.</span></span><span class="sig-name descname"><span class="pre">default_reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vessels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targ</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/general_bench.html#default_reward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.general_bench.default_reward" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-chemistrylab.benches.reaction_bench">
+<span id="chemistrylab-benches-reaction-bench-v1-module"></span><h2>chemistrylab.benches.reaction_bench_v1 module<a class="headerlink" href="#module-chemistrylab.benches.reaction_bench" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReactBandit_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.reaction_bench.</span></span><span class="sig-name descname"><span class="pre">FictReactBandit_v0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#FictReactBandit_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReactBandit_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action Index</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Reaction Vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: [273,373], ht: 300</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>fict_A Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>fict_B Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>fict_C Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>fict_D Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReactBandit_v0.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#FictReactBandit_v0.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReactBandit_v0.step" title="Permalink to this definition"></a></dt>
+<dd><p>Here, actions are performed by ‘_perform_discrete_action’ or ‘_perform_continuous_action’. Afterwards, all vessels in
+react_list have their concentrations updated by a reaction (specified in __init__). Finally, a CharacterizationBench
+is used to generate an observation, and a reward function provides a reward (if a terminal state was reached).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><em>1D array</em>) – The action to be performed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReactDemo_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.reaction_bench.</span></span><span class="sig-name descname"><span class="pre">FictReactDemo_v0</span></span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#FictReactDemo_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReactDemo_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action Index</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Reaction Vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: [273,373], ht: 12</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>fict_A Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>fict_B Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>fict_C Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>fict_D Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReactDemo_v0.get_keys_to_action">
+<span class="sig-name descname"><span class="pre">get_keys_to_action</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#FictReactDemo_v0.get_keys_to_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReactDemo_v0.get_keys_to_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReactDemo_v0.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">60,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReactDemo_v0.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReact_v2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.reaction_bench.</span></span><span class="sig-name descname"><span class="pre">FictReact_v2</span></span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#FictReact_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReact_v2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action Index</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Reaction Vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: [273,373], ht: 300</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>fict_A Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>fict_B Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>fict_C Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>fict_D Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.FictReact_v2.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">10,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.reaction_bench.FictReact_v2.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.GeneralWurtzReact_v0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.reaction_bench.</span></span><span class="sig-name descname"><span class="pre">GeneralWurtzReact_v0</span></span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#GeneralWurtzReact_v0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.GeneralWurtzReact_v0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action Index</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Reaction Vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: [156,307], ht: 500</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1-chlorohexane Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>2-chlorohexane Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>3-chlorohexane Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>Na Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.GeneralWurtzReact_v0.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">10,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.reaction_bench.GeneralWurtzReact_v0.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.GeneralWurtzReact_v2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.reaction_bench.</span></span><span class="sig-name descname"><span class="pre">GeneralWurtzReact_v2</span></span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#GeneralWurtzReact_v2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.GeneralWurtzReact_v2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.benches.general_bench.GenBench" title="chemistrylab.benches.general_bench.GenBench"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenBench</span></code></a></p>
+<blockquote>
+<div><p>Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+Here is a breakdown of the action space:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action Index</p></th>
+<th class="head"><p>Vessel</p></th>
+<th class="head"><p>Event Performed</p></th>
+<th class="head"><p>Event Parameters</p></th>
+<th class="head"><p>Other Vessel</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>Reaction Vessel</p></td>
+<td><p>heat contact</p></td>
+<td><p>Tf: [156,307], ht: 500</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1-chlorohexane Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>2-chlorohexane Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>3-chlorohexane Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>Na Vessel</p></td>
+<td><p>pour by percent</p></td>
+<td><p>fraction: [0,1]</p></td>
+<td><p>Reaction Vessel</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.GeneralWurtzReact_v2.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_fps':</span> <span class="pre">10,</span> <span class="pre">'render_modes':</span> <span class="pre">['rgb_array']}</span></em><a class="headerlink" href="#chemistrylab.benches.reaction_bench.GeneralWurtzReact_v2.metadata" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.benches.reaction_bench.get_mat">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.benches.reaction_bench.</span></span><span class="sig-name descname"><span class="pre">get_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/benches/reaction_bench.html#get_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.benches.reaction_bench.get_mat" title="Permalink to this definition"></a></dt>
+<dd><p>Makes a Vessel with a single material</p>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.benches">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chemistrylab.benches" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chemistrylab.vessel.html" class="btn btn-neutral float-left" title="chemistrylab.vessel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chemistrylab.extract_algorithms.html" class="btn btn-neutral float-right" title="chemistrylab.extract_algorithms package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

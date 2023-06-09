@@ -5,6 +5,7 @@ import copy
 import sys
 from chemistrylab import material, vessel
 import numba
+from typing import NamedTuple, Tuple, Callable, Optional, List
 
 @numba.jit(nopython=True)
 def calc_absorb3(item, C, x, w_min, w_max, absorb):
@@ -34,15 +35,24 @@ class CharacterizationBench:
     A set of methods made available to inspect an inputted vessel.
 
     Args:
-    - observation_list (Tuple[str]): Ordered list of observations to make (see Method Map)
-    - targets (Tuple[str]): A list of target materials
-    - n_vessels (int): The (maximum) number of vessels included in an observation
+        observation_list (Tuple[str]): Ordered list of observations to make (see Method Map)
+        targets (Tuple[str]): A list of target materials
+        n_vessels (int): The (maximum) number of vessels included in an observation
 
     Method Map:
-    - 'spectra' -> get_spectra
-    - 'layers'  -> get_layers
-    - 'targets' -> encode_target
-    - 'PVT'     -> encode_PVT
+
+    +------------+----------------+
+    | Key        | Method         |
+    +============+================+
+    | 'spectra'  | get_spectra    |
+    +------------+----------------+
+    | 'layers'   | get_layers     |
+    +------------+----------------+
+    | 'targets'  | encode_target  |
+    +------------+----------------+
+    | 'PVT'      | encode_PVT     |
+    +------------+----------------+
+
 
     """
 
@@ -77,14 +87,14 @@ class CharacterizationBench:
         self.observation_shape=(n_vessels*n_pixels,)
         self.state_s = (n_vessels,n_pixels)
 
-    def get_observation(self, vessels, target):
+    def get_observation(self, vessels: vessel.Vessel, target: str):
         """
         Returns a concatenation of observations of the vessels provided, using the list of observations provided
         in __init__
 
         Args:
-        - vessels (Tuple[Vessel]): A list of vessels you want an observtation of.
-        - target (str): The current target material
+            vessels (Tuple[Vessel]): A list of vessels you want an observtation of.
+            target (str): The current target material
         """
         self.target=target
         state=np.zeros(self.state_s,dtype=np.float32)
@@ -97,20 +107,19 @@ class CharacterizationBench:
         return self.get_observation(vessels, target)
 
 
-    def get_spectra(self, vessel, materials=None, overlap=True):
+    def get_spectra(self, vessel: vessel.Vessel, materials: Optional[Tuple[material.Material]] = None, overlap: bool = True):
         """
         Class method to generate total spectral data using a gaussian decay.
 
         Args:
-        - vessel (Vessel): The vessel inputted for spectroscopic analysis.
-        - materials (Optional[list]): List of materials to get the spectra from
-        - overlap (bool): Indicates if the spectral plots show overlapping signatures. 
+            vessel (Vessel): The vessel inputted for spectroscopic analysis.
+            materials (Optional[Tuple[material.Material]]): List of materials to get the spectra from
+            overlap (bool): Indicates if the spectral plots show overlapping signatures. 
                 Defaults to False.
 
         Returns:
-        - spectra (np.array): A 1D array containing the absorption data of the present materials.
+            np.array: A 1D array containing the absorption data of the present materials.
 
-        Note: Note sure if this is improved. . . consider falling back to previous implementation: calc_absorb
         """
         
         mat_dict=vessel.material_dict
@@ -138,12 +147,16 @@ class CharacterizationBench:
         return np.clip(absorb, 0.0, 1.0)
 
             
-    def get_layers(self, vessel):
-        """Returns a 1D array of vessel layer information"""
+    def get_layers(self, vessel: vessel.Vessel):
+        """
+        Returns:
+            np.array: a 1D array of vessel layer information"""
         return vessel.get_layers()
 
-    def encode_PVT(self,vessel):
-        """Returns a size 3 array containing [temperature,volume,pressure]"""
+    def encode_PVT(self,vessel: vessel.Vessel):
+        """
+        Returns:
+            np.array: a size 3 array containing [temperature,volume,pressure]"""
         # set up the temperature
         #Tmin, Tmax = vessel.get_Tmin(), vessel.get_Tmax()
         temp = vessel.temperature
@@ -161,9 +174,10 @@ class CharacterizationBench:
         out = np.array([normalized_temp,normalized_volume,normalized_pressure],dtype=np.float32)
         return np.clip(out,0,1)
 
-    def encode_target(self, vessel):
+    def encode_target(self, vessel: vessel.Vessel):
         """
-        Returns a 1D one-hot encoding of the target material (note self.target must be set before doing this)
+        Returns:
+            np.array: a 1D one-hot encoding of the target material (note self.target must be set before doing this)
         """
         targ_index = self.targets.index(self.target)
         one_hot=np.zeros(len(self.targets))
