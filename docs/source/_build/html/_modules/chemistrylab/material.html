@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.material &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../chemistrylab.html">chemistrylab package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chemistrylab.material</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chemistrylab.material</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This file is part of ChemGymRL.</span>
+
+
+
+<span class="sd">Property : Intended Units -- Object Type -- Brief Description</span>
+<span class="sd">    - `name` : N/A -- `str` -- The name of the material, used for identification purposes.</span>
+<span class="sd">    - `density` : g/cm**3 -- `float` -- The density of the material at STP.</span>
+<span class="sd">    - `polarity` : N/A -- `float` -- The polarity of the material.</span>
+<span class="sd">    - `temperature` : K -- `float` -- The initial temperature of the material upon being called.</span>
+<span class="sd">    - `pressure` : kPa -- `float` -- The initial pressure of the material upon being called.</span>
+<span class="sd">    - `phase` : N/A -- `str` -- The state of the material at the initial temperature.</span>
+<span class="sd">    - `charge` : C -- `float` -- The electric charge associated with the material.</span>
+<span class="sd">    - `molar_mass` : g/mol -- `float` -- The most common molar mass of the material.</span>
+<span class="sd">    - `color` : N/A -- `float` -- A number representing the color of the material using a 0 -&gt; 1 scale.</span>
+<span class="sd">    - `solute` : N/A -- `bool` -- A boolean indicating if the material is to be used as a solute.</span>
+<span class="sd">    - `solvent` : N/A -- `bool` -- A boolean indicating if the material is to be used as a solvent.</span>
+<span class="sd">    - `boiling_point` : K -- `float` -- The boiling point of the material.</span>
+<span class="sd">    - `melting_point` : K -- `float` -- The melting point of the material.</span>
+<span class="sd">    - `specific_heat` : J/g*K -- `float` -- The specific heat capacity of the material.</span>
+<span class="sd">    - `enthalpy_fusion` : J/mol -- `float` -- The material&#39;s enthalpy of fusion.</span>
+<span class="sd">    - `enthalpy_vapor` : J/mol -- `float` -- The material&#39;s enthalpy of vapor.</span>
+<span class="sd">    - `index` : N/A -- `int` -- An additional index used for identification purposes.</span>
+
+<span class="sd">    - heat_capacity: heat capacity in J/K</span>
+<span class="sd">    - litres: volume in litres</span>
+<span class="sd">    - vapour_enthalpy: heat to vaporize in J</span>
+
+<span class="sd">Moreover, the `REGISTRY` variable gives a dictionary of available materials.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">chemistrylab.util</span> <span class="kn">import</span> <span class="n">diff_spectra</span> <span class="k">as</span> <span class="n">spec</span>
+
+<span class="n">REGISTRY</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<div class="viewcode-block" id="register"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.register">[docs]</a><span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="o">*</span><span class="n">material_classes</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">material_class</span> <span class="ow">in</span> <span class="n">material_classes</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">material_class</span><span class="p">()</span><span class="o">.</span><span class="n">_name</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">REGISTRY</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot register the same Material (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">) Twice!&quot;</span><span class="p">)</span>
+        <span class="n">REGISTRY</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">material_class</span></div>
+
+<div class="viewcode-block" id="Material"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material">[docs]</a><span class="k">class</span> <span class="nc">Material</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>  <span class="c1"># in g/cm**3</span>
+                 <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in K</span>
+                 <span class="n">pressure</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in kPa</span>
+                 <span class="n">phase</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># one of &quot;s&quot;, &quot;l&quot;, or &quot;g&quot; at temperature</span>
+                 <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">molar_mass</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in g/mol</span>
+                 <span class="n">color</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># color scale from 0 to 1</span>
+                 <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># is material a solute</span>
+                 <span class="n">solvent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># is material a solvent</span>
+                 <span class="n">boiling_point</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in K</span>
+                 <span class="n">melting_point</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in K</span>
+                 <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+                 <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in J/mol</span>
+                 <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># in J/mol</span>
+                 <span class="n">spectra_overlap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">index</span><span class="o">=</span><span class="kc">None</span>
+                 <span class="p">):</span>
+        
+        <span class="c1">#properties that can change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="n">polarity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pressure</span> <span class="o">=</span> <span class="n">pressure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">phase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+
+        <span class="c1">#Properties likely to remain constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span> <span class="o">=</span> <span class="n">molar_mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_density</span> <span class="o">=</span> <span class="n">density</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_solute</span> <span class="o">=</span> <span class="n">solute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_solvent</span> <span class="o">=</span> <span class="n">solvent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_boiling_point</span> <span class="o">=</span> <span class="n">boiling_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_melting_point</span> <span class="o">=</span> <span class="n">melting_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_specific_heat</span> <span class="o">=</span> <span class="n">specific_heat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enthalpy_fusion</span> <span class="o">=</span> <span class="n">enthalpy_fusion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enthalpy_vapor</span> <span class="o">=</span> <span class="n">enthalpy_vapor</span>
+
+        <span class="c1">#dealing with spectra</span>
+        <span class="k">if</span> <span class="n">spectra_overlap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">spectra_no_overlap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectra_overlap</span> <span class="o">=</span> <span class="n">spectra_overlap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectra_no_overlap</span> <span class="o">=</span> <span class="n">spectra_no_overlap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
+
+    <span class="c1">#Hashing / Naming properties</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="o">==</span><span class="n">other</span><span class="o">.</span><span class="n">_name</span>
+    <span class="c1"># Less mutable properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">molar_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">get_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">boiling_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boiling_point</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">melting_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_melting_point</span>
+    <span class="c1">#Derived quantities</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">heat_capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_specific_heat</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">litres</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">1e-3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">]</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">litres_per_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">1e-3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_molar_mass</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">]</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vapour_enthalpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_enthalpy_vapor</span>
+
+<div class="viewcode-block" id="Material.ration"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.ration">[docs]</a>    <span class="k">def</span> <span class="nf">ration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ratio</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new Material and moves `ratio` fraction of the moles to the new material</span>
+<span class="sd">        Args:</span>
+<span class="sd">        - ratio (float): Should be in [0,1]</span>
+<span class="sd">        Returns</span>
+<span class="sd">        - mat (Material): Material with the same class where the moles were moved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">diff</span><span class="o">=</span><span class="n">ratio</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">-=</span> <span class="n">diff</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
+        <span class="n">mat</span><span class="o">.</span><span class="n">mol</span><span class="o">=</span><span class="n">diff</span>
+
+        <span class="n">mat</span><span class="o">.</span><span class="n">phase</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span>
+        <span class="n">mat</span><span class="o">.</span><span class="n">_solute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_solute</span>
+        <span class="n">mat</span><span class="o">.</span><span class="n">_solvent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_solvent</span>
+        <span class="k">return</span> <span class="n">mat</span></div>
+
+<div class="viewcode-block" id="Material.dissolve"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.dissolve">[docs]</a>    <span class="k">def</span> <span class="nf">dissolve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># should be able to return how this material is dissolved</span>
+        <span class="c1"># for NaCl this should at least return Na(charge=1) and Cl(charge=-1)</span>
+        <span class="c1"># for the rest, like how Na and Cl dissolve in solvent, can be handled by the vessel&#39;s dissolve function</span>
+        <span class="n">dis_mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
+        <span class="n">dis_mat</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dis_mat</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">dis_mat</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">dis_mat</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Material.precipitate"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.precipitate">[docs]</a>    <span class="k">def</span> <span class="nf">precipitate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># should be able to return how this material precipitates</span>
+        <span class="c1"># for Na this should at least return Cl (requirements) &amp; NaCl (results)</span>
+        <span class="n">prep_mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
+        <span class="n">prep_mat</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[[[{</span><span class="n">prep_mat</span><span class="p">:</span> <span class="mi">1</span><span class="p">}],</span> <span class="n">prep_mat</span><span class="p">]]</span></div>
+
+    <span class="c1"># functions to access material&#39;s properties</span>
+<div class="viewcode-block" id="Material.get_name"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+<div class="viewcode-block" id="Material.get_density"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.get_density">[docs]</a>    <span class="k">def</span> <span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">per_L</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># need to convert to g/dm^3 in order to get volume in litres</span>
+        <span class="k">if</span> <span class="n">per_L</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="Material.is_solute"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.is_solute">[docs]</a>    <span class="k">def</span> <span class="nf">is_solute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solute</span></div>
+
+<div class="viewcode-block" id="Material.is_solvent"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.is_solvent">[docs]</a>    <span class="k">def</span> <span class="nf">is_solvent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solvent</span></div>
+
+    <span class="c1"># functions to change material&#39;s properties</span>
+<div class="viewcode-block" id="Material.set_solute_flag"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.set_solute_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_solute_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">flag</span><span class="p">,</span>
+                        <span class="p">):</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solute</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solvent</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solute</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Material.set_solvent_flag"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.set_solvent_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_solvent_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">flag</span><span class="p">,</span>
+                         <span class="p">):</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solvent</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solute</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_solvent</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Material.set_specific_heat"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.set_specific_heat">[docs]</a>    <span class="k">def</span> <span class="nf">set_specific_heat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specific_heat</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_specific_heat</span> <span class="o">=</span> <span class="n">specific_heat</span></div>
+
+<div class="viewcode-block" id="Material.set_enthalpy_fusion"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.set_enthalpy_fusion">[docs]</a>    <span class="k">def</span> <span class="nf">set_enthalpy_fusion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enthalpy_fusion</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enthalpy_fusion</span> <span class="o">=</span> <span class="n">enthalpy_fusion</span></div>
+
+<div class="viewcode-block" id="Material.enthalpy_vapor"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.enthalpy_vapor">[docs]</a>    <span class="k">def</span>     <span class="nf">enthalpy_vapor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enthalpy_vapor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enthalpy_vapor</span> <span class="o">=</span> <span class="n">enthalpy_vapor</span></div>
+
+<div class="viewcode-block" id="Material.set_color"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.set_color">[docs]</a>    <span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color</span> <span class="o">=</span> <span class="n">color</span></div>
+
+<div class="viewcode-block" id="Material.get_spectra_overlap"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.get_spectra_overlap">[docs]</a>    <span class="k">def</span> <span class="nf">get_spectra_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectra_overlap</span></div>
+
+<div class="viewcode-block" id="Material.get_spectra_no_overlap"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.get_spectra_no_overlap">[docs]</a>    <span class="k">def</span> <span class="nf">get_spectra_no_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectra_no_overlap</span></div>
+
+<div class="viewcode-block" id="Material.get_index"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Material.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span></div></div>
+
+<span class="c1">## ---------- ## PRE-DEFINED MATERIALS ## ---------- ##</span>
+
+<div class="viewcode-block" id="Air"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Air">[docs]</a><span class="k">class</span> <span class="nc">Air</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Air&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">1.225e-3</span><span class="p">},</span>  <span class="c1"># in g/cm^3</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">297</span><span class="p">,</span>  <span class="c1"># in K</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">28.963</span><span class="p">,</span>  <span class="c1"># in g/mol</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.0035</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">0</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="H2O"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.H2O">[docs]</a><span class="k">class</span> <span class="nc">H2O</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;H2O&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.997</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">1.24</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="mf">109.5</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span><span class="p">))),</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">18.015</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">373.15</span><span class="p">,</span>
+                         <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">solvent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">4.1813</span><span class="p">,</span>
+                         <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">40650.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">1</span>
+                         <span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">H</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">8.9e-5</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">1.008</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">20.25</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">2</span>
+                         <span class="p">)</span>
+
+
+<div class="viewcode-block" id="H2"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.H2">[docs]</a><span class="k">class</span> <span class="nc">H2</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;H2&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">8.9e-5</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">2.016</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">20.25</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">14.304</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">3</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="O"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.O">[docs]</a><span class="k">class</span> <span class="nc">O</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">1.429e-3</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">15.999</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">90.188</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">4</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="O2"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.O2">[docs]</a><span class="k">class</span> <span class="nc">O2</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;O2&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">1.429e-3</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">31.999</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">90.188</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">0.918</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">5</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="O3"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.O3">[docs]</a><span class="k">class</span> <span class="nc">O3</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;O3&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">2.144e-3</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="mf">116.8</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span><span class="p">))),</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">47.998</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">161.15</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">6</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="C6H14"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.C6H14">[docs]</a><span class="k">class</span> <span class="nc">C6H14</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;C6H14&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.655</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">86.175</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">solvent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">342.15</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.26</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">7</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NaCl"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.NaCl">[docs]</a><span class="k">class</span> <span class="nc">NaCl</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NaCl&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">58.443</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">1738.0</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">0.853</span><span class="p">,</span>
+                         <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">27950.0</span><span class="p">,</span>
+                         <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">229700.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">8</span>
+                         <span class="p">)</span>
+
+<div class="viewcode-block" id="NaCl.dissolve"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.NaCl.dissolve">[docs]</a>    <span class="k">def</span> <span class="nf">dissolve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dis_Na</span> <span class="o">=</span> <span class="n">Na</span><span class="p">()</span>
+        <span class="n">dis_Na</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">dis_Na</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dis_Na</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">dis_Na</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">dis_Na</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+
+        <span class="n">dis_Cl</span> <span class="o">=</span> <span class="n">Cl</span><span class="p">()</span>
+        <span class="n">dis_Cl</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">dis_Cl</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">dis_Cl</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">dis_Cl</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">dis_Cl</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">dis_Na</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dis_Cl</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span></div></div>
+
+<span class="c1"># Polarity is dependant on charge for atoms</span>
+<div class="viewcode-block" id="Na"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Na">[docs]</a><span class="k">class</span> <span class="nc">Na</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Na&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">0.968</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.856</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+                         <span class="n">solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">22.990</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">1156.0</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.23</span><span class="p">,</span>
+                         <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">2600.0</span><span class="p">,</span>
+                         <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">97700.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">9</span>
+                         <span class="p">)</span>
+
+<div class="viewcode-block" id="Na.precipitate"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Na.precipitate">[docs]</a>    <span class="k">def</span> <span class="nf">precipitate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">prep_Na</span> <span class="o">=</span> <span class="n">Na</span><span class="p">()</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+
+        <span class="n">prep_Cl</span> <span class="o">=</span> <span class="n">Cl</span><span class="p">()</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+
+        <span class="n">prep_NaCl</span> <span class="o">=</span> <span class="n">NaCl</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">[[[{</span><span class="n">prep_Na</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="n">prep_Cl</span><span class="p">:</span> <span class="mi">1</span><span class="p">}],</span> <span class="n">prep_NaCl</span><span class="p">]]</span></div></div>
+
+
+<span class="c1"># Note: Cl is very unstable when not an aqueous ion</span>
+<div class="viewcode-block" id="Cl"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Cl">[docs]</a><span class="k">class</span> <span class="nc">Cl</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cl&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">1.558</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">3.214e-3</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+                         <span class="n">solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">35.453</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">1156.0</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">0.48</span><span class="p">,</span>
+                         <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">3200.0</span><span class="p">,</span>
+                         <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">10200.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">10</span>
+                         <span class="p">)</span>
+
+<div class="viewcode-block" id="Cl.precipitate"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Cl.precipitate">[docs]</a>    <span class="k">def</span> <span class="nf">precipitate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">prep_Na</span> <span class="o">=</span> <span class="n">Na</span><span class="p">()</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">prep_Na</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+
+        <span class="n">prep_Cl</span> <span class="o">=</span> <span class="n">Cl</span><span class="p">()</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">set_solute_flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">polarity</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">prep_Cl</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="s1">&#39;l&#39;</span>
+
+        <span class="n">prep_NaCl</span> <span class="o">=</span> <span class="n">NaCl</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">[[[</span><span class="n">prep_Na</span><span class="p">,</span> <span class="n">prep_Cl</span><span class="p">],</span> <span class="p">[</span><span class="n">prep_NaCl</span><span class="p">]]]</span></div></div>
+
+<div class="viewcode-block" id="Cl2"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Cl2">[docs]</a><span class="k">class</span> <span class="nc">Cl2</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cl2&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">2.898e-3</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">70.906</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">238.55</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">11</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LiF"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.LiF">[docs]</a><span class="k">class</span> <span class="nc">LiF</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;LiF&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.640</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">25.939</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">1953.15</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">12</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Li"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Li">[docs]</a><span class="k">class</span> <span class="nc">Li</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Li&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">0.534</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">6.941</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">1603.15</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">13</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="F2"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.F2">[docs]</a><span class="k">class</span> <span class="nc">F2</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;F2&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">1.696e-3</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">37.997</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mf">85.15</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">0.824</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">15</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CuSO4"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.CuSO4">[docs]</a><span class="k">class</span> <span class="nc">CuSO4</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;CuS04&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">3.6</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">159.6</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mi">923</span><span class="p">,</span>
+                         <span class="n">melting_point</span><span class="o">=</span><span class="mi">383</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">0.853</span><span class="p">,</span>
+                         <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">27950.0</span><span class="p">,</span>
+                         <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">229700.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">8</span>
+                         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CuSO4Pentahydrate"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.CuSO4Pentahydrate">[docs]</a><span class="k">class</span> <span class="nc">CuSO4Pentahydrate</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;CuS04*5H2O&#39;</span><span class="p">,</span>
+                         <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.286</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                         <span class="n">polarity</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                         <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+                         <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+                         <span class="n">molar_mass</span><span class="o">=</span><span class="mf">249.68</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                         <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                         <span class="n">boiling_point</span><span class="o">=</span><span class="mi">923</span><span class="p">,</span>
+                         <span class="n">melting_point</span><span class="o">=</span><span class="mi">383</span><span class="p">,</span>
+                         <span class="n">specific_heat</span><span class="o">=</span><span class="mf">0.853</span><span class="p">,</span>
+                         <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">27950.0</span><span class="p">,</span>
+                         <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">229700.0</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="mi">8</span>
+                         <span class="p">)</span></div>
+
+
+<span class="c1">## ---------- ## HYDROCARBONS ## ---------- ##</span>
+
+<div class="viewcode-block" id="Dodecane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Dodecane">[docs]</a><span class="k">class</span> <span class="nc">Dodecane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dodecane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">489.5</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">263.6</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">16</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OneChlorohexane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.OneChlorohexane">[docs]</a><span class="k">class</span> <span class="nc">OneChlorohexane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;1-chlorohexane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.879</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">120.62</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">408.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">179.2</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.5408</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">15490.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">42800.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_1_chlorohexane</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_1_chlorohexane</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">17</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TwoChlorohexane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.TwoChlorohexane">[docs]</a><span class="k">class</span> <span class="nc">TwoChlorohexane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;2-chlorohexane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.87</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">120.62</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">395.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">308.3</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.5408</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">11970.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">43820.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_2_chlorohexane</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_2_chlorohexane</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">18</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThreeChlorohexane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.ThreeChlorohexane">[docs]</a><span class="k">class</span> <span class="nc">ThreeChlorohexane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;3-chlorohexane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">120.62</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">396.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">308.3</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.5408</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">11970.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">32950.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_3_chlorohexane</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_3_chlorohexane</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">19</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FiveMethylundecane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.FiveMethylundecane">[docs]</a><span class="k">class</span> <span class="nc">FiveMethylundecane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;5-methylundecane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">481.1</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">255.2</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">20</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FourEthyldecane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.FourEthyldecane">[docs]</a><span class="k">class</span> <span class="nc">FourEthyldecane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;4-ethyldecane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">480.1</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">254.2</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">21</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FiveSixDimethyldecane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.FiveSixDimethyldecane">[docs]</a><span class="k">class</span> <span class="nc">FiveSixDimethyldecane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;5,6-dimethyldecane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.757</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">474.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">222.4</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">22</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FourEthylFiveMethylnonane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.FourEthylFiveMethylnonane">[docs]</a><span class="k">class</span> <span class="nc">FourEthylFiveMethylnonane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;4-ethyl-5-methylnonane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">476.3</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">224.5</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">23</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FourFiveDiethyloctane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.FourFiveDiethyloctane">[docs]</a><span class="k">class</span> <span class="nc">FourFiveDiethyloctane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;4,5-diethyloctane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.768</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">470.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">222.4</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">24</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ethoxyethane"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.Ethoxyethane">[docs]</a><span class="k">class</span> <span class="nc">Ethoxyethane</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ethoxyethane&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.713</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">74.123</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">34.6</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=-</span><span class="mf">116.3</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">solvent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.253</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">7190.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">27250.0</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">25</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EthylAcetate"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.EthylAcetate">[docs]</a><span class="k">class</span> <span class="nc">EthylAcetate</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ethyl acetate&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.902</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.654</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">88.106</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">189.6</span><span class="p">,</span>
+            <span class="n">solvent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.904</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mi">10480</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mi">31940</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">26</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DiEthylEther"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.DiEthylEther">[docs]</a><span class="k">class</span> <span class="nc">DiEthylEther</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;diethyl ether&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">0.7134</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">74.123</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">307.8</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">156.8</span><span class="p">,</span>
+            <span class="n">solvent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">119.46</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=-</span><span class="mf">252.7e3</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">27.247e3</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">29</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="A"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.A">[docs]</a><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_A&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">489.5</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">263.6</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_A</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_A</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">30</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="B"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.B">[docs]</a><span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_B&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">120.62</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">408.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">179.2</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.5408</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">15490.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">42800.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_B</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_B</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">31</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="C"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.C">[docs]</a><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_C&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">120.62</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">395.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">308.3</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.5408</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">11970.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">43820.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_C</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_C</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">32</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="D"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.D">[docs]</a><span class="k">class</span> <span class="nc">D</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_D&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">120.62</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">396.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">308.3</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.5408</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">11970.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">32950.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_D</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_D</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">33</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="E"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.E">[docs]</a><span class="k">class</span> <span class="nc">E</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_E&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">481.1</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">255.2</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_E</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_E</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">34</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="F"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.F">[docs]</a><span class="k">class</span> <span class="nc">F</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_F&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">480.1</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">254.2</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_F</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_F</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">35</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="G"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.G">[docs]</a><span class="k">class</span> <span class="nc">G</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_G&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">474.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">222.4</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_G</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_G</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">36</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="H"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.H">[docs]</a><span class="k">class</span> <span class="nc">H</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_H&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">476.3</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">224.5</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_H</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_H</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">37</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="I"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.I">[docs]</a><span class="k">class</span> <span class="nc">I</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fict_I&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="mf">2.165</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">170.34</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.45</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mf">470.2</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">222.4</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">2.3889</span><span class="p">,</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mf">19790.0</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mf">41530.0</span><span class="p">,</span>
+            <span class="n">spectra_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_I</span><span class="p">,</span>
+            <span class="n">spectra_no_overlap</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">S_I</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">38</span>
+        <span class="p">)</span></div>
+
+<span class="c1">##------Indicators------##</span>
+
+
+<div class="viewcode-block" id="MethylRed"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.MethylRed">[docs]</a><span class="k">class</span> <span class="nc">MethylRed</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;methyl red&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mf">0.902</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">88.106</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mi">630</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mi">455</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.904</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mi">10480</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mi">31940</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">27</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1">##-------Acids-------##</span>
+
+
+<div class="viewcode-block" id="HCl"><a class="viewcode-back" href="../../chemistrylab.material.html#chemistrylab.material.HCl">[docs]</a><span class="k">class</span> <span class="nc">HCl</span><span class="p">(</span><span class="n">Material</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                         
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;HCl&#39;</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mf">1.48e-3</span><span class="p">},</span>
+            <span class="n">polarity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="mf">88.106</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">charge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="n">boiling_point</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
+            <span class="n">melting_point</span><span class="o">=</span><span class="mf">189.6</span><span class="p">,</span>
+            <span class="n">solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">specific_heat</span><span class="o">=</span><span class="mf">1.904</span><span class="p">,</span>  <span class="c1"># in J/g*K</span>
+            <span class="n">enthalpy_fusion</span><span class="o">=</span><span class="mi">10480</span><span class="p">,</span>
+            <span class="n">enthalpy_vapor</span><span class="o">=</span><span class="mi">31940</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="mi">28</span>
+        <span class="p">)</span></div>
+
+
+<span class="n">register</span><span class="p">(</span><span class="o">*</span><span class="n">Material</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

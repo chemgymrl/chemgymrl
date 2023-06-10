@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.material module &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="Installation.html" />
+    <link rel="prev" title="chemistrylab.util package" href="chemistrylab.util.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="chemistrylab.html">chemistrylab package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="chemistrylab.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.vessel.html">chemistrylab.vessel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.benches.html">chemistrylab.benches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.extract_algorithms.html">chemistrylab.extract_algorithms package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.lab.html">chemistrylab.lab package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.reactions.html">chemistrylab.reactions package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.util.html">chemistrylab.util package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">chemistrylab.material module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chemistrylab.html">chemistrylab package</a></li>
+      <li class="breadcrumb-item active">chemistrylab.material module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/chemistrylab.material.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-chemistrylab.material">
+<span id="chemistrylab-material-module"></span><h1>chemistrylab.material module<a class="headerlink" href="#module-chemistrylab.material" title="Permalink to this heading"></a></h1>
+<p>This file is part of ChemGymRL.</p>
+<dl class="simple">
+<dt>Property<span class="classifier">Intended Units – Object Type – Brief Description</span></dt><dd><ul class="simple">
+<li><p><cite>name</cite> : N/A – <cite>str</cite> – The name of the material, used for identification purposes.</p></li>
+<li><p><cite>density</cite> : g/cm**3 – <cite>float</cite> – The density of the material at STP.</p></li>
+<li><p><cite>polarity</cite> : N/A – <cite>float</cite> – The polarity of the material.</p></li>
+<li><p><cite>temperature</cite> : K – <cite>float</cite> – The initial temperature of the material upon being called.</p></li>
+<li><p><cite>pressure</cite> : kPa – <cite>float</cite> – The initial pressure of the material upon being called.</p></li>
+<li><p><cite>phase</cite> : N/A – <cite>str</cite> – The state of the material at the initial temperature.</p></li>
+<li><p><cite>charge</cite> : C – <cite>float</cite> – The electric charge associated with the material.</p></li>
+<li><p><cite>molar_mass</cite> : g/mol – <cite>float</cite> – The most common molar mass of the material.</p></li>
+<li><p><cite>color</cite> : N/A – <cite>float</cite> – A number representing the color of the material using a 0 -&gt; 1 scale.</p></li>
+<li><p><cite>solute</cite> : N/A – <cite>bool</cite> – A boolean indicating if the material is to be used as a solute.</p></li>
+<li><p><cite>solvent</cite> : N/A – <cite>bool</cite> – A boolean indicating if the material is to be used as a solvent.</p></li>
+<li><p><cite>boiling_point</cite> : K – <cite>float</cite> – The boiling point of the material.</p></li>
+<li><p><cite>melting_point</cite> : K – <cite>float</cite> – The melting point of the material.</p></li>
+<li><p><cite>specific_heat</cite> : J/g*K – <cite>float</cite> – The specific heat capacity of the material.</p></li>
+<li><p><cite>enthalpy_fusion</cite> : J/mol – <cite>float</cite> – The material’s enthalpy of fusion.</p></li>
+<li><p><cite>enthalpy_vapor</cite> : J/mol – <cite>float</cite> – The material’s enthalpy of vapor.</p></li>
+<li><p><cite>index</cite> : N/A – <cite>int</cite> – An additional index used for identification purposes.</p></li>
+<li><p>heat_capacity: heat capacity in J/K</p></li>
+<li><p>litres: volume in litres</p></li>
+<li><p>vapour_enthalpy: heat to vaporize in J</p></li>
+</ul>
+</dd>
+</dl>
+<p>Moreover, the <cite>REGISTRY</cite> variable gives a dictionary of available materials.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.A">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">A</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#A"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.A" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Air">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Air</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Air"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Air" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.B">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">B</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#B"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.B" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.C">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.C" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.C6H14">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">C6H14</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#C6H14"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.C6H14" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Cl">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Cl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Cl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Cl" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Cl.precipitate">
+<span class="sig-name descname"><span class="pre">precipitate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Cl.precipitate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Cl.precipitate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Cl2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Cl2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Cl2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Cl2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.CuSO4">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">CuSO4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#CuSO4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.CuSO4" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.CuSO4Pentahydrate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">CuSO4Pentahydrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#CuSO4Pentahydrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.CuSO4Pentahydrate" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.DiEthylEther">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">DiEthylEther</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#DiEthylEther"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.DiEthylEther" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Dodecane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Dodecane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Dodecane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Dodecane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.E">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">E</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#E"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.E" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Ethoxyethane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Ethoxyethane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Ethoxyethane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Ethoxyethane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.EthylAcetate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">EthylAcetate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#EthylAcetate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.EthylAcetate" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.F">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">F</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#F"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.F" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.F2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">F2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#F2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.F2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.FiveMethylundecane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">FiveMethylundecane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#FiveMethylundecane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.FiveMethylundecane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.FiveSixDimethyldecane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">FiveSixDimethyldecane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#FiveSixDimethyldecane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.FiveSixDimethyldecane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.FourEthylFiveMethylnonane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">FourEthylFiveMethylnonane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#FourEthylFiveMethylnonane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.FourEthylFiveMethylnonane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.FourEthyldecane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">FourEthyldecane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#FourEthyldecane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.FourEthyldecane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.FourFiveDiethyloctane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">FourFiveDiethyloctane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#FourFiveDiethyloctane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.FourFiveDiethyloctane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.G">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">G</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#G"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.G" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.H">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">H</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#H"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.H" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.H2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">H2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#H2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.H2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.H2O">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">H2O</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#H2O"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.H2O" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.HCl">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">HCl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#HCl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.HCl" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.I">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">I</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#I"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.I" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Li">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Li</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Li"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Li" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.LiF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">LiF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#LiF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.LiF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Material">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'g':</span> <span class="pre">1.0,</span> <span class="pre">'l':</span> <span class="pre">1.0,</span> <span class="pre">'s':</span> <span class="pre">1.0}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molar_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boiling_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">melting_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_heat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enthalpy_fusion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enthalpy_vapor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectra_overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectra_no_overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.boiling_point">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">boiling_point</span></span><a class="headerlink" href="#chemistrylab.material.Material.boiling_point" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.dissolve">
+<span class="sig-name descname"><span class="pre">dissolve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.dissolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.dissolve" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.enthalpy_vapor">
+<span class="sig-name descname"><span class="pre">enthalpy_vapor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enthalpy_vapor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.enthalpy_vapor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.enthalpy_vapor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.get_color">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_color</span></span><a class="headerlink" href="#chemistrylab.material.Material.get_color" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.get_density">
+<span class="sig-name descname"><span class="pre">get_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">per_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.get_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.get_density" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.get_index">
+<span class="sig-name descname"><span class="pre">get_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.get_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.get_index" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.get_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.get_spectra_no_overlap">
+<span class="sig-name descname"><span class="pre">get_spectra_no_overlap</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.get_spectra_no_overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.get_spectra_no_overlap" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.get_spectra_overlap">
+<span class="sig-name descname"><span class="pre">get_spectra_overlap</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.get_spectra_overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.get_spectra_overlap" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.heat_capacity">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">heat_capacity</span></span><a class="headerlink" href="#chemistrylab.material.Material.heat_capacity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.is_solute">
+<span class="sig-name descname"><span class="pre">is_solute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.is_solute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.is_solute" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.is_solvent">
+<span class="sig-name descname"><span class="pre">is_solvent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.is_solvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.is_solvent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.litres">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">litres</span></span><a class="headerlink" href="#chemistrylab.material.Material.litres" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.litres_per_mol">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">litres_per_mol</span></span><a class="headerlink" href="#chemistrylab.material.Material.litres_per_mol" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.melting_point">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">melting_point</span></span><a class="headerlink" href="#chemistrylab.material.Material.melting_point" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.molar_mass">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">molar_mass</span></span><a class="headerlink" href="#chemistrylab.material.Material.molar_mass" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.precipitate">
+<span class="sig-name descname"><span class="pre">precipitate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.precipitate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.precipitate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.ration">
+<span class="sig-name descname"><span class="pre">ration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.ration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.ration" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a new Material and moves <cite>ratio</cite> fraction of the moles to the new material
+Args:
+- ratio (float): Should be in [0,1]
+Returns
+- mat (Material): Material with the same class where the moles were moved</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.set_color">
+<span class="sig-name descname"><span class="pre">set_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.set_color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.set_color" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.set_enthalpy_fusion">
+<span class="sig-name descname"><span class="pre">set_enthalpy_fusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enthalpy_fusion</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.set_enthalpy_fusion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.set_enthalpy_fusion" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.set_solute_flag">
+<span class="sig-name descname"><span class="pre">set_solute_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.set_solute_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.set_solute_flag" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.set_solvent_flag">
+<span class="sig-name descname"><span class="pre">set_solvent_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.set_solvent_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.set_solvent_flag" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.set_specific_heat">
+<span class="sig-name descname"><span class="pre">set_specific_heat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specific_heat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Material.set_specific_heat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Material.set_specific_heat" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="chemistrylab.material.Material.vapour_enthalpy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vapour_enthalpy</span></span><a class="headerlink" href="#chemistrylab.material.Material.vapour_enthalpy" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.MethylRed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">MethylRed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#MethylRed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.MethylRed" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.Na">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">Na</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Na"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Na" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.Na.precipitate">
+<span class="sig-name descname"><span class="pre">precipitate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#Na.precipitate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.Na.precipitate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.NaCl">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">NaCl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#NaCl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.NaCl" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="chemistrylab.material.NaCl.dissolve">
+<span class="sig-name descname"><span class="pre">dissolve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#NaCl.dissolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.NaCl.dissolve" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.O">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">O</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#O"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.O" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.O2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">O2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#O2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.O2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.O3">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">O3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#O3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.O3" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.OneChlorohexane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">OneChlorohexane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#OneChlorohexane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.OneChlorohexane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.ThreeChlorohexane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">ThreeChlorohexane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#ThreeChlorohexane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.ThreeChlorohexane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chemistrylab.material.TwoChlorohexane">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">TwoChlorohexane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#TwoChlorohexane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.TwoChlorohexane" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#chemistrylab.material.Material" title="chemistrylab.material.Material"><code class="xref py py-class docutils literal notranslate"><span class="pre">Material</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.material.register">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.material.</span></span><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">material_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/material.html#register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.material.register" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chemistrylab.util.html" class="btn btn-neutral float-left" title="chemistrylab.util package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

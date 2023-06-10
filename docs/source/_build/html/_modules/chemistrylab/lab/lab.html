@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.lab.lab &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../chemistrylab.html">chemistrylab package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chemistrylab.lab.lab</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chemistrylab.lab.lab</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span> <span class="nn">chemistrylab</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">Agent</span> <span class="o">=</span> <span class="nb">object</span>
+
+<div class="viewcode-block" id="Lab"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab">[docs]</a><span class="k">class</span> <span class="nc">Lab</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_num_vessels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        render_mode: a string for the render mode of the environment if the user wishes to see outputs from the benches</span>
+<span class="sd">        max_num_vessels: the maximum number of vessels that the shelf can store</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_envs</span> <span class="o">=</span> <span class="n">envs</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="c1"># the following parameters list out all available reactions, extractions and distillations that the agent can use</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reactions</span> <span class="o">=</span> <span class="p">[</span><span class="n">env_spec</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">env_spec</span> <span class="ow">in</span> <span class="n">all_envs</span> <span class="k">if</span> <span class="s1">&#39;React&#39;</span> <span class="ow">in</span> <span class="n">env_spec</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extractions</span> <span class="o">=</span> <span class="p">[</span><span class="n">env_spec</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">env_spec</span> <span class="ow">in</span> <span class="n">all_envs</span> <span class="k">if</span> <span class="s1">&#39;Extract&#39;</span> <span class="ow">in</span> <span class="n">env_spec</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distillations</span> <span class="o">=</span> <span class="p">[</span><span class="n">env_spec</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">env_spec</span> <span class="ow">in</span> <span class="n">all_envs</span> <span class="k">if</span> <span class="s1">&#39;Distill&#39;</span> <span class="ow">in</span> <span class="n">env_spec</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characterization</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">CharacterizationBench</span><span class="p">()</span><span class="o">.</span><span class="n">techniques</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characterization_bench</span> <span class="o">=</span> <span class="n">CharacterizationBench</span><span class="p">()</span>
+        <span class="c1"># the following is a dictionary of all available agents that can operate each bench feel free to add your own</span>
+        <span class="c1"># custom agents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">RandomAgent</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">RandomAgent</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">RandomAgent</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_mode</span> <span class="o">=</span> <span class="n">render_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_num_vessels</span> <span class="o">=</span> <span class="n">max_num_vessels</span>
+        <span class="c1"># the shelf holds all available vessels that can be used by the agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span> <span class="o">=</span> <span class="n">Shelf</span><span class="p">(</span><span class="n">max_num_vessels</span><span class="o">=</span><span class="n">max_num_vessels</span><span class="p">)</span>
+        <span class="c1"># the action space is a vector:</span>
+        <span class="c1"># the 0th index represents what bench is selected (reaction, extraxction, distillation, done)</span>
+        <span class="c1"># the 1st index represents what environment the agent selects</span>
+        <span class="c1"># the 2nd index represents what vessel from the shelf the agent uses</span>
+        <span class="c1"># the 3rd index represents which agent will be used to perform the experiment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">MultiDiscrete</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span>
+                                                      <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extractions</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distillations</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">characterization</span><span class="p">)]),</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">max_num_vessels</span><span class="p">,</span>
+                                                      <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span><span class="p">)])])</span>
+        <span class="c1"># have to get back to this part</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Lab.register_agent"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.register_agent">[docs]</a>    <span class="k">def</span> <span class="nf">register_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bench</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        a function that registers an agent for a specified bench</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bench: the bench for which the agent will be registered</span>
+<span class="sd">        name: the name of the agent to be registered</span>
+<span class="sd">        agent: the agent itself derived from the agent class</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bench</span> <span class="o">==</span> <span class="s2">&quot;reaction&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s2">&quot;extraction&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s2">&quot;distillation&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;bench must be &quot;reaction&quot;, &quot;extraction&quot; or &quot;distillation&quot;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">MultiDiscrete</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span>
+                                                      <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extractions</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distillations</span><span class="p">)]),</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">max_num_vessels</span><span class="p">,</span>
+                                                      <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span><span class="p">),</span>
+                                                           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span><span class="p">)])])</span></div>
+
+<div class="viewcode-block" id="Lab.load_reaction_bench"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.load_reaction_bench">[docs]</a>    <span class="k">def</span> <span class="nf">load_reaction_bench</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this function returns the reaction environment that the agent has selected</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index: the index of the agent to be run</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        the gym environment that has been loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Lab.load_extraction_bench"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.load_extraction_bench">[docs]</a>    <span class="k">def</span> <span class="nf">load_extraction_bench</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this function returns the extraction environment that the agent has selected</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index: the index of the agent to be run</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        the gym environment that has been loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extractions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extractions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Lab.load_distillation_bench"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.load_distillation_bench">[docs]</a>    <span class="k">def</span> <span class="nf">load_distillation_bench</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this function returns the distillation environment that the agent has selected</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index: the index of the agent to be run</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        the gym environment that has been loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distillations</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distillations</span><span class="p">[</span><span class="n">index</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Lab.run_bench"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.run_bench">[docs]</a>    <span class="k">def</span> <span class="nf">run_bench</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bench</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">vessel_index</span><span class="p">,</span> <span class="n">agent_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">custom_agent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this function works as a wrapper for the lab environment and allows for an agent to specify what</span>
+<span class="sd">        environment they wish to run and with what vessel and agent</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bench</span>
+<span class="sd">        env_index</span>
+<span class="sd">        vessel_index</span>
+<span class="sd">        agent_index</span>
+<span class="sd">        custom_agent</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;reaction&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">env_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reactions</span><span class="p">):</span>
+                <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_reaction_bench</span><span class="p">(</span><span class="n">env_index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">vessel_index</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">open_slot</span><span class="p">:</span>
+                    <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">env</span><span class="o">.</span><span class="n">update_vessel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">get_vessel</span><span class="p">(</span><span class="n">vessel_index</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">agent_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+                <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">agent_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">agent_index</span><span class="p">]</span>
+                <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">react_agents</span><span class="p">[</span><span class="n">agent_name</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;extraction&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">env_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extractions</span><span class="p">):</span>
+                <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_extraction_bench</span><span class="p">(</span><span class="n">env_index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">vessel_index</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">open_slot</span><span class="p">:</span>
+                    <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">env</span><span class="o">.</span><span class="n">update_vessel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">get_vessel</span><span class="p">(</span><span class="n">vessel_index</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">agent_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+                <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">agent_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">agent_index</span><span class="p">]</span>
+                <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_agents</span><span class="p">[</span><span class="n">agent_name</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;distillation&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">env_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distillations</span><span class="p">):</span>
+                <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_distillation_bench</span><span class="p">(</span><span class="n">env_index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">vessel_index</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">open_slot</span><span class="p">:</span>
+                    <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">env</span><span class="o">.</span><span class="n">update_vessel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">get_vessel</span><span class="p">(</span><span class="n">vessel_index</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">agent_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+                 <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">agent_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">agent_index</span><span class="p">]</span>
+                <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distill_agents</span><span class="p">[</span><span class="n">agent_name</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;characterization&#39;</span><span class="p">:</span>
+            <span class="n">analysis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+            <span class="k">if</span> <span class="n">vessel_index</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">open_slot</span> <span class="ow">or</span> <span class="n">env_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">characterization</span><span class="p">):</span>
+                <span class="n">total_reward</span> <span class="o">-=</span> <span class="mi">10</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">analysis</span><span class="p">,</span> <span class="n">rtn_vessel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">characterization_bench</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">get_vessel</span><span class="p">(</span><span class="n">vessel_index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">characterization</span><span class="p">[</span><span class="n">env_index</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">return_vessel_to_shelf</span><span class="p">(</span><span class="n">vessel</span><span class="o">=</span><span class="n">rtn_vessel</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">total_reward</span><span class="p">,</span> <span class="n">analysis</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bench</span><span class="si">}</span><span class="s1"> is not a recognized bench&#39;</span><span class="p">)</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="n">total_reward</span> <span class="o">&lt;</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">custom_agent</span><span class="p">:</span>
+                <span class="n">agent</span> <span class="o">=</span> <span class="n">custom_agent</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                <span class="c1"># env.render(mode=self.render_mode)</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                <span class="n">state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+                <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+            <span class="n">rtn_vessel</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">vessels</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">return_vessel_to_shelf</span><span class="p">(</span><span class="n">vessel</span><span class="o">=</span><span class="n">rtn_vessel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total_reward</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span></div>
+
+<div class="viewcode-block" id="Lab.step"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">list</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function takes in an agents command and deconstructs the command and runs the appropriate environment with</span>
+<span class="sd">        the specified bench, environment, vessel, and agent</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        action: [list, np.array]: this parameter specifies the action the agent takes</span>
+<span class="sd">        action: [bench_id, environment_id, vessel_id, agent_id]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># reaction bench</span>
+            <span class="n">bench</span> <span class="o">=</span> <span class="s1">&#39;reaction&#39;</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># extraction bench</span>
+            <span class="n">bench</span> <span class="o">=</span> <span class="s1">&#39;extraction&#39;</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># distillation bench</span>
+            <span class="n">bench</span> <span class="o">=</span> <span class="s1">&#39;distillation&#39;</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1"># characterization bench</span>
+            <span class="n">bench</span> <span class="o">=</span> <span class="s1">&#39;characterization&#39;</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">bench</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> is not a valid environment&#39;</span><span class="p">)</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+            <span class="n">env_index</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">vessel_index</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">agent_index</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">reward</span><span class="p">,</span> <span class="n">analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_bench</span><span class="p">(</span><span class="n">bench</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">vessel_index</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reward</span><span class="p">,</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">done</span></div>
+
+<div class="viewcode-block" id="Lab.reset"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.lab.Lab.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this function resets the shelf and gets rid of all the currently stored vessels</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">vessels</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -15,9 +15,29 @@ Much like bench agents, the lab manager is also learning how to best perform tas
 ## Input
 
 The lab manager's input are the three main environments that it will be working with, mainly the reaction, extraction,
-and distillation environments. This is made available and specified under `manager_v1.py`.
+and distillation environments. This is made available and specified under `lab.py`.
 
-![lab manager input](../tutorial_figures/labmanager/lab_input.png)
+```python
+class Lab(gym.Env, ABC):
+    """
+    The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals
+    """
+    def __init__(self, render_mode: str = None, max_num_vessels: int = 100):
+        """
+
+        Parameters
+        ----------
+        render_mode: a string for the render mode of the environment if the user wishes to see outputs from the benches
+        max_num_vessels: the maximum number of vessels that the shelf can store
+        """
+        all_envs = envs.registry.all()
+        # the following parameters list out all available reactions, extractions and distillations that the agent can use
+        self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
+        self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
+        self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
+        self.characterization = list(CharacterizationBench().techniques.keys())
+        self.characterization_bench = CharacterizationBench()
+```
 
 ## Output
 
@@ -25,4 +45,16 @@ The lab manager's output will be messages from the environment that it is curren
 depend on the action that is being performed. The lab manager itself does not have any specific outputs. We can, 
 however, use lab manager to access the extraction environment and get outputs from that.
 
-![extract action](../tutorial_figures/labmanager/extract_output.png)
+```commandline
+>>> python manager.py
+Index: Action
+0: load vessel from pickle
+1: load distillation bench
+2: load reaction bench
+3: load extraction bench
+4: load characterization bench
+5: list vessels
+6: create new vessel
+7: save vessel
+8: quit
+```

@@ -10,11 +10,12 @@ A-X + A-X -> A-A + X-X and A-X + B-X -> A-B + X-X
 
 In this lesson we will try to get a high reward in the reaction of the form above. Rewards will come from producing either A-A or B-B. It's important to note that the reward cannot come from A-B as this doesn't make the desired property. The reaction we will be taking an in depth look at in this lesson is:
 
+![image](../tutorial_figures/wurtz_reaction1.png)
 2 3-chlorohexane + 2 Na -> 4,5-diethyloctane + 2 NaCl
 
 We will try to get the desired material: 4,5-diethyloctane
 
-In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions directory. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v2`. The main difference between this reaction file and the one used in lesson 1 is that this file's target material is 4,5-diethyloctane instead of dodecane.
+In similar fashion to lesson 1, the reactions used in this lesson are found in the available reactions directory. This particular lesson will use the reaction file `chloro_wurtz_v1.py` and is registered under the id `WurtzReact-v2`. The main difference between this lesson and lesson 1 is that the target material is 4,5-diethyloctane instead of dodecane.
 
 From lesson 1 we know that our action space is a 6 element vector represented by:
 
@@ -106,8 +107,8 @@ do this by running the following commands:
 
 ```python
 if total_steps  < 20:
-    action[0] = 1
-    action[1] = 1
+    action[0] = 1    # temperature
+    action[1] = 1    # volume
     action[2] = 0    # 1-chlorohexane
     action[3] = 0    # 2-chlorohexane
     action[4] = 1    # 3-chlorohexane
@@ -116,7 +117,7 @@ if total_steps  < 20:
 
 Notice that we're only adding the reactants we need for the reaction to continue; 3-chlorohexane and Na.
 
-![reaction](https://cdn.pixabay.com/photo/2012/04/02/13/57/chemical-reaction-24562__340.png)
+![reaction](../sample_figures/reaction.png)
 
 <a style="font-size: 10px">(source https://pixabay.com/vectors/chemical-reaction-experiment-flask-24562/)</a>
 
@@ -130,8 +131,8 @@ while not done:
     #   a[1] changes the Volume between -dV (a[1] = 0.0) and +dV (a[1] = 1.0)
     #   a[2:] adds between none (a[2:] = 0.0) and all (a[2:] = 1.0) of each reactant
     if total_steps  < 20:
-        action[0] = 1
-        action[1] = 1
+        action[0] = 1    # temperature
+        action[1] = 1    # volume
         action[2] = 0    # 1-chlorohexane
         action[3] = 0    # 2-chlorohexane
         action[4] = 1    # 3-chlorohexane
@@ -157,7 +158,7 @@ while not done:
     # print(state)
 
     # render the plot
-    env.render(mode=render_mode)
+    env.render(mode=render_mode, nb=True)
     # sleep(2)
 
     # increment one step
@@ -173,7 +174,7 @@ while not done:
 
 Notice that we get a high total reward. A visual representation of the reactants being used and total reward increasing can be seen in the subplot we produce!
 
-![subplot](../tutorial_figures/reaction-lesson-2/subplots.png)
+![subplot](tutorial_figures/reaction-lesson-2/subplots.png)
 
 This simply shows us the stats of the reaction vessel. It essentially shows everything from thermodynamic variables, to the amount of material
 
@@ -245,12 +246,12 @@ For the second part of the experiment let's uncomment the code that adds the rea
 
 ```python
 # Adding Reactants not needed:
-action[0] = 1
-action[1] = 1
-action[5] = 1
-action[4] = 1
-action[2] = 1
-action[3] = 1
+action[0] = 1    # temperature
+action[1] = 1    # volume
+action[2] = 1    # 1-chlorohexane
+action[3] = 1    # 2-chlorohexane
+action[4] = 1    # 3-chlorohexane
+action[5] = 1    # Na
 ```
 
 If we run this code we'll notice that our reward is significantly lower. It is a significant drop-off from the reward we get from our previous set of actions. Once again, the reason this is happening is that other reactions are taking place instead of the reaction that produces our desired material. This is because we add additional reactants such as 1-chlorohexane and 2-chlorohexane.

@@ -8,86 +8,43 @@ ChemistryLab Init Registration File
 :history: 2020-07-03
 '''
 
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 
 ############################ ExtractBench ####################################
 
 register(
-    id='WurtzExtract-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1',
-    max_episode_steps=100
+    id='GenWurtzExtract-v2',
+    entry_point='chemistrylab.benches.extract_bench:GeneralWurtzExtract_v2',
 )
 
 register(
-    id='WurtzExtract_Ctd-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Wurtz_Ctd_v1',
-    max_episode_steps=100
-)
-
-register(
-    id='Oil_Water_Extract-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:ExtractWorld_Oil_v1',
-    max_episode_steps=100
-)
-
-register(
-    id='MethylRed_Extract-v1',
-    entry_point='chemistrylab.extract_bench.methyl_red:ExtractWorld_MethylRed',
-    max_episode_steps=100
-)
-
-register(
-    id='MethylRed_Extract-v2',
-    entry_point='chemistrylab.extract_bench.extraction_0:ExtractWorld_MethylRed',
-    max_episode_steps=100
+    id='WaterOilExtract-v0',
+    entry_point='chemistrylab.benches.extract_bench:WaterOilExtract_v0',
 )
 
 ############################ ReactBench ####################################
 
 register(
-    id='WurtzReact-v1',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:WurtzReact_v1',
-    max_episode_steps=100
+    id='GenWurtzReact-v2',
+    entry_point='chemistrylab.benches.reaction_bench:GeneralWurtzReact_v2'
 )
 
 register(
-    id='GenWurtzReact-v1',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:GeneralWurtzReact_v1'
-)
-
-register(
-    id='FictReact-v1',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:FictReact_v1'
+    id='GenWurtzReact-v0',
+    entry_point='chemistrylab.benches.reaction_bench:GeneralWurtzReact_v0'
 )
 
 register(
     id='FictReact-v2',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:FictReact_v2'
+    entry_point='chemistrylab.benches.reaction_bench:FictReact_v2'
 )
 
-register(
-    id='DecompReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_1',
-    max_episode_steps=100
-)
-
-register(
-    id='WurtzReact-v2',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_3',
-    max_episode_steps=100
-)
-
-register(
-    id='ODETestReact-v0',
-    entry_point='chemistrylab.reaction_bench.reaction_bench_v1:ReactionBenchEnv_ODE_Test',
-    max_episode_steps=100
-)
 
 ############################ DistillationBench ####################################
 
 register(
-    id='WurtzDistill-v1',
-    entry_point='chemistrylab.distillation_bench.distillation_bench_v1:WurtzDistill_v1',
+    id='GenWurtzDistill-v2',
+    entry_point='chemistrylab.benches.distillation_bench:GeneralWurtzDistill_v2',
     max_episode_steps=100
 )
 
@@ -95,6 +52,47 @@ register(
 
 register(
     id='LabManager-v0',
-    entry_point='chemistrylab.manager.manager_v1:LabManager',
+    entry_point='chemistrylab.manager.manager:LabManager',
     max_episode_steps=100
 )
+
+
+######################## Bandit Gyms ############################################
+
+register(
+    id='FictReactBandit-v0',
+    entry_point='chemistrylab.benches.reaction_bench:FictReactBandit_v0'
+)
+
+register(
+    id='FictReactBandit-v1',
+    entry_point='chemistrylab.benches.reaction_bench:FictReactBandit_v0',
+    kwargs = dict(targets=["fict_I"])
+)
+
+######################## DEMO GYMS #########################################
+
+
+register(
+    id='WurtzExtractDemo-v0',
+    entry_point='chemistrylab.benches.extract_bench:WurtzExtractDemo_v0',
+)
+
+
+register(
+    id='FictReactDemo-v0',
+    entry_point='chemistrylab.benches.reaction_bench:FictReactDemo_v0',
+
+)
+
+register(
+    id='WurtzDistillDemo-v0',
+    entry_point='chemistrylab.benches.distillation_bench:WurtzDistillDemo_v0',
+)
+
+
+register(
+    id='ExtractTest-v0',
+    entry_point='chemistrylab.benches.extract_bench:SeparateTest_v0',
+)
+

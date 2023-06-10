@@ -1,0 +1,59 @@
+{
+  "name": "chloro-wurtz reactions",
+  "REACTANTS": [
+    "1-chlorohexane",
+    "2-chlorohexane",
+    "3-chlorohexane",
+    "Na"
+  ],
+  "PRODUCTS": [
+    "dodecane",
+    "5-methylundecane",
+    "4-ethyldecane",
+    "5,6-dimethyldecane",
+    "4-ethyl-5-methylnonane",
+    "4,5-diethyloctane",
+    "NaCl"
+  ],
+  "SOLVENTS": [
+    "diethyl ether"
+  ],
+  "MATERIALS": [
+    "1-chlorohexane",
+    "2-chlorohexane",
+    "3-chlorohexane",
+    "Na",
+    "dodecane",
+    "5-methylundecane",
+    "4-ethyldecane",
+    "5,6-dimethyldecane",
+    "4-ethyl-5-methylnonane",
+    "4,5-diethyloctane",
+    "NaCl",
+    "diethyl ether"
+  ],
+  "pre_exp_arr": [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0  ],
+  "activ_energy_arr": [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0  ],
+  "stoich_coeff_arr": [
+    [ 2.0, 0.0, 0.0, 2.0 ],
+    [ 1.0, 1.0, 0.0, 2.0 ],
+    [ 1.0, 0.0, 1.0, 2.0 ],
+    [ 0.0, 2.0, 0.0, 2.0 ],
+    [ 0.0, 1.0, 1.0, 2.0 ],
+    [ 0.0, 0.0, 2.0, 2.0 ]
+  ],
+  "conc_coeff_arr": [
+    [-2.0,-1.0,-1.0, 0.0, 0.0, 0.0 ],
+    [ 0.0,-1.0, 0.0,-2.0,-1.0, 0.0 ],
+    [ 0.0, 0.0,-1.0, 0.0,-1.0,-2.0 ],
+    [-2.0,-2.0,-2.0,-2.0,-2.0,-2.0 ],
+    [ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+    [ 0.0, 1.0, 0.0, 0.0, 0.0, 0.0 ],
+    [ 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 ],
+    [ 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 ],
+    [ 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 ],
+    [ 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 ],
+    [ 2.0, 2.0, 2.0, 2.0, 2.0, 2.0 ],
+    [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+  ]
+}

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.extract_algorithms package &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="chemistrylab.lab package" href="chemistrylab.lab.html" />
+    <link rel="prev" title="chemistrylab.benches" href="chemistrylab.benches.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="chemistrylab.html">chemistrylab package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="chemistrylab.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.vessel.html">chemistrylab.vessel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.benches.html">chemistrylab.benches</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">chemistrylab.extract_algorithms package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.extract_algorithms.separate">chemistrylab.extract_algorithms.separate module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.extract_algorithms">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.lab.html">chemistrylab.lab package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.reactions.html">chemistrylab.reactions package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.util.html">chemistrylab.util package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.material.html">chemistrylab.material module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chemistrylab.html">chemistrylab package</a></li>
+      <li class="breadcrumb-item active">chemistrylab.extract_algorithms package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/chemistrylab.extract_algorithms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chemistrylab-extract-algorithms-package">
+<h1>chemistrylab.extract_algorithms package<a class="headerlink" href="#chemistrylab-extract-algorithms-package" title="Permalink to this heading"></a></h1>
+<section id="module-chemistrylab.extract_algorithms.separate">
+<span id="chemistrylab-extract-algorithms-separate-module"></span><h2>chemistrylab.extract_algorithms.separate module<a class="headerlink" href="#module-chemistrylab.extract_algorithms.separate" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.extract_algorithms.separate.map_to_state">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.extract_algorithms.separate.</span></span><span class="sig-name descname"><span class="pre">map_to_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.,</span> <span class="pre">0.01010101,</span> <span class="pre">0.02020202,</span> <span class="pre">0.03030303,</span> <span class="pre">0.04040404,</span> <span class="pre">0.05050505,</span> <span class="pre">0.06060606,</span> <span class="pre">0.07070707,</span> <span class="pre">0.08080808,</span> <span class="pre">0.09090909,</span> <span class="pre">0.1010101,</span> <span class="pre">0.11111111,</span> <span class="pre">0.12121212,</span> <span class="pre">0.13131313,</span> <span class="pre">0.14141414,</span> <span class="pre">0.15151516,</span> <span class="pre">0.16161616,</span> <span class="pre">0.17171717,</span> <span class="pre">0.18181819,</span> <span class="pre">0.1919192,</span> <span class="pre">0.2020202,</span> <span class="pre">0.21212122,</span> <span class="pre">0.22222222,</span> <span class="pre">0.23232323,</span> <span class="pre">0.24242425,</span> <span class="pre">0.25252524,</span> <span class="pre">0.26262626,</span> <span class="pre">0.27272728,</span> <span class="pre">0.28282827,</span> <span class="pre">0.2929293,</span> <span class="pre">0.3030303,</span> <span class="pre">0.3131313,</span> <span class="pre">0.32323232,</span> <span class="pre">0.33333334,</span> <span class="pre">0.34343433,</span> <span class="pre">0.35353535,</span> <span class="pre">0.36363637,</span> <span class="pre">0.37373737,</span> <span class="pre">0.3838384,</span> <span class="pre">0.3939394,</span> <span class="pre">0.4040404,</span> <span class="pre">0.41414142,</span> <span class="pre">0.42424244,</span> <span class="pre">0.43434343,</span> <span class="pre">0.44444445,</span> <span class="pre">0.45454547,</span> <span class="pre">0.46464646,</span> <span class="pre">0.47474748,</span> <span class="pre">0.4848485,</span> <span class="pre">0.4949495,</span> <span class="pre">0.5050505,</span> <span class="pre">0.5151515,</span> <span class="pre">0.5252525,</span> <span class="pre">0.53535354,</span> <span class="pre">0.54545456,</span> <span class="pre">0.5555556,</span> <span class="pre">0.56565654,</span> <span class="pre">0.57575756,</span> <span class="pre">0.5858586,</span> <span class="pre">0.5959596,</span> <span class="pre">0.6060606,</span> <span class="pre">0.61616164,</span> <span class="pre">0.6262626,</span> <span class="pre">0.6363636,</span> <span class="pre">0.64646465,</span> <span class="pre">0.65656567,</span> <span class="pre">0.6666667,</span> <span class="pre">0.67676765,</span> <span class="pre">0.68686867,</span> <span class="pre">0.6969697,</span> <span class="pre">0.7070707,</span> <span class="pre">0.7171717,</span> <span class="pre">0.72727275,</span> <span class="pre">0.7373737,</span> <span class="pre">0.74747473,</span> <span class="pre">0.75757575,</span> <span class="pre">0.7676768,</span> <span class="pre">0.7777778,</span> <span class="pre">0.7878788,</span> <span class="pre">0.7979798,</span> <span class="pre">0.8080808,</span> <span class="pre">0.8181818,</span> <span class="pre">0.82828283,</span> <span class="pre">0.83838385,</span> <span class="pre">0.8484849,</span> <span class="pre">0.85858583,</span> <span class="pre">0.86868685,</span> <span class="pre">0.8787879,</span> <span class="pre">0.8888889,</span> <span class="pre">0.8989899,</span> <span class="pre">0.90909094,</span> <span class="pre">0.9191919,</span> <span class="pre">0.9292929,</span> <span class="pre">0.93939394,</span> <span class="pre">0.94949496,</span> <span class="pre">0.959596,</span> <span class="pre">0.969697,</span> <span class="pre">0.97979796,</span> <span class="pre">0.989899,</span> <span class="pre">1.],</span> <span class="pre">dtype=float32)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/extract_algorithms/separate.html#map_to_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.extract_algorithms.separate.map_to_state" title="Permalink to this definition"></a></dt>
+<dd><p>Uses the position and variance of each solvent to stochastically create a layer-view of the vessel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>np.ndarray</em>) – The volume of each solvent</p></li>
+<li><p><strong>B</strong> (<em>np.ndarray</em>) – The current positions of the solvent layers in the vessel</p></li>
+<li><p><strong>C</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The current variance of the solvent layers in the vessel</p></li>
+<li><p><strong>colors</strong> (<em>np.ndarray</em>) – The color of each solvent</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The solvent at each layer position (0.65 for air)</p></li>
+<li><p>The index of the solvent at each position (len(B)-1 for air)</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray]</p>
+</dd>
+</dl>
+<p>Algorithm:</p>
+<ol class="arabic simple">
+<li><p>Discretize the vessel into 100 layers each with one unit of volume</p></li>
+<li><p>Quantize the volumes into units of size sum(v)/100. (Round up agressively)</p></li>
+<li><dl class="simple">
+<dt>Do a checksum to make sure these quantized volumes sum to 100</dt><dd><ol class="lowerroman simple">
+<li><p>If the sum of everything that isn’t air is over 100, then decrease the solvent with the largest number of units</p></li>
+<li><p>Otherwise you can just set the number of air units to 100-sum([all vi which aren’t air])</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Find the position of the top layer</p></li>
+<li><dl class="simple">
+<dt>For each of the quantized layers, gather the height of each gaussian at that layer position and sample a solvent proportional to this height</dt><dd><ol class="lowerroman simple">
+<li><p>This is approximately the same as doing an integral of the solvents distribution over the layer</p></li>
+<li><p>Unfortunately, the solvent distributions don’t add up to 1 so you have to normalize.</p></li>
+<li><p>The distributions are more ballparks so you have to keep track of how many units you placed, and set the probability of the layer having a solvent to zero if all the units have already been placed</p></li>
+<li><p>This also means you may not have placed all of your units by the time you are way outside the variance of your gaussian, so you should keep track of the lowest layer that still has units to place, and make sure those units are all placed once you start to go way past it.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chemistrylab.extract_algorithms.separate.mix">
+<span class="sig-prename descclassname"><span class="pre">chemistrylab.extract_algorithms.separate.</span></span><span class="sig-name descname"><span class="pre">mix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vprev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_solute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Spol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lpol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mixing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/extract_algorithms/separate.html#mix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.extract_algorithms.separate.mix" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>np.ndarray</em>) – The volume of each solvent</p></li>
+<li><p><strong>Vprev</strong> (<em>np.ndarray</em>) – The volume of each solvent on the previous iteration</p></li>
+<li><p><strong>v_solute</strong> (<em>np.ndarray</em>) – The specific volume of each solute (litres per mol)</p></li>
+<li><p><strong>B</strong> (<em>np.ndarray</em>) – The current positions of the solvent layers in the vessel</p></li>
+<li><p><strong>C</strong> (<em>np.ndarray</em>) – The current variances of the solvent layers in the vessel</p></li>
+<li><p><strong>C0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
+<li><p><strong>D</strong> (<em>np.ndarray</em>) – The density of each solvent</p></li>
+<li><p><strong>Spol</strong> (<em>np.ndarray</em>) – The relative polarities of the solutes</p></li>
+<li><p><strong>Lpol</strong> (<em>np.ndarray</em>) – The relative polarities of the solvents</p></li>
+<li><p><strong>S</strong> (<em>np.ndarray</em>) – The current amounts of solutes in each solvent layer (2D array)</p></li>
+<li><p><strong>mixing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The time value assigned to a fully mixed solution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>layers_position: An array of floats representing the new positions of the solvent layers in the vessel</p></li>
+<li><p>layers_variance: An array of floats representing the new variances of the solvent layers in the vessel</p></li>
+<li><p>new_solute_amount: An array of floats representing the new amounts of solutes in each solvent layer</p></li>
+<li><p>var_layer: Modified layer variances which account for the extra volume due to dissolved solutes</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray]</p>
+</dd>
+</dl>
+<p>Algorithm (Solvent):</p>
+<ol class="arabic simple">
+<li><p>Using the volumes and densities of each solvent, determine where each solvent’s center of mass should be at t-&gt; inf</p></li>
+<li><p>Determine the speed in which each solvent should separate out using the densities</p></li>
+<li><dl class="simple">
+<dt>Handle any external changes to the solving (pouring in/out) using v and Vprev</dt><dd><ol class="lowerroman simple">
+<li><dl class="simple">
+<dt>Since there is an injective map between variance and time, it is easier to work with variance</dt><dd><ol class="loweralpha simple">
+<li><p>Initial variance is sum(v)/sqrt(12) [gaussian approximation of a uniform distribution]</p></li>
+<li><p>Final variance is vi/MINVAR -&gt; MINVAR should probably be around sqrt(12) still (but be &lt;=)</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Pouring in a solvent should kind of mix around the solution, and since the max variance is sum(v)/sqrt(12) adding in dv/sqrt(12) seems reasonable</p></li>
+<li><p>For the solvent actually being added, we can assume you are pouring into the top, so it should be mixed the closer to the bottom the solvent layer is. It should also be mixed more depending on how much you are adding.</p></li>
+<li><p>If adding a solvent causes things to be mixed around a bunch, it should end up mixing the solutes too</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Get a time-like variable saying much each solvent is settled using the current variance (Recall the map is injective)</p></li>
+<li><dl class="simple">
+<dt>Increment this by the mixing parameter</dt><dd><ol class="lowerroman simple">
+<li><p>If time is being decreased by the mixing parameter, we first set T&lt;= Tmax so something which settled for a long time still mixes reasonably fast (and also as T-&gt;inf the map between variance and time gets sus cuz of floats)</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Use this incremented time to update your layer positions, as well as layer variances</p></li>
+</ol>
+<p>Algorithm (Solute):
+TODO: Write this out</p>
+</dd></dl>
+
+</section>
+<section id="module-chemistrylab.extract_algorithms">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-chemistrylab.extract_algorithms" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chemistrylab.benches.html" class="btn btn-neutral float-left" title="chemistrylab.benches" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chemistrylab.lab.html" class="btn btn-neutral float-right" title="chemistrylab.lab package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

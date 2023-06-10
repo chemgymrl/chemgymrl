@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chemistrylab.lab.manager &mdash; chemistrygym 1.5.7 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            chemistrygym
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../chemistrylab.html">chemistrylab package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">chemistrygym</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chemistrylab.lab.manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chemistrylab.lab.manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">chemistrylab</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+
+<span class="n">Agent</span> <span class="o">=</span> <span class="nb">object</span> <span class="c1">#TODO: add this actually</span>
+
+<div class="viewcode-block" id="Manager"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager">[docs]</a><span class="k">class</span> <span class="nc">Manager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor class module for the Manager class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        &#39;mode&#39;: `str`: [&#39;human&#39;, &#39;random&#39;, &#39;custom&#39;]:</span>
+<span class="sd">            Parameter to describe the mode that the manager will be run in. Note: `human` opens up a cli that can be</span>
+<span class="sd">            used to run or by adding an agent to the agents.</span>
+<span class="sd">        &#39;agent&#39;: `agent.Agent`</span>
+<span class="sd">            Parameter to specify a custom user made agent for the manager to use in solving the lab environment.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">RandomAgent</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span> <span class="o">=</span> <span class="n">Lab</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Manager.register_agent"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.register_agent">[docs]</a>    <span class="k">def</span> <span class="nf">register_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows the user to add a lab agent to the manager environment.</span>
+<span class="sd">        Added lab agents can then use to perform actions in the lab environment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        `name` : `str`</span>
+<span class="sd">            The name of the agent to be registered.</span>
+<span class="sd">        `agent` : `agent.Agent`</span>
+<span class="sd">            The class representation of the agent to be registered.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># add the custom agent to the dictionary of registered agents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span></div>
+
+<div class="viewcode-block" id="Manager.register_bench_agent"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.register_bench_agent">[docs]</a>    <span class="k">def</span> <span class="nf">register_bench_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bench</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to allow the user to add bench-specific agents to the lab environment.</span>
+<span class="sd">        Added bench agents can then be used in order to perform actions in a bench</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        `bench` : `str`</span>
+<span class="sd">            The name of the bench to which the agent is being assigned.</span>
+<span class="sd">        `name` : `str`</span>
+<span class="sd">            The name of the agent to be registered.</span>
+<span class="sd">        `agent` : `agent.Agent`</span>
+<span class="sd">            The class representation of the agent to be registered.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># pass the parameters to the lab class to register the bench engine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">register_agent</span><span class="p">(</span><span class="n">bench</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">agent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Manager.run"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to run the specified agent or human mode based on the parameters passed to the Manager class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if &quot;human&quot; was specified, run the lab manager in human mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;human&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_human_run</span><span class="p">()</span>
+        <span class="c1"># if the mode given matches a registered agent, acquire the corresponding agent and run it</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">]()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_agent_run</span><span class="p">()</span>
+        <span class="c1"># if an agent was specified directly, run that agent</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_agent_run</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;agent specified does not exist&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_human_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to run the specified agent or human mode based on the parameters passed to the Manager class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># set up the done parameter</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># specify the allowed human-specifiable commands</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;load vessel from pickle&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;load distillation bench&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;load reaction bench&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;load extraction bench&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;load characterization bench&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;list vessels&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;create new vessel&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;save vessel&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;quit&#39;</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+            <span class="c1"># print all the actions available</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Index: Action&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">command</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">commands</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="c1"># instruct the user to select an action by means of its index</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Please select an action by index: &#39;</span><span class="p">))</span>
+
+            <span class="c1"># action[0] == load vessel from pickle file</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;please specify the path of the vessel: &#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_vessel</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="c1"># action[1] == load distillation bench</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_human_bench</span><span class="p">(</span><span class="s1">&#39;distillation&#39;</span><span class="p">)</span>
+            <span class="c1"># action[2] == load reaction bench</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_human_bench</span><span class="p">(</span><span class="s1">&#39;reaction&#39;</span><span class="p">)</span>
+            <span class="c1"># action[3] == load extraction bench</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_human_bench</span><span class="p">(</span><span class="s1">&#39;extraction&#39;</span><span class="p">)</span>
+            <span class="c1"># action[4] == load the analysis bench</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_human_bench</span><span class="p">(</span><span class="s1">&#39;characterization&#39;</span><span class="p">)</span>
+                <span class="c1"># action[5] == list the avilable vessels</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list_vessels</span><span class="p">()</span>
+            <span class="c1"># action[6] == create a new vessel</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_new_vessel</span><span class="p">()</span>
+            <span class="c1"># action[7] == save an existing vessel</span>
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_vessel</span><span class="p">()</span>
+            <span class="c1"># action[8] OR action not in range(0, 8) == end the program</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_human_bench</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bench</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to set up the bench, environment, vessel, and agent as specified by the human user.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        `bench` : `str`</span>
+<span class="sd">            The name of the bench that has been selected in `_human_run`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># acquire all the environments and agents from the selected bench</span>
+        <span class="k">if</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;distillation&#39;</span><span class="p">:</span>
+            <span class="n">envs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">distillations</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">distill_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;reaction&#39;</span><span class="p">:</span>
+            <span class="n">envs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">reactions</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">react_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;extraction&#39;</span><span class="p">:</span>
+            <span class="n">envs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">extractions</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">extract_agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">bench</span> <span class="o">==</span> <span class="s1">&#39;characterization&#39;</span><span class="p">:</span>
+            <span class="n">envs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;characterization&#39;</span><span class="p">]</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Inputted bench not supported&#39;</span><span class="p">)</span>
+
+        <span class="c1"># print the environments of the selected bench and request the user select an environment</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;index: env&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">env</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">envs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">env</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Please specify what environment you wish to use: &#39;</span><span class="p">))</span>
+
+        <span class="c1"># list all the vessels available on the shelf and request the user select a vessel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_vessels</span><span class="p">()</span>
+        <span class="n">vessel</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span>
+            <span class="s1">&#39;Please specify what vessel you wish to use (inputting -1 we will create a new vessel and use that) : &#39;</span>
+        <span class="p">))</span>
+        <span class="k">if</span> <span class="n">vessel</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_new_vessel</span><span class="p">()</span>
+
+        <span class="c1"># list all the available agents and request the user select an agent</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">agent</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">agents</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">agent</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">agent_ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Please specify what agent you wish to use: &#39;</span><span class="p">))</span>
+
+        <span class="c1"># load the bench, environment, vessel, and agent and determine how much time it takes to do so</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_bench</span><span class="p">(</span><span class="n">bench</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">vessel</span><span class="p">,</span> <span class="n">agent_ind</span><span class="p">)</span>
+        <span class="n">finish</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">finish</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_agent_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to run the specified agent based on the parameters passed to the Manager class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># reset the done parameter</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># reset the lab environment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+        <span class="c1"># set up a reward counter</span>
+        <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># set up an array to contain the analysis information made available to the lab manager</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="c1"># have the agent select actions and run the lab manager step function until the done parameter is satisfied</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+            <span class="c1"># agent selects actions based on the state of the environemnt and the chosen characterization of a vessel</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="p">,</span> <span class="n">analysis</span><span class="p">)</span>
+            <span class="n">reward</span><span class="p">,</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+            <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+
+<div class="viewcode-block" id="Manager.load_bench"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.load_bench">[docs]</a>    <span class="k">def</span> <span class="nf">load_bench</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bench</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">vessel_index</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to load the specified bench based on the environment, vessel, and agent parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        `bench` : `str`</span>
+<span class="sd">            The name of the bench that is to be loaded.</span>
+<span class="sd">        `env_index` : `np.int64`</span>
+<span class="sd">            The index corresponding to the requested bench environment that is to be set up.</span>
+<span class="sd">        `vessel_index` : `np.int64`</span>
+<span class="sd">            The index corresponding to the requested vessel that is to be set up.</span>
+<span class="sd">        `agent` : `np.int64`</span>
+<span class="sd">            The index corresponding to the requested agent that is to be set up.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># pass the necessary parameters to the `run_bench` method of the `lab` environment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">run_bench</span><span class="p">(</span><span class="n">bench</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">vessel_index</span><span class="p">,</span> <span class="n">agent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Manager.list_vessels"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.list_vessels">[docs]</a>    <span class="k">def</span> <span class="nf">list_vessels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to list all the vessels available on the shelf and their contents.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vessel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">vessels</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">vessel</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">vessel</span><span class="o">.</span><span class="n">get_material_dict</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">vessel</span><span class="o">.</span><span class="n">get_solute_dict</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Manager.load_vessel"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.load_vessel">[docs]</a>    <span class="k">def</span> <span class="nf">load_vessel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to load a vessel from a specified path.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        `path` : `str`</span>
+<span class="sd">            The directory path to a valid pickle file containing a vessel object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        `IOError`:</span>
+<span class="sd">            Raised if the specified file path does not correspond to a valid vessel pickle file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># check that the vessel path is a valid path</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">([</span>
+                <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;pickle&quot;</span>
+        <span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Invalid vessel path!&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">load_vessel</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Manager.create_new_vessel"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.create_new_vessel">[docs]</a>    <span class="k">def</span> <span class="nf">create_new_vessel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to create a new vessel and place the new vessel on the shelf.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">create_new_vessel</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Manager.save_vessel"><a class="viewcode-back" href="../../../chemistrylab.lab.html#chemistrylab.lab.manager.Manager.save_vessel">[docs]</a>    <span class="k">def</span> <span class="nf">save_vessel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to save a human-specified vessel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ---------------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># set up a boolean to track if the specified parameters are completely validated</span>
+        <span class="n">valid_parameters</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># set up default vessel and path parameters</span>
+        <span class="n">vessel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># list the available vessels on the shelf and request a vessel to be saved in a certain location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_vessels</span><span class="p">()</span>
+
+
+        <span class="n">vessel</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">&#39;What vessel do you wish to save: &#39;</span><span class="p">))</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Specify the relative path for the vessel: &#39;</span><span class="p">)</span>
+
+        <span class="c1"># pass the vessel and intended vessel path to the lab shelf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">shelf</span><span class="o">.</span><span class="n">vessels</span><span class="p">[</span><span class="n">vessel</span><span class="p">]</span><span class="o">.</span><span class="n">save_vessel</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;human&#39;</span><span class="p">)</span>
+    <span class="n">manager</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -16,40 +16,60 @@ When the agent performs enough positive actions and is satisfied with the amount
 
 The input to the reaction bench is initialized in the `reaction_bench_v1.py` file. 
 
-![reaction bench input](../tutorial_figures/reaction/reaction_bench_input.png)
+```python
+class GeneralWurtzReact_v2(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 10,
+    }
+    def __init__(self):
+        r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
+        shelf = Shelf([
+            get_mat("diethyl ether",4,"Reaction Vessel"),
+            get_mat("1-chlorohexane",1),
+            get_mat("2-chlorohexane",1),
+            get_mat("3-chlorohexane",1),
+            get_mat("Na",3),
+        ])
+        actions = [
+            Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',   [0],  0.01,  False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
+        ]
+
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
+        
+        super(GeneralWurtzReact_v2, self).__init__(
+            shelf,
+            actions,
+            ["PVT","spectra","targets"],
+            targets=react_info.PRODUCTS,
+            default_events = (Event("react", (Reaction(react_info),), None),),
+            reward_function=r_rew,
+            discrete=False,
+            max_steps=20
+        )
+```
 
 In here we pass parameters such as the materials and solutes needed for the experiment, the path to an input vessel 
 (if we're including one), the output vessel path, the number of time steps to be taken during each action, the amount
 of time taken in each time step, and an indication to show if spectral plots show overlapping. 
 
-We also pass in the reaction file identifier which is the name of the reaction file located in the 
-`../available_reactions` directory. This file includes important values that the engine will use to simulate the 
-reaction. It contains information on the reactants, products, and solutes available to the reaction. It defines the 
-desired material which an agent will be rewarded for if it picks the actions that produces the said material. It also 
-contains all the thermodynamic values and vessel parameters. Lastly it includes arrays for the activation energy, 
-stoichiometric coefficients, and concentration calculation coefficients. 
+We also pass in a reaction event which is constructed using a json file located in `chemistrylab/reactions/available_reactions`. This file includes important values that the engine will use to simulate the reaction. It contains information on the reactants, products, and solutes available to the reaction. Additionally, it includes arrays for the activation energy, stoichiometric coefficients, and concentration calculation coefficients. 
 
 ## Output
 
-Once the reaction bench is ran and the render function is called, plots will appear showing data about the reaction 
-being performed by the agent. There are two main plot modes:
+Once the reaction bench is reset and the render function is called, plots will appear showing data about the reaction 
+being performed by the agent.
 
-- Human Render
+- Render
     - Plots thermodynamic variables and spectral data. The human render plots a minimal amount of data and provides a 
     'surface-level' understanding of the information portrayed.
     - Plots absorbance, time, temperature, volume, pressure, and the amount of reactants remaining.
   
 ![human render output](tutorial_figures/reaction/human_render_reaction.png)
-
-- Full Render
-    -  Plots thermodynamic variables and spectral data. The full render plots a significant amount of data for a more 
-    in-depth understanding of the information portrayed.
-    - In addition to the data human render plots, full render also plots the molar amount, molar concentration, and 
-    absorbance of both reactants and products. It also plots the temperature and pressure mapped to range between 0 and 
-    1, as well as the pressure in units kPa.            
-
-![full render output](tutorial_figures/reaction/full_render_reaction.png)
-
-In addition to these plots, the reaction engine will also provide a vessel of the completed reaction which contains 
-information on the updated thermodynamic variables, material dictionary, and solute dictionary after the reaction. This 
-vessel is contained within a pickle file with the default name `reaction_vessel.pickle`.
