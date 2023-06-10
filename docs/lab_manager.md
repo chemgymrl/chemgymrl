@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Lab Manager
+# Lab Manager
 
 <span style="display:block;text-align:center">![Lab Manager](tutorial_figures/lab_manager.png)
 

@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Distillation Bench
+# Distillation Bench
 
 <span style="display:block;text-align:center">![Distillation](tutorial_figures/distillation.png)
 

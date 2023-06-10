@@ -1,9 +1,9 @@
-## Vessel: Lesson
+# Vessel: Lesson
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/vessel_lesson.ipynb)
 
 
-### Overview:
+## Overview:
 
 In this lesson, we will be going through a class that is vital to the operation of all of our benches, the vessel class.
 The source code for this can be found here: `chemistrylab/chem_algorithms/vessel.py`. The vessel class as it is named is
@@ -24,7 +24,7 @@ solute_dict|{str(solute): array[len(solvents)] , ...}| dictionary that represent
 
 
 
-## An example vessel:
+### An example vessel:
 
 
 
@@ -275,7 +275,7 @@ display(
 </table>
    
 
-# Customizing the event queue
+## Customizing the event queue
 
 You can add custom events to the Vessel class by registering them with `Vessel.register(f: Callable, f_id: str)`. Functions must be of the following form:
 ```python

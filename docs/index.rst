@@ -11,7 +11,17 @@ Welcome to chemistrygym's documentation!
    :caption: Contents:
 
    chemistrylab
-   Installation
+   gettingstarted
+   usermanual
+   tutorials
+
+   :caption: Contact Us:
+   Contact
+   :caption: Citation and Licence:
+   License
+
+
+
 
 Indices and tables
 ==================

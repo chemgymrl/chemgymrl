@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Reaction Bench: Lesson 1
+# Reaction Bench: Lesson 1
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/reaction_lesson.ipynb)
 

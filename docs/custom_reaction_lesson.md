@@ -1,4 +1,4 @@
-## Creating a Custom Reaction
+# Creating a Custom Reaction
 
 In this tutorial, I am going to walk you through how reactions work and how to make your own custom reaction
 
@@ -14,7 +14,7 @@ from IPython.display import display,clear_output,JSON
 
 ```
 
-# Adding hydronium and hydroxide materials
+## Adding hydronium and hydroxide materials
 
 
 ```python
@@ -62,7 +62,7 @@ class OH(material.Material):
 material.register(H3O,OH)
 ```
 
-# Setting the reactants and products
+## Setting the reactants and products
 
 $H_2O$, $H_3O^+$, and  $OH^-$ are all both reactants and products (since we are including both the forward and reverse reaction)
 
@@ -75,7 +75,7 @@ SOLVENTS = ["H2O"]
 MATERIALS=["H2O","H3O","OH"]
 ```
 
-# Setting rates
+## Setting rates
 
 For each reaction we have: $k = Ae^{\frac{Ea}{RT}}$
 
@@ -92,7 +92,7 @@ pre_exp_arr = np.array([55.34,1e-14])*1e7
 activ_energy_arr = np.array([1.0,1.0])
 ```
 
-# Setting Stoicheometry coefficients
+## Setting Stoicheometry coefficients
 
 This will be a [reactions, reactants] shape array
 
@@ -104,7 +104,7 @@ stoich_coeff_arr = np.array([
 ]).astype(np.float32)
 ```
 
-# Setting concentration coefficients
+## Setting concentration coefficients
 
 This will be a [materials, reactions] shape array. It represents the change in concentrations given by each reaction. (Changes in concentration will always be within the column space of this matrix)
 
@@ -120,7 +120,7 @@ conc_coeff_arr = np.array([
 info = ReactInfo(name,REACTANTS,PRODUCTS,SOLVENTS,MATERIALS,pre_exp_arr,activ_energy_arr,stoich_coeff_arr,conc_coeff_arr)
 ```
 
-# Setting up the reaction
+## Setting up the reaction
 
 
 ```python
@@ -238,7 +238,7 @@ v.get_material_dataframe()
 
 
 
-# Looking at the pH
+## Looking at the pH
 
 
 ```python
@@ -250,7 +250,7 @@ print(f"pH: {pH}")
     pH: 7.000699771831425
     
 
-# Saving as a json file
+## Saving as a json file
 
 
 ```python
@@ -293,7 +293,7 @@ print(json_text)
     }
     
 
-# Loading from your json file
+## Loading from your json file
 
 
 ```python

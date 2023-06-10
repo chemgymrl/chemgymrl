@@ -1,10 +1,10 @@
-## Distillation Bench: Lesson 1
+# Distillation Bench: Lesson 1
 
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/distillation_lesson.ipynb)
 
 
-### Running the environment
+## Running the environment
 
 We will first start by importing the necessary required modules, both external and local. By now this step should seem very familiar as we have done them in both reaction and extraction lessons.
 
@@ -62,7 +62,7 @@ Action 0	boil_vessel: heat contact	([270. 200.])	 -> Beaker 1
 
 Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentration of the desired material (in our case dodecane) in a particular vessel.
 
-#### Step 1: Adding temperature to the vessel
+### Step 1: Adding temperature to the vessel
 
 `Action 9	boil_vessel: heat contact	([1000.   30.])	 -> Beaker 1`
 This will result in the temperature of the vessel increasing.
@@ -102,7 +102,7 @@ for x in range(4):
     
 
 
-#### Step 1: Pour from condensation to storage vessel
+### Step 2: Pour from condensation to storage vessel
 
 `Action 28	Beaker 1: pour by volume	([0.88888889])	 -> Beaker 2`
 
@@ -134,7 +134,7 @@ plt.show()
     
 
 
-#### Step 3: Add some more temperature
+### Step 3: Add some more temperature
 
 `Action 9 boil_vessel: heat contact ([1000. 30.]) -> Beaker 1`
 
@@ -165,7 +165,7 @@ for x in range(4):
     
 
 
-#### Step 5: Ending the experiment
+### Step 5: Ending the experiment
 
 `Action 30: End Experiment`
 
