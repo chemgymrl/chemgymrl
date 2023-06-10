@@ -45,7 +45,7 @@ The lab manager's output will be messages from the environment that it is curren
 depend on the action that is being performed. The lab manager itself does not have any specific outputs. We can, 
 however, use lab manager to access the extraction environment and get outputs from that.
 
-```commandline
+```
 >>> python manager.py
 Index: Action
 0: load vessel from pickle

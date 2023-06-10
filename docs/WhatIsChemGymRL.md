@@ -1,7 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-What is ChemGymRL?
-==================
+# What is ChemGymRL?
 
 <span style="display:block;text-align:center">![WhatIsChemGymRL](tutorial_figures/WhatIsChemGymRL.png)
 

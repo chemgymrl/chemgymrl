@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Contact Us
+# Contact Us
 
 Thank you for using ChemGymRL!
 

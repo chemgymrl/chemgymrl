@@ -36,7 +36,7 @@ plt.show()
 
 We initialize done to False so our agent can run the experiment. We run reset() to return an initial observation.
 
-```commandline
+```
 Action 0	boil_vessel: heat contact	([270. 200.])	 -> Beaker 1 
 . . .
 Action 9	boil_vessel: heat contact	([1000.   30.])	 -> Beaker 1 
@@ -185,6 +185,3 @@ print(total_reward)
 This concludes the end of our tutorial. Hopefully you got a chance to see how the basic actions in the distillation environment works and see how you can use the agent in RL applications to maximize the distillation of a desired material.
 
 
-```python
-
-```

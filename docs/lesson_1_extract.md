@@ -4,7 +4,7 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/extraction_lesson.ipynb)
 
-### Using a non-polar solute to extract a solute from water
+## Using a non-polar solute to extract a solute from water
 
 In this tutorial, I am going to walk you through how our extraction environment works and hopefully give some insight into how an
 RL agent might interact with the environment. In this extraction we are going to be using water to extract sodium and
@@ -48,7 +48,7 @@ solvent!
 
 ![image of command](https://ak.picdn.net/shutterstock/videos/4620521/thumb/4.jpg)
 
-#### Step 1: Pour Water into the extraction vessel
+### Step 1: Pour Water into the extraction vessel
 
 `Action 33	H2O Vessel: pour by volume	([0.4])	 -> extraction_vessel `
 
@@ -73,7 +73,7 @@ plt.show()
 
 ![image of graphs with added oil](tutorial_figures/extraction-lesson-1/water_oil_1.png)
 
-#### Step 2: Mix the extraction vessel
+### Step 2: Mix the extraction vessel
 
 `Action 9	extraction_vessel: mix	([-1.])	 -> None`
 
@@ -94,7 +94,7 @@ plt.show()
 ![image of graphs mixed](tutorial_figures/extraction-lesson-1/water_oil_2.png)
 
 
-#### Step 3: Wait for the layers to separate
+### Step 3: Wait for the layers to separate
 
 `Action 39	extraction_vessel: mix	([0.16])	 -> None`
 
@@ -115,7 +115,7 @@ plt.axis("off")
 plt.show()
 ```
 
-#### Step 4: Pouring out the Saltwater
+### Step 4: Pouring out the Saltwater
 
 `Action 4	extraction_vessel: drain by pixel	([10])	 -> Beaker 1`:
 
@@ -140,7 +140,7 @@ plt.show()
 
 ![image of graphs draining](tutorial_figures/extraction-lesson-1/water_oil_3.png)
 
-#### Step 5: Pouring the oil into the waste vessel
+### Step 5: Pouring the oil into the waste vessel
 
 `Action 24	extraction_vessel: pour by volume	([1.])	 -> Waste Vessel`
 

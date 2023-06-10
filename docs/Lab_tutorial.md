@@ -51,7 +51,7 @@ First, let's take a look at all the environments registered to each bench:
 lab.reactions
 ```
 
-```commandline
+```
 ['WurtzReact-v1',
  'GenWurtzReact-v1',
  'FictReact-v1',
@@ -66,7 +66,7 @@ lab.reactions
 lab.extractions
 ```
 
-```commandline
+```
 ['GenWurtzExtract-v1',
  'WurtzExtract-v1',
  'WurtzExtractCtd-v1',
@@ -79,7 +79,7 @@ lab.extractions
 lab.distillations
 ```
 
-```commandline
+```
 ['WurtzDistill-v1', 'GenWurtzDistill-v1', 'Distillation-v1']
 ```
 

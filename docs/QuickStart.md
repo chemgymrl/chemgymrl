@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Quick Start
+# Quick Start
 
 For this quick start guide we will run through the Lab Manager demo as seen in this 
 [video](https://youtu.be/HJtxiDbloUQ)
@@ -11,7 +11,7 @@ For this quick start guide we will run through the Lab Manager demo as seen in t
 
 To follow along with the video and test all the actions for yourself simply run the following commands `./chemgymrl`
 
-```commandline
+```
 cd chemistrylab/lab
 python manager
 ```

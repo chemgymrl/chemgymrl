@@ -14,13 +14,8 @@ Welcome to chemistrygym's documentation!
    gettingstarted
    usermanual
    tutorials
-
-   :caption: Contact Us:
    Contact
-   :caption: Citation and Licence:
    License
-
-
 
 
 Indices and tables
@@ -28,7 +23,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
-
-
-
-```

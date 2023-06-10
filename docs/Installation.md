@@ -9,7 +9,7 @@ pip install "git+https://github.com/chemgymrl/chemgymrl.git@rewrite"
 ```
 
 
-### Demo
+## Demo
 
 If you want to demo the benches, you will need to install the gymnasium classic control dependency. 
 ```
