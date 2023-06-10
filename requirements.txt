@@ -1,6 +1,6 @@
 gymnasium
 numpy
-matplotlib>=3.6
+matplotlib
 cmocean
 pyyaml
 scipy
