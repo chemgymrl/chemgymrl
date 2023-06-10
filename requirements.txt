@@ -7,3 +7,4 @@ scipy
 numba
 pillow
 pandas
+myst-parser
