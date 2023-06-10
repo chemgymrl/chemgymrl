@@ -8,7 +8,7 @@
 
 
 import sys
-sys.path.append("../")
+sys.path.append("../../")
 
 
 ######################### Adding Some extra documentation #################
