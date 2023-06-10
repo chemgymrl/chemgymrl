@@ -7,7 +7,8 @@ from chemistrylab.vessel import Vessel
 from chemistrylab.benches.general_bench import GenBench
 
 
-
+import numpy as np
+floattypes = {np.float16, np.float32, np.float64, float}
 Event = namedtuple('Event', ['name', 'parameter', 'other_vessel'])
 Action = namedtuple('Action', ['vessels', 'parameters', 'event_name', 'affected_vessels', 'dt', 'terminal'])
 
@@ -22,7 +23,7 @@ param_names = {
     'heat contact': ("Tf", "ht"),
 }
 
-def generate_table(shelf: List[object], actions: List[Action]) -> str:
+def generate_table(shelf, actions) -> str:
     """Make a restructuredText table describing the actions list"""
     table_data = []
     for i, action in enumerate(actions, start=0):
@@ -35,6 +36,8 @@ def generate_table(shelf: List[object], actions: List[Action]) -> str:
             discrete=False
             min_val, max_val, thresh, other = params
             params = (f"[{min_val},{max_val}]",*other)
+        
+        params = [round(a,3) if type(a) in floattypes else a for a in params]
         
         vessels = ', '.join([shelf[vessel[0]].label for vessel in action[0]])
         event_params = ', '.join([f"{name}: {a}" for name,a in zip(param_names[event.name],params)])

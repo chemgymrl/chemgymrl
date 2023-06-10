@@ -11,11 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,7 +47,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="chemistrylab.html">chemistrylab package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="chemistrylab.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="chemistrylab.vessel.html">chemistrylab.vessel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="chemistrylab.benches.html">chemistrylab.benches package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chemistrylab.benches.html">chemistrylab.benches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="chemistrylab.extract_algorithms.html">chemistrylab.extract_algorithms package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">chemistrylab.lab package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-chemistrylab.lab.lab">chemistrylab.lab.lab module</a></li>
@@ -63,6 +63,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
 </ul>
 
         </div>
@@ -96,7 +97,7 @@
 <span id="chemistrylab-lab-lab-module"></span><h2>chemistrylab.lab.lab module<a class="headerlink" href="#module-chemistrylab.lab.lab" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="chemistrylab.lab.lab.Lab">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.lab.lab.</span></span><span class="sig-name descname"><span class="pre">Lab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">render_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/lab/lab.html#Lab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.lab.lab.Lab" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chemistrylab.lab.lab.</span></span><span class="sig-name descname"><span class="pre">Lab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">render_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_vessels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/chemistrylab/lab/lab.html#Lab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chemistrylab.lab.lab.Lab" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Env</span></code>, <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
 <p>The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals</p>
 <dl class="py method">
@@ -105,7 +106,7 @@
 <dd><p>this function returns the distillation environment that the agent has selected</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>the index</em><em> of </em><em>the agent to be run</em>) – </p>
+<dd class="field-odd"><p><strong>index</strong> (<em>the index of the agent to be run</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>the gym environment that has been loaded</p>
@@ -119,7 +120,7 @@
 <dd><p>this function returns the extraction environment that the agent has selected</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>the index</em><em> of </em><em>the agent to be run</em>) – </p>
+<dd class="field-odd"><p><strong>index</strong> (<em>the index of the agent to be run</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>the gym environment that has been loaded</p>
@@ -133,7 +134,7 @@
 <dd><p>this function returns the reaction environment that the agent has selected</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>the index</em><em> of </em><em>the agent to be run</em>) – </p>
+<dd class="field-odd"><p><strong>index</strong> (<em>the index of the agent to be run</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>the gym environment that has been loaded</p>
@@ -149,7 +150,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bench</strong> (<em>the bench for which the agent will be registered</em>) – </p></li>
-<li><p><strong>name</strong> (<em>the name</em><em> of </em><em>the agent to be registered</em>) – </p></li>
+<li><p><strong>name</strong> (<em>the name of the agent to be registered</em>) – </p></li>
 <li><p><strong>agent</strong> (<em>the agent itself derived from the agent class</em>) – </p></li>
 </ul>
 </dd>

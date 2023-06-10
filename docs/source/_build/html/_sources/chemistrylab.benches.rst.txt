@@ -1,8 +1,8 @@
-chemistrylab.benches package
+chemistrylab.benches
 ============================
 
 
-chemistrylab.benches.characterization\_bench module
+Characterization Bench
 ---------------------------------------------------
 
 .. automodule:: chemistrylab.benches.characterization_bench
@@ -10,7 +10,7 @@ chemistrylab.benches.characterization\_bench module
    :undoc-members:
    :show-inheritance:
 
-chemistrylab.benches.distillation\_bench\_v1 module
+Distillation Bench
 ---------------------------------------------------
 
 .. automodule:: chemistrylab.benches.distillation_bench
@@ -18,7 +18,7 @@ chemistrylab.benches.distillation\_bench\_v1 module
    :undoc-members:
    :show-inheritance:
 
-chemistrylab.benches.extract\_bench\_v1 module
+Extraction Bench
 ----------------------------------------------
 
 .. automodule:: chemistrylab.benches.extract_bench
@@ -26,7 +26,17 @@ chemistrylab.benches.extract\_bench\_v1 module
    :undoc-members:
    :show-inheritance:
 
-chemistrylab.benches.general\_bench module
+
+Reaction Bench
+-----------------------------------------------
+
+.. automodule:: chemistrylab.benches.reaction_bench
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+General Bench
 ------------------------------------------
 
 .. automodule:: chemistrylab.benches.general_bench
@@ -34,13 +44,7 @@ chemistrylab.benches.general\_bench module
    :undoc-members:
    :show-inheritance:
 
-chemistrylab.benches.reaction\_bench\_v1 module
------------------------------------------------
 
-.. automodule:: chemistrylab.benches.reaction_bench
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 Module contents
 ---------------
