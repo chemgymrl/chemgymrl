@@ -204,7 +204,7 @@ class FictReactBandit_v0(GenBench):
             o,r,d,*_ = super().step(act)
             gate[gate<self.steps-1]=self.max_steps
             ret+=r
-        return o,ret,d,*_
+        return (o,ret,d,*_)
 
 
 
