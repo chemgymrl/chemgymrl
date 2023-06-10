@@ -5,11 +5,9 @@
 import os
 import sys
 import numpy as np
-sys.path.append("../../")
 from chemistrylab.util.reward import RewardGenerator
 from chemistrylab import material, vessel
 from chemistrylab.benches.general_bench import *
-import importlib
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 from chemistrylab.lab.shelf import Shelf
 
