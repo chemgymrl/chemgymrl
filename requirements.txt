@@ -1,1 +1,9 @@
-mkdocs >= 1.2.2
+gymnasium
+numpy
+matplotlib>=3.6
+cmocean
+pyyaml
+scipy
+numba
+pillow
+pandas
