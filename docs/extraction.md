@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Extraction Bench
+# Extraction Bench
 
 <span style="display:block;text-align:center">![Extraction](tutorial_figures/extraction.png)
 

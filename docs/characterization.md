@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Characterization Bench
+# Characterization Bench
 
 <span style="display:block;text-align:center">![Characterization](tutorial_figures/characterization.png)
 

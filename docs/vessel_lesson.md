@@ -1,9 +1,9 @@
-## Vessel: Lesson
+# Vessel: Lesson
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/vessel_lesson.ipynb)
 
 
-### Overview:
+## Overview:
 
 In this lesson, we will be going through a class that is vital to the operation of all of our benches, the vessel class.
 The source code for this can be found here: `chemistrylab/chem_algorithms/vessel.py`. The vessel class as it is named is
@@ -11,7 +11,7 @@ meant to simulate the use of any given you might find in a chemistry lad, such a
 Here we will be going through the important concepts, functions and attributes that make up the vessel class so that you
 can easily use it when designing your own reactions.
 
-If you want a more detailed look into each function of the vessel I suggest you go to our [documentation]() on the data
+If you want a more detailed look into each function of the vessel I suggest you go to our [documentation](Vessel) on the data
 structure. 
 
 The Vessel class serves as any container you might find in a lab, a beaker, a dripper, etc. The vessel class simulates and allows for any action that you might want to perform within a lab, such as draining contents, storing gasses from a reaction, performing reactions, mix, pour, etc. This is performed using an event queue, which we will look at later in this lesson. First an overview of some of the important variables that make up the vessel class:
@@ -24,7 +24,7 @@ solute_dict|{str(solute): array[len(solvents)] , ...}| dictionary that represent
 
 
 
-## An example vessel:
+### An example vessel:
 
 
 
@@ -275,7 +275,7 @@ display(
 </table>
    
 
-# Customizing the event queue
+## Customizing the event queue
 
 You can add custom events to the Vessel class by registering them with `Vessel.register(f: Callable, f_id: str)`. Functions must be of the following form:
 ```python
@@ -331,7 +331,7 @@ display(v.get_material_dataframe())
 
 
 
-#### The Workflow
+### The Workflow
   
   1. Agent choose action from the action space of an environment.
   2. The environment does the calculation and update and generate events.

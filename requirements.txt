@@ -1,1 +1,11 @@
-mkdocs >= 1.2.2
+gymnasium
+numpy
+matplotlib
+cmocean
+pyyaml
+scipy
+numba
+pillow
+pandas
+myst-parser
+tabulate

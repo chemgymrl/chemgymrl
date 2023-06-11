@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Building A Custom Extraction File
+# Building A Custom Extraction Bench
 
 For this tutorial, we will be showing you how to create a custom extraction environment to train an RL agent on!
 
@@ -18,7 +18,7 @@ the environment and as a result, a lot more to set up. As a result, we are start
 but after having implemented this it should be obvious how to extend this to larger more complicated extractions.
 
 
-# Getting Started:
+## Getting Started:
 
 ```python
 from chemistrylab.chem_algorithms import material, vessel
@@ -30,7 +30,7 @@ from chemistrylab.lab.shelf import Shelf
 
 ```
 
-# Creating a Shelf filled with Vessels
+### Creating a Shelf filled with Vessels
 
 Here we create a shelf containing all of the vessels required for this material. The extraction vessel will have NaCl dissolved in oil, two extra vessels will be provided, one to extract the salt and the other to pour out any waste material (oil).
 
@@ -80,7 +80,7 @@ print(shelf)
 Shelf: (Extract Vessel, Extract Beaker, Waste, C6H14 Vessel, H2O Vessel)
 ```
 
-# Creating the Actions
+### Creating the Actions
 
 Actions are parameterized by a named tuple:
 ```python
@@ -134,7 +134,7 @@ actions = [
 ]
 ```
 
-# Determining the Reward Scheme & observations
+### Determining the Reward Scheme & observations
 
 Since we just want to get the salt out of the oil, we have our reward function discount the reward if C6H14 is present, and set NaCl as our target, making sure to include dissolved components as NaCl. In order to see what we are doing with the extraction, we will set the observation to just return layer information of our vessels.
 
@@ -148,7 +148,7 @@ observations = ["layers"]
 
 ```
 
-# Making the Bench
+## Making the Bench
 
 
 ```python

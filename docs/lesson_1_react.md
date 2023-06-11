@@ -1,10 +1,10 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Reaction Bench: Lesson 1
+# Reaction Bench: Lesson 1
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/reaction_lesson.ipynb)
 
-### Part 1:
+## Part 1:
 
 In this lesson, I will be taking you through how our reaction bench environment works and how an RL agent might interact with the environment.
 
@@ -99,7 +99,7 @@ while not d:
     plt.show()
 ```
 
-### Part 2:
+## Part 2:
 
 
 Here I will provide instructions on how to maximize the return of this reaction environment.

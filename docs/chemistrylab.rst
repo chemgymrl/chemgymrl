@@ -1,4 +1,4 @@
-chemistrylab package
+Chemistrylab package
 ====================
 
 Subpackages

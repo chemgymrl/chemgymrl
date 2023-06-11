@@ -11,14 +11,15 @@ Welcome to chemistrygym's documentation!
    :caption: Contents:
 
    chemistrylab
-   Installation
+   gettingstarted
+   usermanual
+   tutorials
+   Contact
+   License
+
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`search`
-
-
-
-```

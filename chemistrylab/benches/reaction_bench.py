@@ -5,11 +5,9 @@
 import os
 import sys
 import numpy as np
-sys.path.append("../../")
 from chemistrylab.util.reward import RewardGenerator
 from chemistrylab import material, vessel
 from chemistrylab.benches.general_bench import *
-import importlib
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 from chemistrylab.lab.shelf import Shelf
 
@@ -206,7 +204,7 @@ class FictReactBandit_v0(GenBench):
             o,r,d,*_ = super().step(act)
             gate[gate<self.steps-1]=self.max_steps
             ret+=r
-        return o,ret,d,*_
+        return (o,ret,d,*_)
 
 
 

@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Reaction Bench
+# Reaction Bench
 
 <span style="display:block;text-align:center">![Reaction](tutorial_figures/reaction.png)
 
