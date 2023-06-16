@@ -16,7 +16,14 @@ from tests.unit.benches.util import chemgym_filter,check_conservation,check_non_
 
 ENVS = chemgym_filter([a for a in gym.envs.registry])
 
-def run_env_no_overflow(env_id,seed=1,acts = None):
+
+def get_reaction(env):
+    try:
+        return env.default_events[0].parameter[0]
+    except:
+        return None
+
+def run_env_no_overflow(env_id,seed=1,acts = None, trace = False):
     """
     Runs a chemgymrl env while making sure no overflow happens in the vessels.
     
@@ -43,7 +50,9 @@ def run_env_no_overflow(env_id,seed=1,acts = None):
             act=acts[i]
         o,r,d,*_ = env.step(act)
         i+=1
-    return start_vessels,env.shelf.get_vessels(),env.reaction_info
+    if trace:
+        return start_vessels,env.shelf.get_vessels(), get_reaction(env), env, acts
+    return start_vessels,env.shelf.get_vessels(), get_reaction(env)
 
 
 class BenchTestCase(TestCase):

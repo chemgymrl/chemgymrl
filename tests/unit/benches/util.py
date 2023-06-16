@@ -82,7 +82,7 @@ def get_diff(vectors,x):
     return x-projection
 
 
-def check_conservation_react(start_vessels,end_vessels, reaction_info, TOL = 1e-8):
+def check_conservation_react(start_vessels,end_vessels, reaction, TOL = 1e-8):
     """
     Intended use: 
     1. Disable overflow on all vessels
@@ -102,7 +102,7 @@ def check_conservation_react(start_vessels,end_vessels, reaction_info, TOL = 1e-
     is inside this space via projection.
     """
     
-    reactants = {mat:i for i,mat in enumerate(reaction_info.MATERIALS)}
+    reactants = {mat:i for i,mat in enumerate(reaction.materials)}
     
     start_react = np.zeros(len(reactants))
     
@@ -138,6 +138,6 @@ def check_conservation_react(start_vessels,end_vessels, reaction_info, TOL = 1e-
         if abs(amount-start_total[mat])>TOL:
             print(amount,start_total[mat])
             return False
-    diff = get_diff(reaction_info.conc_coeff_arr,end_react-start_react)
+    diff = get_diff(reaction.conc_coeff_arr,end_react-start_react)
         
     return np.dot(diff,diff)<TOL

@@ -67,8 +67,7 @@ def get_rates(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, n
     
     return conc_change
 
-
-@numba.jit(nopython=True)
+@numba.njit
 def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr, num_reagents, temp, conc, dt, N):
     """
 
@@ -106,12 +105,11 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
     
     ddt=dt/N
     
-    factor=1
-    
     k = (ddt*pre_exp_arr) * np.exp((-1.0 * activ_energy_arr) / (R * temp))
     
+    factor=1
     count=0
-        
+    d_conc=conc*0
     while dt>0:
         conc = np.clip(conc, 0, None)
         #k are the reaction constants
@@ -121,27 +119,29 @@ def newton_solve(stoich_coeff_arr, pre_exp_arr, activ_energy_arr, conc_coeff_arr
             for j in range(num_reagents):
                 rates[i] *= conc[j] ** stoich_coeff_arr[i][j]
         
-        ratio=np.max(rates)/(np.max(conc)+1e-6)
+        #calculate concentration changes
+        for i in range(conc.shape[0]):
+            d_conc[i]=0
+            for j in range(rates.shape[0]):
+                d_conc[i] += conc_coeff_arr[i][j]*rates[j]
         
-        #mess with the step size to make sure you don't get any super huge concentration changes
+        #maximum proportion of material reduction        
+        ratio=np.max(-d_conc/(conc+1e-6))
+        
+        #mess with the step size to make sure you don't get any super huge concentration decreases
         while ratio*factor<targ and factor<10:
             factor*=2
         while ratio*factor>0.1:
             factor*=0.5
-            
         if factor*ddt>=dt:
             factor = dt/ddt
             dt=0
         
-        dt-=factor*ddt
-            
-        rates*=factor
+        dt-=factor*ddt            
         count+=1
-        #calculate concentration changes and add them to the concentration
-        for i in range(conc.shape[0]):
-            for j in range(rates.shape[0]):
-                conc[i] += conc_coeff_arr[i][j]*rates[j]
-               
+        # Add concentration changes
+        conc+=d_conc*factor
+
     return conc
    
 
