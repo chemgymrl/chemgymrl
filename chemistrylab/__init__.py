@@ -50,11 +50,11 @@ register(
 
 ############################ LabManager ####################################
 
-register(
-    id='LabManager-v0',
-    entry_point='chemistrylab.manager.manager:LabManager',
-    max_episode_steps=100
-)
+#register(
+#    id='LabManager-v0',
+#    entry_point='chemistrylab.manager.manager:LabManager',
+#    max_episode_steps=100
+#)
 
 
 ######################## Bandit Gyms ############################################
