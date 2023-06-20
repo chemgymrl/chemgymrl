@@ -317,7 +317,7 @@ def add_material(vessel: Vessel, dt: float, other_vessel: Optional[Vessel], mate
     # Rebuild the vessel's solute dict if new solvents have been added
     vessel.validate_solvents()
     vessel.validate_solutes()
-    return vessel.handle_overflow()
+    return vessel._handle_overflow()
 
 Vessel.register(add_material,"add material")
 

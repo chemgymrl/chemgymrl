@@ -32,10 +32,10 @@ for env,reg in gym.registry.items():
 
 #sys.path.append("C:\\Users\\sprag\\Documents\\Python Scripts\\ResearchF2022\\CHEMGYM\\chemgymrl")
 
-project = 'chemistrygym'
+project = 'ChemGymRL'
 copyright = '2023, Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn'
 author = 'Chris Beeler, Sriram Ganapathi Subramanian, Kyle Sprague, Nouha Chatti, ColinBellinger, Mitchell Shahen, Nicholas Paquin, Mark Baula, Amanuel Dawit, Zihan Yang,Xinkai Li, Mark Crowley, Isaac Tamblyn'
-release = '1.5.7'
+release = '1.5.8'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

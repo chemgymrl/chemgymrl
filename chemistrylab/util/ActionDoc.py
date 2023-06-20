@@ -27,25 +27,26 @@ def generate_table(shelf, actions) -> str:
     """Make a restructuredText table describing the actions list"""
     table_data = []
     for i, action in enumerate(actions, start=0):
-        event = action[0][0][1]
-        event_performed = action[0][0][1].name
-        
-        discrete = True
-        params = event.parameter
-        if type(params) is ContinuousParam:
-            discrete=False
-            min_val, max_val, thresh, other = params
-            params = (f"[{min_val},{max_val}]",*other)
-        
-        params = [round(a,3) if type(a) in floattypes else a for a in params]
-        
-        vessels = ', '.join([shelf[vessel[0]].label for vessel in action[0]])
-        event_params = ', '.join([f"{name}: {a}" for name,a in zip(param_names[event.name],params)])
-        other_vessel = event.other_vessel.label if event.other_vessel is not None else 'N/A'
         
         if action[1].terminal:
-            vessels=event_params="N/A"
+            vessels=event_params=other_vessel="N/A"
             event_performed = "End Experiment"
+        else:
+            event = action[0][0][1]
+            event_performed = action[0][0][1].name
+            
+            discrete = True
+            params = event.parameter
+            if type(params) is ContinuousParam:
+                discrete=False
+                min_val, max_val, thresh, other = params
+                params = (f"[{min_val},{max_val}]",*other)
+            
+            params = [round(a,3) if type(a) in floattypes else a for a in params]
+            vessels = ', '.join([shelf[vessel[0]].label for vessel in action[0]])
+            event_params = ', '.join([f"{name}: {a}" for name,a in zip(param_names[event.name],params)])
+            other_vessel = event.other_vessel.label if event.other_vessel is not None else 'N/A'
+
         table_data.append([i, vessels, event_performed, event_params, other_vessel])
     
     action_col = "Action" if discrete else "Action Index"

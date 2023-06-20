@@ -12,47 +12,9 @@ from copy import deepcopy
 from unittest import TestCase
 
 
-from tests.unit.benches.util import chemgym_filter,check_conservation,check_non_negative,check_conservation_react
+from tests.unit.benches.util import chemgym_filter,check_conservation,check_non_negative,check_conservation_react, run_env_no_overflow
 
 ENVS = chemgym_filter([a for a in gym.envs.registry])
-
-
-def get_reaction(env):
-    try:
-        return env.default_events[0].parameter[0]
-    except:
-        return None
-
-def run_env_no_overflow(env_id,seed=1,acts = None, trace = False):
-    """
-    Runs a chemgymrl env while making sure no overflow happens in the vessels.
-    
-    """
-    if acts is None:
-        acts = []
-    env = gym.make(env_id)
-    _ = env.reset(seed=seed)
-    
-    #increase vessel sizes so no overflow happens
-    tot_vol = sum(v.filled_volume() for v in env.shelf)
-    tot_vol = 2**np.ceil(np.log(tot_vol)/np.log(2))
-    for v in env.shelf:
-        v.volume=tot_vol
-    #collect initial vessels  
-    start_vessels = deepcopy([v for v in env.shelf])    
-    d = False
-    i=0
-    while not d:
-        if len(acts)<=i:
-            act = env.action_space.sample()
-            acts+=[act]
-        else:
-            act=acts[i]
-        o,r,d,*_ = env.step(act)
-        i+=1
-    if trace:
-        return start_vessels,env.shelf.get_vessels(), get_reaction(env), env, acts
-    return start_vessels,env.shelf.get_vessels(), get_reaction(env)
 
 
 class BenchTestCase(TestCase):

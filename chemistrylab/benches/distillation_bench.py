@@ -179,7 +179,7 @@ class WurtzDistillDemo_v0(GenBench):
             Action([0],    heat_info,            'heat contact',   [1],   0.01,   False),
             Action([0],    amounts,              'pour by volume', [1],   0.01,   False),
             Action([1],    amounts,              'pour by volume', [2],   0.01,   False),
-            Action([0],    [[0]],                'mix',            None,  0,      True)
+            Action([],     [[]],                 'End',            None,  0,      True)
         ]
         
         targets = [
