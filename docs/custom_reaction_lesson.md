@@ -2,7 +2,7 @@
 
 In this tutorial, I am going to walk you through how reactions work and how to make your own custom reaction
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/custom_reaction.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/main/lessons/notebooks/custom_reaction.ipynb)
 
 ```python
 from chemistrylab.reactions.reaction_info import ReactInfo

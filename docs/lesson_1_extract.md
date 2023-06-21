@@ -2,7 +2,7 @@
 
 # Extraction Bench: Lesson 1
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/rewrite/lessons/notebooks/extraction_lesson.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/main/lessons/notebooks/extraction_lesson.ipynb)
 
 ## Using a non-polar solute to extract a solute from water
 
