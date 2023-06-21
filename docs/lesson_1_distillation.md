@@ -15,7 +15,7 @@ import chemistrylab
 import matplotlib,time
 import numpy as np
 from matplotlib import pyplot as plt
-from chemistrylab.benches import Visualization
+from chemistrylab.util import Visualization
 from IPython.display import display,clear_output
 
 Visualization.use_mpl_light(size=2)

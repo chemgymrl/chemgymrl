@@ -21,7 +21,7 @@ but after having implemented this it should be obvious how to extend this to lar
 ## Getting Started:
 
 ```python
-from chemistrylab.chem_algorithms import material, vessel
+from chemistrylab import material, vessel
 from chemistrylab.benches.general_bench import *
 from chemistrylab.chem_algorithms.reward import RewardGenerator
 import importlib

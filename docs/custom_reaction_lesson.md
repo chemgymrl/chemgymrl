@@ -7,7 +7,7 @@ In this tutorial, I am going to walk you through how reactions work and how to m
 ```python
 from chemistrylab.reactions.reaction_info import ReactInfo
 from chemistrylab.reactions.reaction import Reaction
-from chemistrylab.chem_algorithms import material,vessel
+from chemistrylab import material,vessel
 
 import numpy as np
 from IPython.display import display,clear_output,JSON

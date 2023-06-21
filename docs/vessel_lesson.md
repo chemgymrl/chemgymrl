@@ -30,8 +30,8 @@ solute_dict|{str(solute): array[len(solvents)] , ...}| dictionary that represent
 
 ```python
 
-from chemistrylab.chem_algorithms import vessel,material
-from chemistrylab.benches import Visualization
+from chemistrylab import vessel,material
+from chemistrylab.util import Visualization
 from IPython.display import display,clear_output,HTML
 from copy import deepcopy
 Visualization.use_mpl_light(size=1)
