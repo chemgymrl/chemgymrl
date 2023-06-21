@@ -19,19 +19,7 @@ pip install gymnasium[classic-control]
 
 Then you can play the benches with the following command:
 ```
-python -c "import gymnasium,chemistrylab;from gymnasium.utils.play import play;play(gymnasium.make('WurtzExtractDemo-v0'))"
+python -m chemistrylab.demo
 ```
 
-```
-Controls (Use the numpad or number row):
-1: extraction_vessel performs Event(name='drain by pixel', parameter=[1], other_vessel=Beaker 1)
-2: extraction_vessel performs Event(name='mix', parameter=array([-0.02]), other_vessel=None)
-3: Beaker 1 performs Event(name='pour by volume', parameter=array([0.02]), other_vessel=extraction_vessel)
-4: Beaker 2 performs Event(name='pour by volume', parameter=array([0.02]), other_vessel=extraction_vessel)
-5: extraction_vessel performs Event(name='pour by volume', parameter=array([0.02]), other_vessel=Beaker 2)
-6: C6H14 Vessel performs Event(name='pour by volume', parameter=array([0.01]), other_vessel=extraction_vessel)
-7: diethyl ether Vessel performs Event(name='pour by volume', parameter=array([0.01]), other_vessel=extraction_vessel)
-8: extraction_vessel performs Event(name='mix', parameter=[0.001], other_vessel=None)
-9: extraction_vessel performs Event(name='mix', parameter=[0.016], other_vessel=None)
-0: end experiment
-```
+This demo lets you select the [Extraction Bench Demo](https://chemgymrl.readthedocs.io/en/latest/chemistrylab.benches.html#chemistrylab.benches.extract_bench.WurtzExtractDemo_v0), the [Reaction Bench Demo](https://chemgymrl.readthedocs.io/en/latest/chemistrylab.benches.html#chemistrylab.benches.reaction_bench.FictReactDemo_v0), and the [Distillation Bench Demo](https://chemgymrl.readthedocs.io/en/latest/chemistrylab.benches.html#chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0)
