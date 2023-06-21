@@ -1,9 +1,6 @@
 Chemistrylab package
 ====================
 
-Subpackages
------------
-
 .. toctree::
    :maxdepth: 4
 
