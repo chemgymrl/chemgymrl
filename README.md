@@ -102,7 +102,7 @@ source chemgymrl/bin/activate
 Now that the virtual environment is created and activated we will now look to install all the correct packages.
 
 #### Install Library:
-Now that everything is set up we simply seed to install the library. If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
+Now that everything is set up we simply need to install the library. If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
  
 ```commandline
 pip install .
