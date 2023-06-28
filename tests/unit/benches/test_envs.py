@@ -1,6 +1,3 @@
-def null_test(x):
-    raise NotImplementedError
-
 import sys
 sys.path.append('../../../')
 
@@ -13,7 +10,7 @@ from chemistrylab import vessel, material
 from copy import deepcopy
 from unittest import TestCase
 
-from tests.unit.benches.util import chemgym_filter,check_conservation,check_non_negative,check_conservation_react, run_env_no_overflow
+from tests.unit.benches.util import chemgym_filter,check_conservation,check_non_negative,check_conservation_react, run_env_no_overflow, prep_no_overflow
 
 ENVS = chemgym_filter([a for a in gym.envs.registry])
 
@@ -68,7 +65,6 @@ class EnvTestCase(TestCase):
         o,r,d,*_ = env.step([1,1,1,1,1])
         self.assertTrue(np.max(o)<=1 and np.min(o)>=0)
         #TODO: Finish observation test
-        1/0
     def test_FictReact_v2_pour_by_percent(self):
         #conservation of stuff works
         info = run_env_no_overflow("FictReact-v2", 10, acts=[[1,1,1,1,1]]+[[1,0,0,0,0]]*19)
@@ -158,7 +154,58 @@ class EnvTestCase(TestCase):
             env.shelf[pour_2[0]].push_event_to_queue(pour_2[1:])
         check_non_negative(env.shelf)
         
+    def test_GenWurtzDistill_v2_mix(self):
+        env = gym.make("GenWurtzDistill-v2")
+        _=env.reset()
         
+        o,r,done,*_ = env.step(30)
+        
+        self.assertTrue(done)
+        
+    def test_GenWurtzDistill_v2_observation(self):
+        env = gym.make("GenWurtzDistill-v2")
+        _=env.reset()
+        o,r,d,*_ = env.step(0)
+        self.assertTrue(np.max(o)<=1 and np.min(o)>=0)
+        
+    def test_GenWurtzExtract_v2_drain_by_pixel(self):
+        env = gym.make("GenWurtzExtract-v2")
+        _=env.reset(seed=10)
+        
+        src_0 = env.shelf[0].filled_volume()
+        dest_0 = env.shelf[1].filled_volume()
+        
+        #settle the ev
+        env.step(39)
+        # Draining action for 2 pixels
+        o,r,d,*_ = env.step(0)
+        
+        
+        src_1 = env.shelf[0].filled_volume()
+        dest_1 = env.shelf[1].filled_volume()
+        
+        #make sure source vessel volume decreases
+        self.assertTrue( src_1<src_0)
+        #make sure destination vessel volume increases
+        self.assertTrue(dest_1>dest_0)
+        
+        #checking nonnegative
+        for x in range(12):
+            #max pouring
+            env.step(9)
+        self.assertTrue(env.shelf[0].filled_volume()>=0)
+        self.assertTrue(check_non_negative(env.shelf))
+        
+        #checking conservation
+        _=env.reset()
+        
+        initial = prep_no_overflow(env)
+        
+        for x in range(4):
+            #max pouring
+            env.step(9)
+        
+        self.assertTrue(check_conservation(initial,env.shelf))
         
         
 # The below code adds a test case for each type of action of each bench to the EnvTestCase class which raises a NotImplementedError

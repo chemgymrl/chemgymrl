@@ -7,6 +7,18 @@ def get_reaction(env):
         return env.default_events[0].parameter[0]
     except:
         return None
+    
+    
+def prep_no_overflow(env):
+    """Increases the capacity of each vessel so overflow can't occur and deepcopies the initial set of vessels"""
+    tot_vol = sum(v.filled_volume() for v in env.shelf)
+    tot_vol = 2**np.ceil(np.log(tot_vol)/np.log(2))
+    for v in env.shelf:
+        v.volume=tot_vol
+    #collect initial vessels  
+    start_vessels = deepcopy([v for v in env.shelf])
+    return start_vessels
+    
 def run_env_no_overflow(env_id,seed=1,acts = None, trace = False):
     """
     Runs a chemgymrl env while making sure no overflow happens in the vessels.
