@@ -1,40 +1,15 @@
 """
-This file is part of ChemGymRL.
 
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
-
-Module to create the lab manager and facilitate it's processes.
-
-:title: manager.py
-
-:author: Mark Baula, Nicholas Paquin, and Mitchell Shahen
-
-:history: 22-06-2020
-
-The Manager class works as an interface for the agent to work with the lab environment and helps to automate the use of
-the entire lab.
 """
 
 import os
 import sys
 
 import numpy as np
-sys.path.append("../../") # to access `chemistrylab`
-from chemistrylab.lab.lab import Lab
-from chemistrylab.lab.agent import RandomAgent, Agent
+import chemistrylab
 import datetime as dt
 
+Agent = object #TODO: add this actually
 
 class Manager:
     def __init__(self, mode='custom', agent=None):

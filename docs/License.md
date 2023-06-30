@@ -1,14 +1,14 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Citation & License
+# Citation & License
 
-### Citation
+## Citation
 
 Please use the following citation for ChemGymRL:
 
 * Crowley, M., Tamblyn, I., et al, ChemGymRL, April 2021. URL: https://chemgymrl.com/
 
-### License 
+## License 
 
 ChemGymRL is licensed under GPLv3
 

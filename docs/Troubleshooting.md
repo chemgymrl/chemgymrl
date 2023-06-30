@@ -12,8 +12,8 @@ Here we will discuss some possible error messages here and try to find a solutio
 
 ```
 register(
-    id='WurtzExtract-v1',
-    entry_point='chemistrylab.extract_bench.extract_bench_v1:WurtzExtract_v1',
+    id='GenWurtzReact-v2',
+    entry_point='chemistrylab.benches.reaction_bench:GeneralWurtzReact_v2'
 )
 ```
 
@@ -22,17 +22,17 @@ AttributeError: module 'chemistrylab.extract_bench.extract_bench_v1:WurtzExtract
 ```
 
 When registering any environment it's important to note that the corresponding entry point must also be added. In the 
-picture above the entry point to `WurtzReact-v1` was expected to be the class `WurtzExtract_v1` in 
-`reaction_bench_v1.py`. Failure to add the corresponding class will result in this error message.
+picture above the entry point to `GenWurtzReact-v2` was expected to be the class `GenWurtzReact_v2` in 
+`reaction_bench.py`. Failure to add the corresponding class will result in this error message.
 
 **Not registering an environment**
 
 ```
->>> env = gym.make("WurtzReact-v1")
+>>> env = gym.make("GenWurtzReact-v2")
 ```
 
 ```
-gym.error.UnregisteredEnv: No registered env with id: WurtzReact-v1
+gym.error.UnregisteredEnv: No registered env with id: GenWurtzReact-v2
 ```
 
 When adding a new environment it's required to also add a registration entry in `chemistrylab/__init__.py`. Failure to

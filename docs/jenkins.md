@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Jenkins: Pipelinefile
+# Jenkins: Pipelinefile
 
 Below here is the file that you must add to your branch, however there are a few changes that must be made for your
 branch. Create a file named `Jenkinsfile` at the root of the repository so in our case `chemistrygym/Jenkinsfile` and copy the text below into the file. Please then make the appropriate

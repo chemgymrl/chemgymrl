@@ -20,15 +20,18 @@ import sys
 setup(name='chemistrygym',
       packages=find_packages(),
       install_requires=[
-          'gym<0.20.0',
+          'gymnasium',
           'numpy',
-          'matplotlib',
+          'matplotlib>=3.6',
           'cmocean',
           'pyyaml',
           'scipy',
           'numba',
+          'pillow',
+          'pandas',
       ],
+      include_package_data=True,
       description='Implementation of extraction simulations in the OpenAI Gym environment framework.',
       author='CLEAN and UW ECE ML',
       url='https://github.com/chemgymrl/chemgymrl',
-      version='1.0.0')
+      version='2.0.0')

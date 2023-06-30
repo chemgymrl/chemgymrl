@@ -1,32 +1,13 @@
 """
-This file is part of ChemGymRL.
 
-ChemGymRL is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ChemGymRL is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ChemGymRL.  If not, see <https://www.gnu.org/licenses/>.
 """
 import sys
 from abc import ABC
-
-sys.path.append("../../") # to access `chemistrylab`
-sys.path.append('../../chemistrylab/reactions')
-from chemistrylab.lab.agent import RandomAgent, Agent
-from chemistrylab.lab.shelf import Shelf
-import gym
+import gymnasium as gym
 import chemistrylab
 import numpy as np
-from gym import envs
-from chemistrylab.characterization_bench.characterization_bench import CharacterizationBench
 
+Agent = object
 
 class Lab(gym.Env, ABC):
     """

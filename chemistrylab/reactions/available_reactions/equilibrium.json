@@ -1,0 +1,35 @@
+{
+  "name": "equilibrium reactions",
+  "REACTANTS": [
+    "CuS04*5H2O",
+    "CuS04",
+    "H2O"
+  ],
+  "PRODUCTS": [
+    "CuS04*5H2O",
+    "CuS04",
+    "H2O"
+  ],
+  "SOLVENTS": [
+    "H2O"
+  ],
+  "MATERIALS": [
+    "CuS04*5H2O",
+    "CuS04",
+    "H2O"
+  ],
+  "pre_exp_arr": [ 1.0, 1.0  ],
+  "activ_energy_arr": [
+    [ 8.0 ],
+    [ 10.0 ]
+  ],
+  "stoich_coeff_arr": [
+    [ 1.0, 1.0, 0.0 ],
+    [ 0.0, 0.0, 1.0 ]
+  ],
+  "conc_coeff_arr": [
+    [-1.0, 1.0 ],
+    [ 1.0, 1.0 ],
+    [ 5.0,-1.0 ]
+  ]
+}

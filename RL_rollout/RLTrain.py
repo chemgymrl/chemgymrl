@@ -141,11 +141,10 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
 from stable_baselines3.common.env_util import make_vec_env
 #from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
-import gym
+import gymnasium as gym
 #from wandb.integration.sb3 import WandbCallback
 #import wandb
 import sys
-sys.path.append('../')
 import chemistrylab
 import numpy as np
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
@@ -192,7 +191,7 @@ if __name__=="__main__":
     if op.dir=="<DEFAULT>":
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y--%H-%M-%S")
-        op.dir="MODELS\\"+op.environment+"\\"+op.algorithm+"\\"+dt_string
+        op.dir="RLMODELS\\"+op.environment+"\\"+op.algorithm+"\\"+dt_string
     
     
     #Set up output directory

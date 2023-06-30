@@ -1,6 +1,6 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Distillation Bench
+# Distillation Bench
 
 <span style="display:block;text-align:center">![Distillation](tutorial_figures/distillation.png)
 
@@ -12,28 +12,64 @@ An agent tasked to operate on this bench must control the heat energy added to t
 
 ## Input 
 
-The input to the extraction bench is initialized in the `distillation_bench_v1.py` file.
+The construction of the distillation bench is initialized in the `distillation_bench_v1.py` file.
 
 ```python
-class Distillation_v1(DistillationBenchEnv):
-    '''
-    Class to define an environment to perform a distillation experiment
-    on an inputted vessel and obtain a pure form of a targetted material.
-    '''
+class WurtzDistillDemo_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 60,
+    }
 
     def __init__(self):
-        super(Distillation_v1, self).__init__(
-            boil_vessel=get_vessel(
-                vessel_path=os.path.join(os.getcwd(), "test_extract_vessel.pickle"),
-                in_vessel=boil_vessel()
-            ),
-            reaction=_Reaction,
-            reaction_file_identifier="chloro_wurtz",
-            precipitation_file_identifier="precipitation",
-            target_material="dodecane",
-            dQ=1000.0,
-            out_vessel_path=os.getcwd()
+        d_rew= RewardGenerator(use_purity=True,exclude_solvents=False,include_dissolved=True)
+        shelf = VariableShelf( [
+            lambda x:wurtz_vessel(x)[0],
+            lambda x:vessel.Vessel("Beaker 1"),
+            lambda x:vessel.Vessel("Beaker 2"),
+        ],[], n_working = 3)
+
+        amounts=np.ones([1,1])*0.02
+        
+        heat_info = np.array([
+            [300,20], # Room temp water
+            [270,20], # Freezing water
+            [1000,3]  # Fire
+        ])
+
+        actions = [
+            Action([0],    heat_info,            'heat contact',   [1],   0.01,   False),
+            Action([0],    amounts,              'pour by volume', [1],   0.01,   False),
+            Action([1],    amounts,              'pour by volume', [2],   0.01,   False),
+            Action([0],    [[0]],                'mix',            None,  0,      True)
+        ]
+        
+        targets = ["dodecane", "5-methylundecane", "4-ethyldecane",
+            "5,6-dimethyldecane", "4-ethyl-5-methylnonane", "4,5-diethyloctane", "NaCl"]
+
+        react_info = ReactInfo.from_json(REACTION_PATH+"/precipitation.json")
+        reaction = Reaction(react_info)
+        reaction.solver="newton"
+        reaction.newton_steps=100
+
+        super(WurtzDistillDemo_v0, self).__init__(
+            shelf,
+            actions,
+            ["layers","PVT","targets"],
+            targets=targets,
+            default_events = (Event("react", (reaction,), None),),
+            reward_function=d_rew,
+            max_steps=500
         )
+
+    def get_keys_to_action(self):
+        # Control with the numpad or number keys.
+        keys = {(ord(k),):i for i,k in enumerate("123456") }
+        keys[()]=0
+        return keys
 ```
 
 Here we pass the boiling vessel, or a path to the pickle file produced by a previous bench. We provide a reaction
@@ -83,44 +119,34 @@ For this tutorial, we will just familiarize ourselves with the basic actions, fu
 
 Here we have the different possible actions that we can take with the environment. The **action_set is an array indexed correspondingly to the action we want to perform.**
 
-The action_space is a multidiscrete action space of shape [5 10].
+The action_space size is equal to the total amount of action parameter tuples.
 
-**The first index allows us to choose from the action set. The second index allows us to pick a multiplier that will affect the action variably depending on our chosen multiplier.**
 
-For example, the following pair of numbers will add a great amount of heat compared to a multiplier of 6. 
-
-Action: 0
-
-Action Multiplier: 10
-
-Note that the multiplier affects each action differently. For examply the way the agents chosen multiplier affects heat change is given by the following code:
+For example, the following code defines 3 actions: 
 
 ```python
-multiplier = 2 * (multiplier/self.n_actions - 0.5)
-heat_change = multiplier * self.dQ
+heat_info = np.array([
+    [300,20], # Room temp water
+    [270,20], # Freezing water
+    [1000,3]  # Fire
+])
+
+Action([0], heat_info, 'heat contact', [1], 0.01, False)
+
 ```
 
-Also note that when we are performing heat changes, it heavily relies on the given value of dQ. For our lessons we will be using a dQ of 1000.0. Please make sure to change your dQ value to 1000.0 if you are following this lesson to ensure our results stay the same. You can change this value in the `distillation_bench_v1.py` file under the distillation bench folder.
+The first action (with parameters [300, 20]) corresponds to performing heat transfer with a reservoir at 300 Kelvin (just above room temperature) for 20 time-like units.
 
 Typically an agent will choose actions based on what will give a higher reward, and higher reward is given by getting a high molar amount and concentration of the desired material (in our case dodecane) in a particular vessel.
 
 ## Output
 
 Once the distillation bench is reset and the render function is called, plots will appear showing data about the distillation 
-being performed by the agent. There are two main plot modes:
+being performed by the agent.
 
-- Human Render
-    - Plots the solvent contents of each vessel with some thermodynamic information. The human render plots a minimal
-    amount of data and provides a 'surface-level' understanding of the information portrayed.
-    - Sequential pixels corresponding to the same solvent constitute a single layer.
-
-![human render output](tutorial_figures/distillation/human_render_distillation.png)
-
-- Full Render
+- Render
     -  Plots the solvent contents of each vessel, some thermodynamic information, the amount of each material in each vessel.
     The full render plots a significant amount of data for a more in-depth understanding of the information portrayed.
 
 ![full render output](tutorial_figures/distillation/full_render_distillation.png)
 
-Like the other benches, distillation also saves the vessel once the distillation process is completed. The default name 
-for the pickle file is 'distillation_vessel_{i}' where i ranges from 0 to the total number of validated vessels.

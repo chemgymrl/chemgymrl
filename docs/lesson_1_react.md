@@ -1,10 +1,10 @@
 [chemgymrl.com](https://chemgymrl.com/)
 
-## Reaction Bench: Lesson 1
+# Reaction Bench: Lesson 1
 
-Here is a [link](https://github.com/chemgymrl/chemgymrl/blob/main/lessons/notebooks/reaction_lesson.ipynb) to the jupyter notebook, please use it at your pleasure.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chemgymrl/chemgymrl/blob/main/lessons/notebooks/reaction_lesson.ipynb)
 
-### Part 1:
+## Part 1:
 
 In this lesson, I will be taking you through how our reaction bench environment works and how an RL agent might interact with the environment.
 
@@ -13,37 +13,32 @@ The reaction bench environment is meant to as it sounds simulate a reaction, in 
 Below is just some simple code that loads our desired environment
 
 ```python
-import sys
-sys.path.append('../')
-sys.path.append('../chemistrylab/reactions')
-import gym
+import gymnasium as gym
 import chemistrylab
+import matplotlib,time
 import numpy as np
-from gym import envs
-all_envs = envs.registry.all()
-env_ids = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
-print(env_ids)
-env = gym.make('WurtzReact-v1')
-render_mode = "human"
-action_set = ['Temperature', 'Volume', "1-chlorohexane", "2-chlorohexane", "3-chlorohexane", "Na"]
+from matplotlib import pyplot as plt
+from chemistrylab.util import Visualization
+from IPython.display import display,clear_output
 
-assert len(action_set) == env.action_space.shape[0]
+Visualization.use_mpl_light(size=2)
+# IF you are using dark mode
 ```
 
 First let's load up the environment, I highly recommend you look at the source code for the reaction bench and
 reaction, it should help provide insight into how this all works. Further the lesson on creating a custom reaction
 environment will also help give insight into the reaction mechanics.
 
-```commandline
---------------------
-Temperature: 
-```
 
 If you run the cell below you will see a graph appear that looks something like this:
 
 ```python
+env = gym.make('GenWurtzReact-v2')
 env.reset()
-env.render(mode=render_mode, nb=True)
+rgb = env.render()
+plt.imshow(rgb)
+plt.axis("off")
+plt.show()
 ```
 
 ![graph](tutorial_figures/reaction-lesson-1/wurtz_lesson_0.png)
@@ -64,9 +59,9 @@ This reaction is performed in an aqueous state with diethylether as the solvent.
 With all that out of the way let's focus our attention to the action space. For this reaction environemnt our action
 space is represented by a 6 element vector. 
 
-|              | Temperature | Volume | 1-chlorohexane | 2-chlorohexane | 3-chlorohexane | Na  |
-|--------------|-------------|--------|----------------|----------------|----------------|-----|
-| Value range: | 0-1         | 0-1    | 0-1            | 0-1            | 0-1            | 0-1 |
+|              | Temperature | 1-chlorohexane | 2-chlorohexane | 3-chlorohexane | Na  |
+|--------------|-------------|----------------|----------------|----------------|-----|
+| Value range: | 0-1         | 0-1            | 0-1            | 0-1            | 0-1 |
 
 As you might have noticed now, the reaction bench environment deals with a continuous action space. So what exactly do
 these continuous values represent? For the environmental conditions, in this case Volume and Temperature 0 represents a
@@ -79,77 +74,83 @@ Below you will find a code cell that will allow you to interact with the gym env
 
 
 ```python
-done = False
+d = False
 state = env.reset()
 total_reward = 0
-while not done:
-    # print(state)
-    env.render(mode=render_mode, nb=True)
-    action = np.zeros(env.action_space.shape[0])
-    print('--------------------')
-    for i, a in enumerate(action_set):
-        action[i] = float(input(f'{a}: '))
-    state, reward, done, _ = env.step(action)
-    total_reward += reward
-    print(f'reward: {reward}')
+
+action = np.ones(env.action_space.shape[0])
+print(f'Target: {env.target_material}')
+for i, a in enumerate(env.actions):
+    v,event = env.shelf[a[0][0][0]],a[0][0][1]
+    action[i] = float(input(f'{v}: {event.name} -> {event.other_vessel}| '))
+
+
+while not d:
+    action = np.clip(action,0,1)
+    o, r, d, *_ = env.step(action)
+    total_reward += r
+    time.sleep(0.1)
+    clear_output(wait=True)
+    print(f'reward: {r}')
     print(f'total_reward: {total_reward}')
+    rgb = env.render()
+    plt.imshow(rgb)
+    plt.axis("off")
+    plt.show()
 ```
 
-### Part 2:
+## Part 2:
 
 
 Here I will provide instructions on how to maximize the return of this reaction environment.
 
 This is fairly simple for this task and have thus provided some script which demonstrates our strategy, and I encourage
-you to try your own strategy and see how it performs. In this case cour strategy is at step 1 to increase the temperature,
-keep the volume of solvent constant, and to add all our reagents, in this case 1-chlorohexane and Na. This gives us an
+you to try your own strategy and see how it performs. In this case cour strategy is to maximize the temperature and add in all our reagents. For example, to make dodecane we want to add 1-chlorohexane and Na. This gives us an
 action vector of:
 
-| Temperature | Volume | 1-chlorohexane | 2-chlorohexane | 3-chlorohexane | Na  |
-|-------------|--------|----------------|----------------|----------------|-----|
-| 1         | 1/2    | 1            | 0            | 0            | 1 |
+| Temperature | 1-chlorohexane | 2-chlorohexane | 3-chlorohexane | Na  |
+|-------------|----------------|----------------|----------------|-----|
+| 1         | 1            | 0            | 0            | 1 |
+
 
 ![image of reaction](sample_figures/reaction.jpg)
 
-Then at every next step we are going to keep the solvent volume constant and increase the temperature
 
-| Temperature | Volume | 1-chlorohexane | 2-chlorohexane | 3-chlorohexane | Na  |
-|-------------|--------|----------------|----------------|----------------|-----|
-| 1         | 1/2    | 0            | 0            | 0            | 0 |
-
-![heating up vessel](sample_figures/heating.jpg)
-
-To see this in action simply run the following code cell:
+To see this in action run the following code cell:
 
 
 ```python
-done = False
-state = env.reset()
-total_reward = 0
-round = 0
+def predict(observation):
+    t = np.argmax(observation[-7:])
+    #targs = {0: "dodecane", 1: "5-methylundecane", 2: "4-ethyldecane", 3: "5,6-dimethyldecane", 4: "4-ethyl-5-methylnonane", 5: "4,5-diethyloctane", 6: "NaCl"}
+    actions=np.array([
+    [1,1,0,0,1],#dodecane
+    [1,1,1,0,1],#5-methylundecane
+    [1,1,0,1,1],#4-ethyldecane
+    [1,0,1,0,1],#5,6-dimethyldecane
+    [1,0,1,1,1],#4-ethyl-5-methylnonane
+    [1,0,0,1,1],#4,5-diethyloctane
+    [1,1,1,1,1],#NaCl
+    ],dtype=np.float32)
+    return actions[t]
 
-while not done:
-    # print(state)
-    env.render(mode=render_mode, nb=True)
-    action = np.zeros(env.action_space.shape[0])
-    if round == 0:
-        action[0] = 1
-        action[1] = 1
-        action[2] = 1
-        action[-1] = 1
-    else:
-        action[0] = 1
-        action[1] = 1
-
-    print('--------------------')
-    print(round)
-    state, reward, done, _ = env.step(action)
-    total_reward += reward
-    print(f'reward: {reward}')
+d=False
+o,*_=env.reset()
+total_reward=0
+while not d:
+    action = predict(o)
+    o, r, d, *_ = env.step(action)
+    total_reward += r
+    time.sleep(0.1)
+    clear_output(wait=True)
+    print(f"Target: {env.target_material}")
+    print(f"Action: {action}")
+    print(f'reward: {r}')
     print(f'total_reward: {total_reward}')
-    round += 1
-    if done:
-        wait = input("PRESS ENTER TO EXIT")
+    rgb = env.render()
+    plt.imshow(rgb)
+    plt.axis("off")
+    plt.show()
 ```
 
 Now we're done! I hope you have a better sense of how the reaction environment works and the process through which
