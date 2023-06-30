@@ -440,9 +440,10 @@ class Vessel:
 
         drained_layers = self._hashed_layers[:n_pixel]
         tot_pixels=len(self._hashed_layers)
-        for i,key in enumerate(self.solvents):
-            #NOTE mat is the solvent material
-            mat = self.material_dict[key]
+        for i,mat in enumerate(self._layer_mats):
+            # This shouldn't cause any issues but might in the future
+            key = str(mat)
+            #mat = self.material_dict[key]
             drained_volume = (drained_layers==i).sum()/tot_pixels
             if drained_volume<=1e-12:continue
             #how much solvent is drained (percent wise)
@@ -456,7 +457,10 @@ class Vessel:
                 mat.mol -= d_mol
             else:
                 other_mats[key] = mat.ration(fraction)
-            #drain the solutes
+
+            #All solvents are at the beginning of the list
+            if i>= len(self.solvents):continue
+            #drain the solutes 
             for u_key in self.solute_dict:
                 #NOTE u_mat is the solute material
                 u_mat = self.material_dict[u_key]
@@ -563,6 +567,10 @@ class Vessel:
         Returns:
             List[float]: The color of each vessel layer.
         """
+        if self.ignore_layout:
+            self.ignore_layout = False
+            self.validate_solvents()
+            self.validate_solutes()
         if self._layers is None:
             self._mix(0,None,0)
             self._update_layers(0,None)

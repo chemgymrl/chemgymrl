@@ -8,412 +8,348 @@ import sys
 import numpy as np
 import chemistrylab
 import datetime as dt
+from typing import NamedTuple, Tuple, Callable, Optional, List
+from chemistrylab.benches.general_bench import *
+from chemistrylab.benches.characterization_bench import CharacterizationBench
+from chemistrylab.util.Visualization import pygameVisualizer
 
-Agent = object #TODO: add this actually
+ASSETS_PATH = os.path.dirname(__file__) + "/assets/"
 
-class Manager:
-    def __init__(self, mode='custom', agent=None):
-        """
-        Constructor class module for the Manager class.
 
-        Parameters
-        ---------------
-        'mode': `str`: ['human', 'random', 'custom']:
-            Parameter to describe the mode that the manager will be run in. Note: `human` opens up a cli that can be
-            used to run or by adding an agent to the agents.
-        'agent': `agent.Agent`
-            Parameter to specify a custom user made agent for the manager to use in solving the lab environment.
 
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        self.mode = mode
-        self.agents = {'random': RandomAgent}
-        self.agent = agent
-        self.lab = Lab()
-
-    def register_agent(self, name: str, agent: Agent):
-        """
-        Allows the user to add a lab agent to the manager environment.
-        Added lab agents can then use to perform actions in the lab environment.
-
-        Parameters
-        ---------------
-        `name` : `str`
-            The name of the agent to be registered.
-        `agent` : `agent.Agent`
-            The class representation of the agent to be registered.
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # add the custom agent to the dictionary of registered agents
-        self.agents[name] = agent
-
-    def register_bench_agent(self, bench: str, name: str, agent: Agent):
-        """
-        Method to allow the user to add bench-specific agents to the lab environment.
-        Added bench agents can then be used in order to perform actions in a bench
-
-        Parameters
-        ---------------
-        `bench` : `str`
-            The name of the bench to which the agent is being assigned.
-        `name` : `str`
-            The name of the agent to be registered.
-        `agent` : `agent.Agent`
-            The class representation of the agent to be registered.
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # pass the parameters to the lab class to register the bench engine
-        self.lab.register_agent(bench, name, agent)
-
-    def run(self):
-        """
-        Method to run the specified agent or human mode based on the parameters passed to the Manager class.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # if "human" was specified, run the lab manager in human mode
-        if self.mode == 'human':
-            self._human_run()
-        # if the mode given matches a registered agent, acquire the corresponding agent and run it
-        elif self.mode in self.agents:
-            self.agent = self.agents[self.mode]()
-            self._agent_run()
-        # if an agent was specified directly, run that agent
-        elif self.agent:
-            self.agent = self.agent()
-            self._agent_run()
-        else:
-            raise ValueError("agent specified does not exist")
-
-    def _human_run(self):
-        """
-        Method to run the specified agent or human mode based on the parameters passed to the Manager class.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # set up the done parameter
-        done = False
-
-        # specify the allowed human-specifiable commands
-        commands = ['load vessel from pickle',
-                    'load distillation bench',
-                    'load reaction bench',
-                    'load extraction bench',
-                    'load characterization bench',
-                    'list vessels',
-                    'create new vessel',
-                    'save vessel',
-                    'quit']
-
-        while not done:
-            # print all the actions available
-            print('Index: Action')
-            for i, command in enumerate(commands):
-                print(f'{i}: {command}')
-
-            # instruct the user to select an action by means of its index
-            action = int(input('Please select an action by index: '))
-
-            # action[0] == load vessel from pickle file
-            if action == 0:
-                path = input('please specify the path of the vessel: ')
-                self.load_vessel(path)
-            # action[1] == load distillation bench
-            elif action == 1:
-                self._human_bench('distillation')
-            # action[2] == load reaction bench
-            elif action == 2:
-                self._human_bench('reaction')
-            # action[3] == load extraction bench
-            elif action == 3:
-                self._human_bench('extraction')
-            # action[4] == load the analysis bench
-            elif action == 4:
-                self._human_bench('characterization')
-                # action[5] == list the avilable vessels
-            elif action == 5:
-                self.list_vessels()
-            # action[6] == create a new vessel
-            elif action == 6:
-                self.create_new_vessel()
-            # action[7] == save an existing vessel
-            elif action == 7:
-                self.save_vessel()
-            # action[8] OR action not in range(0, 8) == end the program
+class Manager():
+    def __init__(self, benches: Tuple[GenBench], bench_names: Tuple[str]):
+        self.benches=benches
+        self.bench_names=bench_names
+        for b in self.benches:
+            b.reset()
+        self.hand = []
+    
+    def swap_vessels(self,bench_idx, vessel_idx):
+        bench = self.benches[bench_idx]
+        if len(self.hand)==1:
+            if vessel_idx>=len(bench.shelf):
+                bench.shelf.append(self.hand.pop())
             else:
-                done = True
+                bench.shelf[vessel_idx], self.hand[0] = self.hand[0],bench.shelf[vessel_idx]
+        elif len(self.hand)==0:
+            if vessel_idx<len(bench.shelf):
+                self.hand.append(bench.shelf.pop(vessel_idx))
 
-    def _human_bench(self, bench: str):
-        """
-        Method to set up the bench, environment, vessel, and agent as specified by the human user.
+    def use_bench(self, bench, policy):
+        #prep the bench
+        #Check for an illegal vessel setup
+        if not bench.validate_shelf():
+            return -1
 
-        Parameters
-        ---------------
-        `bench` : `str`
-            The name of the bench that has been selected in `_human_run`.
+        o = bench.re_init()
+        d = False
+        while not d:
+            o,r,d,*_ = bench.step(policy(o))
+        
+        for vessel in bench.shelf:
+            print (vessel.get_material_dataframe())
 
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # acquire all the environments and agents from the selected bench
-        if bench == 'distillation':
-            envs = self.lab.distillations
-            agents = list(self.lab.distill_agents.keys())
-        elif bench == 'reaction':
-            envs = self.lab.reactions
-            agents = list(self.lab.react_agents.keys())
-        elif bench == 'extraction':
-            envs = self.lab.extractions
-            agents = list(self.lab.extract_agents.keys())
-        elif bench == 'characterization':
-            envs = ['characterization']
-            agents = ['none']
-        else:
-            raise KeyError('Inputted bench not supported')
-
-        # print the environments of the selected bench and request the user select an environment
-        print('index: env')
-        for i, env in enumerate(envs):
-            print(f'{i}: {env}')
-        env = int(input('Please specify what environment you wish to use: '))
-
-        # list all the vessels available on the shelf and request the user select a vessel
-        self.list_vessels()
-        vessel = int(input(
-            'Please specify what vessel you wish to use (inputting -1 we will create a new vessel and use that) : '
-        ))
-        if vessel == -1:
-            self.create_new_vessel()
-
-        # list all the available agents and request the user select an agent
-        for i, agent in enumerate(agents):
-            print(f'{i}: {agent}')
-        agent_ind = int(input('Please specify what agent you wish to use: '))
-
-        # load the bench, environment, vessel, and agent and determine how much time it takes to do so
-        start = dt.datetime.now()
-        self.load_bench(bench, env, vessel, agent_ind)
-        finish = dt.datetime.now()
-        print(finish - start)
-
-    def _agent_run(self):
-        """
-        Method to run the specified agent based on the parameters passed to the Manager class.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # reset the done parameter
-        done = False
-
-        # reset the lab environment
-        self.lab.reset()
-
-        # set up a reward counter
-        total_reward = 0
-
-        # set up an array to contain the analysis information made available to the lab manager
-        analysis = np.array([])
-
-        # have the agent select actions and run the lab manager step function until the done parameter is satisfied
-        while not done:
-            # agent selects actions based on the state of the environemnt and the chosen characterization of a vessel
-            action = self.agent.run_step(self.lab, analysis)
-            reward, analysis, done = self.lab.step(action)
-            total_reward += reward
-
-    def load_bench(self, bench, env_index, vessel_index, agent):
-        """
-        Method to load the specified bench based on the environment, vessel, and agent parameters.
-
-        Parameters
-        ---------------
-        `bench` : `str`
-            The name of the bench that is to be loaded.
-        `env_index` : `np.int64`
-            The index corresponding to the requested bench environment that is to be set up.
-        `vessel_index` : `np.int64`
-            The index corresponding to the requested vessel that is to be set up.
-        `agent` : `np.int64`
-            The index corresponding to the requested agent that is to be set up.
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # pass the necessary parameters to the `run_bench` method of the `lab` environment
-        self.lab.run_bench(bench, env_index, vessel_index, agent)
-
-    def list_vessels(self):
-        """
-        Method to list all the vessels available on the shelf and their contents.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        for i, vessel in enumerate(self.lab.shelf.vessels):
-            print(f'{i}: {vessel.label}')
-            print(vessel.get_material_dict())
-            print(vessel.get_solute_dict())
-
-    def load_vessel(self, path):
-        """
-        Method to load a vessel from a specified path.
-
-        Parameters
-        ---------------
-        `path` : `str`
-            The directory path to a valid pickle file containing a vessel object.
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        `IOError`:
-            Raised if the specified file path does not correspond to a valid vessel pickle file.
-        """
-
-        # check that the vessel path is a valid path
-        if any([
-                not os.path.isfile(path),
-                path.split(".")[-1] != "pickle"
-        ]):
-            raise IOError("Invalid vessel path!")
-
-        self.lab.shelf.load_vessel(path)
-
-    def create_new_vessel(self):
-        """
-        Method to create a new vessel and place the new vessel on the shelf.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        self.lab.shelf.create_new_vessel()
-
-    def save_vessel(self):
-        """
-        Method to save a human-specified vessel.
-
-        Parameters
-        ---------------
-        None
-
-        Returns
-        ---------------
-        None
-
-        Raises
-        ---------------
-        None
-        """
-
-        # set up a boolean to track if the specified parameters are completely validated
-        valid_parameters = False
-
-        # set up default vessel and path parameters
-        vessel = 0
-        path = ""
-
-        # list the available vessels on the shelf and request a vessel to be saved in a certain location
-        self.list_vessels()
+        return 0
+    
+    def characterize(self, observation_list):
+        self.charbench = CharacterizationBench(observation_list,[],len(self.hand))
+        return self.charbench(self.hand,"")
 
 
-        vessel = int(input('What vessel do you wish to save: '))
-        path = input('Specify the relative path for the vessel: ')
+class ManualPolicy():
+    def __init__(self, env, screen = None, fps=60):
 
-        # pass the vessel and intended vessel path to the lab shelf
-        self.lab.shelf.vessels[vessel].save_vessel(path)
+        self.fps=fps
+        self.keys_to_action = dict()
+        #using the same system of openai gym play
+        for key_combination, action in env.get_keys_to_action().items():
+            key_code = tuple(
+                sorted(ord(key) if isinstance(key, str) else key for key in key_combination)
+                )
+            self.keys_to_action[key_code] = action
 
+        self.pressed=[]
+        self.relevant_keys = set(a for keyset in self.keys_to_action for a in keyset)
+        self.screen = screen
+        self.env=env
+        self.noop = self.keys_to_action.get((),env.action_space.sample()*0)
+        self.clock = pygame.time.Clock()
+    def process_event(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key in self.relevant_keys:
+                self.pressed.append(event.key)
+        if event.type == pygame.KEYUP:
+            if event.key in self.relevant_keys:
+                self.pressed.remove(event.key)
+    def __call__(self,o):
+        for event in pygame.event.get():
+            self.process_event(event)
+        self.clock.tick(self.fps)
+
+        arr = self.env.render()
+        arr_min, arr_max = np.min(arr), np.max(arr)
+        arr = 255.0 * (arr - arr_min) / (arr_max - arr_min)
+        pyg_img = pygame.surfarray.make_surface(arr.swapaxes(0, 1))
+        #scaler = max(self.screen.get_size()) / max(pyg_img.get_size())
+        #size=np.array(pyg_img.get_size())*scaler
+        pyg_img = pygame.transform.scale(pyg_img, self.screen.get_size())
+        self.screen.blit(pyg_img, (0, 0))
+
+
+        pygame.event.pump()
+        pygame.display.flip()
+
+        return self.keys_to_action.get(tuple(sorted(self.pressed)), self.noop)
+
+class Button():
+    def __init__(self, width, height, color = '#66c666', hover = "#66FF66",  text=None):
+        
+        self.text=text
+        self.font = pygame.font.SysFont('Arial', int(height*2/3))
+        self.surf = pygame.Surface((width, height))
+        self.surf.fill(color)
+        self.hover_surf = pygame.Surface((width, height))
+        self.hover_surf.fill(hover)
+        self.pos=np.zeros(2)-1000
+        if text is not None:
+            text_render = self.font.render(text, True, (0,0,0))
+
+            offset = (np.array([width,height])-np.array(text_render.get_size()))/2
+
+            self.surf.blit(text_render,offset)
+            self.hover_surf.blit(text_render,offset)
+        self.dim = np.array([width,height])
+
+    def show(self, screen, pos):
+        screen.blit(self.surf,pos)
+        self.pos = np.array(pos)
+    def show_hover(self,screen, pos):
+        screen.blit(self.hover_surf,pos)
+        self.pos = np.array(pos)
+    def check_hover(self, mousepos):
+        mpos = np.array(mousepos)
+        return all((mpos>=self.pos)&(mpos-self.pos<=self.dim))
+
+
+class ManagerGui():
+    def __init__(self, manager: Manager):
+        self.manager = manager
+        self.cam = np.zeros(2)
+        self.screen=None
+        global pygame, gfxdraw
+        try:
+            import pygame
+            from pygame import gfxdraw
+        except ImportError:
+            raise DependencyNotInstalled(
+                "pygame is not installed, run `pip install gym[classic_control]`"
+            )
+
+    def input(self):
+        """Handle key and mouse events"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return True
+            elif event.type == pygame.MOUSEWHEEL:
+                self.cam += np.array((event.y,event.x))*30
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button==1:
+                print(event)
+                xy = np.array(event.pos)
+                sxy = np.array(self.bench.get_size())
+                for i,pos in enumerate(self.benchpos):
+                    #rel = xy-pos+self.cam
+                    #if all((rel>=0)&(rel<sxy)):
+                    if self.bench_titles[i].check_hover(xy):
+                        self.bench_idx = i
+                        if i<len(self.manager.benches):
+                            self.bench_buttons = [Button(40,20, text = "Start")]
+                        else:
+                            self.bench_buttons = [Button(40,20, text = a) for a in ["layers","spectra","PVT"]]
+                        return
+                if self.bench_idx is not None:
+                    self.handle_bench_click(xy)
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.bench_idx = None
+                if event.key == 1073741892: #f11 key
+                    if self.fullscreen:
+                        self.screen = pygame.display.set_mode((640,480),pygame.RESIZABLE)
+                        self.video_size = self.screen.get_size()
+                    else:
+                        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN|pygame.RESIZABLE)
+                        self.video_size = self.screen.get_size()
+                    self.fullscreen=not self.fullscreen
+                    self.benchpos = np.array([(x*200,self.video_size[1]-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
+
+            elif event.type == pygame.VIDEORESIZE:
+                self.video_size = event.size
+                self.benchpos = np.array([(x*200,self.video_size[1]-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
+                self.screen = pygame.display.set_mode(self.video_size,pygame.RESIZABLE)
+        return False
+
+    def display_char_bench(self):
+        """Display the characteriation bench output until left click is pressed"""
+        arr = pygameVisualizer(self.manager.charbench).get_rgb(self.manager.hand)
+        if np.product(arr.shape)>0:
+            arr_min, arr_max = np.min(arr), np.max(arr)
+            arr = 255.0 * (arr - arr_min) / (arr_max - arr_min)
+            pyg_img = pygame.surfarray.make_surface(arr.swapaxes(0, 1))
+            self.screen.blit(pyg_img, (0, 0))
+        while np.product(arr.shape)>0:
+            pygame.event.pump()
+            self.clock.tick(60)
+            pygame.display.flip()
+            if any([(event.type == pygame.MOUSEBUTTONDOWN and event.button==1) for event in pygame.event.get()]):
+                return
+    def display_err_message(self,message):
+
+        font = pygame.font.SysFont('Arial', int(self.video_size[1]/8))
+        text = font.render(message, True, (255,0,0))
+        self.screen.blit(text, (np.array(self.video_size) - np.array(text.get_size()))/2)
+
+        while True:
+            pygame.event.pump()
+            self.clock.tick(60)
+            pygame.display.flip()
+            if any([(event.type == pygame.MOUSEBUTTONDOWN and event.button==1) for event in pygame.event.get()]):
+                return
+    def handle_bench_click(self, xy):
+        """Check if mouse-clicks interact with a bench / inventory menu"""
+        # Handle observation display
+        if self.bench_idx == len(self.manager.benches):
+            for button in self.bench_buttons:
+                if button.check_hover(xy):
+                    _ = self.manager.characterize([button.text])
+                    self.display_char_bench()
+                    return
+                
+        idx = self.probe_inventory(np.zeros(2), xy, 5, 2)
+        if idx>=0:
+            self.manager.swap_vessels(self.bench_idx, idx)
+
+        if self.bench_buttons[0].check_hover(xy):
+            manual_extract = ManualPolicy(self.manager.benches[self.bench_idx],screen=self.screen,fps=60)
+            code = self.manager.use_bench(self.manager.benches[self.bench_idx],manual_extract)
+            if code<0:
+                self.display_err_message("Invalid Bench Setup")
+
+    def render(self):
+
+        if self.screen is None:
+            self.fullscreen=False
+            pygame.display.init()
+            self.video_size = (640,480)
+            self.screen = pygame.display.set_mode(self.video_size,pygame.RESIZABLE)
+            self.clock = pygame.time.Clock()
+            self.bench = pygame.image.load(ASSETS_PATH+"drawing.svg").convert_alpha()
+
+            self.bench_titles = []
+            for i in range(len(self.manager.benches)):
+                self.bench_titles.append(Button(141,29, text = self.manager.bench_names[i], color="#888888", hover = "#dddddd"))
+
+            self.bench_titles.append(Button(141,29, text = "Characterization",color="#888888", hover="#dddddd"))
+
+            print(self.bench.get_size())
+            self.benchpos = np.array([(x*200,480-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
+            self.flasks=[]
+            for i in range(11):
+                tmp = pygame.image.load(ASSETS_PATH+f"vessels/rflask_{i}.png").convert_alpha()
+                self.flasks.append(pygame.transform.scale(tmp,(80,70)))
+            self.bench_idx = None
+
+
+
+        surf = pygame.Surface(self.video_size)
+        surf.fill((255, 255, 255))
+        self.screen.blit(surf,(0,0))
+        self.render_benches()
+
+        inhand = self.vessel_thumbnails(self.manager.hand)
+        self.screen.blit(self.make_inventory(1,1,inhand),np.array(self.video_size)-110)
+
+        self.clock.tick(60)
+        pygame.event.pump()
+
+        pygame.display.flip()
+    
+    def render_benches(self):
+        for i,pos in enumerate(self.benchpos):
+            self.screen.blit(self.bench,pos-self.cam)
+            b = self.bench_titles[i]
+            if b.check_hover(np.array(pygame.mouse.get_pos())):
+                b.show_hover(self.screen,pos-self.cam+(12,20))
+            else:
+                b.show(self.screen,pos-self.cam+(12,20))
+        if self.bench_idx is not None:
+            #Might change this (right now characterization bench isnt included in benches)
+            if self.bench_idx<len(self.manager.benches):
+                items = self.vessel_thumbnails(self.manager.benches[self.bench_idx].shelf)
+                self.screen.blit(self.make_inventory(5,2,items),(0,0))
+            buttonpos = self.benchpos[self.bench_idx]+np.array((0,-30)-self.cam)
+            for idx, button in enumerate(self.bench_buttons):
+                if button.check_hover(np.array(pygame.mouse.get_pos())):
+                    button.show_hover(self.screen,buttonpos+(idx*50,0))
+                else:
+                    button.show(self.screen,buttonpos+(idx*50,0))
+
+    def make_inventory(self, dx, dy, items, selected = None, boxsize = 100):
+        """Create a surface element representing an inventory"""
+        box = pygame.Surface((boxsize*1.05,boxsize*1.05))
+        rect = pygame.Rect(boxsize/20,boxsize/20,boxsize*0.95,boxsize*0.95)
+        gfxdraw.box(box,rect,(255,255,255))
+        surf = pygame.Surface((dx*boxsize+boxsize/20, dy*boxsize+boxsize/20))
+        for x in range(dx):
+            for y in range(dy):
+                surf.blit(box,(x*boxsize,y*boxsize))
+        #items should be a list of surfaces
+        # TODO: make sure they fit into the box
+        for i,item in enumerate(items):
+            if i>=dx*dy:
+                break
+            sx,sy=item.get_size()
+            surf.blit(item,((i%dx)*boxsize+(boxsize-sx)/2,(i//dx)*boxsize+(boxsize-sy)/2))
+        return surf
+
+    def probe_inventory(self, startpos, mousepos, dx, dy, boxsize=100):
+        slot = np.floor((mousepos-startpos)/boxsize)
+        bds = np.array([dx,dy])
+        if all((slot>=0)&(slot<bds)):
+            idx = int(slot[0]) + int(slot[1])*dx
+            return idx
+        return -1
+
+    def vessel_thumbnails(self,vessels):
+        """Simple image representation of a vessel"""
+        thumbnails=[]
+        font = pygame.font.SysFont('Arial', 8)
+        for v in vessels:
+            idx = round(v.filled_volume()*10/v.volume)
+            surf = self.flasks[idx].copy()
+            text = font.render(v.label, True, (0,0,0))
+            offset = (surf.get_size()[0]-text.get_size()[0])/2 , surf.get_size()[1] - text.get_size()[1]
+
+            surf.blit(text,offset)
+            thumbnails.append(surf)
+        return thumbnails
 
 if __name__ == "__main__":
-    manager = Manager(mode='human')
-    manager.run()
+    from chemistrylab.benches.distillation_bench import GeneralWurtzDistill_v2 as WDBench
+    from chemistrylab.benches.distillation_bench import WurtzDistillDemo_v0 as WDDemo
+    from chemistrylab.benches.reaction_bench import GeneralWurtzReact_v2 as WRBench
+    from chemistrylab.benches.reaction_bench import WurtzReactDemo_v0 as WRDemo
+    from chemistrylab.benches.extract_bench import GeneralWurtzExtract_v2 as WEBench
+    from chemistrylab.benches.extract_bench import WurtzExtractDemo_v0 as WEDemo
+    manager = Manager(
+        [WRDemo(),WDDemo(), WEDemo()],
+        ["Reaction","Distillation", "Extraction"]
+        )
+
+    gui = ManagerGui(manager)
+    while True:
+        gui.render()
+        if gui.input():
+            break
+        

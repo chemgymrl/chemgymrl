@@ -411,8 +411,9 @@ class pygameVisualizer():
             y (int): Position of the top right corner of ths image tile
         """
 
-        cvals = np.array([mat._color for mat in vessel._layer_mats]+[0.65])
-        cnames = [mat._name for mat in vessel._layer_mats]+["air"]
+        tol = vessel.volume/200
+        cvals = np.array([mat._color for mat in vessel._layer_mats if mat.litres>tol]+[0.65])
+        cnames = [mat._name for mat in vessel._layer_mats if mat.litres>tol]+["air"]
         for i,name in enumerate(cnames):
             #cache the rendered text to save time
             if not name in self.misc_text:
@@ -461,7 +462,7 @@ class pygameVisualizer():
         pygame.draw.rect(self.surf, (255,30,255), pygame.Rect(x+self.w/4, y+self.w/6, self.w*p*0.75, self.w/12))
         self.surf.blit(self.misc_text["PVT"],(x, y))
 
-        bbox = [(self.w/4+x,y),(self.w/4+x,y+self.w/4),(self.w+x-1,y+self.w/4),(self.w+x-1,y)]
+        bbox = [(self.w/4+x,y),(self.w/4+x,y+self.w/4-1),(self.w+x-1,y+self.w/4-1),(self.w+x-1,y)]
 
         pygame.draw.lines(self.surf, points=bbox, closed=True, color=(0, 0, 0))
 

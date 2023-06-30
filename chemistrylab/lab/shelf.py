@@ -27,7 +27,7 @@ class Shelf:
         return tuple(self.vessels[:self.n_working])
     def get_vessels(self):
         return tuple(self.vessels)
-    def pop(index=-1):
+    def pop(self,index=-1):
         return self.vessels.pop(index)
     def __getitem__(self, slice):
         return self.vessels[slice]

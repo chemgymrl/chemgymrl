@@ -263,3 +263,60 @@ class FictReactDemo_v0(GenBench):
             keys[str(i+1)] = arr
         keys[()] = np.zeros(5)
         return keys
+
+
+class WurtzReactDemo_v0(GenBench):
+    """
+    Class to define an environment which performs a Wurtz extraction on materials in a vessel.
+    """
+
+    metadata = {
+        "render_modes": ["rgb_array"],
+        "render_fps": 60,
+    }
+
+    def __init__(self):
+        r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
+                                include_dissolved=False, exclude_mat = "fict_E")
+
+        v = get_mat("H2O",30,"Reaction Vessel")
+        v.default_dt=0.0008
+        shelf = Shelf([
+            get_mat("diethyl ether",4,"Reaction Vessel"),
+            get_mat("1-chlorohexane",1),
+            get_mat("2-chlorohexane",1),
+            get_mat("3-chlorohexane",1),
+            get_mat("Na",3),
+        ])
+
+        actions = [
+            Action([0],    [ContinuousParam(273,373,0,(12,))],  'heat contact',     [0],  0,   False),
+            Action([1],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+            Action([2],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+            Action([3],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+            Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
+        ]
+        
+
+        react_info = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json")
+        
+        super(WurtzReactDemo_v0, self).__init__(
+            shelf,
+            actions,
+            ["PVT","spectra","targets"],
+            targets=react_info.PRODUCTS,
+            default_events = (Event("react", (Reaction(react_info),), None),),
+            reward_function=r_rew,
+            discrete=False,
+            max_steps=500
+        )
+        
+    def get_keys_to_action(self):
+        # Control with the numpad or number keys.
+        keys = dict()
+        for i in range(5):
+            arr=np.zeros(5)
+            arr[i]=1    
+            keys[str(i+1)] = arr
+        keys[()] = np.zeros(5)
+        return keys

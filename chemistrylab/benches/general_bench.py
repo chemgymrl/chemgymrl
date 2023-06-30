@@ -104,11 +104,17 @@ class GenBench(gym.Env):
 
         self.reset()
         
-    def get_vessels(self):
-        return self.shelf
-    def update_vessels(self,new_vessels):
-        # TODO: Implement this
-        raise NotImplementedError
+    def validate_shelf(self):
+        """
+        Returns:
+            bool: True if there are enough vessels to perform all of the actions and false otherwise.
+        """
+        vessels_idx = [v for a in self.action_list for v in a.vessels]
+        affected_vessels_idx = [v for a in self.action_list if a.affected_vessels is not None for v in a.affected_vessels ]
+        min_vessels = max(*vessels_idx, *affected_vessels_idx)+1
+        if min_vessels>len(self.shelf):
+            return False
+        return True
         
     def build_event(self,action,param):
         """
@@ -221,16 +227,26 @@ class GenBench(gym.Env):
         
         return state, reward, done, False, {}
     
-    def _reset(self,target):
+    def re_init(self):
+        """
+        Lets the bench know the current shelf setup is the starting setup.
+        (i.e Resets the steps, rebuilds the list of actions, and resets the initial reward)
+        
+        """
         self.steps=0
-        self.shelf.reset(target)
-        self.target_material=target
         #Rebuild the list of actions with the new vessels
         self.actions = [(self.build_event(a,p),a)  for a in self.action_list for p in a.parameters]
         #Gather the initial reward using a provided reward function
         self.initial_reward = self.reward_function(self.shelf.get_working_vessels(), self.target_material)
-        
+
         return self.characterization_bench(self.shelf.get_working_vessels(), self.target_material)
+
+    def _reset(self,target):
+        self.shelf.reset(target)
+        self.target_material=target
+        return self.re_init()
+        
+        
     
     def reset(self, *args, seed=None, options=None):
 

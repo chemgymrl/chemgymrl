@@ -141,6 +141,7 @@ def make_solvent(mat):
     solvent_class.mol=1e6
     solvent_vessel.material_dict = {mat:solvent_class}
     # instruct the vessel to update its material dictionary
+    solvent_vessel.volume = solvent_vessel.filled_volume()
     return solvent_vessel
 
 

@@ -77,16 +77,26 @@ def map_to_state(A, B, C, colors, x=x):
     sum_A = 1.0 if np.sum(A) == 0 else np.sum(A)
     # Number of pixels available for each solvent (2.)
     n=np.zeros(A.shape,dtype=np.int32)
-    n[:]=((A / sum_A) * L.shape[0] + np.float32(0.95))
+    r = (A / sum_A) * L.shape[0]
+    n[:]= r
     # Since this agressively rounds up, fix any rounding issues
-    count = np.sum(n[:-1]) - L.shape[0]
-    if count>0:
+    count = np.sum(n) - L.shape[0]
+    if count>=0:
         # 3.i
         for i in range(count):
             n[n.argmax()] -= 1
     else:
-        # Make any unused pixels air (3.ii)
-        n[-1] = -count
+        r -= n
+        #CONSIDER: Reduce the probability of inceasing air with: 
+        r[-1]=1e-12
+        for i in range(-count):
+            # get a random choice without replacement
+            cum_dist = np.cumsum(r)
+            cum_dist /= cum_dist[-1]
+            rnd = np.random.rand()
+            index = np.searchsorted(cum_dist, rnd, side="right")
+            n[index] += 1
+            r[index]=0
     
     # Loop over each layer pixel
     for l in range(L.shape[0]):
