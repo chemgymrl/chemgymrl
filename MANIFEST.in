@@ -1,1 +1,2 @@
 include chemistrylab/reactions/available_reactions/*.json
+include chemistrylab/materials.pkl

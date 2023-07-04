@@ -1,30 +1,30 @@
 {
   "name": "ficticious reactions",
   "REACTANTS": [
-    "fict_A",
-    "fict_B",
-    "fict_D",
-    "fict_F",
-    "fict_G"
+    "[Af]",
+    "[Bf]",
+    "[Df]",
+    "[Ff]",
+    "[Gf]"
   ],
   "PRODUCTS": [
-    "fict_E",
-    "fict_F",
-    "fict_G",
-    "fict_I"
+    "[Ef]",
+    "[Ff]",
+    "[Gf]",
+    "[If]"
   ],
   "SOLVENTS": [
-    "H2O"
+    "O"
   ],
   "MATERIALS": [
-    "fict_A",
-    "fict_B",
-    "fict_D",
-    "fict_F",
-    "fict_G",
-    "fict_E",
-    "fict_I",
-    "H2O"
+    "[Af]",
+    "[Bf]",
+    "[Df]",
+    "[Ff]",
+    "[Gf]",
+    "[Ef]",
+    "[If]",
+    "O"
   ],
   "pre_exp_arr": [ 5.0, 1.0, 1.0, 1.0  ],
   "activ_energy_arr": [ 1.0, 1.0, 1.0, 1.0  ],

@@ -28,9 +28,9 @@ def get_dissolved_amounts(vessel: Vessel, desired_material: str):
     n=0
     for mat in dis_mats:
         #Can't make any with what's dissolved
-        if not mat._name in vessel.solute_dict: return 0,0
+        if not mat in vessel.solute_dict: return 0,0
         # Determine how much of the target the solute would make
-        amount = vessel.material_dict[mat._name].mol / dis_mats[mat]
+        amount = vessel.material_dict[mat].mol / dis_mats[mat]
         if amount< min_amount:
             min_amount=amount
         n+=dis_mats[mat]
@@ -84,7 +84,7 @@ class RewardGenerator():
             if self.use_purity:
                 #Total amount is either calculated using all materials, or just the non-solvents
                 if self.exclude_solvents:
-                    all_mats = sum(mat.mol for key,mat in mat_dict.items() if not mat.is_solvent())
+                    all_mats = sum(mat.mol for key,mat in mat_dict.items() if not mat.is_solvent)
                 else:
                     all_mats = sum(mat.mol for key,mat in mat_dict.items())
                 all_mats -= exclude

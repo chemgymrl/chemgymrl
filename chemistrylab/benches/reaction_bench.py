@@ -14,12 +14,13 @@ from chemistrylab.lab.shelf import Shelf
 def get_mat(mat,amount,name=None):
     "Makes a Vessel with a single material"
     
+    matclass = material.REGISTRY[mat]()
     my_vessel = vessel.Vessel(
-        label=f'{mat} Vessel' if name is None else name,
+        label=f'{matclass._name} Vessel' if name is None else name,
         ignore_layout=True
     )
     # create the material dictionary for the vessel
-    matclass = material.REGISTRY[mat]()
+    
     matclass.mol=amount
     material_dict = {mat:matclass}
     # instruct the vessel to update its material dictionary
@@ -44,11 +45,11 @@ class GeneralWurtzReact_v2(GenBench):
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
         shelf = Shelf([
-            get_mat("diethyl ether",4,"Reaction Vessel"),
-            get_mat("1-chlorohexane",1),
-            get_mat("2-chlorohexane",1),
-            get_mat("3-chlorohexane",1),
-            get_mat("Na",3),
+            get_mat("CCOCC",4,"Reaction Vessel"),
+            get_mat("CCCCCCCl",1),
+            get_mat("CCCCC(C)Cl",1),
+            get_mat("CCCC(CC)Cl",1),
+            get_mat("[Na+]",3),
         ])
         actions = [
             Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',   [0],  0.01,  False),
@@ -82,11 +83,11 @@ class GeneralWurtzReact_v0(GenBench):
     def __init__(self):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
         shelf = Shelf([
-            get_mat("diethyl ether",4,"Reaction Vessel"),
-            get_mat("1-chlorohexane",1),
-            get_mat("2-chlorohexane",1),
-            get_mat("3-chlorohexane",1),
-            get_mat("Na",3),
+            get_mat("CCOCC",4,"Reaction Vessel"),
+            get_mat("CCCCCCCl",1),
+            get_mat("CCCCC(C)Cl",1),
+            get_mat("CCCC(CC)Cl",1),
+            get_mat("[Na+]",3),
         ])
         actions = [
             Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',     [0],  0.01,  False),
@@ -123,11 +124,11 @@ class FictReact_v2(GenBench):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
         shelf = Shelf([
-            get_mat("H2O",30,"Reaction Vessel"),
-            get_mat("fict_A",1),
-            get_mat("fict_B",1),
-            get_mat("fict_C",1),
-            get_mat("fict_D",3),
+            get_mat("O",30,"Reaction Vessel"),
+            get_mat("[Af]",1),
+            get_mat("[Bf]",1),
+            get_mat("[Cf]",1),
+            get_mat("[Df]",3),
         ])
 
         actions = [
@@ -138,7 +139,7 @@ class FictReact_v2(GenBench):
             Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
         
-        targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
+        targets = ["[Ef]", "[Ff]", "[Gf]", "[Hf]", "[If]"]
         react_info = ReactInfo.from_json(REACTION_PATH+"/fict_react.json")
 
         super(FictReact_v2, self).__init__(
@@ -162,11 +163,11 @@ class FictReactBandit_v0(GenBench):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
         shelf = Shelf([
-            get_mat("H2O",30,"Reaction Vessel"),
-            get_mat("fict_A",1),
-            get_mat("fict_B",1),
-            get_mat("fict_C",1),
-            get_mat("fict_D",3),
+            get_mat("O",30,"Reaction Vessel"),
+            get_mat("[Af]",1),
+            get_mat("[Bf]",1),
+            get_mat("[Cf]",1),
+            get_mat("[Df]",3),
         ])
 
         actions = [
@@ -177,7 +178,7 @@ class FictReactBandit_v0(GenBench):
             Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],   0.01,   False),
         ]
         if targets is None:
-            targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
+            targets = ["[Ef]", "[Ff]", "[Gf]", "[Hf]", "[If]"]
         react_info = ReactInfo.from_json(REACTION_PATH+"/fict_react.json")
 
         super().__init__(
@@ -222,14 +223,14 @@ class FictReactDemo_v0(GenBench):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
 
-        v = get_mat("H2O",30,"Reaction Vessel")
+        v = get_mat("O",30,"Reaction Vessel")
         v.default_dt=0.0008
         shelf = Shelf([
             v,
-            get_mat("fict_A",1),
-            get_mat("fict_B",1),
-            get_mat("fict_C",1),
-            get_mat("fict_D",3),
+            get_mat("[Af]",1),
+            get_mat("[Bf]",1),
+            get_mat("[Cf]",1),
+            get_mat("[Df]",3),
         ])
 
         actions = [
@@ -240,7 +241,7 @@ class FictReactDemo_v0(GenBench):
             Action([4],    [ContinuousParam(0,1,1e-3,())],      'pour by percent',  [0],  0,   False),
         ]
         
-        targets = ["fict_E", "fict_F", "fict_G", "fict_H", "fict_I"]
+        targets = ["[Ef]", "[Ff]", "[Gf]", "[Hf]", "[If]"]
         react_info = ReactInfo.from_json(REACTION_PATH+"/fict_react.json")
 
         super(FictReactDemo_v0, self).__init__(
@@ -279,14 +280,14 @@ class WurtzReactDemo_v0(GenBench):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,
                                 include_dissolved=False, exclude_mat = "fict_E")
 
-        v = get_mat("H2O",30,"Reaction Vessel")
+        v = get_mat("CCOCC",4,"Reaction Vessel")
         v.default_dt=0.0008
         shelf = Shelf([
-            get_mat("diethyl ether",4,"Reaction Vessel"),
-            get_mat("1-chlorohexane",1),
-            get_mat("2-chlorohexane",1),
-            get_mat("3-chlorohexane",1),
-            get_mat("Na",3),
+            v,
+            get_mat("CCCCCCCl",1),
+            get_mat("CCCCC(C)Cl",1),
+            get_mat("CCCC(CC)Cl",1),
+            get_mat("[Na+]",3),
         ])
 
         actions = [

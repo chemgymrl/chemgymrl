@@ -158,7 +158,7 @@ class Vessel:
         if self.ignore_layout:return
         n_solvents=len(self.solvents)
         #gather a list of solutes
-        solutes = tuple(a for a in self.material_dict if self.material_dict[a].is_solute())
+        solutes = tuple(a for a in self.material_dict if self.material_dict[a].is_solute)
         if n_solvents==0 or len(solutes)==0:return
         #get mol information for solutes and solvents
         solute_mols = np.array([self.material_dict[key].mol for key in solutes])
@@ -179,7 +179,7 @@ class Vessel:
         
         """
         if self.ignore_layout:return
-        new_solvents = tuple(a for a in self.material_dict if self.material_dict[a].is_solvent())
+        new_solvents = tuple(a for a in self.material_dict if self.material_dict[a].is_solvent)
         #union should be the same length as both new_solvents and solvents
         union = tuple(a for a in new_solvents if a in self.solvent_dict)
         if len(new_solvents)!=len(self.solvents) or len(new_solvents)!= len(union) :
@@ -230,21 +230,21 @@ class Vessel:
         """
         C_air = 1.2292875 #Heat capacity of air in J/L*K (near STP)
         #Adding in an approximate heat capacity for the air
-        return self.volume*C_air+sum(mat.heat_capacity for a,mat in self.material_dict.items())
+        return self.volume*C_air+sum(mat.heat_capacity_J_K for a,mat in self.material_dict.items())
 
     def filled_volume(self):
         """
         Returns:
             float: The volume of all non-gas phase materials in the vessel (in Litres).
         """
-        return sum(mat.litres for a,mat in self.material_dict.items())
+        return sum(mat.volume_L for a,mat in self.material_dict.items())
 
     def get_material_dataframe(self):
         """
         Returns:
             :class:`~pandas.DataFrame`: A DataFrame detailing all materials present in the Vessel.  
         """
-        info_dict = {key:(mat.mol,mat.phase,mat.is_solute(),mat.is_solvent()) for key,mat in self.material_dict.items()}
+        info_dict = {key:(mat.mol,mat.phase,mat.is_solute,mat.is_solvent) for key,mat in self.material_dict.items()}
     
         return pd.DataFrame.from_dict(info_dict, orient="index",columns = ["Amount","Phase","Solute","Solvent"])
 
@@ -345,7 +345,7 @@ class Vessel:
             # -1 if placing an empty beaker on something hot
             return 0 if Tf<373 else -1
         #get sorted boiling points
-        bp = sorted([(key,mdict[key]._boiling_point) for key in mdict],key = lambda x:x[1])
+        bp = sorted([(key,mdict[key].boiling_point_K) for key in mdict],key = lambda x:x[1])
 
         key,boil=bp[0]
         i=0
@@ -355,7 +355,7 @@ class Vessel:
             ht += ln((Tf-boil)/(Tf-self.temperature))*self.heat_capacity() #i
             self.temperature = boil #i
             if use_dQ: Tf = self.temperature+1
-            boil_enthalpy=material.vapour_enthalpy #ii
+            boil_enthalpy=material.vapour_enthalpy_J #ii
             # ht = dQ/(T_f-T_boil)
             ht_used=min(ht,boil_enthalpy/(Tf-boil)) #ii
             ht-=ht_used #iii
@@ -401,7 +401,7 @@ class Vessel:
         other_mats=other_vessel.material_dict
         #Iterate through each material in the vessel
         for key,mat in self.material_dict.items():
-            if mat.is_solute() and len(self.solvents)>0:
+            if mat.is_solute and len(self.solvents)>0:
                 self.solute_dict[key] *= (1-fraction)
             # Update other vessel's material dict
             if key in other_mats:
@@ -448,7 +448,7 @@ class Vessel:
             if drained_volume<=1e-12:continue
             #how much solvent is drained (percent wise)
             fraction=np.clip(drained_volume/self._layers_volume[i],0,1)
-            if mat.litres<1e-12:
+            if mat.volume_L<1e-12:
                 self.DEBUG=self._hashed_layers*1,self.solvents
             #drain out the solvent
             if key in other_mats:
@@ -500,18 +500,18 @@ class Vessel:
 
         solute_flag = sum(mat.mol for mat in solvents)<=1e-12
         misc_mats = [mat for key,mat in self.material_dict.items() 
-            if (not mat.is_solvent()) and (solute_flag or not mat.is_solute())]
+            if (not mat.is_solvent) and (solute_flag or not mat.is_solute)]
 
         layer_mats=solvents+misc_mats
 
-        layer_volume = [mat.litres for mat in layer_mats]
+        layer_volume = [mat.volume_L for mat in layer_mats]
 
         self._layer_mats = layer_mats
 
         # Add air to the end ov the volume list s.t it fills the remainder of the vessel
         layer_volume = np.array(layer_volume+[self.volume - sum(layer_volume)], dtype=np.float32)
-        layer_density = np.array([mat.get_density() for mat in layer_mats]+[d_air], dtype=np.float32)
-        self._layer_colors = np.array([mat._color for mat in layer_mats]+[c_air], dtype=np.float32)
+        layer_density = np.array([mat.density_g_L for mat in layer_mats]+[d_air], dtype=np.float32)
+        self._layer_colors = np.array([mat.color for mat in layer_mats]+[c_air], dtype=np.float32)
         #Exclude air since it's not a solvent?
         solvent_polarity = np.array([mat.polarity for mat in solvents], dtype=np.float32)
 

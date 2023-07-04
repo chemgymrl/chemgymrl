@@ -1,30 +1,20 @@
 {
   "name": "decomp reactions",
   "REACTANTS": [
-    "NaCl"
+    "[Na+].[Cl-]"
   ],
   "PRODUCTS": [
-    "Na",
-    "Cl"
+    "[Na+]",
+    "[Cl-]"
   ],
   "SOLVENTS": [
-    "H2O"
+    "O"
   ],
   "MATERIALS": [
-    "NaCl",
-    "Na",
-    "Cl",
-    "H2O"
+    "[Na+].[Cl-]",
+    "[Na+]",
+    "[Cl-]",
+    "O"
   ],
-  "pre_exp_arr": [ 1.0  ],
-  "activ_energy_arr": [ 8.0  ],
-  "stoich_coeff_arr": [
-    [ 1.0 ]
-  ],
-  "conc_coeff_arr": [
-    [-1.0 ],
-    [ 1.0 ],
-    [ 1.0 ],
-    [ 0.0 ]
-  ]
+  "pre_exp_arr": 1.0,   "activ_energy_arr": 8.0,   "stoich_coeff_arr": 1.0,   "conc_coeff_arr": [     -1.0, 1.0, 1.0, 0.0  ]
 }

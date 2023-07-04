@@ -33,63 +33,59 @@ def wurtz_vessel(add_mat=""):
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
 
     # initialize DiEthylEther
-    DiEthylEther = material.DiEthylEther()
+    DiEthylEther = material.REGISTRY["CCOCC"]()
 
     # initialize Na
-    Na = material.Na()
+    Na = material.REGISTRY["[Na+]"]()
     Na.charge = 1.0
-    Na.set_solute_flag(True)
-    Na.set_color(0.0)
+    Na.is_solute = True
+    #Na.set_color(0.0)
     Na.polarity = 2.0
     Na.phase = 'l'
-    Na._boiling_point = material.NaCl()._boiling_point
 
     # initialize Cl
-    Cl = material.Cl()
+    Cl = material.REGISTRY["[Cl-]"]()
     Cl.charge = -1.0
-    Cl.set_solute_flag(True)
-    Cl.set_color(0.0)
+    Cl.is_solute = True
+    #Cl.set_color(0.0)
     Cl.polarity = 2.0
     Cl.phase = 'l'
-    Cl._boiling_point = material.NaCl()._boiling_point
 
     # initialize material
-    products = {'dodecane': material.Dodecane,
-        '5-methylundecane': material.FiveMethylundecane,
-        '4-ethyldecane': material.FourEthyldecane,
-        '5,6-dimethyldecane': material.FiveSixDimethyldecane,
-        '4-ethyl-5-methylnonane': material.FourEthylFiveMethylnonane,
-        '4,5-diethyloctane': material.FourFiveDiethyloctane,
-        'NaCl': material.NaCl
-    }
+    products = [
+        "CCCCCCCCCCCC",
+        "CCCCCCC(C)CCCC",
+        "CCCCCCC(CC)CCC",
+        "CCCCC(C)C(C)CCCC",
+        "CCCCC(C)C(CC)CCC",
+        "CCCC(CC)C(CC)CCC",
+    ]
+
     try:
         if add_mat == "":
-            add_mat = choice(list(products.keys()))
-        
-        if add_mat != "NaCl":
-            add_material = products[add_mat]()
-        else:
-            add_material = products['dodecane']()
+            add_mat = choice(products)
+        add_material = material.REGISTRY[add_mat]()
     
     except KeyError:
-        add_mat = 'dodecane'
-        add_material = products['dodecane']()
+        add_mat = 'CCCCCCCCCCCC'
+        add_material = material.REGISTRY[add_mat]()
     
-    add_material.set_solute_flag(True)
-    add_material.set_color(0.0)
+    add_material.is_solute = True
+    #add_material.set_color(0.0)
     add_material.phase = 'l'
 
 
     DiEthylEther.mol=4.0
+    DiEthylEther.is_solvent = True
     Na.mol=1.0
     Cl.mol=1.0
     add_material.mol=1.0
     # material_dict
     material_dict = {
-        DiEthylEther.get_name(): DiEthylEther,
-        Na.get_name(): Na,
-        Cl.get_name(): Cl,
-        add_material.get_name(): add_material,
+        str(DiEthylEther): DiEthylEther,
+        str(Na): Na,
+        str(Cl): Cl,
+        str(add_material): add_material,
     }
 
     extraction_vessel.material_dict=material_dict
@@ -112,13 +108,27 @@ def oil_vessel():
     # initialize extraction vessel
     extraction_vessel = vessel.Vessel(label='extraction_vessel')
     # initialize H2O
-    C6H14 = material.C6H14()
+    C6H14 = material.REGISTRY["CCCCCC"]()
     C6H14.mol=1.0
     # Get dissolved NaCl
-    dissolved = material.NaCl().dissolve()
-    for d in dissolved:
-        d.mol=dissolved[d]
-    mats = [C6H14]+[d for d in dissolved]
+    
+    # initialize Na
+    Na = material.REGISTRY["[Na+]"](mol=1.0)
+    Na.charge = 1.0
+    Na.is_solute = True
+    #Na.set_color(0.0)
+    Na.polarity = 2.0
+    Na.phase = 'l'
+
+    # initialize Cl
+    Cl = material.REGISTRY["[Cl-]"](mol=1.0)
+    Cl.charge = -1.0
+    Cl.is_solute = True
+    #Cl.set_color(0.0)
+    Cl.polarity = 2.0
+    Cl.phase = 'l'
+
+    mats = [C6H14,Na,Cl]
 
     # material_dict
     material_dict = {mat._name:mat for mat in mats}
@@ -132,12 +142,15 @@ def oil_vessel():
 
 def make_solvent(mat):
     "Makes a Vessel with a single material"
+
+    solvent_class = material.REGISTRY[mat]()
+
     solvent_vessel = vessel.Vessel(
-        label=f'{mat} Vessel',
+        label=f'{solvent_class._name} Vessel',
     )
     # create the material dictionary for the solvent vessel
-    solvent_class = material.REGISTRY[mat]()
-    solvent_class.set_solvent_flag(True)
+    
+    solvent_class.is_solvent = True
     solvent_class.mol=1e6
     solvent_vessel.material_dict = {mat:solvent_class}
     # instruct the vessel to update its material dictionary
@@ -161,8 +174,8 @@ class GeneralWurtzExtract_v2(GenBench):
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
-            lambda x:make_solvent("C6H14"),
-            lambda x:make_solvent("diethyl ether")
+            lambda x:make_solvent("CCCCCC"),
+            lambda x:make_solvent("CCOCC")
         ],[], n_working = 3)
         amounts=np.linspace(0.2,1,5).reshape([5,1])
         pixels = (amounts*10).astype(np.int32)
@@ -205,8 +218,8 @@ class WaterOilExtract_v0(GenBench):
             lambda x:oil_vessel(),
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Waste Vessel"),
-            lambda x:make_solvent("C6H14"),
-            lambda x:make_solvent("H2O")
+            lambda x:make_solvent("CCCCCC"),
+            lambda x:make_solvent("O")
         ], [], n_working = 2)
         amounts=np.linspace(0.2,1,5).reshape([5,1])
         pixels = (amounts*10).astype(np.int32)
@@ -228,7 +241,7 @@ class WaterOilExtract_v0(GenBench):
             shelf,
             actions,
             ["layers","targets"],
-            targets=["NaCl"],
+            targets=["[Na+].[Cl-]"],
             reward_function=e_rew,
         )
 
@@ -252,8 +265,8 @@ class WurtzExtractDemo_v0(GenBench):
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
-            lambda x:make_solvent("C6H14"),
-            lambda x:make_solvent("diethyl ether")
+            lambda x:make_solvent("CCCCCC"),
+            lambda x:make_solvent("CCOCC")
         ],[], n_working = 3)
         amounts=np.ones([1,1])*0.02
         pixels = [[1]]
@@ -302,11 +315,11 @@ class SeparateTest_v0(GenBench):
             lambda x:wurtz_vessel(x)[0],
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
-            lambda x:make_solvent("C6H14"),
-            lambda x:make_solvent("diethyl ether"),
-            lambda x:make_solvent("H2O"),
-            lambda x:make_solvent("ethoxyethane"),
-            lambda x:make_solvent("ethyl acetate"),
+            lambda x:make_solvent("CCCCCC"),
+            lambda x:make_solvent("CCOCC"),
+            lambda x:make_solvent("O"),
+            lambda x:make_solvent("O"),
+            lambda x:make_solvent("CCOC(=O)C"),
         ],[], n_working = 3)
         amounts=np.ones([1,1])*0.02
         pixels = [[1]]

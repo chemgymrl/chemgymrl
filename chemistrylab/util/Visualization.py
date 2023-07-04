@@ -412,8 +412,8 @@ class pygameVisualizer():
         """
 
         tol = vessel.volume/200
-        cvals = np.array([mat._color for mat in vessel._layer_mats if mat.litres>tol]+[0.65])
-        cnames = [mat._name for mat in vessel._layer_mats if mat.litres>tol]+["air"]
+        cvals = np.array([mat.color for mat in vessel._layer_mats if mat.volume_L>tol]+[0.65])
+        cnames = [mat._name for mat in vessel._layer_mats if mat.volume_L>tol]+["air"]
         for i,name in enumerate(cnames):
             #cache the rendered text to save time
             if not name in self.misc_text:
