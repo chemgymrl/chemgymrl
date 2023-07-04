@@ -29,6 +29,8 @@ class Shelf:
         return tuple(self.vessels)
     def pop(self,index=-1):
         return self.vessels.pop(index)
+    def insert(self, vessel, index):
+        self.vessels.insert(vessel, index)
     def __getitem__(self, slice):
         return self.vessels[slice]
     def __setitem__(self, slice, item):

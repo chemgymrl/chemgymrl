@@ -12,7 +12,7 @@ from typing import NamedTuple, Tuple, Callable, Optional, List
 from chemistrylab.benches.general_bench import *
 from chemistrylab.benches.characterization_bench import CharacterizationBench
 from chemistrylab.util.Visualization import pygameVisualizer
-
+from chemistrylab.lab.shelf import Shelf
 ASSETS_PATH = os.path.dirname(__file__) + "/assets/"
 
 
@@ -24,9 +24,13 @@ class Manager():
         for b in self.benches:
             b.reset()
         self.hand = []
+        self.shelf = Shelf([],n_working=0)
     
-    def swap_vessels(self,bench_idx, vessel_idx):
-        bench = self.benches[bench_idx]
+    def swap_vessels(self, bench_idx, vessel_idx):
+        if bench_idx<0:
+            bench=self
+        else:
+            bench = self.benches[bench_idx]
         if len(self.hand)==1:
             if vessel_idx>=len(bench.shelf):
                 bench.shelf.append(self.hand.pop())
@@ -35,6 +39,7 @@ class Manager():
         elif len(self.hand)==0:
             if vessel_idx<len(bench.shelf):
                 self.hand.append(bench.shelf.pop(vessel_idx))
+
 
     def use_bench(self, bench, policy):
         #prep the bench
@@ -131,6 +136,84 @@ class Button():
         mpos = np.array(mousepos)
         return all((mpos>=self.pos)&(mpos-self.pos<=self.dim))
 
+class Inventory():
+    flasks = []
+    def __init__(self, dx, dy, shelf, boxsize = 100):
+        self.dx=dx
+        self.dy=dy
+        self.shelf=shelf
+        self.boxsize = boxsize
+        self.update()
+        self.hover = pygame.Surface((boxsize*1.05,boxsize*1.05)).convert_alpha()
+        self.hover.fill((255,255,255,128))
+        self.pos=np.zeros(2)
+
+    def vessel_thumbnails(self,vessels):
+        """Simple image representation of a vessel"""
+        thumbnails=[]
+        font = pygame.font.SysFont('Arial', 8)
+        for v in vessels:
+            idx = round(v.filled_volume()*10/v.volume)
+            surf = Inventory.flasks[idx].copy()
+            text = font.render(v.label, True, (0,0,0))
+            offset = (surf.get_size()[0]-text.get_size()[0])/2 , surf.get_size()[1] - text.get_size()[1]
+
+            surf.blit(text,offset)
+            thumbnails.append(surf)
+        return thumbnails
+    
+    def update(self):
+        self.items = self.vessel_thumbnails(self.shelf)
+        self.positions = {i:i for i in range(len(self.items))}
+        self.render_inventory()
+
+    def render_inventory(self):
+        """Create a surface element representing an inventory"""
+        boxsize=self.boxsize
+        box = pygame.Surface((boxsize*1.05,boxsize*1.05))
+        rect = pygame.Rect(boxsize/20,boxsize/20,boxsize*0.95,boxsize*0.95)
+        gfxdraw.box(box,rect,(255,255,255))
+        surf = pygame.Surface((self.dx*boxsize+boxsize/20, self.dy*boxsize+boxsize/20))
+        for x in range(self.dx):
+            for y in range(self.dy):
+                surf.blit(box,(x*boxsize,y*boxsize))
+        #items should be a list of surfaces
+        # TODO: make sure they fit into the box
+        for i,pos in self.positions.items():
+            if i>=self.dx*self.dy:
+                break
+            item = self.items[pos]
+            sx,sy=item.get_size()
+            surf.blit(item,((i%self.dx)*boxsize+(boxsize-sx)/2,(i//self.dx)*boxsize+(boxsize-sy)/2))
+
+        self.surf = surf
+        return surf
+
+    def show(self, screen, pos):
+        screen.blit(self.surf,pos)
+        self.pos = np.array(pos)
+
+    def show_hover(self, screen, pos, idx = None):
+        screen.blit(self.surf,pos)
+        self.pos = np.array(pos)
+        if idx is None:
+            idx = self.check_hover(pygame.mouse.get_pos())
+        if idx>=0:
+            x = idx%self.dx
+            y = idx//self.dx
+            screen.blit(self.hover,self.pos+(x*self.boxsize,y*self.boxsize))
+
+    def check_hover(self, mousepos):
+        startpos=self.pos
+        boxsize=self.boxsize
+        slot = np.floor((mousepos-startpos)/boxsize)
+        bds = np.array([self.dx,self.dy])
+        if all((slot>=0)&(slot<bds)):
+            idx = int(slot[0]) + int(slot[1])*self.dx
+            return idx
+        return -1
+
+
 
 class ManagerGui():
     def __init__(self, manager: Manager):
@@ -155,8 +238,18 @@ class ManagerGui():
             elif event.type == pygame.MOUSEWHEEL:
                 self.cam += np.array((event.y,event.x))*30
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button==1:
+                
+
                 print(event)
                 xy = np.array(event.pos)
+
+                idx = self.shelf_inventory.check_hover(xy)
+                if idx>=0:
+                    self.manager.swap_vessels(-1, idx)
+                    self.shelf_inventory.update()
+                    self.hand_inventory.update()
+                    return
+                
                 sxy = np.array(self.bench.get_size())
                 for i,pos in enumerate(self.benchpos):
                     #rel = xy-pos+self.cam
@@ -170,6 +263,8 @@ class ManagerGui():
                         return
                 if self.bench_idx is not None:
                     self.handle_bench_click(xy)
+                
+
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -225,10 +320,13 @@ class ManagerGui():
                     _ = self.manager.characterize([button.text])
                     self.display_char_bench()
                     return
+            return
                 
-        idx = self.probe_inventory(np.zeros(2), xy, 5, 2)
+        idx = self.bench_inventories[self.bench_idx].check_hover(xy)
         if idx>=0:
             self.manager.swap_vessels(self.bench_idx, idx)
+            self.bench_inventories[self.bench_idx].update()
+            self.hand_inventory.update()
 
         if self.bench_buttons[0].check_hover(xy):
             manual_extract = ManualPolicy(self.manager.benches[self.bench_idx],screen=self.screen,fps=60)
@@ -254,10 +352,17 @@ class ManagerGui():
 
             print(self.bench.get_size())
             self.benchpos = np.array([(x*200,480-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
-            self.flasks=[]
+            
+
+
             for i in range(11):
                 tmp = pygame.image.load(ASSETS_PATH+f"vessels/rflask_{i}.png").convert_alpha()
-                self.flasks.append(pygame.transform.scale(tmp,(80,70)))
+                Inventory.flasks.append(pygame.transform.scale(tmp,(80,70)))
+
+            self.bench_inventories = [Inventory(5, 2, bench.shelf) for bench in self.manager.benches]
+            self.hand_inventory = Inventory(1,1,self.manager.hand)
+            self.shelf_inventory = Inventory(1,1,self.manager.shelf)
+
             self.bench_idx = None
 
 
@@ -267,8 +372,11 @@ class ManagerGui():
         self.screen.blit(surf,(0,0))
         self.render_benches()
 
-        inhand = self.vessel_thumbnails(self.manager.hand)
-        self.screen.blit(self.make_inventory(1,1,inhand),np.array(self.video_size)-110)
+        self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-110)
+
+        if self.hand_inventory.items:
+            offset = np.array(self.hand_inventory.items[0].get_size())/2
+            self.screen.blit(self.hand_inventory.items[0],-offset+pygame.mouse.get_pos())
 
         self.clock.tick(60)
         pygame.event.pump()
@@ -286,8 +394,8 @@ class ManagerGui():
         if self.bench_idx is not None:
             #Might change this (right now characterization bench isnt included in benches)
             if self.bench_idx<len(self.manager.benches):
-                items = self.vessel_thumbnails(self.manager.benches[self.bench_idx].shelf)
-                self.screen.blit(self.make_inventory(5,2,items),(0,0))
+                inventory = self.bench_inventories[self.bench_idx]
+                inventory.show_hover(self.screen,(0,0))
             buttonpos = self.benchpos[self.bench_idx]+np.array((0,-30)-self.cam)
             for idx, button in enumerate(self.bench_buttons):
                 if button.check_hover(np.array(pygame.mouse.get_pos())):
@@ -295,45 +403,6 @@ class ManagerGui():
                 else:
                     button.show(self.screen,buttonpos+(idx*50,0))
 
-    def make_inventory(self, dx, dy, items, selected = None, boxsize = 100):
-        """Create a surface element representing an inventory"""
-        box = pygame.Surface((boxsize*1.05,boxsize*1.05))
-        rect = pygame.Rect(boxsize/20,boxsize/20,boxsize*0.95,boxsize*0.95)
-        gfxdraw.box(box,rect,(255,255,255))
-        surf = pygame.Surface((dx*boxsize+boxsize/20, dy*boxsize+boxsize/20))
-        for x in range(dx):
-            for y in range(dy):
-                surf.blit(box,(x*boxsize,y*boxsize))
-        #items should be a list of surfaces
-        # TODO: make sure they fit into the box
-        for i,item in enumerate(items):
-            if i>=dx*dy:
-                break
-            sx,sy=item.get_size()
-            surf.blit(item,((i%dx)*boxsize+(boxsize-sx)/2,(i//dx)*boxsize+(boxsize-sy)/2))
-        return surf
-
-    def probe_inventory(self, startpos, mousepos, dx, dy, boxsize=100):
-        slot = np.floor((mousepos-startpos)/boxsize)
-        bds = np.array([dx,dy])
-        if all((slot>=0)&(slot<bds)):
-            idx = int(slot[0]) + int(slot[1])*dx
-            return idx
-        return -1
-
-    def vessel_thumbnails(self,vessels):
-        """Simple image representation of a vessel"""
-        thumbnails=[]
-        font = pygame.font.SysFont('Arial', 8)
-        for v in vessels:
-            idx = round(v.filled_volume()*10/v.volume)
-            surf = self.flasks[idx].copy()
-            text = font.render(v.label, True, (0,0,0))
-            offset = (surf.get_size()[0]-text.get_size()[0])/2 , surf.get_size()[1] - text.get_size()[1]
-
-            surf.blit(text,offset)
-            thumbnails.append(surf)
-        return thumbnails
 
 if __name__ == "__main__":
     from chemistrylab.benches.distillation_bench import GeneralWurtzDistill_v2 as WDBench
