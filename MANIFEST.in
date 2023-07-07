@@ -1,3 +1,4 @@
 include chemistrylab/reactions/available_reactions/*.json
 include chemistrylab/lab/assets/*
+include chemistrylab/lab/assets/vessels/*
 include chemistrylab/materials.pkl
