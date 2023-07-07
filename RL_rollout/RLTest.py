@@ -91,7 +91,9 @@ if __name__=="__main__":
     i=0
     for x in range(op.steps):
         #testing taking actions
-        act,_=model.predict(obs)
+        act=model.predict(obs)
+        if not issubclass(Policy,model):
+            act,_ = act
         newobs,rew,done,info,*_ = env.step(act)
         rollout["InState"]+=[obs]
         rollout["Action"]+=[act]
