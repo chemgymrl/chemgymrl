@@ -15,16 +15,28 @@ from chemistrylab.util.Visualization import pygameVisualizer
 from chemistrylab.lab.shelf import Shelf
 ASSETS_PATH = os.path.dirname(__file__) + "/assets/"
 
-
+class Policy():
+    def __call__(self,observation):
+        return self.predict(observation)
+    def predict(self, observation):
+        """
+        Args:
+        - observation: Observation of the state.
+        
+        Returns:
+            The action to be performed.
+        """
+        raise NotImplementedError
 
 class Manager():
-    def __init__(self, benches: Tuple[GenBench], bench_names: Tuple[str]):
+    def __init__(self, benches: Tuple[GenBench], bench_names: Tuple[str], bench_agents: Tuple[dict]):
         self.benches=benches
         self.bench_names=bench_names
         for b in self.benches:
             b.reset()
         self.hand = []
         self.shelf = Shelf([],n_working=0)
+        self.bench_agents = bench_agents
     
     def swap_vessels(self, bench_idx, vessel_idx):
         if bench_idx<0:
@@ -62,7 +74,7 @@ class Manager():
         return self.charbench(self.hand,"")
 
 
-class ManualPolicy():
+class ManualPolicy(Policy):
     def __init__(self, env, screen = None, fps=60):
 
         self.fps=fps
@@ -87,10 +99,14 @@ class ManualPolicy():
         if event.type == pygame.KEYUP:
             if event.key in self.relevant_keys:
                 self.pressed.remove(event.key)
-    def __call__(self,o):
+    def predict(self,o):
         for event in pygame.event.get():
             self.process_event(event)
         self.clock.tick(self.fps)
+
+        if self.clock.get_rawtime()>1000:
+            self.pressed=[]
+        
 
         arr = self.env.render()
         arr_min, arr_max = np.min(arr), np.max(arr)
@@ -101,11 +117,34 @@ class ManualPolicy():
         pyg_img = pygame.transform.scale(pyg_img, self.screen.get_size())
         self.screen.blit(pyg_img, (0, 0))
 
-
         pygame.event.pump()
         pygame.display.flip()
 
         return self.keys_to_action.get(tuple(sorted(self.pressed)), self.noop)
+
+
+class VisualPolicy(Policy):
+    def __init__(self, env, policy, screen = None, fps=60):
+        self.screen = screen
+        self.env=env
+        self.policy = policy
+        self.clock = pygame.time.Clock()
+
+    def predict(self, observation):
+        arr = self.env.render()
+        arr_min, arr_max = np.min(arr), np.max(arr)
+        arr = 255.0 * (arr - arr_min) / (arr_max - arr_min)
+        pyg_img = pygame.surfarray.make_surface(arr.swapaxes(0, 1))
+        #scaler = max(self.screen.get_size()) / max(pyg_img.get_size())
+        #size=np.array(pyg_img.get_size())*scaler
+        pyg_img = pygame.transform.scale(pyg_img, self.screen.get_size())
+        self.screen.blit(pyg_img, (0, 0))
+        #pygame.event.pump()
+        pygame.display.flip()
+
+        return self.policy(observation)
+
+
 
 class Button():
     def __init__(self, width, height, color = '#66c666', hover = "#66FF66",  text=None):
@@ -135,6 +174,8 @@ class Button():
     def check_hover(self, mousepos):
         mpos = np.array(mousepos)
         return all((mpos>=self.pos)&(mpos-self.pos<=self.dim))
+
+
 
 class Inventory():
     flasks = []
@@ -215,6 +256,7 @@ class Inventory():
 
 
 
+
 class ManagerGui():
     def __init__(self, manager: Manager):
         self.manager = manager
@@ -257,21 +299,19 @@ class ManagerGui():
                     if self.bench_titles[i].check_hover(xy):
                         self.bench_idx = i
                         if i<len(self.manager.benches):
-                            self.bench_buttons = [Button(40,20, text = "Start")]
+                            self.bench_buttons = [Button(40,20, text = name) for name, p in manager.bench_agents[i]]
                         else:
                             self.bench_buttons = [Button(40,20, text = a) for a in ["layers","spectra","PVT"]]
                         return
                 if self.bench_idx is not None:
                     self.handle_bench_click(xy)
-                
-
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.bench_idx = None
                 if event.key == 1073741892: #f11 key
                     if self.fullscreen:
-                        self.screen = pygame.display.set_mode((640,480),pygame.RESIZABLE)
+                        self.screen = pygame.display.set_mode((1280,720),pygame.RESIZABLE)
                         self.video_size = self.screen.get_size()
                     else:
                         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN|pygame.RESIZABLE)
@@ -328,18 +368,20 @@ class ManagerGui():
             self.bench_inventories[self.bench_idx].update()
             self.hand_inventory.update()
 
-        if self.bench_buttons[0].check_hover(xy):
-            manual_extract = ManualPolicy(self.manager.benches[self.bench_idx],screen=self.screen,fps=60)
-            code = self.manager.use_bench(self.manager.benches[self.bench_idx],manual_extract)
-            if code<0:
-                self.display_err_message("Invalid Bench Setup")
+        for i,button in enumerate(self.bench_buttons):
+            if button.check_hover(xy):
+                name, policy = self.manager.bench_agents[self.bench_idx][i]
+                code = self.manager.use_bench(self.manager.benches[self.bench_idx],policy)
+                self.bench_inventories[self.bench_idx].update()
+                if code<0:
+                    self.display_err_message("Invalid Bench Setup")
 
     def render(self):
 
         if self.screen is None:
             self.fullscreen=False
             pygame.display.init()
-            self.video_size = (640,480)
+            self.video_size = (1280,720)
             self.screen = pygame.display.set_mode(self.video_size,pygame.RESIZABLE)
             self.clock = pygame.time.Clock()
             self.bench = pygame.image.load(ASSETS_PATH+"drawing.svg").convert_alpha()
@@ -351,7 +393,7 @@ class ManagerGui():
             self.bench_titles.append(Button(141,29, text = "Characterization",color="#888888", hover="#dddddd"))
 
             print(self.bench.get_size())
-            self.benchpos = np.array([(x*200,480-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
+            self.benchpos = np.array([(x*200,self.video_size[1]-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
             
 
 
@@ -361,9 +403,14 @@ class ManagerGui():
 
             self.bench_inventories = [Inventory(5, 2, bench.shelf) for bench in self.manager.benches]
             self.hand_inventory = Inventory(1,1,self.manager.hand)
-            self.shelf_inventory = Inventory(1,1,self.manager.shelf)
+            self.shelf_inventory = Inventory(4,1,self.manager.shelf)
 
             self.bench_idx = None
+
+            for plist in self.manager.bench_agents:
+                for name, policy in plist:
+                    if (type(policy) is ManualPolicy) or (type(policy) is VisualPolicy):
+                        policy.screen=self.screen
 
 
 
@@ -372,7 +419,7 @@ class ManagerGui():
         self.screen.blit(surf,(0,0))
         self.render_benches()
 
-        self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-110)
+        self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-(410,110))
 
         if self.hand_inventory.items:
             offset = np.array(self.hand_inventory.items[0].get_size())/2
@@ -411,9 +458,18 @@ if __name__ == "__main__":
     from chemistrylab.benches.reaction_bench import WurtzReactDemo_v0 as WRDemo
     from chemistrylab.benches.extract_bench import GeneralWurtzExtract_v2 as WEBench
     from chemistrylab.benches.extract_bench import WurtzExtractDemo_v0 as WEDemo
+
+    from chemistrylab.lab.heuristics.ReactionHeuristics import WurtzReactHeuristic
+
+    import pygame
+
+    benches = [WRDemo(),WDDemo(), WEDemo()]
+    policies = [[("Manual",ManualPolicy(bench))] for bench in benches]
+    policies[0]+=[("Heuristic",VisualPolicy(benches[0],WurtzReactHeuristic()))]
     manager = Manager(
-        [WRDemo(),WDDemo(), WEDemo()],
-        ["Reaction","Distillation", "Extraction"]
+        benches,
+        ["Reaction","Distillation", "Extraction"],
+        policies
         )
 
     gui = ManagerGui(manager)

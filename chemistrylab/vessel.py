@@ -139,7 +139,7 @@ class Vessel:
         self.solvent_dict=dict() #String Keys, index values
         self.solvents=[]
         self._layers_position = np.zeros(1, dtype=np.float32)
-        self._layers_variance = np.array([self.volume/3.46], dtype=np.float32)
+        self._layers_settle_time = np.array([0], dtype=np.float32)
         self._layer_volumes = np.array([self.volume], dtype=np.float32)
         self._variance = 1e-5
         self._layers = None
@@ -173,20 +173,30 @@ class Vessel:
         #set the new solute dict
         self.solute_dict={key:mol_dissolved[i] for i,key in enumerate(solutes)}
 
+    def _establish_solvents(self):
+        if self.ignore_layout:return
+        for key, mat in self.material_dict.items():
+            if mat.is_solvent:continue
+            for sol in mat.all_dissolves_in():
+                if sol in self.material_dict:
+                    mat.is_solute=True
+                    self.material_dict[sol].is_solvent = True
+
     def validate_solvents(self):
         """
         Updates the solute_dict and solvent_dict / solvent array when the solvents have changed
         
         """
         if self.ignore_layout:return
+        self._establish_solvents()
         new_solvents = tuple(a for a in self.material_dict if self.material_dict[a].is_solvent)
         #union should be the same length as both new_solvents and solvents
         union = tuple(a for a in new_solvents if a in self.solvent_dict)
         if len(new_solvents)!=len(self.solvents) or len(new_solvents)!= len(union) :
 
             #copy over variances
-            self._layers_variance = np.array([self._layers_variance[self.solvent_dict[sol]]
-            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_variance[-1]],
+            self._layers_settle_time = np.array([self._layers_settle_time[self.solvent_dict[sol]]
+            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_settle_time[-1]],
             dtype = np.float32)
             #copy over amounts
             self._layer_volumes = np.array([self._layer_volumes[self.solvent_dict[sol]]
@@ -244,9 +254,9 @@ class Vessel:
         Returns:
             :class:`~pandas.DataFrame`: A DataFrame detailing all materials present in the Vessel.  
         """
-        info_dict = {key:(mat.mol,mat.phase,mat.is_solute,mat.is_solvent) for key,mat in self.material_dict.items()}
+        info_dict = {mat._name:(key,mat.mol,mat.phase,mat.is_solute,mat.is_solvent) for key,mat in self.material_dict.items()}
     
-        return pd.DataFrame.from_dict(info_dict, orient="index",columns = ["Amount","Phase","Solute","Solvent"])
+        return pd.DataFrame.from_dict(info_dict, orient="index",columns = ["Smiles","Amount","Phase","Solute","Solvent"])
 
     def get_solute_dataframe(self):
         """
@@ -525,12 +535,12 @@ class Vessel:
 
         solute_svolume = np.array([mat.litres_per_mol for mat in solutes], dtype=np.float32)
         
-        self._layers_position, self._layers_volume, self._layers_variance, self._variance, new_solute_amount, self._lvar = separate.mix(
+        self._layers_position, self._layers_volume, self._layers_settle_time, self._variance, new_solute_amount, self._lvar = separate.mix(
             layer_volume,
             self._layer_volumes.astype(np.float32),
             solute_svolume,
             self._layers_position.astype(np.float32),
-            self._layers_variance.astype(np.float32),
+            self._layers_settle_time.astype(np.float32),
             np.float32(self._variance),
             layer_density,
             solute_polarity,
@@ -540,6 +550,7 @@ class Vessel:
         )
 
         self._layer_volumes = layer_volume
+        
 
         for i,s in enumerate(s_names):
             self.solute_dict[s] = new_solute_amount[i]

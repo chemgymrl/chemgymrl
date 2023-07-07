@@ -137,7 +137,7 @@ class Material():
         mat._solute=self._solute
         return mat
 
-    def all_dissolved_in(self):
+    def all_dissolves_in(self):
         """
         Returns:
         - Generator[str]: A generator of smiles codes representing the Materials this material dissolves in."""

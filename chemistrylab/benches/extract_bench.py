@@ -38,7 +38,6 @@ def wurtz_vessel(add_mat=""):
     # initialize Na
     Na = material.REGISTRY["[Na+]"]()
     Na.charge = 1.0
-    Na.is_solute = True
     #Na.set_color(0.0)
     Na.polarity = 2.0
     Na.phase = 'l'
@@ -46,7 +45,6 @@ def wurtz_vessel(add_mat=""):
     # initialize Cl
     Cl = material.REGISTRY["[Cl-]"]()
     Cl.charge = -1.0
-    Cl.is_solute = True
     #Cl.set_color(0.0)
     Cl.polarity = 2.0
     Cl.phase = 'l'
@@ -61,22 +59,18 @@ def wurtz_vessel(add_mat=""):
         "CCCC(CC)C(CC)CCC",
     ]
 
-    try:
-        if add_mat == "":
-            add_mat = choice(products)
-        add_material = material.REGISTRY[add_mat]()
+    if add_mat == "":
+        add_mat = choice(products)
     
-    except KeyError:
+    if not add_mat in products:
         add_mat = 'CCCCCCCCCCCC'
-        add_material = material.REGISTRY[add_mat]()
     
-    add_material.is_solute = True
+    add_material = material.REGISTRY[add_mat]()
     #add_material.set_color(0.0)
     add_material.phase = 'l'
 
 
     DiEthylEther.mol=4.0
-    DiEthylEther.is_solvent = True
     Na.mol=1.0
     Cl.mol=1.0
     add_material.mol=1.0
@@ -115,7 +109,6 @@ def oil_vessel():
     # initialize Na
     Na = material.REGISTRY["[Na+]"](mol=1.0)
     Na.charge = 1.0
-    Na.is_solute = True
     #Na.set_color(0.0)
     Na.polarity = 2.0
     Na.phase = 'l'
@@ -123,7 +116,6 @@ def oil_vessel():
     # initialize Cl
     Cl = material.REGISTRY["[Cl-]"](mol=1.0)
     Cl.charge = -1.0
-    Cl.is_solute = True
     #Cl.set_color(0.0)
     Cl.polarity = 2.0
     Cl.phase = 'l'
@@ -150,7 +142,6 @@ def make_solvent(mat):
     )
     # create the material dictionary for the solvent vessel
     
-    solvent_class.is_solvent = True
     solvent_class.mol=1e6
     solvent_vessel.material_dict = {mat:solvent_class}
     # instruct the vessel to update its material dictionary
