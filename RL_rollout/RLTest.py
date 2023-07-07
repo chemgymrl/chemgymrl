@@ -35,7 +35,7 @@ from RLTrain import *
 import pandas as pd
 import numpy as np
 
-from Heuristic_Policies import *
+from chemistrylab.lab.heuristics import *
 
 
     
