@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="160" height="140">
+	        
+	<g transform="translate(80, 45) rotate(0)">
+		              
+		<defs>
+			        
+			<clipPath id="gen-clip421654">
+				            
+				<path d="M -8.75,-35.0 L -8.75 17.5 A 27.00052082830996 27.00052082830996 0 1 0 8.75 17.5 L 8.75 -35.0                Z"/>
+				        
+			</clipPath>
+			      
+		</defs>
+		        
+		<rect x="-35.0" y="-34.3" width="70" height="102.2" fill="#a2d0fa" stroke="none" clip-path="url(#gen-clip421654)"/>
+		        
+		<rect x="-35.0" y="-34.3" width="70" height="102.2" fill="none" opacity="0.2" stroke="none" clip-path="url(#gen-clip421654)"/>
+		              
+		<path d="M -8.75,-35.0 L -8.75 17.5 A 27.00052082830996 27.00052082830996 0 1 0 8.75 17.5 L 8.75 -35.0                Z" fill="none" stroke="black" stroke-width="5" opacity="1"/>
+		        
+	</g>
+</svg>
