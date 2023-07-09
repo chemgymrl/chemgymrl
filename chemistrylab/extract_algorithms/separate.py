@@ -203,9 +203,11 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     Returns:
         Tuple[np.ndarray]:
-            - layers_position: An array of floats representing the new positions of the solvent layers in the vessel
-            - layers_variance: An array of floats representing the new variances of the solvent layers in the vessel
-            - new_solute_amount: An array of floats representing the new amounts of solutes in each solvent layer
+            - layers_position: 1D array with the new positions of the solvent layers in the vessel
+            - layers_volume: The volume of each layer adjusted to how much solute is dissolved in it
+            - layers_settle_time: 1D array representing how far along settling is for each layer
+            - variance: Variance measure for the solute separation
+            - new_solute_amount: 1D array with the new amounts of solutes in each solvent layer
             - var_layer: Modified layer variances which account for the extra volume due to dissolved solutes
 
     Algorithm (Solvent):
@@ -239,35 +241,18 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     tseparate = np.float32(-1.47)
     TOL=np.float32(1e-12)
     E3 = np.float32(1e-3)
-    MAXVAR = np.float32(3.0)
-
     # copy mixing for the solutes in case you need to modify it
     solute_mixing = 0
-    #figure out where the gaussians should end up at T-> inf
-    #order=np.argsort(D)[::-1]
     Vtot= np.sum(v) #Total volume
 
-
-    #Get convergence speeds based off of how different the densities are
-    diff = np.zeros(D.shape[0],dtype=np.float32)
-    for i in range(diff.shape[0]):
-        for j in range(0, i):
-            diff[j] -= (D[j] - D[i])
-        for j in range(i+1, D.shape[0]):
-            diff[j] -= (D[j] - D[i])
-    diff = np.clip(np.abs(diff),E3,None)
-
-    tau = 2/diff.max()
-    max_var = Vtot/MAXVAR
+    # Approximate separation time
+    tau = 2/(D.max()-D.min()+E3)
     solvent_mixing=0
     #adjust variance
     for i in range(Lpol.shape[0]):
         # Figure out how much the volume has changed
         dv = v[i] - Vprev[i]
-        # Make sure variance is at least as big as fully separated variance
-        # Add some variance to each solvent
-        #s+=dv/MAXVAR
-        # Extra mixing dependant on the position and how much was added
+        # Adding in solvents reverses the separation process
         if dv>1e-6:            
             ratio = (dv/(np.abs(v[i]-dv)+TOL))*(Vtot-x[i])
             #mix surrounding solvents
@@ -295,11 +280,6 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     T+=dt
     #Make sure Time is >= 0 (0 is fully mixed time)
     T=np.clip(T,0,None)
-
-    C = T
-
-    #Math for position vs time:
-    #https://www.desmos.com/calculator/imukub1xzr 
 
     # A are the volumes used for dissolving
     A=v[:Lpol.shape[0]]
@@ -336,9 +316,6 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
             Ldif += np.abs(Spol[i] - Lpol[j])
             Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
 
-        # Calculate total amount of solute
-        
-        
         # Note A*re_weight has the same sum as A
         re_weight = (1 - (np.abs(Spol[i] - Lpol) / Ldif)) / (1 - (Ldif0) / (np.sum(A) * Ldif))
         #coeff for current timestep
@@ -379,42 +356,25 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
             #reduce amount of air
             v_layer[-1]-=vol
 
-
-
     #final layer positions
     means = np.zeros(D.shape[0],dtype=np.float32)
     #final layer variances
-    sf2 = np.zeros(D.shape[0],dtype=np.float32)
+    var_layer = np.zeros(D.shape[0],dtype=np.float32)
     # Total volume
     Vtot=np.sum(v_layer)
+
+    # Math for position vs time:
+    # https://www.desmos.com/calculator/zdxelweyw4 
 
     for i in range(D.shape[0]):
         di = D[i]
         # NOTE: You can swap tanh(x) with np.clip(x,-1,1) but you need to adjust tau and SCALING
-
         #total separation can be thought of as a sum of pair-wise separations
         means[i] = Vtot/2 - np.sum(np.tanh((di-D)*T)*v_layer)/2
         # same goes for final variances. . .
-        sf2[i] = Vtot/MINVAR - np.sum(np.tanh(np.abs(di-D)*T)*v_layer)/MINVAR
+        var_layer[i] = Vtot/MINVAR - np.sum(np.tanh(np.abs(di-D)*T)*v_layer)/MINVAR
 
-
-    # Calculate final layer positions
-#    means = np.zeros(D.shape[0],dtype=np.float32)
-#    Vtot = np.float32(0)
-#    for i in order:
-#        means[i] = Vtot+v_layer[i]/2
-#        Vtot+=v_layer[i]
-#
-    #update positions
-    B = means#+(Vtot/2-means)*g
-    # Adjust variances for dissolved volumes
-#    sf2 = v_layer/MINVAR 
-    var_layer = sf2#+(si-sf2)*g
-
-    return B, v_layer, C,C0, S, var_layer
-
-
-
+    return means, v_layer, T , C0, S, var_layer
 
 
 
