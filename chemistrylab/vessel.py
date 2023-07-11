@@ -139,7 +139,7 @@ class Vessel:
         self.solvent_dict=dict() #String Keys, index values
         self.solvents=[]
         self._layers_position = np.zeros(1, dtype=np.float32)
-        self._layers_settle_time = np.array([0], dtype=np.float32)
+        self._layers_settle_time = np.float32(0)#np.array([0], dtype=np.float32)
         self._layer_volumes = np.array([self.volume], dtype=np.float32)
         self._variance = 1e-5
         self._layers = None
@@ -195,9 +195,10 @@ class Vessel:
         if len(new_solvents)!=len(self.solvents) or len(new_solvents)!= len(union) :
 
             #copy over variances
-            self._layers_settle_time = np.array([self._layers_settle_time[self.solvent_dict[sol]]
-            if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_settle_time[-1]],
-            dtype = np.float32)
+            #self._layers_settle_time = np.array([self._layers_settle_time[self.solvent_dict[sol]]
+            #if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layers_settle_time[-1]],
+            #dtype = np.float32)
+            
             #copy over amounts
             self._layer_volumes = np.array([self._layer_volumes[self.solvent_dict[sol]]
             if sol in self.solvent_dict else 0 for sol in new_solvents]+[self._layer_volumes[-1]],
@@ -540,7 +541,7 @@ class Vessel:
             self._layer_volumes.astype(np.float32),
             solute_svolume,
             self._layers_position.astype(np.float32),
-            self._layers_settle_time.astype(np.float32),
+            np.float32(self._layers_settle_time),#.astype(np.float32),
             np.float32(self._variance),
             layer_density,
             solute_polarity,

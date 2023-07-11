@@ -69,8 +69,11 @@ def map_to_state(A, B, C, colors, x=x):
     #If you want to change one you have to change both
     #https://www.desmos.com/calculator/kzydc5ra3q
 
-    width = C*3.5/2
-    #MINVAR is 3.5 here
+    width = C
+    
+    #adjust variance 
+    C = C*2/3.5
+    #MINP is the probability at which the left side of the gaussian is clipped
     MINP=0.21626516683
 
     
@@ -100,24 +103,17 @@ def map_to_state(A, B, C, colors, x=x):
     
     # Loop over each layer pixel
     for l in range(L.shape[0]):
-        # Map layer pixel position to x position
-        k = l
-
         # 5.i
-        P_raw = np.exp(-0.5 * (((x[k] - B) / C) ** 2))
-        # MINP is a cutoff value to set the gaussian to 0
-        P_clip = P_raw* ((P_raw > MINP) | (x[k]>B))#+ P_raw*(P_raw < MINP))
-        
+        P_raw = np.exp(-0.5 * (((x[l] - B) / C) ** 2))
+        # Gaussian can only be found to the right of the width parameter
+        P_clip = P_raw*(x[l]>=B-width)
         # Calculate Gaussian values at current x position
         P = A /C * P_clip
-        
         # Check to see if any phases have no pixels remaining
-        past_due = False
         for j in range(P.shape[0]):
             if n[j] == 0:
                 # Set Gaussian value to avoid placement by random set
                 P[j] = 0.0
-                P_raw[j]=0.0
                 # Set Gaussian center extremely positive outside of range to avoid placement by default set
                 B1[j] += 1e9
 
@@ -131,27 +127,20 @@ def map_to_state(A, B, C, colors, x=x):
             return L,L2
         # Sum of all Gaussians at this x position
         
-
         # Random number for mixing of layers
         r = np.random.rand()
         place_jmin = False
         #Below if part 5.iv
         # The current point has to be far to the RIGHT of the gaussian for it to have passed over
-        if P_clip[j_min] < MINP and n[j_min]>0 and x[k]>B[j_min]:
+        if n[j_min]>0 and x[l]>B[j_min]+width[j_min]:
             if P_clip[j_min]<1e-12:
                 place_jmin=True
             else:
                 P[j_min] = (A[j_min] / C[j_min]) * MINP
-                #More likely to place j_min pixels the lower it's propability is
-                #choice_ratio = 0.1*MINP**2/P_clip[j_min]
-                #r2=np.random.rand()
-                #if choice_ratio>=r2:
-                #    place_jmin=True
 
-        Psum = np.sum(P)
-
+        P_cum = np.cumsum(P)
         # If x position is outside every Gaussian peak (5.iv and 5.iii)
-        if Psum < 1e-6  or place_jmin:
+        if P_cum[-1] < 1e-6  or place_jmin:
             # Calculate the index of the most negative phase
             j = j_min
             # Set pixel value
@@ -161,12 +150,12 @@ def map_to_state(A, B, C, colors, x=x):
             n[j] -= 1
         # If x position is inside at least one Gaussian peak (5.i - 5.iii)
         else:
-            p = 0.0
+            #normalize
+            P_cum/=P_cum[-1]
             # Loop until pixel is set
             for j in range(P.shape[0]):
-                p += P[j]
                 # If random number is less than relative probability for that phase (5.ii)
-                if r - p / Psum < 1e-6:
+                if r - P_cum[j] < 1e-6:
                     # Set pixel value
                     L[l] = colors[j]
                     L2[l]=j
@@ -184,7 +173,7 @@ def map_to_state(A, B, C, colors, x=x):
 
 @numba.jit(cache=True,nopython=True)
 #@cc.export('mix', '(f4[:], f4[:], f4[:], f4[:], f4[:], f4, f4[:], f4[:], f4[:], f4[:,:],f4)')
-def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
+def mix(v, Vprev, v_solute, B, T0, C0 , D, Spol, Lpol, S, mixing):
     """
     Calculates the positions and variances of solvent layers in a vessel, as well as the new solute amounts, based on the given inputs.
 
@@ -210,35 +199,20 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
             - new_solute_amount: 1D array with the new amounts of solutes in each solvent layer
             - var_layer: Modified layer variances which account for the extra volume due to dissolved solutes
 
-    Algorithm (Solvent):
+    Algorithm:
 
-    1. Using the volumes and densities of each solvent, determine where each solvent's center of mass should be at t-> inf
-    2. Determine the speed in which each solvent should separate out using the densities
-    3. Handle any external changes to the solving (pouring in/out) using v and Vprev
-        i. Since there is an injective map between variance and time, it is easier to work with variance
-            a) Initial variance is sum(v)/sqrt(12) [gaussian approximation of a uniform distribution]
-            b) Final variance is vi/MINVAR -> MINVAR should probably be around sqrt(12) still (but be <=)
-        ii. Pouring in a solvent should kind of mix around the solution, and since the max variance is sum(v)/sqrt(12) adding in dv/sqrt(12) seems reasonable
-        iii. For the solvent actually being added, we can assume you are pouring into the top, so it should be mixed the closer to the bottom the solvent layer is. It should also be mixed more depending on how much you are adding.
-        iv. If adding a solvent causes things to be mixed around a bunch, it should end up mixing the solutes too
-    4. Get a time-like variable saying much each solvent is settled using the current variance (Recall the map is injective)
-    5. Increment this by the mixing parameter
-        i. If time is being decreased by the mixing parameter, we first set T<= Tmax so something which settled for a long time still mixes reasonably fast (and also as T->inf the map between variance and time gets sus cuz of floats)
-    6. Use this incremented time to update your layer positions, as well as layer variances
-
-    Algorithm (Solute):
-    TODO: Write this out
+    1. Calculate change in time (run time backwards for mixing, and forwards for settling, T=0 is fully mixed)
+    2. Determine equilibrium values for dissolved amounts using polarity
+    3. Scale solute amounts between fully mixed and equilibrium using the time component
+    4. Use the new dissolved amounts to adjust layer volumes
+    5. Use the time variable to determine how much the layers have pushed eachother apart.
 
     """
     
     x=B*1
-    # CONSTANTS
-    MINVAR=np.float32(3.5)
     SCALING=np.float32(2e-1)
-    t_scale = 25
-    #Cmix = np.float32(2.0)
-    tmix = np.float32(-1.6120857137646178)#-1.0 * np.log(Cmix * np.sqrt(2.0 * np.pi))
-    tseparate = np.float32(-1.47)
+    t_scale = 125
+    tseparate = np.float32(0.142)
     TOL=np.float32(1e-12)
     E3 = np.float32(1e-3)
     # copy mixing for the solutes in case you need to modify it
@@ -247,104 +221,79 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
 
     # Approximate separation time
     tau = 2/(D.max()-D.min()+E3)
-    solvent_mixing=0
-    #adjust variance
+    T = T0
+
     for i in range(Lpol.shape[0]):
         # Figure out how much the volume has changed
         dv = v[i] - Vprev[i]
         # Adding in solvents reverses the separation process
         if dv>1e-6:            
             ratio = (dv/(np.abs(v[i]-dv)+TOL))*(Vtot-x[i])
-            #mix surrounding solvents
+            #mix solvents
             if i<v.shape[0]-1:
-                #Mix solvent
-                C = np.clip(C,0,tau)
-                C -= ratio*tau/4
-                C[i] -= ratio*tau/4
-                C = np.clip(C,0,tau)
+                T -= ratio*tau/4     
             #TODO: Set extra mixing of solutes
-            solute_mixing = min(solute_mixing, (tmix-tseparate)*ratio )
-                
-    T = np.zeros(D.shape[0])
-    #avoid size issues?
-    T[:C.shape[0]]=C[:T.shape[0]]
-    #Set T in line with air for non-solvents
-    T[Lpol.shape[0]:] = T[-1]
+            solute_mixing = min(solute_mixing, -tseparate*ratio )
+
+    # Do a cap on T when mixing  (set max settling time)
+    if mixing< -1e-4 or solute_mixing<-1e-4:
+        T=min(T,tau)
 
     dt = mixing*SCALING
-    # Do a cap on T when mixing since you should always be able to stir the vessel
-    # Even if the vessel has been settling for 100 years
-    if mixing< -1e-4:
-        T=np.clip(T,0,tau)
-
     T+=dt
     #Make sure Time is >= 0 (0 is fully mixed time)
-    T=np.clip(T,0,None)
+    T=max(T,0)
 
     # A are the volumes used for dissolving
     A=v[:Lpol.shape[0]]
 
 ##############################[Mixing / Separating Solutes]#######################################
 
-    t = np.float32(-np.log(C0 * np.sqrt(2.0 * np.pi)) )
-
-    # Mixing should always mix at least a bit   
-    if mixing<0 or solute_mixing<0:
-        t=min(t,tseparate)
-
-    mixing+=solute_mixing
-    # Check if fully mixed already
-    if t + mixing < tmix:
-        mixing = tmix - t
-    t += mixing
-
-
     Scur = np.copy(S)
     # only do the calculation if there are two or more solvents
-    if not ((len(A) < 2) or A.sum()-A.max()<1e-12 or abs(mixing)<1e-12):
-    # Update amount of solute i in each solvent
-      for i in range(S.shape[0]):
+    if not ((len(A) < 2) or A.sum()-A.max()<1e-12 or abs(T-T0)<1e-12):
+        a = A/A.sum()
+        # Update amount of solute i in each solvent
+        for i in range(S.shape[0]):
+            Ssum = np.sum(Scur[i])
+            if Ssum<1e-6:
+                continue    
+            polarity_diff = np.abs(Spol[i] - Lpol)
+            # Re weight based off of polarity difference and solvent amount
+            #re_weight = a*(polarity_diff.sum()-polarity_diff)
+            re_weight = a/(polarity_diff+1e-2)
 
-        Ssum = np.sum(Scur[i])
-        if Ssum<1e-6:
-            continue    
+            re_weight /= re_weight.sum()
+            #coeff for current timestep
+            alpha = np.exp(-t_scale*T)
+            #coeff for prev timestep
+            beta = np.exp(-t_scale*T0)
+            # Calculate the ideal amount of solute i in each solvent for the current time step
+            St = Ssum *(alpha*a + (1-alpha)*re_weight)
+            # Calculate the ideal amount of solute i in each solvent for the previous time step
+            St0 = Ssum * (beta*a + (1 - beta) * re_weight)
 
-        # Calculate the relative and weighted polarity terms
-        Ldif = np.float32(0)
-        Ldif0 = np.float32(0)
-        for j in range(Lpol.shape[0]):
-            Ldif += np.abs(Spol[i] - Lpol[j])
-            Ldif0 += A[j] * np.abs(Spol[i] - Lpol[j])
-
-        # Note A*re_weight has the same sum as A
-        re_weight = (1 - (np.abs(Spol[i] - Lpol) / Ldif)) / (1 - (Ldif0) / (np.sum(A) * Ldif))
-        #coeff for current timestep
-        alpha = np.exp(t_scale*(tmix - t))
-        #coeff for prev timestep
-        beta = np.exp(t_scale*(tmix - (t - mixing)))
-        # Calculate the ideal amount of solute i in each solvent for the current time step
-        St = (Ssum * A / np.sum(A)) * (alpha + (1-alpha)*re_weight)
-        # Calculate the ideal amount of solute i in each solvent for the previous time step
-        St0 = (Ssum * A / np.sum(A)) * (beta + (1 - beta) * re_weight)
-        #print(S[i],St0,St,re_weight,mixing,alpha,beta)
-        if np.abs(t - mixing - tmix) > 1e-9:
-            #Square of the cosine between the two distributions
-            cosine = (St0*S[i]).sum()/((S[i]**2).sum()*(St**2).sum())**0.5
-            # Moving backwards in time
-            if mixing<0:
-                #Make sure mixing always happens reasonably well
-                cosine = max(cosine,1-cosine)
-                S[i] = S[i]*(1-cosine) + St*cosine
-            # Moving Forwards in time
+            if np.abs(T-T0) > 1e-9:
+                #Square of the cosine between the two distributions
+                cosine = (St0*S[i]).sum()/((S[i]**2).sum()*(St**2).sum())**0.5
+                # Moving backwards in time
+                if T-T0<0:
+                    #Make sure mixing always happens reasonably well
+                    cosine = max(cosine,1-cosine)
+                    S[i] = S[i]*(1-cosine) + St*cosine
+                # Moving Forwards in time
+                else:
+                    #scale cosine to be higher if you wait longer (bad approximation)
+                    cosine = max(min(1,cosine**1.5*(mixing*t_scale*5)**1.5),1e-2)
+                    # Move towards projected step St with cosine step size
+                    S[i] = S[i]*(1-cosine) + St*cosine
             else:
-                #scale cosine to be higher if you wait longer (bad approximation)
-                cosine = max(min(1,cosine**1.5*(mixing*t_scale*5)**1.5),1e-2)
-                # Move towards projected step St with cosine step size
-                S[i] = S[i]*(1-cosine) + St*cosine
-        else:
-            S[i] = St
+                S[i] = St
 
-    C0 = np.float32( np.exp(-1.0 * t) / np.sqrt(2.0 * np.pi) )
+    C0 = T*5
+
+    ########################### MOVING LAYERS ##################################
+
 
     #Update layer volumes to include their dissolved solutes
     v_layer = v.copy()
@@ -366,13 +315,14 @@ def mix(v, Vprev, v_solute, B, C, C0 , D, Spol, Lpol, S, mixing):
     # Math for position vs time:
     # https://www.desmos.com/calculator/zdxelweyw4 
 
+    #Roughly simulates how layers will push eachother apart
     for i in range(D.shape[0]):
         di = D[i]
         # NOTE: You can swap tanh(x) with np.clip(x,-1,1) but you need to adjust tau and SCALING
         #total separation can be thought of as a sum of pair-wise separations
         means[i] = Vtot/2 - np.sum(np.tanh((di-D)*T)*v_layer)/2
         # same goes for final variances. . .
-        var_layer[i] = Vtot/MINVAR - np.sum(np.tanh(np.abs(di-D)*T)*v_layer)/MINVAR
+        var_layer[i] = Vtot/2 - np.sum(np.tanh(np.abs(di-D)*T)*v_layer)/2
 
     return means, v_layer, T , C0, S, var_layer
 

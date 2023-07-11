@@ -290,6 +290,26 @@ class WurtzExtractDemo_v0(GenBench):
         keys[()]=7
         return keys
 
+
+def test_vessel(x):
+        
+    extraction_vessel = vessel.Vessel(label='extraction_vessel')
+
+    dodecane = material.REGISTRY["CCCCCCCCCCCC"](mol=1.0)
+    # material_dict
+    material_dict = {
+        str(dodecane): dodecane,
+    }
+
+    extraction_vessel.material_dict=material_dict
+    extraction_vessel.validate_solvents()
+    extraction_vessel.validate_solutes()
+
+    extraction_vessel._mix(-1000,None,-1000)
+
+    return extraction_vessel
+
+
 class SeparateTest_v0(GenBench):
     """
     Class to define an environment which performs a Wurtz extraction on materials in a vessel.
@@ -303,7 +323,7 @@ class SeparateTest_v0(GenBench):
     def __init__(self):
         e_rew= RewardGenerator(use_purity=True,exclude_solvents=True,include_dissolved=True)
         shelf = VariableShelf( [
-            lambda x:wurtz_vessel(x)[0],
+            lambda x:test_vessel(x),
             lambda x:vessel.Vessel("Beaker 1"),
             lambda x:vessel.Vessel("Beaker 2"),
             lambda x:make_solvent("CCCCCC"),
@@ -339,3 +359,9 @@ class SeparateTest_v0(GenBench):
             reward_function=e_rew,
             max_steps=5000
         )
+
+#    def step(self,action):
+#
+#        for key,val in self.shelf[0].solute_dict.items():
+#            print(key,val)
+#        return super().step(action)

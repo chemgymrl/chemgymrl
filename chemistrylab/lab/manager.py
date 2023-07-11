@@ -66,6 +66,10 @@ class Manager():
         
         for vessel in bench.shelf:
             print (vessel.get_material_dataframe())
+            print (vessel.get_solute_dataframe())
+            print(vessel._layers_settle_time)
+            print(vessel._variance)
+            print("-"*50)
 
         return 0
     
