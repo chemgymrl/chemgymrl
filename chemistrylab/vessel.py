@@ -499,7 +499,7 @@ class Vessel:
         t=np.float32(t) #or replace dt
         # Make air layer properties
         d_air = 1.225 #in g/L
-        c_air = 0.65 #chosen color of air
+        c_air = 1.0 #chosen color of air
 
         #This is just to ensure the order of solutes does not change
         s_names = tuple(s for s in self.solute_dict)
@@ -522,7 +522,7 @@ class Vessel:
         # Add air to the end ov the volume list s.t it fills the remainder of the vessel
         layer_volume = np.array(layer_volume+[self.volume - sum(layer_volume)], dtype=np.float32)
         layer_density = np.array([mat.density_g_L for mat in layer_mats]+[d_air], dtype=np.float32)
-        self._layer_colors = np.array([mat.color for mat in layer_mats]+[c_air], dtype=np.float32)
+        self._layer_colors = np.array([mat.transmittance for mat in layer_mats]+[c_air], dtype=np.float32)
         #Exclude air since it's not a solvent?
         solvent_polarity = np.array([mat.polarity for mat in solvents], dtype=np.float32)
 

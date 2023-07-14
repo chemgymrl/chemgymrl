@@ -411,13 +411,20 @@ class pygameVisualizer():
             y (int): Position of the top right corner of ths image tile
         """
 
+        def cmap(alpha):
+            r=g=b=np.clip(alpha*10-9,0,1)*200+55
+            return np.array((r,g,b),dtype=np.uint8)
+
         tol = vessel.volume/200
-        cvals = np.array([mat.color for mat in vessel._layer_mats if mat.volume_L>tol]+[0.65])
+        cvals = np.array([mat.transmittance for mat in vessel._layer_mats if mat.volume_L>tol]+[1.0])
+
+        cvals = cmap(cvals)
+
         cnames = [mat._name for mat in vessel._layer_mats if mat.volume_L>tol]+["air"]
         for i,name in enumerate(cnames):
             #cache the rendered text to save time
             if not name in self.misc_text:
-                color = (255*cvals[i],128*cvals[i]+100,128*cvals[i]+100)
+                color = cvals[:,i]
                 # Drawing Rectangle
                 im = self._prerender_text(" "*6+name,self.w/20)
                 pygame.draw.rect(im, color, pygame.Rect(self.w/50, self.w/240, self.w/40, self.w/40))
@@ -427,10 +434,10 @@ class pygameVisualizer():
 
 
         im = np.zeros([1,100,3],dtype=np.uint8)
-
-        im[:] = vessel.get_layers()[None,::-1,None]*255
-        im[:,:,1:] = im[:,:,1:]/2
-        im[:,:,1:]+=100
+        
+        im[:] = cmap(vessel.get_layers()[::-1]).T
+        #im[:,:,1:] = im[:,:,1:]/2
+        #im[:,:,1:]+=100
 
         surf = pygame.surfarray.make_surface(im)
         surf = pygame.transform.scale(surf,(self.w/2,self.w*5/6))

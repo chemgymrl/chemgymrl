@@ -360,8 +360,29 @@ class SeparateTest_v0(GenBench):
             max_steps=5000
         )
 
-#    def step(self,action):
-#
-#        for key,val in self.shelf[0].solute_dict.items():
-#            print(key,val)
-#        return super().step(action)
+    def step(self,action):
+
+
+        args =  super().step(action)
+        obs = args[0]
+
+        layer_info  = obs[0:100]
+        corr0 = np.mean(layer_info[1:]*layer_info[:-1])-np.mean(layer_info[1:])*np.mean(layer_info[:-1])
+
+        var = np.var(layer_info)
+
+        correlation = (corr0+1e-6)/(var+1e-6)
+
+        eps=1e-2
+
+        coords = np.arange(layer_info.shape[0]+1)
+        y = np.sort(layer_info)
+        break_points = np.ones(y.shape[0]+1,dtype=np.bool_)
+        break_points[1:-1]=y[1:]-y[:-1] > eps
+        indices = coords[break_points]
+        clusters = tuple(y[indices[i]:indices[i+1]] for i in range(indices.shape[0]-1))
+        cluster_info = {int(x.mean()*100+0.5):x.shape[0] for x in clusters}
+
+        print(correlation, correlation>0.8, cluster_info)
+
+        return args

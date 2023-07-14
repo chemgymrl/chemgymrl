@@ -143,7 +143,8 @@ class VisualPolicy(Policy):
         #size=np.array(pyg_img.get_size())*scaler
         pyg_img = pygame.transform.scale(pyg_img, self.screen.get_size())
         self.screen.blit(pyg_img, (0, 0))
-        #pygame.event.pump()
+        
+        pygame.event.pump()
         pygame.display.flip()
 
         return self.policy(observation)
@@ -463,13 +464,21 @@ if __name__ == "__main__":
     from chemistrylab.benches.extract_bench import GeneralWurtzExtract_v2 as WEBench
     from chemistrylab.benches.extract_bench import WurtzExtractDemo_v0 as WEDemo
 
-    from chemistrylab.lab.heuristics.ReactionHeuristics import WurtzReactHeuristic
+    from chemistrylab.lab.heuristics import WurtzReactHeuristic, GenWurtzExtractHeuristic, GenWurtzDistillHeuristic
 
     import pygame
 
     benches = [WRDemo(),WDDemo(), WEDemo()]
     policies = [[("Manual",ManualPolicy(bench))] for bench in benches]
     policies[0]+=[("Heuristic",VisualPolicy(benches[0],WurtzReactHeuristic()))]
+
+    extract_heuristic = GenWurtzExtractHeuristic(0,6,5,1,8,9, (0,100))
+    policies[2]+=[(("Heuristic"), VisualPolicy(benches[2],extract_heuristic))]
+
+    distill_heuristic = GenWurtzDistillHeuristic(2,3,4,5, ((0,100),(110,210),(220,320)))
+
+    policies[1]+=[(("Heuristic"), VisualPolicy(benches[1],distill_heuristic))]
+
     manager = Manager(
         benches,
         ["Reaction","Distillation", "Extraction"],
