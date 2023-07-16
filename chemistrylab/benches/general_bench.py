@@ -243,10 +243,11 @@ class GenBench(gym.Env):
 
     def _reset(self,target):
         self.shelf.reset(target)
-        self.target_material=target
+        self.set_target(target)
         return self.re_init()
-        
-        
+    
+    def set_target(self,target):
+        self.target_material=target
     
     def reset(self, *args, seed=None, options=None):
 

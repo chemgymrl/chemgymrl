@@ -109,6 +109,8 @@ class GenWurtzExtractHeuristic(Policy):
         clusters = tuple(y[indices[i]:indices[i+1]] for i in range(indices.shape[0]-1))
         cluster_info = {int(x.mean()*1000+0.5):x.shape[0] for x in clusters}
 
+        correlation+=len(cluster_info)/(layer_info.shape[0]-1)
+
         return correlation, cluster_info
 
     def choose_action(self,observation):

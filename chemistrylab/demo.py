@@ -8,6 +8,7 @@ if __name__ == "__main__":
     from gymnasium.utils.play import play
     #Visualization.set_backend("numba")
     Visualization.set_backend("pygame")
+    #Visualization.toggle_custom_colors()
 
     Visualization.matplotVisualizer.legend_update_delay=1
 

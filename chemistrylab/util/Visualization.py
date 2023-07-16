@@ -285,6 +285,31 @@ class matplotVisualizer():
         fig.tight_layout()
         plt.show()
 
+
+CUSTOMCOLORS = {
+
+    "CCCCCC":           np.array([222, 229, 166],dtype=np.uint8),
+    "O":                np.array([136, 194, 229],dtype=np.uint8),
+    "CCOCC":            np.array([166, 229, 136],dtype=np.uint8),
+    "[Na+].[Cl-]":      np.array([212, 213, 211],dtype=np.uint8),
+    "CCCCCCCCCCCC":     np.array([188, 202, 157],dtype=np.uint8),
+    "CCCCCCC(C)CCCC":   np.array([175, 194, 132],dtype=np.uint8),
+    "CCCCCCC(CC)CCC":   np.array([163, 187, 106],dtype=np.uint8),
+    "CCCCC(C)C(C)CCCC": np.array([159, 198, 70 ],dtype=np.uint8),
+    "CCCCC(C)C(CC)CCC": np.array([172, 209, 31 ],dtype=np.uint8),
+    "CCCC(CC)C(CC)CCC": np.array([167, 213, 0  ],dtype=np.uint8),
+    "CCCCCCCl":         np.array([202, 212, 167],dtype=np.uint8),
+    "CCCCC(C)Cl":       np.array([189, 197, 158],dtype=np.uint8),
+    "CCCC(CC)Cl":       np.array([172, 180, 145],dtype=np.uint8),
+}
+
+
+
+
+
+
+
+
 class pygameVisualizer():
     """
     Class to visualize the chemistry benches.
@@ -416,15 +441,23 @@ class pygameVisualizer():
             return np.array((r,g,b),dtype=np.uint8)
 
         tol = vessel.volume/200
-        cvals = np.array([mat.transmittance for mat in vessel._layer_mats if mat.volume_L>tol]+[1.0])
 
-        cvals = cmap(cvals)
+        # TODO: Think of a flag to set globally for this
+        if not CUSTOM_COLORS:
+            cvals = np.array([mat.transmittance for mat in vessel._layer_mats if mat.volume_L>tol]+[1.0])
+            cvals = cmap(cvals).T
+        else:
+            null_color = np.ones(3,dtype=np.uint8)
+            legend = np.array([CUSTOMCOLORS.get(mat._smiles,null_color) for mat in vessel._layer_mats]+[null_color*255])
+            def color_hash(indices):
+                return legend[indices]
+            cvals = np.array([CUSTOMCOLORS.get(mat._smiles,null_color) for mat in vessel._layer_mats if mat.volume_L>tol]+[null_color*255])
 
         cnames = [mat._name for mat in vessel._layer_mats if mat.volume_L>tol]+["air"]
         for i,name in enumerate(cnames):
             #cache the rendered text to save time
             if not name in self.misc_text:
-                color = cvals[:,i]
+                color = cvals[i]
                 # Drawing Rectangle
                 im = self._prerender_text(" "*6+name,self.w/20)
                 pygame.draw.rect(im, color, pygame.Rect(self.w/50, self.w/240, self.w/40, self.w/40))
@@ -435,7 +468,12 @@ class pygameVisualizer():
 
         im = np.zeros([1,100,3],dtype=np.uint8)
         
-        im[:] = cmap(vessel.get_layers()[::-1]).T
+        if not CUSTOM_COLORS:
+            im[:] = cmap(vessel.get_layers()[::-1]).T
+        else:
+            vessel.get_layers()
+            im[:] = color_hash(vessel._hashed_layers[::-1])
+
         #im[:,:,1:] = im[:,:,1:]/2
         #im[:,:,1:]+=100
 
@@ -506,6 +544,11 @@ def use_mpl_light(size=2):
         'axes.edgecolor':'black', 'axes.labelcolor':'black',
         'text.color':'black','xtick.color':'black',
         'ytick.color':'black','font.size': 12*RES, 'figure.figsize': (size*8,size*4)})
+
+CUSTOM_COLORS=True
+def toggle_custom_colors():
+    global CUSTOM_COLORS
+    CUSTOM_COLORS = not CUSTOM_COLORS
 
 def Visualizer(char_bench):
     return __backends[__backend](char_bench)

@@ -29,7 +29,7 @@ class Policy():
         raise NotImplementedError
 
 class Manager():
-    def __init__(self, benches: Tuple[GenBench], bench_names: Tuple[str], bench_agents: Tuple[dict]):
+    def __init__(self, benches: Tuple[GenBench], bench_names: Tuple[str], bench_agents: Tuple[dict], targets: Tuple[str]):
         self.benches=benches
         self.bench_names=bench_names
         for b in self.benches:
@@ -37,6 +37,7 @@ class Manager():
         self.hand = []
         self.shelf = Shelf([],n_working=0)
         self.bench_agents = bench_agents
+        self.targets=targets
     
     def swap_vessels(self, bench_idx, vessel_idx):
         if bench_idx<0:
@@ -52,6 +53,18 @@ class Manager():
             if vessel_idx<len(bench.shelf):
                 self.hand.append(bench.shelf.pop(vessel_idx))
 
+    def insert_vessel(self, bench_idx, vessel_idx):
+        if len(self.hand)==0:return
+        if bench_idx<0:
+            bench = self
+        else:
+            bench = self.benches[bench_idx]
+
+        bench.shelf.insert(vessel_idx, self.hand.pop())
+
+    
+    def set_target(self, bench_idx, target_idx):
+        self.benches[bench_idx].set_target(self.targets[target_idx])
 
     def use_bench(self, bench, policy):
         #prep the bench
@@ -157,19 +170,22 @@ class Button():
         self.text=text
         self.font = pygame.font.SysFont('Arial', int(height*2/3))
         self.surf = pygame.Surface((width, height))
-        self.surf.fill(color)
+        self.color,self.hover = color,hover
+        
         self.hover_surf = pygame.Surface((width, height))
-        self.hover_surf.fill(hover)
+        
         self.pos=np.zeros(2)-1000
-        if text is not None:
-            text_render = self.font.render(text, True, (0,0,0))
-
-            offset = (np.array([width,height])-np.array(text_render.get_size()))/2
-
-            self.surf.blit(text_render,offset)
-            self.hover_surf.blit(text_render,offset)
         self.dim = np.array([width,height])
-
+        if text is not None:
+            self.set_text(text)
+    def set_text(self, text):
+        self.surf.fill(self.color)
+        self.hover_surf.fill(self.hover)
+        width,height = self.dim
+        text_render = self.font.render(text, True, (0,0,0))
+        offset = (np.array([width,height])-np.array(text_render.get_size()))/2
+        self.surf.blit(text_render,offset)
+        self.hover_surf.blit(text_render,offset)
     def show(self, screen, pos):
         screen.blit(self.surf,pos)
         self.pos = np.array(pos)
@@ -184,15 +200,28 @@ class Button():
 
 class Inventory():
     flasks = []
-    def __init__(self, dx, dy, shelf, boxsize = 100):
+    def __init__(self, dx, dy, shelf, boxsize = 100, name = ""):
         self.dx=dx
         self.dy=dy
         self.shelf=shelf
         self.boxsize = boxsize
+
+        self.make_text(name, boxsize)
         self.update()
         self.hover = pygame.Surface((boxsize*1.05,boxsize*1.05)).convert_alpha()
         self.hover.fill((255,255,255,128))
         self.pos=np.zeros(2)
+
+    def make_text(self, name, boxsize):
+
+        self.font = pygame.font.SysFont('Arial', int(boxsize/3))
+        self.text_render = self.font.render(name, True, (0,0,0))
+        self.text_surf = pygame.Surface((self.dx*boxsize+boxsize/20, (0.5)*boxsize))
+        self.text_surf.fill((255,255,255))
+        tsize=self.text_render.get_size()
+        ssize = self.text_surf.get_size()
+        offset = (ssize[0]-tsize[0])/2 , (ssize[1] - tsize[1])/2
+        self.text_surf.blit(self.text_render,offset)
 
     def vessel_thumbnails(self,vessels):
         """Simple image representation of a vessel"""
@@ -208,6 +237,22 @@ class Inventory():
             thumbnails.append(surf)
         return thumbnails
     
+    def get_shelf_idx(self,i):
+        return len([k for k,v in self.positions.items() if k<i])
+
+    def inplace_update(self, i, shelf_idx):
+        """Rearrange the dictionary of filled slots so that no vessels move when one was added/removed"""
+        self.items = self.vessel_thumbnails(self.shelf)
+        if shelf_idx<0:
+            self.render_inventory()
+            return
+        if i in self.positions:
+            self.positions = {k : v - (k>i) for k,v in self.positions.items()}
+            del self.positions[i]
+        else:
+            self.positions = {k : v + (k>i) for k,v in self.positions.items()}
+            self.positions[i] = shelf_idx
+        self.render_inventory()
     def update(self):
         self.items = self.vessel_thumbnails(self.shelf)
         self.positions = {i:i for i in range(len(self.items))}
@@ -219,10 +264,12 @@ class Inventory():
         box = pygame.Surface((boxsize*1.05,boxsize*1.05))
         rect = pygame.Rect(boxsize/20,boxsize/20,boxsize*0.95,boxsize*0.95)
         gfxdraw.box(box,rect,(255,255,255))
-        surf = pygame.Surface((self.dx*boxsize+boxsize/20, self.dy*boxsize+boxsize/20))
+        surf = pygame.Surface((self.dx*boxsize+boxsize/20, (self.dy+0.5)*boxsize+boxsize/20))
+
+        surf.blit(self.text_surf,(0,0))
         for x in range(self.dx):
             for y in range(self.dy):
-                surf.blit(box,(x*boxsize,y*boxsize))
+                surf.blit(box,(x*boxsize,(y+0.5)*boxsize))
         #items should be a list of surfaces
         # TODO: make sure they fit into the box
         for i,pos in self.positions.items():
@@ -230,7 +277,7 @@ class Inventory():
                 break
             item = self.items[pos]
             sx,sy=item.get_size()
-            surf.blit(item,((i%self.dx)*boxsize+(boxsize-sx)/2,(i//self.dx)*boxsize+(boxsize-sy)/2))
+            surf.blit(item,((i%self.dx)*boxsize+(boxsize-sx)/2,(i//self.dx+0.5)*boxsize+(boxsize-sy)/2))
 
         self.surf = surf
         return surf
@@ -246,11 +293,11 @@ class Inventory():
             idx = self.check_hover(pygame.mouse.get_pos())
         if idx>=0:
             x = idx%self.dx
-            y = idx//self.dx
+            y = idx//self.dx+0.5
             screen.blit(self.hover,self.pos+(x*self.boxsize,y*self.boxsize))
 
     def check_hover(self, mousepos):
-        startpos=self.pos
+        startpos=self.pos + (0,self.boxsize/2)
         boxsize=self.boxsize
         slot = np.floor((mousepos-startpos)/boxsize)
         bds = np.array([self.dx,self.dy])
@@ -366,20 +413,40 @@ class ManagerGui():
                     self.display_char_bench()
                     return
             return
-                
-        idx = self.bench_inventories[self.bench_idx].check_hover(xy)
+        
+        inventory = self.bench_inventories[self.bench_idx]
+        idx = inventory.check_hover(xy)
         if idx>=0:
-            self.manager.swap_vessels(self.bench_idx, idx)
-            self.bench_inventories[self.bench_idx].update()
+            shelf_idx = inventory.get_shelf_idx(idx)
+            has_in_hand = len(self.manager.hand)>0
+            # swap if it's in the shelf
+            if idx in inventory.positions:
+                self.manager.swap_vessels(self.bench_idx, shelf_idx)
+            # Insert otherwise
+            elif has_in_hand:
+                self.manager.insert_vessel(self.bench_idx, shelf_idx)
+
+            if idx in inventory.positions and has_in_hand or (not idx in inventory.positions and not has_in_hand):
+                shelf_idx=-1
+
+            inventory.inplace_update(idx, shelf_idx)
             self.hand_inventory.update()
 
         for i,button in enumerate(self.bench_buttons):
             if button.check_hover(xy):
                 name, policy = self.manager.bench_agents[self.bench_idx][i]
                 code = self.manager.use_bench(self.manager.benches[self.bench_idx],policy)
-                self.bench_inventories[self.bench_idx].update()
+                self.bench_inventories[self.bench_idx].inplace_update(0,-1)
                 if code<0:
                     self.display_err_message("Invalid Bench Setup")
+
+        if self.bench_idx< len(self.bench_targets):
+            target_button = self.bench_targets[self.bench_idx]
+            if target_button.check_hover(xy):
+                N = len(self.manager.targets)
+                target_button.idx = (target_button.idx+1)%N
+                self.manager.set_target(self.bench_idx,target_button.idx)
+                target_button.set_text("Target: "+self.manager.targets[target_button.idx])
 
     def render(self):
 
@@ -392,8 +459,12 @@ class ManagerGui():
             self.bench = pygame.image.load(ASSETS_PATH+"drawing.svg").convert_alpha()
 
             self.bench_titles = []
+            self.bench_targets = []
             for i in range(len(self.manager.benches)):
                 self.bench_titles.append(Button(141,29, text = self.manager.bench_names[i], color="#888888", hover = "#dddddd"))
+                self.bench_targets.append(Button(280,30, text = "Target: "+self.manager.targets[0], color="#8888FF", hover = "#ccccff"))
+                self.bench_targets[i].idx = 0
+                self.manager.set_target(i,0)
 
             self.bench_titles.append(Button(141,29, text = "Characterization",color="#888888", hover="#dddddd"))
 
@@ -406,7 +477,8 @@ class ManagerGui():
                 tmp = pygame.image.load(ASSETS_PATH+f"vessels/rflask_{i}.png").convert_alpha()
                 Inventory.flasks.append(pygame.transform.scale(tmp,(80,70)))
 
-            self.bench_inventories = [Inventory(5, 2, bench.shelf) for bench in self.manager.benches]
+            inv_names = [n+" Bench Inventory" for n in self.manager.bench_names]
+            self.bench_inventories = [Inventory(5, 2, bench.shelf,name=inv_names[i]) for i,bench in enumerate(self.manager.benches)]
             self.hand_inventory = Inventory(1,1,self.manager.hand)
             self.shelf_inventory = Inventory(4,1,self.manager.shelf)
 
@@ -424,7 +496,7 @@ class ManagerGui():
         self.screen.blit(surf,(0,0))
         self.render_benches()
 
-        self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-(410,110))
+        self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-(410,160))
 
         if self.hand_inventory.items:
             offset = np.array(self.hand_inventory.items[0].get_size())/2
@@ -443,11 +515,23 @@ class ManagerGui():
                 b.show_hover(self.screen,pos-self.cam+(12,20))
             else:
                 b.show(self.screen,pos-self.cam+(12,20))
+
+
         if self.bench_idx is not None:
             #Might change this (right now characterization bench isnt included in benches)
             if self.bench_idx<len(self.manager.benches):
                 inventory = self.bench_inventories[self.bench_idx]
                 inventory.show_hover(self.screen,(0,0))
+
+                t = self.bench_targets[self.bench_idx]
+                pos=self.benchpos[self.bench_idx]
+                if t.check_hover(np.array(pygame.mouse.get_pos())):
+                    t.show_hover(self.screen,(10,300))
+                else:
+                    t.show(self.screen,(10,300))
+
+
+
             buttonpos = self.benchpos[self.bench_idx]+np.array((0,-30)-self.cam)
             for idx, button in enumerate(self.bench_buttons):
                 if button.check_hover(np.array(pygame.mouse.get_pos())):
@@ -465,7 +549,7 @@ if __name__ == "__main__":
     from chemistrylab.benches.extract_bench import WurtzExtractDemo_v0 as WEDemo
 
     from chemistrylab.lab.heuristics import WurtzReactHeuristic, GenWurtzExtractHeuristic, GenWurtzDistillHeuristic
-
+    from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
     import pygame
 
     benches = [WRDemo(),WDDemo(), WEDemo()]
@@ -479,10 +563,13 @@ if __name__ == "__main__":
 
     policies[1]+=[(("Heuristic"), VisualPolicy(benches[1],distill_heuristic))]
 
+    targets = ReactInfo.from_json(REACTION_PATH+"/chloro_wurtz.json").PRODUCTS
+
     manager = Manager(
         benches,
         ["Reaction","Distillation", "Extraction"],
-        policies
+        policies,
+        targets
         )
 
     gui = ManagerGui(manager)
