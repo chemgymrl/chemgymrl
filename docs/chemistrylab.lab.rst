@@ -6,4 +6,7 @@ chemistrylab.lab package
    :undoc-members:
    :show-inheritance:
 
-
+.. automodule:: chemistrylab.lab.manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
