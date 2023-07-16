@@ -7,19 +7,17 @@ Welcome to chemistrygym's documentation!
 ========================================
 
 .. image:: tutorial_figures/chemgymrl.svg
-  :width: 400
+  :width: 600
   :alt: ChemGymRL
 
 
-A chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the OpenAI Gym environment framework for use with reinforcement learning applications.
+ChemGymRL is a chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the OpenAI Gym environment framework for use with reinforcement learning applications.
 
-ChemGymRL is an environment created to train Reinforcement Learning agents to perform realistic operations in a virtual chemistry lab environment. Such operations are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
-
-
+It was created to train Reinforcement Learning agents to perform realistic operations in a virtual chemistry lab environment. Such operations are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
 
 .. image:: tutorial_figures/ChemLabLabOverview.png
-  :width: 400
-  :alt: ChemGymRL
+  :width: 600
+  :alt: Lab Overview
 
 
 
