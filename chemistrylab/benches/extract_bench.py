@@ -135,15 +135,15 @@ def oil_vessel():
 def make_solvent(mat):
     "Makes a Vessel with a single material"
 
-    solvent_class = material.REGISTRY[mat]()
+    solvent = material.REGISTRY[mat](mol=1.0)
 
     solvent_vessel = vessel.Vessel(
-        label=f'{solvent_class._name} Vessel',
+        label=f'{solvent._name} Vessel',
     )
     # create the material dictionary for the solvent vessel
     
-    solvent_class.mol=1e6
-    solvent_vessel.material_dict = {mat:solvent_class}
+    solvent.mol=(2/solvent.volume_L)
+    solvent_vessel.material_dict = {mat:solvent}
     # instruct the vessel to update its material dictionary
     solvent_vessel.volume = solvent_vessel.filled_volume()
     return solvent_vessel

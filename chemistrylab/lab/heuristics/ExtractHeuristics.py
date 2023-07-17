@@ -116,7 +116,7 @@ class GenWurtzExtractHeuristic(Policy):
     def choose_action(self,observation):
         correlation, cluster_info = self.get_layer_info(observation)
 
-        print(cluster_info,correlation)
+        #print(cluster_info,correlation)
 
         polar_amount = cluster_info.get(self.polar_color,0)
 

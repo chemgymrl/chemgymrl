@@ -20,6 +20,8 @@ class Shelf:
         self._orig_vessels=[v for v in vessels]
         assert n_working<=len(self._orig_vessels)
         self.n_working = n_working
+        self._length = len(self._orig_vessels)
+
         self.reset()
 
     def get_working_vessels(self):
@@ -28,15 +30,22 @@ class Shelf:
     def get_vessels(self):
         return tuple(self.vessels)
     def pop(self,index=-1):
+
+        index = index%len(self.vessels)
+        if index< self.tmp_working:
+            self.tmp_working-=1
         return self.vessels.pop(index)
-    def insert(self, vessel, index):
-        self.vessels.insert(vessel, index)
+        
+    def insert(self, index, vessel):
+        self.vessels.insert(index, vessel)
+        if index<=self.tmp_working and self.tmp_working<self.n_working:
+            self.tmp_working+=1
     def __getitem__(self, slice):
         return self.vessels[slice]
     def __setitem__(self, slice, item):
         self.vessels[slice] = item
-    def __delitem__(self, slice):
-        del self.vessels[slice]
+    #def __delitem__(self, slice):
+    #    del self.vessels[slice]
     def __len__(self):
         return len(self.vessels)
     def append(self,vessel: Vessel):
@@ -59,7 +68,10 @@ class Shelf:
         Resets the shelf to it's initial state
         """
         self.vessels=[deepcopy(v) for v in self._orig_vessels]
+        self.tmp_working = self.n_working
 
+    def restock(self, target = None):
+        self.vessels=self.vessels[:self.tmp_working]+[deepcopy(v) for v in self._orig_vessels[self.n_working:]]
 
 
 class VariableShelf(Shelf):
@@ -90,3 +102,14 @@ class VariableShelf(Shelf):
         
         self.vessels = variable + [deepcopy(v) for v in self.fixed_vessels]
 
+        self.tmp_working=self.n_working
+    def restock(self, target = None):
+
+        self.vessels=self.vessels[:self.tmp_working]
+        n_variable = len(self.variable_vessels)
+
+        for i in range(self.n_working,self._length):
+            if i < n_variable:
+                self.vessels.append(self.variable_vessels[i](target))
+            else:
+                self.vessels.append(deepcopy(self.fixed_vessels[i-n_variable]))

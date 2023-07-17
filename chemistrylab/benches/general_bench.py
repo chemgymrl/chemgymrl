@@ -248,6 +248,8 @@ class GenBench(gym.Env):
     
     def set_target(self,target):
         self.target_material=target
+    def get_target(self):
+        return self.target_material
     
     def reset(self, *args, seed=None, options=None):
 

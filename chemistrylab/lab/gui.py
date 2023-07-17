@@ -93,10 +93,26 @@ class VisualPolicy(Policy):
 
 
 class Button():
-    def __init__(self, width, height, color = '#66c666', hover = "#66FF66",  text=None):
+    def __init__(self, width, height, color = '#66c666', hover = "#66FF66",  text=None, fs=None):
+        """
+        Class for making a gui button
+
+        Args:
+            width (int): The width of the button
+            height (int): The height of the button
+            color (str): The regular color of the button in hex
+            hover (str): The color of the button (in hex) when you hover your mouse
+            text (Optional[str]): Any text you want to display in the button
+            fs (Optional[int]): The font size of the text you display (will be set to 2/3 height if left empty)
         
+        """
+
         self.text=text
-        self.font = pygame.font.SysFont('Arial', int(height*2/3))
+
+        if fs is None:
+            fs = int(height*2/3)
+
+        self.font = pygame.font.SysFont('Arial', fs)
         self.surf = pygame.Surface((width, height))
         self.color,self.hover = color,hover
         
@@ -183,7 +199,8 @@ class Inventory():
         self.render_inventory()
     def update(self):
         self.items = self.vessel_thumbnails(self.shelf)
-        self.positions = {i:i for i in range(len(self.items))}
+        work_diff = self.shelf.n_working - self.shelf.tmp_working
+        self.positions = {i + (i>=self.shelf.tmp_working)*(work_diff):i for i in range(len(self.items))}
         self.render_inventory()
 
     def render_inventory(self):
@@ -265,12 +282,8 @@ class ManagerGui():
                 print(event)
                 xy = np.array(event.pos)
 
-                idx = self.shelf_inventory.check_hover(xy)
-                if idx>=0:
-                    self.manager.swap_vessels(-1, idx)
-                    self.shelf_inventory.update()
-                    self.hand_inventory.update()
-                    return
+
+                self.move_vessel(-1,self.shelf_inventory, xy)
                 
                 sxy = np.array(self.bench.get_size())
                 for i,pos in enumerate(self.benchpos):
@@ -279,9 +292,9 @@ class ManagerGui():
                     if self.bench_titles[i].check_hover(xy):
                         self.bench_idx = i
                         if i<len(self.manager.benches):
-                            self.bench_buttons = [Button(40,20, text = name) for name, p in self.manager.bench_agents[i]]
+                            self.bench_buttons = [Button(50,25, text = name, fs=12) for name, p in self.manager.bench_agents[i]]
                         else:
-                            self.bench_buttons = [Button(40,20, text = a) for a in ["layers","spectra","PVT"]]
+                            self.bench_buttons = [Button(50,25, text = a, fs=12) for a in ["layers","spectra","PVT"]]
                         return
                 if self.bench_idx is not None:
                     self.handle_bench_click(xy)
@@ -331,6 +344,25 @@ class ManagerGui():
             pygame.display.flip()
             if any([(event.type == pygame.MOUSEBUTTONDOWN and event.button==1) for event in pygame.event.get()]):
                 return
+
+    def move_vessel(self, bench_idx, inventory, xy):
+        idx = inventory.check_hover(xy)
+        if idx>=0:
+            shelf_idx = inventory.get_shelf_idx(idx)
+            has_in_hand = len(self.manager.hand)>0
+            # swap if it's in the shelf
+            if idx in inventory.positions:
+                self.manager.swap_vessels(bench_idx, shelf_idx)
+            # Insert otherwise
+            elif has_in_hand:
+                self.manager.insert_vessel(bench_idx, shelf_idx)
+
+            if idx in inventory.positions and has_in_hand or (not idx in inventory.positions and not has_in_hand):
+                shelf_idx=-1
+
+            inventory.inplace_update(idx, shelf_idx)
+            self.hand_inventory.update()
+
     def handle_bench_click(self, xy):
         """Check if mouse-clicks interact with a bench / inventory menu"""
         # Handle observation display
@@ -342,23 +374,7 @@ class ManagerGui():
                     return
             return
         
-        inventory = self.bench_inventories[self.bench_idx]
-        idx = inventory.check_hover(xy)
-        if idx>=0:
-            shelf_idx = inventory.get_shelf_idx(idx)
-            has_in_hand = len(self.manager.hand)>0
-            # swap if it's in the shelf
-            if idx in inventory.positions:
-                self.manager.swap_vessels(self.bench_idx, shelf_idx)
-            # Insert otherwise
-            elif has_in_hand:
-                self.manager.insert_vessel(self.bench_idx, shelf_idx)
-
-            if idx in inventory.positions and has_in_hand or (not idx in inventory.positions and not has_in_hand):
-                shelf_idx=-1
-
-            inventory.inplace_update(idx, shelf_idx)
-            self.hand_inventory.update()
+        self.move_vessel(self.bench_idx, self.bench_inventories[self.bench_idx], xy)
 
         for i,button in enumerate(self.bench_buttons):
             if button.check_hover(xy):
@@ -375,6 +391,10 @@ class ManagerGui():
                 target_button.idx = (target_button.idx+1)%N
                 self.manager.set_target(self.bench_idx,target_button.idx)
                 target_button.set_text("Target: "+self.manager.targets[target_button.idx])
+
+            if self.restock_button.check_hover(xy):
+                self.manager.restock_bench(self.bench_idx)
+                self.bench_inventories[self.bench_idx].update()
 
     def render(self):
 
@@ -393,6 +413,8 @@ class ManagerGui():
                 self.bench_targets.append(Button(280,30, text = "Target: "+self.manager.targets[0], color="#8888FF", hover = "#ccccff"))
                 self.bench_targets[i].idx = 0
                 self.manager.set_target(i,0)
+
+            self.restock_button = Button(80,30, text = "Restock", color="#8888FF", hover = "#ccccff")
 
             self.bench_titles.append(Button(141,29, text = "Characterization",color="#888888", hover="#dddddd"))
 
@@ -453,16 +475,22 @@ class ManagerGui():
 
                 t = self.bench_targets[self.bench_idx]
                 pos=self.benchpos[self.bench_idx]
-                if t.check_hover(np.array(pygame.mouse.get_pos())):
+                xy = np.array(pygame.mouse.get_pos())
+                if t.check_hover(xy):
                     t.show_hover(self.screen,(10,300))
                 else:
                     t.show(self.screen,(10,300))
 
+                if self.restock_button.check_hover(xy):
+                    self.restock_button.show_hover(self.screen,(300,300))
+                else:
+                    self.restock_button.show(self.screen,(300,300))
+                
 
 
             buttonpos = self.benchpos[self.bench_idx]+np.array((0,-30)-self.cam)
             for idx, button in enumerate(self.bench_buttons):
                 if button.check_hover(np.array(pygame.mouse.get_pos())):
-                    button.show_hover(self.screen,buttonpos+(idx*50,0))
+                    button.show_hover(self.screen,buttonpos+(idx*55,0))
                 else:
-                    button.show(self.screen,buttonpos+(idx*50,0))
+                    button.show(self.screen,buttonpos+(idx*55,0))

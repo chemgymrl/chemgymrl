@@ -23,7 +23,7 @@ class Manager():
         self.bench_names=bench_names
         for b in self.benches:
             b.reset()
-        self.hand = []
+        self.hand = Shelf([],n_working=0)
         self.shelf = Shelf([],n_working=0)
         self.bench_agents = bench_agents
         self.targets=targets
@@ -79,6 +79,15 @@ class Manager():
         
         """
         self.benches[bench_idx].set_target(self.targets[target_idx])
+
+    def restock_bench(self,bench_idx):
+        """
+        Restocks the shelf of a specified bench.
+
+        NOTE: I may modify this later
+        """
+        bench =  self.benches[bench_idx]
+        bench.shelf.restock(bench.get_target())
 
     def use_bench(self, bench, policy):
         """
