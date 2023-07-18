@@ -348,10 +348,15 @@ class ManagerGui():
     def display_bench_controls(self):
         bench = self.manager.benches[self.bench_idx]
         table = ActionDoc.generate_table(bench.shelf,bench.actions)
-
+        for i in range(10):
+            table = table.replace(f"     {i}",f"Key: {(i+1)%10}")
         font = pygame.font.SysFont('consolas', 15)
         self.screen.fill((255,255,255))
-        for i,line in enumerate(table.split("\n")+["","Click to Continue. . ."]):
+        extra_instruct = """
+        Use the Number Keys to perform actions
+
+        Click to Continue. . ."""
+        for i,line in enumerate(table.split("\n")+extra_instruct.split("\n")):
             text = font.render(line, True, (0,0,0))
             self.screen.blit(text, ((self.video_size[0]-text.get_size()[0])/2,i*15))
 
