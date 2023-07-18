@@ -8,7 +8,7 @@ from typing import NamedTuple, Tuple, Callable, Optional, List
 from chemistrylab.benches.general_bench import *
 from chemistrylab.benches.characterization_bench import CharacterizationBench
 from chemistrylab.lab.shelf import Shelf
-
+from chemistrylab.vessel import Vessel
 
 class Manager():
     def __init__(self, benches: Tuple[GenBench], bench_names: Tuple[str], bench_agents: Tuple, targets: Tuple[str]):
@@ -50,6 +50,14 @@ class Manager():
         elif len(self.hand)==0:
             if vessel_idx<len(bench.shelf):
                 self.hand.append(bench.shelf.pop(vessel_idx))
+
+    def dispose_vessel(self):
+        if len(self.hand)>0:
+            self.hand.pop()
+    
+    def create_vessel(self, label = ""):
+        if len(self.hand)==0:
+            self.hand.insert(0,Vessel(label))
 
     def insert_vessel(self, bench_idx, vessel_idx):
         """

@@ -92,6 +92,8 @@ class VisualPolicy(Policy):
 
 
 
+
+
 class Button():
     def __init__(self, width, height, color = '#66c666', hover = "#66FF66",  text=None, fs=None):
         """
@@ -130,9 +132,12 @@ class Button():
         offset = (np.array([width,height])-np.array(text_render.get_size()))/2
         self.surf.blit(text_render,offset)
         self.hover_surf.blit(text_render,offset)
-    def show(self, screen, pos):
-        screen.blit(self.surf,pos)
+    def show(self, screen, pos, mousepos = None):
         self.pos = np.array(pos)
+        if (mousepos is not None) and self.check_hover(mousepos):
+            screen.blit(self.hover_surf,pos)
+        else:
+            screen.blit(self.surf,pos)
     def show_hover(self,screen, pos):
         screen.blit(self.hover_surf,pos)
         self.pos = np.array(pos)
@@ -140,6 +145,24 @@ class Button():
         mpos = np.array(mousepos)
         return all((mpos>=self.pos)&(mpos-self.pos<=self.dim))
 
+
+class ImageButton(Button):
+    def __init__(self, image, hover = None):
+
+        self.dim = np.array(image.get_size())
+        self.surf = image
+        if hover is None:
+
+            imarr = pygame.surfarray.array_alpha(image)
+            #imarr = np.stack([imarr]*4,axis=-1)
+            self.hover_surf = pygame.Surface(self.dim)
+            self.hover_surf.blit(self.surf,(0,0))
+            self.hover = pygame.Surface(self.dim).convert_alpha()
+            self.hover.fill((255,255,255,128))
+            self.hover_surf.blit(self.hover,(0,0))
+            #pygame.surfarray.blit_array(self.hover_surf,imarr)
+        else:
+            self.hover_surf = hover
 
 
 class Inventory():
@@ -282,6 +305,13 @@ class ManagerGui():
                 print(event)
                 xy = np.array(event.pos)
 
+                if self.trash_button.check_hover(xy):
+                    self.manager.dispose_vessel()
+                    self.hand_inventory.update()
+
+                if self.new_vessel_button.check_hover(xy):
+                    self.manager.create_vessel()
+                    self.hand_inventory.update()
 
                 self.move_vessel(-1,self.shelf_inventory, xy)
                 
@@ -467,7 +497,18 @@ class ManagerGui():
                     if (type(policy) is ManualPolicy) or (type(policy) is VisualPolicy):
                         policy.screen=self.screen
 
+            garbage = pygame.image.load(ASSETS_PATH+"garbage.png").convert_alpha()
 
+            garbage = pygame.transform.scale(garbage,(166,194))
+            garbage2 = pygame.image.load(ASSETS_PATH+"angy_garbage.png").convert_alpha()
+            garbage2 = pygame.transform.scale(garbage2,(166,194))
+            self.trash_button = ImageButton(garbage, garbage2)
+
+            dispenser  = pygame.image.load(ASSETS_PATH+"restock.png").convert_alpha()
+            dispenser = pygame.transform.scale(dispenser,(248,204))
+            self.new_vessel_button = ImageButton(dispenser)
+
+        
 
         surf = pygame.Surface(self.video_size)
         surf.fill((255, 255, 255))
@@ -475,7 +516,8 @@ class ManagerGui():
         self.render_benches()
 
         self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-(410,160))
-
+        self.trash_button.show(self.screen, (self.video_size[0]-166,0) ,pygame.mouse.get_pos())
+        self.new_vessel_button.show(self.screen, (self.video_size[0]-424,0) ,pygame.mouse.get_pos())
         if self.hand_inventory.items:
             offset = np.array(self.hand_inventory.items[0].get_size())/2
             self.screen.blit(self.hand_inventory.items[0],-offset+pygame.mouse.get_pos())
@@ -486,14 +528,10 @@ class ManagerGui():
         pygame.display.flip()
     
     def render_benches(self):
+        xy = np.array(pygame.mouse.get_pos())
         for i,pos in enumerate(self.benchpos):
             self.screen.blit(self.bench,pos-self.cam)
-            b = self.bench_titles[i]
-            if b.check_hover(np.array(pygame.mouse.get_pos())):
-                b.show_hover(self.screen,pos-self.cam+(12,20))
-            else:
-                b.show(self.screen,pos-self.cam+(12,20))
-
+            self.bench_titles[i].show(self.screen,pos-self.cam+(12,20), xy)
 
         if self.bench_idx is not None:
             #Might change this (right now characterization bench isnt included in benches)
@@ -503,22 +541,9 @@ class ManagerGui():
 
                 t = self.bench_targets[self.bench_idx]
                 pos=self.benchpos[self.bench_idx]
-                xy = np.array(pygame.mouse.get_pos())
-                if t.check_hover(xy):
-                    t.show_hover(self.screen,(10,300))
-                else:
-                    t.show(self.screen,(10,300))
-
-                if self.restock_button.check_hover(xy):
-                    self.restock_button.show_hover(self.screen,(300,300))
-                else:
-                    self.restock_button.show(self.screen,(300,300))
+                t.show(self.screen,(10,300),xy)
+                self.restock_button.show(self.screen,(300,300),xy)
                 
-
-
             buttonpos = self.benchpos[self.bench_idx]+np.array((0,-30)-self.cam)
             for idx, button in enumerate(self.bench_buttons):
-                if button.check_hover(np.array(pygame.mouse.get_pos())):
-                    button.show_hover(self.screen,buttonpos+(idx*55,0))
-                else:
-                    button.show(self.screen,buttonpos+(idx*55,0))
+                button.show(self.screen,buttonpos+(idx*55,0), xy)
