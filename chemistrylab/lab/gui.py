@@ -4,7 +4,7 @@ import numpy as np
 from chemistrylab.util.Visualization import pygameVisualizer
 from typing import NamedTuple, Tuple, Callable, Optional, List
 import os
-
+from chemistrylab.util import Visualization,ActionDoc
 
 ASSETS_PATH = os.path.dirname(__file__) + "/assets/"
 
@@ -379,6 +379,11 @@ class ManagerGui():
         for i,button in enumerate(self.bench_buttons):
             if button.check_hover(xy):
                 name, policy = self.manager.bench_agents[self.bench_idx][i]
+
+                bench = self.manager.benches[self.bench_idx]
+                table = ActionDoc.generate_table(bench.shelf,bench.actions)
+                print(table)
+
                 code = self.manager.use_bench(self.manager.benches[self.bench_idx],policy)
                 self.bench_inventories[self.bench_idx].inplace_update(0,-1)
                 if code<0:
