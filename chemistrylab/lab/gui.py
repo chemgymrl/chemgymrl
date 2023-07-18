@@ -382,7 +382,7 @@ class ManagerGui():
 
                 bench = self.manager.benches[self.bench_idx]
                 table = ActionDoc.generate_table(bench.shelf,bench.actions)
-                print(table)
+                print(table,"hi")
 
                 code = self.manager.use_bench(self.manager.benches[self.bench_idx],policy)
                 self.bench_inventories[self.bench_idx].inplace_update(0,-1)
