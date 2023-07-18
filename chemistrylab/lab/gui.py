@@ -293,9 +293,6 @@ class ManagerGui():
                         self.bench_idx = i
                         if i<len(self.manager.benches):
                             self.bench_buttons = [Button(50,25, text = name, fs=12) for name, p in self.manager.bench_agents[i]]
-                            bench = self.manager.benches[self.bench_idx]
-                            table = ActionDoc.generate_table(bench.shelf,bench.actions)
-                            print(table)
                         else:
                             self.bench_buttons = [Button(50,25, text = a, fs=12) for a in ["layers","spectra","PVT"]]
                         return
@@ -348,6 +345,26 @@ class ManagerGui():
             if any([(event.type == pygame.MOUSEBUTTONDOWN and event.button==1) for event in pygame.event.get()]):
                 return
 
+    def display_bench_controls(self):
+        bench = self.manager.benches[self.bench_idx]
+        table = ActionDoc.generate_table(bench.shelf,bench.actions)
+
+        font = pygame.font.SysFont('consolas', 15)
+        self.screen.fill((255,255,255))
+        for i,line in enumerate(table.split("\n")+["","Click to Continue. . ."]):
+            text = font.render(line, True, (0,0,0))
+            self.screen.blit(text, ((self.video_size[0]-text.get_size()[0])/2,i*15))
+
+        while True:
+            pygame.event.pump()
+            self.clock.tick(60)
+            pygame.display.flip()
+            if any([(event.type == pygame.MOUSEBUTTONDOWN and event.button==1) for event in pygame.event.get()]):
+                return
+
+
+        print(table)
+
     def move_vessel(self, bench_idx, inventory, xy):
         idx = inventory.check_hover(xy)
         if idx>=0:
@@ -383,6 +400,8 @@ class ManagerGui():
             if button.check_hover(xy):
                 name, policy = self.manager.bench_agents[self.bench_idx][i]
 
+                if name == "Manual":
+                    self.display_bench_controls()
                 code = self.manager.use_bench(self.manager.benches[self.bench_idx],policy)
                 self.bench_inventories[self.bench_idx].inplace_update(0,-1)
                 if code<0:
