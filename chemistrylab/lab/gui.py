@@ -293,6 +293,9 @@ class ManagerGui():
                         self.bench_idx = i
                         if i<len(self.manager.benches):
                             self.bench_buttons = [Button(50,25, text = name, fs=12) for name, p in self.manager.bench_agents[i]]
+                            bench = self.manager.benches[self.bench_idx]
+                            table = ActionDoc.generate_table(bench.shelf,bench.actions)
+                            print(table)
                         else:
                             self.bench_buttons = [Button(50,25, text = a, fs=12) for a in ["layers","spectra","PVT"]]
                         return
@@ -379,10 +382,6 @@ class ManagerGui():
         for i,button in enumerate(self.bench_buttons):
             if button.check_hover(xy):
                 name, policy = self.manager.bench_agents[self.bench_idx][i]
-
-                bench = self.manager.benches[self.bench_idx]
-                table = ActionDoc.generate_table(bench.shelf,bench.actions)
-                print(table,"hi")
 
                 code = self.manager.use_bench(self.manager.benches[self.bench_idx],policy)
                 self.bench_inventories[self.bench_idx].inplace_update(0,-1)
