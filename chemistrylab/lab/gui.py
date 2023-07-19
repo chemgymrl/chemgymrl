@@ -499,14 +499,16 @@ class ManagerGui():
 
             garbage = pygame.image.load(ASSETS_PATH+"garbage.png").convert_alpha()
 
-            garbage = pygame.transform.scale(garbage,(166,194))
+            garbage = pygame.transform.scale(garbage,(83,97))
             garbage2 = pygame.image.load(ASSETS_PATH+"angy_garbage.png").convert_alpha()
-            garbage2 = pygame.transform.scale(garbage2,(166,194))
+            garbage2 = pygame.transform.scale(garbage2,(83,97))
             self.trash_button = ImageButton(garbage, garbage2)
 
             dispenser  = pygame.image.load(ASSETS_PATH+"restock.png").convert_alpha()
-            dispenser = pygame.transform.scale(dispenser,(248,204))
-            self.new_vessel_button = ImageButton(dispenser)
+            dispenser = pygame.transform.scale(dispenser,(93,105))
+            dispenser2  = pygame.image.load(ASSETS_PATH+"restock_open.png").convert_alpha()
+            dispenser2 = pygame.transform.scale(dispenser2,(93,105))
+            self.new_vessel_button = ImageButton(dispenser,dispenser2)
 
         
 
@@ -516,8 +518,8 @@ class ManagerGui():
         self.render_benches()
 
         self.shelf_inventory.show_hover(self.screen, np.array(self.video_size)-(410,160))
-        self.trash_button.show(self.screen, (self.video_size[0]-166,0) ,pygame.mouse.get_pos())
-        self.new_vessel_button.show(self.screen, (self.video_size[0]-424,0) ,pygame.mouse.get_pos())
+        self.trash_button.show(self.screen, (self.video_size[0]-93,5) ,pygame.mouse.get_pos())
+        self.new_vessel_button.show(self.screen, (self.video_size[0]-200,0) ,pygame.mouse.get_pos())
         if self.hand_inventory.items:
             offset = np.array(self.hand_inventory.items[0].get_size())/2
             self.screen.blit(self.hand_inventory.items[0],-offset+pygame.mouse.get_pos())
