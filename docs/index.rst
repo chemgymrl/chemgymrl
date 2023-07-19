@@ -48,7 +48,7 @@ Welcome to chemistrygym's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contact:
-
+   about
    Contact
    License
 
