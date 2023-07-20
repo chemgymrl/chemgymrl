@@ -28,7 +28,7 @@ It was created to train Reinforcement Learning agents to perform realistic opera
    chemistrylab
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Getting Started:
    
    WhatIsChemGymRL
@@ -36,7 +36,7 @@ It was created to train Reinforcement Learning agents to perform realistic opera
    QuickStart
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: User Manual:
 
    reaction
