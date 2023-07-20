@@ -64,6 +64,7 @@ It was created to train Reinforcement Learning agents to perform realistic opera
    :maxdepth: 2
    :caption: Contact:
 
+   About
    Contact
    License
 
