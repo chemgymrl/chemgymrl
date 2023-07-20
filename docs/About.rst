@@ -1,6 +1,11 @@
 About Us
 =====================
 
+
+
+ChemGymRL would not be possible without the dedication and years of hard work put in from this group of talented developers. Below, you can find all past and present members involved in making ChemGymRL a reality as well as their contributions to the project.
+
+
 .. |br| raw:: html
 
   <br/>
@@ -43,7 +48,8 @@ About Us
             :alt: Chris Beeler
             :class: top-elem
 
-            **Christopher Beeler** - Spring 2018 - Present
+            **Christopher Beeler** - Spring 2018 - Present |br|
+            PhD Student - Chemistry Expert
 
    * - .. container:: card
 
