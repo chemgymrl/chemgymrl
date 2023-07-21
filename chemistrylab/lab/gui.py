@@ -275,7 +275,52 @@ class Inventory():
         return -1
 
 
+class TextInput:
+    def __init__(self, font_size=20, font_color=(0, 0, 0), max_length=20):
+        self.position = np.array((0,0))
+        self.font_size = font_size
+        self.font_color = font_color
+        self.max_length = max_length
+        self.active = False
+        self.text = self.prev = ""
+        self.font = pygame.font.SysFont('consolas', font_size)
+        self.txt_surface = self.font.render(self.text, True, self.font_color)
+        self.rect = pygame.Rect(0, 0, font_size*max_length*0.6, font_size)
 
+    def handle_event(self, event, vessel):
+        self.text = vessel.label
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # Check if the user clicked on the text input box
+            if self.rect.collidepoint(event.pos):
+                self.active = True
+            else:
+                self.active = False
+            print(self.active)
+        elif event.type == pygame.KEYDOWN and self.active:
+            if event.key == pygame.K_BACKSPACE:
+                # Remove the last character
+                self.text = self.text[:-1]
+            elif event.key == pygame.K_RETURN:
+                # Enter key was pressed, do something with the entered text
+                pass
+            else:
+                # Add the pressed character to the text input
+                if self.max_length is None or len(self.text) < self.max_length:
+                    self.text += event.unicode
+        if self.text!=self.prev:            
+            self.txt_surface = self.font.render(self.text, True, self.font_color)
+        
+        vessel.label=self.prev=self.text
+
+    def show(self, screen, pos):
+        
+        self.position = np.array(pos)
+        # Set the position of the rectangle
+        self.rect.topleft = self.position
+        # Draw the text surface on the screen
+        pygame.draw.rect(screen, (0, 0, 0), self.rect, 2)
+        screen.blit(self.txt_surface, self.position+self.font_size/6)
 
 class ManagerGui():
     def __init__(self, manager: Manager):
@@ -346,6 +391,13 @@ class ManagerGui():
                 self.video_size = event.size
                 self.benchpos = np.array([(x*200,self.video_size[1]-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
                 self.screen = pygame.display.set_mode(self.video_size,pygame.RESIZABLE)
+
+            if self.bench_idx == len(self.manager.benches):
+                if len(self.manager.hand)==1:
+                    self.text_input.handle_event(event,self.manager.hand[0])
+                    self.hand_inventory.update()
+                else:
+                    self.text_input.active=False
         return False
 
     def display_char_bench(self):
@@ -510,7 +562,7 @@ class ManagerGui():
             dispenser2 = pygame.transform.scale(dispenser2,(93,105))
             self.new_vessel_button = ImageButton(dispenser,dispenser2)
 
-        
+            self.text_input = TextInput(font_size=15, max_length = 18)
 
         surf = pygame.Surface(self.video_size)
         surf.fill((255, 255, 255))
@@ -549,3 +601,6 @@ class ManagerGui():
             buttonpos = self.benchpos[self.bench_idx]+np.array((0,-30)-self.cam)
             for idx, button in enumerate(self.bench_buttons):
                 button.show(self.screen,buttonpos+(idx*55,0), xy)
+
+        if self.bench_idx == len(self.manager.benches):
+            self.text_input.show(self.screen, self.benchpos[-1]+ (0,-70))
