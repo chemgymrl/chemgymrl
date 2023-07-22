@@ -172,7 +172,7 @@ class GeneralWurtzExtract_v2(GenBench):
         pixels = (amounts*10).astype(np.int32)
         actions = [
             Action([0], pixels,              'drain by pixel',[1],  0.01, False),
-            Action([0],-amounts,             'mix',           None, 0.01, False),
+            Action([0],-amounts,             'mix',           None, 0.00, False),
             Action([1], amounts,             'pour by volume',[0],  0.01, False),
             Action([2], amounts,             'pour by volume',[0],  0.01, False),
             Action([0], amounts,             'pour by volume',[2],  0.01, False),
@@ -216,7 +216,7 @@ class WaterOilExtract_v0(GenBench):
         pixels = (amounts*10).astype(np.int32)
         actions = [
             Action([0], pixels,              'drain by pixel',[1],  0.01, False),
-            Action([0],-amounts,             'mix',           None, 0.01, False),
+            Action([0],-amounts,             'mix',           None, 0.00, False),
             Action([1], amounts,             'pour by volume',[0],  0.01, False),
             Action([2], amounts,             'pour by volume',[0],  0.01, False),
             Action([0], amounts,             'pour by volume',[2],  0.01, False),
