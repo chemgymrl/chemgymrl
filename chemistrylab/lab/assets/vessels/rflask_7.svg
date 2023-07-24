@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="160" height="140">
+<svg height="110" viewBox="0 0 60 110" width="60" xmlns="http://www.w3.org/2000/svg">
 	        
-	<g transform="translate(80, 45) rotate(0)">
+	<g transform="translate(30, 35) rotate(0)">
 		              
 		<defs>
 			        
-			<clipPath id="gen-clip249948">
+			<clipPath id="gen-clip365276">
 				            
 				<path d="M -8.75,-35.0 L -8.75 17.5 A 27.00052082830996 27.00052082830996 0 1 0 8.75 17.5 L 8.75 -35.0                Z"/>
 				        
@@ -13,11 +13,11 @@
 			      
 		</defs>
 		        
-		<rect x="-35.0" y="-3.6399999999999952" width="70" height="71.54" fill="#a2d0fa" stroke="none" clip-path="url(#gen-clip249948)"/>
+		<rect clip-path="url(#gen-clip365276)" fill="#a2d0fa" height="71.54" stroke="none" width="70" x="-35.0" y="-3.6399999999999952"/>
 		        
-		<rect x="-35.0" y="-34.3" width="70" height="102.2" fill="none" opacity="0.2" stroke="none" clip-path="url(#gen-clip249948)"/>
+		<rect clip-path="url(#gen-clip365276)" fill="none" height="102.2" opacity="0.2" stroke="none" width="70" x="-35.0" y="-34.3"/>
 		              
-		<path d="M -8.75,-35.0 L -8.75 17.5 A 27.00052082830996 27.00052082830996 0 1 0 8.75 17.5 L 8.75 -35.0                Z" fill="none" stroke="black" stroke-width="5" opacity="1"/>
+		<path d="M -8.75,-35.0 L -8.75 17.5 A 27.00052082830996 27.00052082830996 0 1 0 8.75 17.5 L 8.75 -35.0                Z" fill="none" opacity="1" stroke="black" stroke-width="5"/>
 		        
 	</g>
 </svg>

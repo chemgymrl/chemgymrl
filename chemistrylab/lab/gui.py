@@ -166,7 +166,26 @@ class ImageButton(Button):
 
 
 class Inventory():
-    flasks = []
+
+
+    @classmethod
+    def load_assets(self_class):
+        
+        self_class.flasks = []
+        self_class.test_tubes=[]
+        self_class.beakers = []
+        
+        for i in range(11):
+            tmp = pygame.image.load(ASSETS_PATH+f"vessels/rflask_{i}.png").convert_alpha()
+            self_class.flasks.append(pygame.transform.scale(tmp,(30,55)))
+
+            tmp = pygame.image.load(ASSETS_PATH+f"vessels/test_tube_{i}.png").convert_alpha()
+            self_class.test_tubes.append(pygame.transform.scale(tmp,(15,30)))
+
+            tmp = pygame.image.load(ASSETS_PATH+f"vessels/beaker_{i}.png").convert_alpha()
+            self_class.beakers.append(pygame.transform.scale(tmp,(55,55)))
+
+
     def __init__(self, dx, dy, shelf, boxsize = 100, name = ""):
         self.dx=dx
         self.dy=dy
@@ -196,11 +215,26 @@ class Inventory():
         font = pygame.font.SysFont('Arial', 8)
         for v in vessels:
             idx = round(v.filled_volume()*10/v.volume)
-            surf = Inventory.flasks[idx].copy()
-            text = font.render(v.label, True, (0,0,0))
-            offset = (surf.get_size()[0]-text.get_size()[0])/2 , surf.get_size()[1] - text.get_size()[1]
 
-            surf.blit(text,offset)
+            if v.volume>1.95:
+                vsurf = Inventory.beakers[idx].copy()
+            elif v.volume>0.5:
+                vsurf = Inventory.flasks[idx].copy()
+            else:
+                vsurf = Inventory.test_tubes[idx].copy()
+            text = font.render(v.label, True, (0,0,0))
+
+            surf = my_surface = pygame.Surface((max(text.get_size()[0],vsurf.get_size()[0]), text.get_size()[1]+vsurf.get_size()[1]))
+            surf = surf.convert_alpha()
+            surf.fill((0, 0, 0, 0))
+
+
+            toffset = (surf.get_size()[0]-text.get_size()[0])/2 , vsurf.get_size()[1]
+
+            voffset = (surf.get_size()[0]-vsurf.get_size()[0])/2 , 0
+
+            surf.blit(vsurf,voffset)
+            surf.blit(text,toffset)
             thumbnails.append(surf)
         return thumbnails
     
@@ -531,11 +565,7 @@ class ManagerGui():
             print(self.bench.get_size())
             self.benchpos = np.array([(x*200,self.video_size[1]-self.bench.get_size()[1]) for x in range(len(self.manager.benches)+1)])
             
-
-
-            for i in range(11):
-                tmp = pygame.image.load(ASSETS_PATH+f"vessels/rflask_{i}.png").convert_alpha()
-                Inventory.flasks.append(pygame.transform.scale(tmp,(80,70)))
+            Inventory.load_assets()
 
             inv_names = [n+" Bench Inventory" for n in self.manager.bench_names]
             self.bench_inventories = [Inventory(5, 2, bench.shelf,name=inv_names[i]) for i,bench in enumerate(self.manager.benches)]

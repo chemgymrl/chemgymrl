@@ -256,6 +256,21 @@ B2_WATER = np.array([
 B2_WATER_INSTRUCT="LLC,,LLLC,,LLL"
 
 
+TEST_TUBE = [[-0.126, -0.54],
+[-0.1125, -0.495],
+[-0.1125, -0.45],
+[-0.1125, 0.225],
+[0.1125, 0.1125, 0, 0, 0, 0.1125, 0.225],
+[0.1125, -0.45],
+[0.1125, -0.495],
+[0.126, -0.54]]
+             
+             
+
+TEST_TUBE_INSTRUCT = "Q,LALQ,"
+
+
+
 #hourglass doesn't have a numpy array base but it probably could have one
 
 def create_curved_hourglass_svg(x,y,width, height, total_time, elapsed_time,s=5):

@@ -11,7 +11,7 @@ from chemistrylab.benches.general_bench import *
 from chemistrylab.reactions.reaction_info import ReactInfo, REACTION_PATH
 from chemistrylab.lab.shelf import Shelf
 
-def get_mat(mat,amount,name=None):
+def get_mat(mat,amount,name=None, volume = 1.0):
     "Makes a Vessel with a single material"
     
     matclass = material.REGISTRY[mat]()
@@ -29,7 +29,7 @@ def get_mat(mat,amount,name=None):
     my_vessel.validate_solvents()
     my_vessel.validate_solutes()
     my_vessel.default_dt=0.01
-    
+    my_vessel.volume = volume
     return my_vessel
 
         
@@ -46,10 +46,10 @@ class GeneralWurtzReact_v2(GenBench):
         r_rew = RewardGenerator(use_purity=False,exclude_solvents=False,include_dissolved=False)
         shelf = Shelf([
             get_mat("CCOCC",4,"Reaction Vessel"),
-            get_mat("CCCCCCCl",1),
-            get_mat("CCCCC(C)Cl",1),
-            get_mat("CCCC(CC)Cl",1),
-            get_mat("[Na+]",3),
+            get_mat("CCCCCCCl",1, volume=0.15),
+            get_mat("CCCCC(C)Cl",1, volume=0.15),
+            get_mat("CCCC(CC)Cl",1, volume=0.15),
+            get_mat("[Na+]",3, volume=0.075),
         ])
         actions = [
             Action([0],    [ContinuousParam(156,307,0,(500,))],  'heat contact',   [0],  0.01,  False),
@@ -284,10 +284,10 @@ class WurtzReactDemo_v0(GenBench):
         v.default_dt=0.0008
         shelf = Shelf([
             v,
-            get_mat("CCCCCCCl",1),
-            get_mat("CCCCC(C)Cl",1),
-            get_mat("CCCC(CC)Cl",1),
-            get_mat("[Na+]",3),
+            get_mat("CCCCCCCl",1, volume=0.15),
+            get_mat("CCCCC(C)Cl",1, volume=0.15),
+            get_mat("CCCC(CC)Cl",1, volume=0.15),
+            get_mat("[Na+]",3, volume=0.075),
         ])
 
         actions = [

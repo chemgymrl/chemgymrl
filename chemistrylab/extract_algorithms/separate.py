@@ -118,7 +118,9 @@ def map_to_state(A, B, C, colors, x=x):
                 B1[j] += 1e9
 
         # j_min is the index of the lowest gaussian which still has pixels to place (5.iv)
-        j_min = np.argmin(B1-width)
+        cutoffs=B1-width
+
+        j_min = np.random.choice(np.nonzero(np.abs(cutoffs-cutoffs.min())<1e-6)[0])
 
         # Only need to place the least dense material
         if np.argmin(B1)==j_max and n[j_max]>0:

@@ -94,7 +94,7 @@ def fill_vessel(x, y, amount, points, seq, size, fill, sw=5, op=0.2, bbox=[0,0,1
         (in any SVG format, e.g., "#a2d0fa", "blue", "rgb(100,200,50)", etc.).
     - sw: float or int representing the width of the stroke (in SVG units) used to draw the outline of the vessel's shape.
     - op: opacity of the glass coloring (0 means fully transparent, 1 means fully opaque).
-    - bbox: list of 4 floats or ints representing the coordinates of the bounding box for the vessel.
+    - bbox: list of 4 floats or ints representing the coordinates of the bounding box (x0,y0,width, height) for the vessel.
     
     Returns:
     - A string containing the SVG code for the filled vessel image.
