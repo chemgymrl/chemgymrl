@@ -1,3 +1,27 @@
+'''
+The material construct signature:
+
+Property:
+    - `smiles` (str): The smiles code of the material
+    - `name` (str): The name of the material.
+    - `molar_mass` (float): The average molar mass of the material.
+    - `phase` (str): The state of the material at the room temperature.
+    - `dissolves_in` (set): A set of smiles codes for materials this dissolves in
+    - `polarity` (float): The polarity of the material
+    - `dissolved_components` (dict): A dictionary of (smiles_code,mol) pairs of what / how much material(s) are dissociated when one mol of this material is dissolved.
+    - `boiling_point_K` (float): The material's boiling point in Kelvin.
+    - `melting_point_K` (float): The material's melting point in Kelvin.
+    - `specific_heat_J_gK` (float): The material's specific heat capacity in Joules per gram*Kelvin
+    - `enthalpy_fusion_J_mol` (float): The material's fusion enthalpy in Joules per mol
+    - `enthalpy_vapor_J_mol` (float): The material's vaporization enthalpy in Joules per mol
+    - `density_g_ml` (dict): The material's density in each phase in grams per mililitre
+    - `color` (float): Single channel color for the material (will be depricated)
+    - `n` (float): The material's refractive index
+    - `spectra_overlap` (np.array): Spectral information of the material
+    - `spectra_no_overlap` (np.array): Alternative? spectral information of the material
+'''
+
+
 import pandas as pd
 import numpy as np
 import os
@@ -9,6 +33,13 @@ construct_signature = ('smiles','name','molar_mass','phase','dissolves_in','pola
         'density_g_ml','color','n','spectra_overlap','spectra_no_overlap')
 
 def register(*material_kwargs):
+    """
+    Add a material or list of materials to the materials registry.
+
+    The materials should either be represented via a tuple corresponding to construct_signature, or a dictionary
+    with construct_signature's items as keys.
+    
+    """
     for kwargs in material_kwargs:
         if not (type(kwargs) is dict):
             kwargs = {key:val for key,val in zip(construct_signature,kwargs)}
@@ -16,6 +47,17 @@ def register(*material_kwargs):
         if key in REGISTRY:
             raise Exception(f"Cannot register the same Material ({key}) Twice!")
         REGISTRY[key] = MaterialConstructor(kwargs)
+
+def from_smiles(smiles_string, mol=0):
+    """
+    Args:
+        smiles_string (str): The smiles code corresponding to the material.
+        mol (float): The amount of material in moles.
+
+    Returns:
+        Material: An instance of the material specified by smiles_string, with it's amount set to mol.
+    """
+    return REGISTRY[smiles_string](mol=mol)
 
 class MaterialConstructor():
     def __init__(self, kwargs: dict):
@@ -153,11 +195,11 @@ class Material():
         
     def ration(self,ratio):
         """
-        Creates a new Material and moves `ratio` fraction of the moles to the new material
+        Creates a new Material and moves `ratio` fraction of the mols to the new material
         Args:
-        - ratio (float): Should be in [0,1]
+            ratio (float): Should be in [0,1]
         Returns
-        - mat (Material): Material with the same class where the moles were moved
+            Material: a copy of the material with the moved mols.
         """
         diff=ratio*self.mol
         self.mol -= diff
@@ -172,7 +214,7 @@ class Material():
     def all_dissolves_in(self):
         """
         Returns:
-        - Generator[str]: A generator of smiles codes representing the Materials this material dissolves in."""
+            Generator[str]: A generator of smiles codes representing the Materials this material dissolves in."""
         return (key for key in self._dissolves_in)
 
     def get_spectra_overlap(self):
@@ -185,32 +227,6 @@ class Material():
         return self._dissolved_components
 
 
-def from_old_mat(mat):
-    kwargs = dict(
-        smiles = input(f"What is the smiles code of {mat._name}? "),
-        name = mat._name,
-        molar_mass = mat.molar_mass,
-        phase=mat.phase,
-        dissolves_in = set(a for a in input(f"What does {mat._name} dissolve in? ").split()),
-        polarity = mat.polarity,
-        dissolved_components = {input(f"{k} smiles? "):v for k,v in mat.dissolve().items()},
-        boiling_point_K = mat._boiling_point,
-        melting_point_K = mat._melting_point,
-        specific_heat_J_gK = mat._specific_heat,
-        enthalpy_fusion_J_mol = mat._enthalpy_fusion,
-        enthalpy_vapor_J_mol = mat._enthalpy_vapor,
-        density_g_ml = mat._density,
-        spectra_overlap = mat.get_spectra_overlap(),
-        spectra_no_overlap = mat.get_spectra_no_overlap(),
-        color = mat._color,
-    )
-
-    return MaterialConstructor(kwargs)
-
-#MATERIALS = pd.read_pickle(os.path.dirname(__file__)+"/materials.pkl")
-#_matloc = MATERIALS.iloc
-#for i in range(MATERIALS.shape[0]):
-#    register({k:v for k,v in _matloc[i].items()})
 
 from numpy import float32,float64
 nan = np.nan
@@ -258,21 +274,6 @@ _MATERIALS = (
 )
 
 
-for mat in _MATERIALS:
-    register(mat)
+register(*_MATERIALS)
 
-
-if __name__ == "__main__":
-    from chemistrylab.material0 import REGISTRY as oldreg
-    
-    print(MATERIALS)
-    materials_list = []
-    for key,matclass in oldreg.items():
-        mat = matclass()
-        args = from_old_mat(mat).get_args()
-        print(args)
-        materials_list.append(args)
-
-    materials_df = pd.DataFrame(data=materials_list, columns=construct_signature)
-    materials_df.to_pickle("materials.pkl")
 

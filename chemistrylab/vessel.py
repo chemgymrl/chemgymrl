@@ -536,13 +536,12 @@ class Vessel:
 
         solute_svolume = np.array([mat.litres_per_mol for mat in solutes], dtype=np.float32)
         
-        self._layers_position, self._layers_volume, self._layers_settle_time, self._variance, new_solute_amount, self._lvar = separate.mix(
+        self._layers_position, self._layers_volume, self._layers_settle_time, new_solute_amount, self._lvar = separate.mix(
             layer_volume,
             self._layer_volumes.astype(np.float32),
             solute_svolume,
             self._layers_position.astype(np.float32),
             np.float32(self._layers_settle_time),#.astype(np.float32),
-            np.float32(self._variance),
             layer_density,
             solute_polarity,
             solvent_polarity,
