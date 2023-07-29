@@ -82,12 +82,14 @@ def check_conservation(start_vessels,end_vessels, TOL = 1e-8):
         # Make sure get_material_dataframe is always implemented no matter how data is stored internally
         mat_df = vessel.get_material_dataframe()
         #set the total amount of each material in starting vessels
-        for name,data in mat_df.iterrows():
+        for _,data in mat_df.iterrows():
+            name = data.Smiles
             start_total[name] = start_total.get(name,0)+data.Amount
     for vessel in end_vessels:
         mat_df = vessel.get_material_dataframe()
         #set the total amount of each material in ending vessels
-        for name,data in mat_df.iterrows():
+        for _,data in mat_df.iterrows():
+            name = data.Smiles
             end_total[name] = end_total.get(name,0)+data.Amount
     #Making sure all of the materials still exist at the end
     for mat in start_total:
@@ -166,7 +168,8 @@ def check_conservation_react(start_vessels,end_vessels, reaction, TOL = 1e-8):
         # Make sure get_material_dataframe is always implemented no matter how data is stored internally
         mat_df = vessel.get_material_dataframe()
         #set the total amount of each material in starting vessels
-        for name,data in mat_df.iterrows():
+        for _,data in mat_df.iterrows():
+            name = data.Smiles
             if name in reactants:
                 start_react[reactants[name]]+=data.Amount
             else:
@@ -174,7 +177,8 @@ def check_conservation_react(start_vessels,end_vessels, reaction, TOL = 1e-8):
     for vessel in end_vessels:
         mat_df = vessel.get_material_dataframe()
         #set the total amount of each material in ending vessels
-        for name,data in mat_df.iterrows():
+        for _,data in mat_df.iterrows():
+            name = data.Smiles
             if name in reactants:
                 end_react[reactants[name]]+=data.Amount
             else:
@@ -188,7 +192,7 @@ def check_conservation_react(start_vessels,end_vessels, reaction, TOL = 1e-8):
         if not mat in start_total:
             return False
         if abs(amount-start_total[mat])>TOL:
-            print(amount,start_total[mat])
+            print(amount,start_total[mat], mat)
             return False
     diff = get_diff(reaction.conc_coeff_arr,end_react-start_react)
         

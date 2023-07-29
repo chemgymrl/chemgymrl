@@ -522,7 +522,7 @@ class Vessel:
         # Add air to the end ov the volume list s.t it fills the remainder of the vessel
         layer_volume = np.array(layer_volume+[self.volume - sum(layer_volume)], dtype=np.float32)
         layer_density = np.array([mat.density_g_L for mat in layer_mats]+[d_air], dtype=np.float32)
-        self._layer_colors = np.array([mat.transmittance for mat in layer_mats]+[c_air], dtype=np.float32)
+        self._layer_colors = np.array([mat.color for mat in layer_mats]+[c_air], dtype=np.float32)
         #Exclude air since it's not a solvent?
         solvent_polarity = np.array([mat.polarity for mat in solvents], dtype=np.float32)
 
