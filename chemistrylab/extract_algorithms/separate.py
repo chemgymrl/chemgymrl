@@ -264,20 +264,21 @@ def mix(v, Vprev, v_solute, layer_pos, T0 , density, Spol, Lpol, n_dissolved, dT
             re_weight /= re_weight.sum()
             # Scale to follow g(t) = c0 + c1*exp(-kt)
             # https://www.desmos.com/calculator/s5nrrpepm9 
-            alpha = np.exp(-t_scale*(T-T0))
             if T-T0 > 0:
                 # Forward time equation which assumes g(T0) = n_dissolved[i], and g(inf) = target
                 target = tot_dissolved*re_weight
+                alpha = np.exp(-t_scale*(T-T0))
                 n_dissolved[i] = target + (n_dissolved[i]-target)*alpha     
             elif T>0:
                 #reverse time equation which assumes g(0) = target, and g(T0) = n_dissolved[i]
                 target = tot_dissolved*a
-                beta=np.exp(-t_scale*T0)
-                n_dissolved[i] = (n_dissolved[i]-target*beta)*(1-alpha)/(1-beta)+n_dissolved[i]*alpha
+                beta  = np.exp(-t_scale*T0)
+                gamma = np.exp(-t_scale*T)
+                n_dissolved[i] = (n_dissolved[i]*(1-gamma)+target*(gamma-beta))/(1-beta)
+                #n_dissolved[i] = (n_dissolved[i]-target*beta)*(1-alpha)/(1-beta)+n_dissolved[i]*alpha
             else:
                 n_dissolved[i] = tot_dissolved*a
             
-
     ########################### MOVING LAYERS ##################################
 
 
