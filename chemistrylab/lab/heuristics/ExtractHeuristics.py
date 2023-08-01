@@ -62,9 +62,10 @@ class GenWurtzExtractHeuristic(Policy):
         wait_act, 
         done_act, 
         layer_pos, 
-        polar_color = 955, 
-        non_polar_color = 951, 
-        history=6
+        polar_color = 638, 
+        non_polar_color = 518, 
+        history=6,
+        dest_layer_pos = None
         ):
         """
         Args:
@@ -82,7 +83,7 @@ class GenWurtzExtractHeuristic(Policy):
         self.wait_act = wait_act
         self.layer_pos = layer_pos
         self.done_act = done_act
-
+        self.dest_layer_pos = dest_layer_pos
         self.polar_color = polar_color
 
         self.non_polar_color = non_polar_color
@@ -91,14 +92,15 @@ class GenWurtzExtractHeuristic(Policy):
 
         self.prev_correlations = [0]*history
     
-    def get_layer_info(self,obs):
-        layer_info  = obs[self.layer_pos[0]:self.layer_pos[1]]
+    def get_layer_info(self,obs, layer_pos = None):
+
+        if layer_pos is None:
+            layer_pos = self.layer_pos
+        
+        layer_info  = obs[layer_pos[0]:layer_pos[1]]
 
         correlation = np.mean(abs(layer_info[1:]-layer_info[:-1])<1e-3)*2-1
 
-        self.prev_correlations = self.prev_correlations[1:]+[correlation]
-
-        correlation=min(self.prev_correlations)
         eps=1e-3
 
         coords = np.arange(layer_info.shape[0]+1)
@@ -114,8 +116,10 @@ class GenWurtzExtractHeuristic(Policy):
         return correlation, cluster_info
 
     def choose_action(self,observation):
-        correlation, cluster_info = self.get_layer_info(observation)
 
+        correlation, cluster_info = self.get_layer_info(observation)
+        self.prev_correlations = self.prev_correlations[1:]+[correlation]
+        correlation=min(self.prev_correlations)
         #print(cluster_info,correlation)
 
         polar_amount = cluster_info.get(self.polar_color,0)
@@ -126,8 +130,12 @@ class GenWurtzExtractHeuristic(Policy):
 
         # Constants
         TOL = 0.955
-        drained=10
+        drained=5
         full=42
+
+        #early exit condition
+        if (self.dest_layer_pos is not None and self.get_layer_info(observation, self.dest_layer_pos)[1].get(1000,0)<10):
+            return self.done_act
 
         #draining phase
         if (correlation > TOL or self.prev==self.drain_act) and min(polar_amount,non_polar_amount)>drained:

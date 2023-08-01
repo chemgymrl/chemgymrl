@@ -158,7 +158,7 @@ if __name__ == "__main__":
     policies = [[("Manual",ManualPolicy(bench))] for bench in benches]
     policies[0]+=[("Heuristic",VisualPolicy(benches[0],WurtzReactHeuristic()))]
 
-    extract_heuristic = GenWurtzExtractHeuristic(0,6,5,1,8,9, (0,100))
+    extract_heuristic = GenWurtzExtractHeuristic(0,6,5,1,8,9, (0,100), dest_layer_pos = (100,200))
     policies[2]+=[(("Heuristic"), VisualPolicy(benches[2],extract_heuristic))]
 
     distill_heuristic = GenWurtzDistillHeuristic(2,3,4,5, ((0,100),(110,210),(220,320)))

@@ -134,15 +134,16 @@ class matplotVisualizer():
         first=first and self.steps%matplotVisualizer.legend_update_delay==0
         if prev is None or first:ax.clear()
 
-        if CUSTOM_COLORS:cnames, cvals, im = get_color_info(vessel)
-        im = im.transpose(1,0,2)
+        if CUSTOM_COLORS:
+            cnames, cvals, im = get_color_info(vessel)
+            im = im.transpose(1,0,2)
 
         if first:
             if CUSTOM_COLORS:
                 patches = [ mpatches.Patch(color=cvals[i].astype(np.float32)/255,label= name) for i,name in enumerate(cnames) ] 
                 ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0. )
             else:
-                cvals = (np.array([mat.transmittance for mat in vessel._layer_mats]+[0.65])+0.2)%1
+                cvals = (np.array([mat.color for mat in vessel._layer_mats]+[0.65])+0.2)%1
                 im = ax.imshow([cvals],cmap=cmap,vmin=0,vmax=1)
                 colors = [ im.cmap(im.norm(value)) for value in cvals]
                 patches = [ mpatches.Patch(color=colors[i],label= name) for i,name in enumerate(list(vessel._layer_mats)+["air"]) ] 
@@ -371,14 +372,14 @@ class pygameVisualizer():
         """
 
         def cmap(alpha):
-            r=g=b=np.clip(alpha*10-9,0,1)*200+55
+            r=g=b=np.clip(alpha,0,1)*200+55
             return np.array((r,g,b),dtype=np.uint8)
 
         tol = vessel.volume/200
 
         # TODO: Think of a flag to set globally for this
         if not CUSTOM_COLORS:
-            cvals = np.array([mat.transmittance for mat in vessel._layer_mats if mat.volume_L>tol]+[1.0])
+            cvals = np.array([mat.color for mat in vessel._layer_mats if mat.volume_L>tol]+[1.0])
             cvals = cmap(cvals).T
         else:
             null_color = np.ones(3,dtype=np.uint8)

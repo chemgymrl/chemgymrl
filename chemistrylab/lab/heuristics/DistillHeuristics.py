@@ -35,8 +35,8 @@ class GenWurtzDistillHeuristic(Policy):
         b2_act, 
         done_act, 
         layer_pos, # should be three length 2 tuples
-        salt_color = 911, 
-        solvent_color = 951, 
+        salt_color = 19, 
+        solvent_colors = (518,638), 
         ):
 
         self.heat_act = heat_act
@@ -45,7 +45,7 @@ class GenWurtzDistillHeuristic(Policy):
         self.done_act = done_act 
         self.layer_pos = layer_pos
         self.salt_color = salt_color
-        self.solvent_color = solvent_color
+        self.solvent_colors = solvent_colors
 
     def get_layer_info(self,obs, layer_start, layer_end):
         layer_info  = obs[layer_start:layer_end]
@@ -65,11 +65,10 @@ class GenWurtzDistillHeuristic(Policy):
         vessel_2_contents = self.get_layer_info(observaiton, *self.layer_pos[1])
         vessel_3_contents = self.get_layer_info(observaiton, *self.layer_pos[2])
 
-
-        if self.solvent_color in vessel_1_contents:
+        if any([s in vessel_1_contents for s in self.solvent_colors]):
             return self.heat_act
 
-        if self.solvent_color in vessel_2_contents:
+        if any([s in vessel_2_contents for s in self.solvent_colors]):
             return self.b2_act
 
         if self.salt_color in vessel_1_contents and len(vessel_1_contents)>2:

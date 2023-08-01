@@ -123,7 +123,7 @@ def oil_vessel():
     mats = [C6H14,Na,Cl]
 
     # material_dict
-    material_dict = {mat._name:mat for mat in mats}
+    material_dict = {str(mat):mat for mat in mats}
     # Set up the vessel
     extraction_vessel.material_dict=material_dict
     extraction_vessel.validate_solvents()
@@ -204,7 +204,7 @@ class WaterOilExtract_v0(GenBench):
     }
 
     def __init__(self):
-        e_rew= RewardGenerator(use_purity=False, exclude_solvents=True, include_dissolved=True, exclude_mat="C6H14")
+        e_rew= RewardGenerator(use_purity=False, exclude_solvents=True, include_dissolved=True, exclude_mat="CCCCCC")
         shelf =VariableShelf( [
             lambda x:oil_vessel(),
             lambda x:vessel.Vessel("Beaker 1"),

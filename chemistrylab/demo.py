@@ -4,6 +4,8 @@ import gymnasium as gym
 import chemistrylab
 from chemistrylab.util import Visualization,ActionDoc
 
+Visualization.CUSTOM_COLORS = False
+
 if __name__ == "__main__":
     from gymnasium.utils.play import play
     #Visualization.set_backend("numba")
