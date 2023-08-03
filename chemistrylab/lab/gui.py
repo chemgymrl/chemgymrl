@@ -9,15 +9,23 @@ from chemistrylab.util import Visualization,ActionDoc
 ASSETS_PATH = os.path.dirname(__file__) + "/assets/"
 
 class ManualPolicy(Policy):
-    def __init__(self, env, screen = None, fps=60):
+    def __init__(self, env = None, screen = None, fps=60):
 
         global pygame
         try:import pygame
         except ImportError:
             raise DependencyNotInstalled("pygame is not installed, run `pip install gym[classic_control]`")
         self.fps=fps
-        self.keys_to_action = dict()
         #using the same system of openai gym play
+        self.screen = screen
+        self.clock = pygame.time.Clock()
+        self.set_env(env)
+
+    def set_env(self, env):
+        self.env=env
+        if env is None: return
+
+        self.keys_to_action = dict()
         for key_combination, action in env.get_keys_to_action().items():
             key_code = tuple(
                 sorted(ord(key) if isinstance(key, str) else key for key in key_combination)
@@ -26,10 +34,8 @@ class ManualPolicy(Policy):
 
         self.pressed=[]
         self.relevant_keys = set(a for keyset in self.keys_to_action for a in keyset)
-        self.screen = screen
-        self.env=env
         self.noop = self.keys_to_action.get((),env.action_space.sample()*0)
-        self.clock = pygame.time.Clock()
+
     def process_event(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key in self.relevant_keys:

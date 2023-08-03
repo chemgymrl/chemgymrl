@@ -1,0 +1,83 @@
+{
+  "benches": [
+    [
+      "Reaction",
+      "GenWurtzReact-v2"
+    ],
+    [
+      "Distillation",
+      "GenWurtzDistill-v2"
+    ],
+    [
+      "Extraction",
+      "GenWurtzExtract-v2"
+    ]
+  ],
+  "policies": [
+    [
+      "Heuristic",
+      "chemistrylab.lab.heuristics:WurtzReactHeuristic",
+      {},
+      0
+    ],
+    [
+      "Heuristic",
+      "chemistrylab.lab.heuristics:GenWurtzExtractHeuristic",
+      {
+        "drain_act": 1,
+        "polar_act": 30,
+        "non_polar_act": 25,
+        "mix_act": 9,
+        "wait_act": 39,
+        "done_act": 40,
+        "layer_pos": [
+          0,
+          100
+        ],
+        "polar_color": 638,
+        "non_polar_color": 518,
+        "history": 2,
+        "dest_layer_pos": [
+          100,
+          200
+        ]
+      },
+      2
+    ],
+    [
+      "Heuristic",
+      "chemistrylab.lab.heuristics:GenWurtzDistillHeuristic",
+      {
+        "heat_act": 9,
+        "b1_act": 19,
+        "b2_act": 29,
+        "done_act": 30,
+        "layer_pos": [
+          [
+            0,
+            100
+          ],
+          [
+            110,
+            210
+          ],
+          [
+            220,
+            320
+          ]
+        ]
+      },
+      1
+    ]
+  ],
+  "targets": [
+    "CCCCCCCCCCCC",
+    "CCCCCCC(C)CCCC",
+    "CCCCCCC(CC)CCC",
+    "CCCCC(C)C(C)CCCC",
+    "CCCCC(C)C(CC)CCC",
+    "CCCC(CC)C(CC)CCC",
+    "[Na+].[Cl-]"
+  ],
+  "actions": []
+}

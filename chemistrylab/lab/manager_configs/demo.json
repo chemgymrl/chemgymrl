@@ -1,0 +1,101 @@
+{
+  "benches": [
+    [
+      "Reaction",
+      "WurtzReactDemo-v0"
+    ],
+    [
+      "Distillation",
+      "WurtzDistillDemo-v0"
+    ],
+    [
+      "Extraction",
+      "WurtzExtractDemo-v0"
+    ]
+  ],
+  "policies": [
+    [
+      "Manual",
+      "chemistrylab.lab.gui:ManualPolicy",
+      {},
+      0
+    ],
+    [
+      "Manual",
+      "chemistrylab.lab.gui:ManualPolicy",
+      {},
+      1
+    ],
+    [
+      "Manual",
+      "chemistrylab.lab.gui:ManualPolicy",
+      {},
+      2
+    ],
+    [
+      "Heuristic",
+      "chemistrylab.lab.heuristics:WurtzReactHeuristic",
+      {},
+      0
+    ],
+    [
+      "Heuristic",
+      "chemistrylab.lab.heuristics:GenWurtzExtractHeuristic",
+      {
+        "drain_act": 0,
+        "polar_act": 6,
+        "non_polar_act": 5,
+        "mix_act": 1,
+        "wait_act": 8,
+        "done_act": 9,
+        "layer_pos": [
+          0,
+          100
+        ],
+        "polar_color": 638,
+        "non_polar_color": 518,
+        "history": 6,
+        "dest_layer_pos": [
+          100,
+          200
+        ]
+      },
+      2
+    ],
+    [
+      "Heuristic",
+      "chemistrylab.lab.heuristics:GenWurtzDistillHeuristic",
+      {
+        "heat_act": 2,
+        "b1_act": 3,
+        "b2_act": 4,
+        "done_act": 5,
+        "layer_pos": [
+          [
+            0,
+            100
+          ],
+          [
+            110,
+            210
+          ],
+          [
+            220,
+            320
+          ]
+        ]
+      },
+      1
+    ]
+  ],
+  "targets": [
+    "CCCCCCCCCCCC",
+    "CCCCCCC(C)CCCC",
+    "CCCCCCC(CC)CCC",
+    "CCCCC(C)C(C)CCCC",
+    "CCCCC(C)C(CC)CCC",
+    "CCCC(CC)C(CC)CCC",
+    "[Na+].[Cl-]"
+  ],
+  "actions": []
+}
