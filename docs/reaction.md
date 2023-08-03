@@ -14,7 +14,7 @@ When the agent performs enough positive actions and is satisfied with the amount
 
 ## Input
 
-The input to the reaction bench is initialized in the [reaction_bench_v1.py](_modules/chemistrylab/benches/reaction_bench.html#GeneralWurtzReact_v0) file. 
+The input to the reaction bench is initialized in the [reaction_bench_v1.py](../_modules/chemistrylab/benches/reaction_bench.html#GeneralWurtzReact_v0) file. 
 
 ```python
 class GeneralWurtzReact_v2(GenBench):
@@ -75,6 +75,6 @@ being performed by the agent.
 ## Reward
 For the reaction benches the default reward function is:
 
-[RewardGenerator](chemistrylab.util.html#chemistrylab.util.reward.RewardGenerator)(use_purity=False,exclude_solvents=False,include_dissolved=False)
+[RewardGenerator](../chemistrylab.util.html#chemistrylab.util.reward.RewardGenerator)(use_purity=False,exclude_solvents=False,include_dissolved=False)
 
 Here, the goal is to maximize the amount of the desired material while possibly minimizing an undesired material.
