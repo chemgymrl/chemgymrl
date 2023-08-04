@@ -14,7 +14,7 @@ When the agent performs enough positive actions and is satisfied with the amount
 
 ## Input
 
-The input to the reaction bench is initialized in the [reaction_bench_v1.py](GeneralWurtzReact_v2) file. 
+The input to the reaction bench is initialized in the [reaction_bench](GeneralWurtzReact_v2) file. 
 
 ```python
 class GeneralWurtzReact_v2(GenBench):
