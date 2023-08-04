@@ -56,9 +56,9 @@ class GeneralWurtzReact_v2(GenBench):
         )
 ```
 
-Here we pass parameters like vessels containing materials and solutes needed for the experiment, the initial conditions of the reaction vessel, the amount of time taken in each time step, what information is passed along as observations, and what reward scheme should be used. 
+Here we pass parameters like vessels containing materials and solutes needed for the experiment, the initial conditions of the reaction vessel, the amount of time taken in each time step, what information is passed along as observations, and what reward scheme should be used.
 
-We also pass in a reaction event which is constructed using a json file located in `chemistrylab/reactions/available_reactions`. This file includes important values that the engine will use to simulate the reaction. It contains information on the reactants, products, and solutes available for the reaction. Additionally, it includes arrays for the activation energy, stoichiometric coefficients, and concentration calculation coefficients. 
+We also pass in a reaction event which is constructed using a json file located in `chemistrylab/reactions/available_reactions`. This file includes important values that the engine will use to simulate the reaction. It contains information on the reactants, products, and solutes available for the reaction. Additionally, it includes arrays for the activation energy, stoichiometric coefficients, and concentration calculation coefficients. Reactions are simulated by iteratively solving the initial value problem defined by the concentration of reactants and products and their rate laws.
 
 ## Output
 
