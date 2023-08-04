@@ -4,7 +4,7 @@
 
 <span style="display:block;text-align:center">![Extraction](tutorial_figures/extraction.png)
 
-The extraction bench aims to isolate and extract certain materials from an inputted vessel container containing multiple materials. This is done by means of transferring materials between a number of vessels and utilizing specifically selected solutes to demarcate and separate materials from each other. The intended output of this bench is at least one beaker, each containing a desired material in quantities that exceed a minimum threshold.
+The extraction bench aims to isolate and extract certain materials from a vessel containing multiple materials. This is done by means of transferring materials between a number of vessels and utilizing specifically selected solutes to demarcate and separate materials from each other. The intended result of this bench is one of the vessels containing only the desired material dissolved in some solvent.
  
 A classic extraction experiment is extracting salt from oil using water. Water is added to a beaker containing salt dissolved in oil, settling below the oil. When the water settles, the dissolved salt is pulled from the oil into the water. Similarly, in the extraction bench, solvents are added to act as the oil and water in the previous extraction experiment, separating collections of materials into layers that can be extracted and poured into auxiliary vessels. An agent performing this experiment will be able to use solutes and extract materials with the aim of extracting and isolating the specified desired material.
 
@@ -12,7 +12,7 @@ The agent operating on this bench will experiment using solutes in different sce
 
 ## Input 
 
-The input to the extraction bench is initialized in the `extraction_bench_v1.py` file.
+The input to the extraction bench is initialized in the [extraction_bench](GeneralWurtzExtract_v2) file.
 
 ```python
 class WurtzExtractDemo_v0(GenBench):
@@ -67,14 +67,11 @@ class WurtzExtractDemo_v0(GenBench):
         return keys
 ```
 
-Here we pass the extraction we want to perform, in the figure above, we would perform the wurtz extraction. The input 
-vessel is also passed here. It contains the material and solute dictionary of a vessel that's typically outputted by the
-reaction bench. We also pass the solute that the extraction will take place in, as well as the target material, and path 
-of the output vessel.
+Here we include the extraction vessel, as well as two empty vessels, and two vessels containing different solvents. Like in the other benches, we pass along the target material. Additionally, actions to shake the extraction vessel, wait for it to settle and drain it into another vessel from the bottom are included. In this bench, a simple heuristic is used to keep track of how solvents with different densities separate over time, and how solutes move between solvents according to their solubility.
 
 ## Output
 
-Once the extraction bench is ran and the render function is called, plots will appear showing data about the extraction 
+Once the extraction bench is reset and the render function is called, plots will appear showing data about the extraction 
 being performed by the agent. There are two main plot modes:
 
 - Render
@@ -83,3 +80,11 @@ being performed by the agent. There are two main plot modes:
     - Sequential pixels corresponding to the same solvent constitute a single layer.
   
 ![human render output](tutorial_figures/extraction/human_render_extraction.png)
+
+
+## Reward
+For the reaction benches the default reward function is:
+
+[RewardGenerator](RewardGenerator)(use_purity=True,exclude_solvents=True,include_dissolved=True)
+
+Here, the goal is to maximize the amount and purity of the desired material. In this case, having other materials (excluding solvents) in a vessel with the desired material will reduce purity.
