@@ -157,7 +157,7 @@ class Manager():
 
     def build_actions(self, actions: Tuple[ManagerAction]):
         self.current_bench = -1
-        self.default_actions = [ManagerAction("set bench", dict(idx=i), 0 None) for i in range(len(self.benches))]
+        self.default_actions = [ManagerAction("set bench", dict(idx=i), 0,  None) for i in range(len(self.benches))]
         self.bench_actions = [[] for bench in self.benches]
         for act in actions:
             if act.bench is None:
