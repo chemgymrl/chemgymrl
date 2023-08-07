@@ -33,6 +33,8 @@ class Manager():
         self.shelf = Shelf([],n_working=0)
         self.bench_agents = bench_agents
         self.targets=targets
+        self.build_actions(actions)
+        self.current_bench = None
     
     def swap_vessels(self, bench_idx, vessel_idx):
         """
@@ -112,7 +114,7 @@ class Manager():
             policy_idx (Policy): The index of the policy to use for the bench
         
         """
-        self.use_bench(self.benches[bench_idx], self.policies[policy_idx])
+        self.use_bench(self.benches[bench_idx], self.bench_agents[bench_idx][policy_idx][1])
     def use_bench(self, bench, policy):
         """
         Runs a bench with a given policy. (This will likely be modified in the future)
@@ -172,6 +174,17 @@ class Manager():
         action_dict = type(self)._action_dict
         action_dict[action.name](self,**action.args)
         return action.cost
+
+    def step(self, action: int):
+        if action < len(self.default_actions):
+            self.perform_action(self.default_actions[action])
+            return self.default_actions[action].cost
+
+        elif self.current_bench is not None:
+            action -= len(self.default_actions)
+            if action < len(self.bench_actions[self.current_bench]):
+                self.perform_action(self.bench_actions[self.current_bench][action])
+                return self.bench_actions[self.current_bench][action].cost
 
     _action_dict = {
         'swap vessels': swap_vessels,
