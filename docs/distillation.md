@@ -92,4 +92,6 @@ For the reaction benches the default reward function is:
 
 [RewardGenerator](RewardGenerator)(use_purity=True,exclude_solvents=False,include_dissolved=True)
 
-Here, the goal is to maximize the amount and purity of the desired material. In this case, having solvents in the same vessel as the desired material (as well as any other material) will reduce purity.
+Here, the goal is to maximize the amount and purity of the desired material. In this case, having solvents in the same vessel as the desired material (as well as any other material) will reduce purity. Note: This reward is given only at the end of the episode.
+
+In addition to the yield reward given at the end of the episode, a reward of -0.1 is given whenever the agent performs an action resulting in a spill or exceptionally hot vessel.
