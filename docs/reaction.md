@@ -77,4 +77,6 @@ For the reaction benches the default reward function is:
 
 [RewardGenerator](RewardGenerator)(use_purity=False,exclude_solvents=False,include_dissolved=False)
 
-Here, the goal is to maximize the amount of the desired material while possibly minimizing an undesired material.
+Here, the goal is to maximize the amount of the desired material while possibly minimizing an undesired material. Note: This reward is given only at the end of the episode.
+
+In addition to the yield reward given at the end of the episode, a reward of -0.1 is given whenever the agent performs an action resulting in a spill.
