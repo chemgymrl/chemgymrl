@@ -102,3 +102,14 @@ register(
     entry_point='chemistrylab.benches.extract_bench:SeparateTest_v0',
 )
 
+
+############################# LAB MANAGER #########################################
+import os
+register(
+    id='Manager-v0',
+    entry_point='chemistrylab.lab.manager:Manager',
+    #this is bad cuz the same benches will be shared across all manager instances
+    kwargs = dict(
+        config_filename = os.path.dirname(__file__)+"/lab/manager_configs/wurtz.json"
+    )
+)

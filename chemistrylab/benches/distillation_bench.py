@@ -43,50 +43,46 @@ def wurtz_vessel(add_mat):
         "[Na+].[Cl-]"
     ]
 
-    try:
-        if add_mat == "":
-            add_mat = choice(products)
-        
-        add_material = material.REGISTRY[add_mat]()
+    if add_mat != "":
+
+        if not add_mat in products:
+            add_mat = 'CCCCCCCCCCCC'
     
-    except KeyError:
-        add_mat = 'CCCCCCCCCCCC'
-        add_material = material.REGISTRY[add_mat]()
-    
-    if (add_mat != '[Na+].[Cl-]'):
-        #add_material.set_color(0.0)
-        add_material.phase = 'l'
-    add_material.mol=1
+        add_material = material.REGISTRY[add_mat](mol=1.0)
 
-    Na = material.REGISTRY["[Na+]"]()
-    Na.charge = 1.0
-    Na.polarity = 2.0
-    Na.phase = 'l'
-    # initialize Cl
-    Cl = material.REGISTRY["[Cl-]"]()
-    Cl.charge = -1.0
-    Cl.polarity = 2.0
-    Cl.phase = 'l'
+        if (add_mat != '[Na+].[Cl-]'):
+            #add_material.set_color(0.0)
+            add_material.phase = 'l'
+
+        Na = material.REGISTRY["[Na+]"]()
+        Na.charge = 1.0
+        Na.polarity = 2.0
+        Na.phase = 'l'
+        # initialize Cl
+        Cl = material.REGISTRY["[Cl-]"]()
+        Cl.charge = -1.0
+        Cl.polarity = 2.0
+        Cl.phase = 'l'
 
 
-    # material_dict
-    material_dict = {
-        str(C6H14): C6H14,
-        str(add_material): add_material,
-        str(Na):Na,
-        str(Cl):Cl
-    }
+        # material_dict
+        material_dict = {
+            str(C6H14): C6H14,
+            str(add_material): add_material,
+            str(Na):Na,
+            str(Cl):Cl
+        }
 
-    if np.random.choice([0, 1]) > 0.5:
-        if (add_mat == '[Na+].[Cl-]'):
-            add_material2 = material.REGISTRY["CCCCCCCCCCCC"]()
-        else:
-            add_material2 = material.REGISTRY['[Na+].[Cl-]']()
-        add_material2.mol=1
-        material_dict[str(add_material2)] = add_material2
+        if np.random.choice([0, 1]) > 0.5:
+            if (add_mat == '[Na+].[Cl-]'):
+                add_material2 = material.REGISTRY["CCCCCCCCCCCC"]()
+            else:
+                add_material2 = material.REGISTRY['[Na+].[Cl-]']()
+            add_material2.mol=1
+            material_dict[str(add_material2)] = add_material2
 
 
-    boil_vessel.material_dict=material_dict
+        boil_vessel.material_dict=material_dict
 
     boil_vessel.validate_solvents()
     boil_vessel.validate_solutes()

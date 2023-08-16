@@ -69,6 +69,9 @@ class RewardGenerator():
 
         """
         reward=0
+        if not desired_material in material.REGISTRY:
+            return reward
+            
         for v in vessels:
             mat_dict = v.material_dict
             # Get the amount of target material that could be extracted from dissolved components

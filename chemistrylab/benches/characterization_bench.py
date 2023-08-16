@@ -106,6 +106,19 @@ class CharacterizationBench:
     def __call__(self, vessels, target):
         return self.get_observation(vessels, target)
 
+    def get_observation_subset(self,vessels, subset: set, target: str = ""):
+        self.target=target
+        subset = set(subset)
+        f=self.functions
+        state=np.zeros(self.state_s,dtype=np.float32)
+
+        obs_list = self.observation_list
+        for i,v in enumerate(vessels):
+            if i>= self.n_vessels:break
+            state[i] = np.concatenate([f[j](v) if obs in subset else np.zeros(self.sizes[obs]) for j,obs in enumerate(obs_list)])
+        
+        mask = np.concatenate([np.ones(self.sizes[obs]) if obs in subset else np.zeros(self.sizes[obs]) for obs in obs_list])
+        return np.clip(state.flatten(),0,1), mask
 
     def get_spectra(self, vessel: vessel.Vessel, materials: Optional[Tuple[material.Material]] = None, overlap: bool = True):
         """
@@ -134,8 +147,11 @@ class CharacterizationBench:
         x = np.linspace(0, 1, 200, endpoint=True, dtype=np.float32)
         absorb = np.zeros(x.shape[0], dtype=np.float32)
 
+        filled_volume = vessel.filled_volume()
+        if filled_volume<1e-12:
+            return absorb
         #Get concentrations and spectras
-        C = np.array([mat.mol for mat in materials])/vessel.filled_volume()
+        C = np.array([mat.mol for mat in materials])/filled_volume
         if not overlap:
             params = tuple(mat.get_spectra_no_overlap() for mat in materials)
         else:
@@ -179,8 +195,10 @@ class CharacterizationBench:
         Returns:
             np.array: a 1D one-hot encoding of the target material (note self.target must be set before doing this)
         """
-        targ_index = self.targets.index(self.target)
         one_hot=np.zeros(len(self.targets))
-        one_hot[targ_index]=1
+
+        if self.target in self.targets:
+            targ_index = self.targets.index(self.target)
+            one_hot[targ_index]=1
 
         return one_hot

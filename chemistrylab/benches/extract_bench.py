@@ -59,30 +59,28 @@ def wurtz_vessel(add_mat=""):
         "CCCC(CC)C(CC)CCC",
     ]
 
-    if add_mat == "":
-        add_mat = choice(products)
+    if add_mat != "":
     
-    if not add_mat in products:
-        add_mat = 'CCCCCCCCCCCC'
-    
-    add_material = material.REGISTRY[add_mat]()
-    #add_material.set_color(0.0)
-    add_material.phase = 'l'
+        if not add_mat in products:
+            add_mat = 'CCCCCCCCCCCC'
+        
+        add_material = material.REGISTRY[add_mat]()
+        #add_material.set_color(0.0)
+        add_material.phase = 'l'
 
+        DiEthylEther.mol=4.0
+        Na.mol=1.0
+        Cl.mol=1.0
+        add_material.mol=1.0
+        # material_dict
+        material_dict = {
+            str(DiEthylEther): DiEthylEther,
+            str(Na): Na,
+            str(Cl): Cl,
+            str(add_material): add_material,
+        }
 
-    DiEthylEther.mol=4.0
-    Na.mol=1.0
-    Cl.mol=1.0
-    add_material.mol=1.0
-    # material_dict
-    material_dict = {
-        str(DiEthylEther): DiEthylEther,
-        str(Na): Na,
-        str(Cl): Cl,
-        str(add_material): add_material,
-    }
-
-    extraction_vessel.material_dict=material_dict
+        extraction_vessel.material_dict=material_dict
 
     extraction_vessel.validate_solvents()
     extraction_vessel.validate_solutes()

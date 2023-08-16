@@ -79,5 +79,103 @@
     "CCCC(CC)C(CC)CCC",
     "[Na+].[Cl-]"
   ],
-  "actions": []
+  "actions": [
+    [
+      "end experiment",
+      {},
+      0.0,
+      null
+    ],
+    [
+      "swap vessels",
+      {
+        "bench_idx": -1,
+        "vessel_idx": 0
+      },
+      0.0,
+      null
+    ],
+    [
+      "swap vessels",
+      {
+        "bench_idx": -1,
+        "vessel_idx": 1
+      },
+      0.0,
+      null
+    ],
+    [
+      "swap vessels",
+      {
+        "bench_idx": -1,
+        "vessel_idx": 2
+      },
+      0.0,
+      null
+    ],
+    [
+      "characterize",
+      {
+        "observation_list": [
+          "PVT"
+        ]
+      },
+      0.0,
+      null
+    ],
+    [
+      "run bench",
+      {
+        "bench_idx": 0,
+        "policy_idx": 0
+      },
+      0.0,
+      0
+    ],
+    [
+      "swap vessels",
+      {
+        "bench_idx": 0,
+        "vessel_idx": 0
+      },
+      0.0,
+      0
+    ],
+    [
+      "run bench",
+      {
+        "bench_idx": 1,
+        "policy_idx": 0
+      },
+      0.0,
+      1
+    ],
+    [
+      "swap vessels",
+      {
+        "bench_idx": 1,
+        "vessel_idx": 0
+      },
+      0.0,
+      1
+    ],
+    [
+      "run bench",
+      {
+        "bench_idx": 2,
+        "policy_idx": 0
+      },
+      0.0,
+      2
+    ],
+    [
+      "swap vessels",
+      {
+        "bench_idx": 2,
+        "vessel_idx": 0
+      },
+      0.0,
+      2
+    ]
+  ]
 }

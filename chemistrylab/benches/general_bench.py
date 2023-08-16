@@ -241,7 +241,13 @@ class GenBench(gym.Env):
 
         return self.characterization_bench(self.shelf.get_working_vessels(), self.target_material)
 
-    def _reset(self,target):
+    def reset_with_target(self,target: str):
+        """
+        Resets the bench with a specific target material.
+
+        Args:
+            target (str): The target material
+        """
         self.shelf.reset(target)
         self.set_target(target)
         return self.re_init()
@@ -256,7 +262,7 @@ class GenBench(gym.Env):
         np.random.seed(seed)
         self.action_space.seed(seed)
         target=np.random.choice(self.targets)
-        return self._reset(target),{}
+        return self.reset_with_target(target),{}
         
     def render(self):
         return self.visual.get_rgb(self.shelf.get_working_vessels())
