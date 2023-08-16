@@ -135,7 +135,7 @@ class Manager(gym.Env):
 
         self.hand_encoding = np.zeros(self.char_bench.observation_shape)
     
-    def set_target(self, bench_idx, target_idx):
+    def set_bench_target(self, bench_idx, target_idx):
         """
         Sets a benches target
 
@@ -314,7 +314,7 @@ class Manager(gym.Env):
         'dispose vessel': dispose_vessel,
         'create vessel': create_vessel,
         'insert vessel': insert_vessel,
-        'set target': set_target,
+        'set bench target': set_bench_target,
         'restock bench': restock_bench,
         'run bench': run_bench,
         'characterize': characterize,
@@ -329,7 +329,7 @@ if __name__ == "__main__":
     from chemistrylab.lab.gui import *
     
     import os
-    demo_path = os.path.dirname(__file__)+"/manager_configs/wurtz.json"
+    demo_path = os.path.dirname(__file__)+"/manager_configs/demo.json"
     benches, bench_names, policies, targets, actions = parse_json(demo_path)
 
     # Set up visualization

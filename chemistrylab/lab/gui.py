@@ -562,7 +562,7 @@ class ManagerGui():
                 self.bench_titles.append(Button(141,29, text = self.manager.bench_names[i], color="#888888", hover = "#dddddd"))
                 self.bench_targets.append(Button(280,30, text = "Target: "+self.manager.targets[0], color="#8888FF", hover = "#ccccff"))
                 self.bench_targets[i].idx = 0
-                self.manager.set_target(i,0)
+                self.manager.set_bench_target(i,0)
 
             self.restock_button = Button(80,30, text = "Restock", color="#8888FF", hover = "#ccccff")
 
