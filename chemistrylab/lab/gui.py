@@ -1,5 +1,6 @@
 from chemistrylab.lab.heuristics.Heuristic import Policy
 from chemistrylab.lab.manager import Manager
+from chemistrylab.benches.characterization_bench import CharacterizationBench
 import numpy as np
 from chemistrylab.util.Visualization import pygameVisualizer
 from typing import NamedTuple, Tuple, Callable, Optional, List
@@ -440,9 +441,10 @@ class ManagerGui():
                     self.text_input.active=False
         return False
 
-    def display_char_bench(self):
+    def display_char_bench(self,obs_list):
         """Display the characteriation bench output until left click is pressed"""
-        arr = pygameVisualizer(self.manager.charbench).get_rgb(self.manager.hand)
+        char_bench = CharacterizationBench(obs_list,[],1)
+        arr = pygameVisualizer(char_bench).get_rgb(self.manager.hand)
         if np.product(arr.shape)>0:
             arr_min, arr_max = np.min(arr), np.max(arr)
             arr = 255.0 * (arr - arr_min) / (arr_max - arr_min)
@@ -516,8 +518,7 @@ class ManagerGui():
         if self.bench_idx == len(self.manager.benches):
             for button in self.bench_buttons:
                 if button.check_hover(xy):
-                    _ = self.manager.characterize([button.text])
-                    self.display_char_bench()
+                    self.display_char_bench([button.text])
                     return
             return
         
@@ -539,7 +540,7 @@ class ManagerGui():
             if target_button.check_hover(xy):
                 N = len(self.manager.targets)
                 target_button.idx = (target_button.idx+1)%N
-                self.manager.set_target(self.bench_idx,target_button.idx)
+                self.manager.set_bench_target(self.bench_idx,target_button.idx)
                 target_button.set_text("Target: "+self.manager.targets[target_button.idx])
 
             if self.restock_button.check_hover(xy):

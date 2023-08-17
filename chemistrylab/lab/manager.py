@@ -108,11 +108,20 @@ class Manager(gym.Env):
         self.hand_encoding = np.zeros(self.char_bench.observation_shape)
 
     def dispose_vessel(self):
+        """
+        Removes and deletes the vessel in the manager's hand
+        """
         if len(self.hand)>0:
             self.hand.pop()
         self.hand_encoding = np.zeros(self.char_bench.observation_shape)
     
     def create_vessel(self, label = ""):
+        """
+        Creates an empty vessel and places it in the manager's hand (as long as the hand is empty)
+
+        Args:
+            label (str): A name for the vessel
+        """
         if len(self.hand)==0:
             self.hand.insert(0,Vessel(label))
 
@@ -215,6 +224,10 @@ class Manager(gym.Env):
 
 
     def encode_bench(self):
+        """
+        Returns:
+            np.ndarray: A vector containing a one-hot encoding of which bench is selected, as well as some information about the contents of the benches shelf.
+        """
         encoding = np.zeros(len(self.benches)+10)
         if self.current_bench is None:
             return encoding
@@ -226,6 +239,15 @@ class Manager(gym.Env):
         return encoding
 
     def get_observation(self):
+        """
+        Creates an observation of the manager's state
+        
+        TODO: Give info about the manager's shelf
+
+        Returns:
+            np.ndarray: The observation
+        
+        """
         return np.concatenate([self.target_encoding, self.encode_bench(),[len(self.hand)],self.hand_encoding])
 
     def build_actions(self, actions: Tuple[ManagerAction]):
@@ -247,28 +269,37 @@ class Manager(gym.Env):
         self.n_actions = len(self.default_actions)+max(len(a) for a in self.bench_actions)
 
     def set_cur_bench(self, idx):
+        """
+        Sets the bench the manager is currently focused on.
+        
+        Args:
+            idx (int): The bench index
+        """
         self.current_bench = min(idx, len(self.benches)-1)
 
-    def perform_action(self, action: ManagerAction):
+    def end_experiment(self):
+        """
+        After calling this, the next call to step() will result in a terminal state.
+        """
+        self.steps = self.max_step
+
+    def _perform_action(self, action: ManagerAction):
         action_dict = type(self)._action_dict
         action_dict[action.name](self,**action.args)
         return action.cost
-
-    def end_experiment(self):
-        self.steps = self.max_step
 
     def step(self, action: int):
         cost = 0
         self.steps+=1
 
         if action < len(self.default_actions):
-            self.perform_action(self.default_actions[action])
+            self._perform_action(self.default_actions[action])
             cost = self.default_actions[action].cost
 
         elif self.current_bench is not None:
             action -= len(self.default_actions)
             if action < len(self.bench_actions[self.current_bench]):
-                self.perform_action(self.bench_actions[self.current_bench][action])
+                self._perform_action(self.bench_actions[self.current_bench][action])
                 cost = self.bench_actions[self.current_bench][action].cost
         
         done = self.steps>=self.max_step
@@ -296,6 +327,13 @@ class Manager(gym.Env):
         return self.get_observation()
     
     def set_target(self,target):
+        """
+        Sets the manager's target material
+
+        Args:
+            target (str): The smiles code of the target material
+        
+        """
         self.target_material=target
         self.char_bench.target = target
         self.target_encoding = self.char_bench.encode_target(None)
