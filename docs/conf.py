@@ -12,7 +12,7 @@ sys.path.append("../")
 
 
 ######################### Adding Some extra documentation #################
-from chemistrylab.util.ActionDoc import append_doc
+from chemistrylab.util.ActionDoc import append_doc, generate_manager_table
 from chemistrylab.benches.general_bench import GenBench
 import importlib
 import gymnasium as gym
@@ -27,6 +27,11 @@ for env,reg in gym.registry.items():
     if issubclass(bench,GenBench) and not bench in doc:
         append_doc(bench)
         doc.add(bench)
+
+from chemistrylab.lab import manager
+manager.Manager_v0 = lambda : 0 
+
+manager.Manager_v0.__doc__ = generate_manager_table(manager.CONFIG_PATH+"/wurtz.json")
 
 ############################################################################
 

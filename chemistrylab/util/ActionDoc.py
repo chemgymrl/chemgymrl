@@ -5,7 +5,8 @@ from collections import namedtuple
 from chemistrylab.benches.general_bench import Action, ContinuousParam
 from chemistrylab.vessel import Vessel
 from chemistrylab.benches.general_bench import GenBench
-
+from chemistrylab.lab.manager_setup import parse_json, ManagerAction
+from chemistrylab.lab.manager import Manager
 
 import numpy as np
 floattypes = {np.float16, np.float32, np.float64, float}
@@ -54,6 +55,38 @@ def generate_table(shelf, actions) -> str:
     table = tabulate(table_data, headers=table_headers, tablefmt='grid')
     return table
 
+
+def args2string(**kwargs):
+    return f"({', '.join(f'{k} = {v}' for k,v in kwargs.items())})"
+
+
+def generate_manager_table(filename: str):
+    benches, bench_names, policies, targets, actions = parse_json(filename)
+
+    default_actions = [ManagerAction("set bench", dict(idx=i), 0,  None) for i in range(len(benches))]
+    bench_actions = [[] for bench in benches]
+    for act in actions:
+        if act.bench is None:
+            default_actions.append(act)
+        else:
+            bench_actions[act.bench].append(act)
+
+    table_headers = ["Action Index","Required Bench", "Function Call"]
+
+    table_data = []
+
+    fdict = Manager._action_dict
+    
+    for i,act in enumerate(default_actions):
+        table_data.append([i, "None", fdict[act.name].__name__+args2string(**act.args)])
+    i=len(default_actions)
+
+    for bench_idx, bench_name in enumerate(bench_names):
+        for j,act in enumerate(bench_actions[bench_idx]):
+            table_data.append([i+j, bench_name , fdict[act.name].__name__+args2string(**act.args)])
+
+    table = tabulate(table_data, headers=table_headers, tablefmt='grid')
+    return table
 
 def append_doc(bench):
     instance = bench()

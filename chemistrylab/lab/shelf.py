@@ -52,6 +52,8 @@ class Shelf:
         self.vessels.append(vessel)
     def __repr__(self):
         'Return a nicely formatted representation string'
+        if len(self.vessels)==0:
+            return "Empty Shelf"
         return self.__class__.__name__ + ': (%s)' % ", ".join(str(v) for v in self.vessels)
 
     def load_vessel(self, path: str):

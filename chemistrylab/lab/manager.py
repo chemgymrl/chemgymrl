@@ -13,6 +13,8 @@ import gymnasium as gym
 from chemistrylab.util.reward import RewardGenerator
 from chemistrylab.lab.manager_setup import parse_json
 
+CONFIG_PATH = os.path.dirname(__file__) + "/manager_configs"
+
 class ManagerAction(NamedTuple):
     name: str
     args: dict
@@ -289,9 +291,9 @@ class Manager(gym.Env):
         return action.cost
 
     def step(self, action: int):
+
         cost = 0
         self.steps+=1
-
         if action < len(self.default_actions):
             self._perform_action(self.default_actions[action])
             cost = self.default_actions[action].cost
@@ -303,9 +305,7 @@ class Manager(gym.Env):
                 cost = self.bench_actions[self.current_bench][action].cost
         
         done = self.steps>=self.max_step
-
         rew = 0 if not done else self.rew_gen(self.shelf,self.target_material)
-
         return self.get_observation(), rew-cost, done, False, {}
 
     def reset_with_target(self,target: str):
@@ -338,6 +338,11 @@ class Manager(gym.Env):
         self.char_bench.target = target
         self.target_encoding = self.char_bench.encode_target(None)
     def get_target(self):
+        """
+        Returns:
+            str: The smiles code of the manager's target
+        
+        """
         return self.target_material
     
     def reset(self, *args, seed=None, options=None):
