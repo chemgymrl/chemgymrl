@@ -14,47 +14,88 @@ Much like bench agents, the lab manager is also learning how to best perform tas
 
 ## Input
 
-The lab manager's input are the three main environments that it will be working with, mainly the reaction, extraction,
-and distillation environments. This is made available and specified under `lab.py`.
+A lab manager's configuration is handled by a json file. Here, the benches, policies, and actions available to the manager are specified. The json below configures the wurtz lab manager.
+
+```json
+{
+  "benches": [
+    ["Reaction",     "GenWurtzReact-v2"],
+    ["Distillation", "GenWurtzDistill-v2"],
+    ["Extraction",   "GenWurtzExtract-v2"]
+  ],
+  "policies": [
+    ["Heuristic", "chemistrylab.lab.heuristics:WurtzReactHeuristic",      {},                   0],
+    ["Heuristic", "chemistrylab.lab.heuristics:GenWurtzDistillHeuristic", {"heat_act": 9 ...},  1],
+    ["Heuristic", "chemistrylab.lab.heuristics:GenWurtzExtractHeuristic", {"drain_act": 1 ...}, 2]
+  ],
+  "targets": [
+    "CCCCCCCCCCCC",
+    "CCCCCCC(C)CCCC",
+    "CCCCCCC(CC)CCC",
+    "CCCCC(C)C(C)CCCC",
+    "CCCCC(C)C(CC)CCC",
+    "CCCC(CC)C(CC)CCC",
+    "[Na+].[Cl-]"
+  ],
+  "actions": [
+    ["end experiment",{},                                0.0, null],
+    ["swap vessels",  {"bench_idx": -1,"vessel_idx": 0}, 0.0, null],
+    ["swap vessels",  {"bench_idx": -1,"vessel_idx": 1}, 0.0, null],
+    ["swap vessels",  {"bench_idx": -1,"vessel_idx": 2}, 0.0, null],
+    ["characterize",  {"observation_list": ["PVT"]},     0.0, null],
+    ["run bench",     {"bench_idx": 0,"policy_idx": 0},  0.0, 0   ],
+    ["swap vessels",  {"bench_idx": 0,"vessel_idx": 0},  0.0, 0   ],
+    ["run bench",     {"bench_idx": 1,"policy_idx": 0},  0.0, 1   ],
+    ["swap vessels",  {"bench_idx": 1,"vessel_idx": 0},  0.0, 1   ],
+    ["run bench",     {"bench_idx": 2,"policy_idx": 0},  0.0, 2   ],
+    ["swap vessels",  {"bench_idx": 2,"vessel_idx": 0},  0.0, 2   ]
+  ]
+}
+```
+
+The above json file gives a list of ordered parameters for the construction of Benches, Policies, and Actions. The corresponding named tuples to these parameters lists are:
+
+<table>
+<tr>
+<td>
+  
+```python
+class BenchParam(NamedTuple):
+    name: str
+    gym_id: str
+```  
+</td>
+<td>
 
 ```python
-class Lab(gym.Env, ABC):
-    """
-    The lab class is meant to be a gym environment so that an agent can figure out how to synthesize different chemicals
-    """
-    def __init__(self, render_mode: str = None, max_num_vessels: int = 100):
-        """
-
-        Parameters
-        ----------
-        render_mode: a string for the render mode of the environment if the user wishes to see outputs from the benches
-        max_num_vessels: the maximum number of vessels that the shelf can store
-        """
-        all_envs = envs.registry.all()
-        # the following parameters list out all available reactions, extractions and distillations that the agent can use
-        self.reactions = [env_spec.id for env_spec in all_envs if 'React' in env_spec.id]
-        self.extractions = [env_spec.id for env_spec in all_envs if 'Extract' in env_spec.id]
-        self.distillations = [env_spec.id for env_spec in all_envs if 'Distill' in env_spec.id]
-        self.characterization = list(CharacterizationBench().techniques.keys())
-        self.characterization_bench = CharacterizationBench()
+class PolicyParam(NamedTuple):
+    name: str
+    entry_point: str
+    args: dict
+    bench_idx: int
 ```
+
+</td>
+<td>
+
+```python
+class ManagerAction(NamedTuple):
+    name: str
+    args: dict
+    cost: float
+    bench: Optional[int]
+```
+</td>
+
+</tr>
+</table>
 
 ## Output
 
-The lab manager's output will be messages from the environment that it is currently performing actions on. It will also 
-depend on the action that is being performed. The lab manager itself does not have any specific outputs. We can, 
-however, use lab manager to access the extraction environment and get outputs from that.
+The lab manager itself does not have any specific outputs. We can, however, use a gui to see what the lab manager does by running the command:
 
 ```
->>> python manager.py
-Index: Action
-0: load vessel from pickle
-1: load distillation bench
-2: load reaction bench
-3: load extraction bench
-4: load characterization bench
-5: list vessels
-6: create new vessel
-7: save vessel
-8: quit
+python -m chemistrylab.lab.manager
 ```
+
+

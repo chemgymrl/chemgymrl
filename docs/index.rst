@@ -51,6 +51,7 @@ The ChemGymRL environment leverages Reinforcement Learning algorithms to train a
    extraction
    distillation
    characterization
+   lab_manager
    Developers
    Glossary
    Troubleshooting
