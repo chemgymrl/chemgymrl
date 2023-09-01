@@ -72,10 +72,11 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             
             **Sriram Ganapathi Subramanian** - Spring 2018 - Present |br|
             Postdoc at Vector Institute - RL Expert
-   
-     - .. container:: flip-card
+     
+     - .. container:: card
+       - .. container:: flip-card
 
-         .. container:: flip-card-inner
+          .. container:: flip-card-inner
                
             .. container:: flip-card-front
 
