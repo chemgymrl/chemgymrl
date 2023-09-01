@@ -38,7 +38,17 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             time began. \*( ¯\\_(ツ)_/¯ he's a physicist)\* |br|
             Principal Investigator
 
+     - .. container:: card
 
+         .. figure:: contributors/cb.png
+            :width: 100%
+            :align: center
+            :alt: Colin Bellinger
+            :class: top-elem
+            
+            **Colin Bellinger** - Since 2021
+
+            Principal Investigator
 
      - .. container:: card
 
