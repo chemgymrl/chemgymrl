@@ -24,8 +24,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             
             **Mark Crowley** - Since time immemorial. |br|
             Associate Professor, UWaterloo |br|
-            Principal Investigator |br|
-            [markcrowley.ca](https://markcrowley.ca/)
+            Principal Investigator
 
      - .. container:: card
 
@@ -37,9 +36,8 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             
             **Isaac Tamblyn** - Actually, even before
             time began. \*( ¯\\_(ツ)_/¯ he's a physicist)\* |br|
-            Adjunct Professor, UOttawa/Vector Institute
+            Adjunct Professor, UOttawa/Vector Institute |br|
             Principal Investigator
-            [CLEAN](http://clean.energyscience.ca/)
 
      - .. container:: card
 
