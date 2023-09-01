@@ -49,7 +49,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Colin Bellinger
             :class: top-elem
 
-            **Colin Bellinger** - Spring 2018 - Present |br|
+            **Colin Bellinger** - Spring 2021 - Present |br|
             Research Officer at the National Research Council of Canada (NRC) |br|
             Principal Investigator
 
@@ -64,7 +64,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Christopher Beeler** - Spring 2018 - Present |br|
             PhD Student - UOttawa - Chemistry Expert
 
-      - - .. container:: card
+      - .. container:: card
 
          .. figure:: contributors/siriam.jpg
             :width: 100%
