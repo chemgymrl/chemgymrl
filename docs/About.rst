@@ -14,7 +14,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
    :widths: 200, 200, 200
    :class: tight-table 
    
-   * .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/mark_c.png
             :width: 100%
@@ -53,7 +53,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             Research Officer at the National Research Council of Canada (NRC) |br|
             Principal Investigator
 
-   * .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/chris.png
             :width: 100%
@@ -64,7 +64,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Christopher Beeler** - Spring 2018 - Present |br|
             PhD Student - UOttawa - Chemistry Expert
 
-      - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/siriam.jpg
             :width: 100%
@@ -75,7 +75,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Sriram Ganapathi Subramanian** - Spring 2018 - Present |br|
             Postdoc at Vector Institute - RL Expert
    
-      - .. container:: flip-card
+     - .. container:: flip-card
 
          .. container:: flip-card-inner
                
@@ -95,7 +95,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                
                My card flips around.
 
-   * .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/nouha.png
             :width: 100%
@@ -106,7 +106,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Nouha Chatti** - Spring 2020 - Present |br|
             Master's Student - RL Expert
 
-      - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/mitchell.png
             :width: 100%
@@ -117,7 +117,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Mitchell Shahen** - Spring 2020 - Spring 2021 |br|
             Co-op and part-time URA Developer
 
-      - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/nicholas.png
             :width: 100%
@@ -129,7 +129,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
    
-   * .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/mark_b.png
             :width: 100%
@@ -153,7 +153,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
 
-      - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/Zihan_Yang.jpg
             :width: 80%
@@ -165,7 +165,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             Co-op and part-time URA Developer
             
    
-   * .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/Xinkai.jpeg
             :width: 100%
