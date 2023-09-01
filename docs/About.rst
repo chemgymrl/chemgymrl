@@ -40,7 +40,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
      - .. container:: card
 
-         .. figure:: contributors/cb.png
+         .. figure:: contributors/cb.jpeg
             :width: 100%
             :align: center
             :alt: Colin Bellinger
