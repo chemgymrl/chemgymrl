@@ -22,10 +22,9 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Mark Crowley
             :class: top-elem
             
-            **Mark Crowley** - Since time immemorial. |br|
-            Associate Professor, UWaterloo |br|
+            **Mark Crowley** - Since time immemorial.
+
             Principal Investigator
-            [markcrowley.ca](https://markcrowley.ca/)
 
      - .. container:: card
 
@@ -37,23 +36,11 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             
             **Isaac Tamblyn** - Actually, even before
             time began. \*( ¯\\_(ツ)_/¯ he's a physicist)\* |br|
-            Adjunct Professor, UOttawa/Vector Institute
             Principal Investigator
-            [CLEAN](http://clean.energyscience.ca/)
+
+
 
      - .. container:: card
-
-         .. figure:: contributors/colin.jpg
-            :width: 100%
-            :align: center
-            :alt: Colin Bellinger
-            :class: top-elem
-
-            **Colin Bellinger** - Spring 2021 - Present |br|
-            Research Officer at the National Research Council of Canada (NRC) |br|
-            Principal Investigator
-
-   * .. container:: card
 
          .. figure:: contributors/chris.png
             :width: 100%
@@ -62,9 +49,9 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
 
             **Christopher Beeler** - Spring 2018 - Present |br|
-            PhD Student - UOttawa - Chemistry Expert
+            PhD Student - Chemistry Expert
 
-      - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/siriam.jpg
             :width: 100%
@@ -73,29 +60,9 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Sriram Ganapathi Subramanian** - Spring 2018 - Present |br|
-            Postdoc at Vector Institute - RL Expert
+            PhD Student - RL Expert
    
-      - .. container:: flip-card
-
-         .. container:: flip-card-inner
-               
-            .. container:: flip-card-front
-
-               .. image:: contributors/kyle.png
-                  :width: 100%
-
-               **Kyle Sprague**
-
-               Human
-
-            .. container:: flip-card-back
-
-
-               That's right.
-               
-               My card flips around.
-
-   * .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/nouha.png
             :width: 100%
@@ -106,7 +73,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Nouha Chatti** - Spring 2020 - Present |br|
             Master's Student - RL Expert
 
-      - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/mitchell.png
             :width: 100%
@@ -117,7 +84,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Mitchell Shahen** - Spring 2020 - Spring 2021 |br|
             Co-op and part-time URA Developer
 
-      - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/nicholas.png
             :width: 100%
@@ -129,7 +96,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
    
-   * .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/mark_b.png
             :width: 100%
@@ -153,7 +120,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
 
-      - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/Zihan_Yang.jpg
             :width: 80%
@@ -165,7 +132,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             Co-op and part-time URA Developer
             
    
-   * .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/Xinkai.jpeg
             :width: 100%
@@ -177,7 +144,25 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
 
+     - .. container:: flip-card
 
+         .. container:: flip-card-inner
+               
+            .. container:: flip-card-front
+
+               .. image:: contributors/kyle.png
+                  :width: 100%
+
+               **Kyle Sprague**
+
+               Human
+
+            .. container:: flip-card-back
+
+
+               That's right.
+               
+               My card flips around.
 
 
 
