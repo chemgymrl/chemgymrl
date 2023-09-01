@@ -14,7 +14,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
    :widths: 200, 200, 200
    :class: tight-table 
    
-   * - .. container:: card
+   * .. container:: card
 
          .. figure:: contributors/mark_c.png
             :width: 100%
@@ -24,7 +24,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             
             **Mark Crowley** - Since time immemorial. |br|
             Associate Professor, UWaterloo |br|
-            Principal Investigator
+            Principal Investigator |br|
             [markcrowley.ca](https://markcrowley.ca/)
 
      - .. container:: card
