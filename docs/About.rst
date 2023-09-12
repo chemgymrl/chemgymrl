@@ -164,7 +164,9 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                
                My card flips around.
 
-   * - .. container:: card
+   * -
+
+     - .. container:: card
 
          .. figure:: contributors/cb.jpeg
             :width: 100%
@@ -175,6 +177,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Colin Bellinger** - Start - Present |br|
             Role
 
-
+     -
 
 
