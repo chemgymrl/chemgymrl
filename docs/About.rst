@@ -38,9 +38,18 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             time began. \*( ¯\\_(ツ)_/¯ he's a physicist)\* |br|
             Principal Investigator
 
-
-
      - .. container:: card
+
+         .. figure:: contributors/cb.jpeg
+            :width: 100%
+            :align: center
+            :alt: Colin Bellinger
+            :class: top-elem
+            
+            **Colin Bellinger** - Start - Present |br|
+            Role
+
+   * - .. container:: card
 
          .. figure:: contributors/chris.png
             :width: 100%
@@ -51,7 +60,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Christopher Beeler** - Spring 2018 - Present |br|
             PhD Student - Chemistry Expert
 
-   * - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/siriam.jpg
             :width: 100%
@@ -73,7 +82,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Nouha Chatti** - Spring 2020 - Present |br|
             Master's Student - RL Expert
 
-     - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/mitchell.png
             :width: 100%
@@ -84,7 +93,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Mitchell Shahen** - Spring 2020 - Spring 2021 |br|
             Co-op and part-time URA Developer
 
-   * - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/nicholas.png
             :width: 100%
@@ -108,7 +117,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
 
-     - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/amanuel.jpg
             :width: 100%
@@ -120,7 +129,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
 
-   * - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/Zihan_Yang.jpg
             :width: 80%
@@ -144,7 +153,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
 
             Co-op  Developer
 
-     - .. container:: flip-card
+   * - .. container:: flip-card
 
          .. container:: flip-card-inner
                
@@ -164,18 +173,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                
                My card flips around.
 
-   * -
-
-     - .. container:: card
-
-         .. figure:: contributors/cb.jpeg
-            :width: 100%
-            :align: center
-            :alt: Colin Bellinger
-            :class: top-elem
-            
-            **Colin Bellinger** - Start - Present |br|
-            Role
+     -
 
      -
 
