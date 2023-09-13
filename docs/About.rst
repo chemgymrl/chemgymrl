@@ -22,8 +22,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Mark Crowley
             :class: top-elem
             
-            **Mark Crowley** - Since time immemorial.
-
+            **Mark Crowley** - Spring 2018 - Present |br|
             Principal Investigator
 
      - .. container:: card
@@ -34,8 +33,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Chris Beeler
             :class: top-elem
             
-            **Isaac Tamblyn** - Actually, even before
-            time began. \*( ¯\\_(ツ)_/¯ he's a physicist)\* |br|
+            **Isaac Tamblyn** - Spring 2018 - Present |br|
             Principal Investigator
 
      - .. container:: card
@@ -46,8 +44,8 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Colin Bellinger
             :class: top-elem
             
-            **Colin Bellinger** - Start - Present |br|
-            Role
+            **Colin Bellinger** - Fall 2021 - Present |br|
+            Principle Investigator
 
    * - .. container:: card
 
@@ -102,7 +100,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Nicholas Alexander Paquin** - Winter 2021
-
             Co-op  Developer
    
      - .. container:: card
@@ -114,7 +111,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Mark Baula** - Winter 2021
-
             Co-op  Developer
 
    * - .. container:: card
@@ -126,7 +122,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
 
             **Amanuel Dawit** - Winter 2021
-
             Co-op  Developer
 
      - .. container:: card
@@ -150,7 +145,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Xinkai Li** - Spring 2019
-
             Co-op  Developer
 
    * - .. container:: flip-card
@@ -162,9 +156,8 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                .. image:: contributors/kyle.png
                   :width: 100%
 
-               **Kyle Sprague**
-
-               Human
+               **Kyle Sprague** - Winter 2023 - Summer 2023
+               Full-time Developer
 
             .. container:: flip-card-back
 
