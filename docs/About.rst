@@ -23,7 +23,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Mark Crowley** - Spring 2018 - Present |br|
-            
             Principal Investigator
 
      - .. container:: card
@@ -35,7 +34,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Isaac Tamblyn** - Spring 2018 - Present |br|
-            
             Principal Investigator
 
      - .. container:: card
@@ -47,7 +45,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Colin Bellinger** - Fall 2021 - Present |br|
-            
             Principle Investigator
 
    * - .. container:: card
@@ -59,7 +56,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
 
             **Christopher Beeler** - Spring 2018 - Present |br|
-            
             PhD Student - Chemistry Expert
 
      - .. container:: card
@@ -71,7 +67,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Sriram Ganapathi Subramanian** - Spring 2018 - Present |br|
-            
             PhD Student - RL Expert
    
      - .. container:: card
@@ -83,7 +78,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Nouha Chatti** - Spring 2020 - Present |br|
-            
             Master's Student - RL Expert
 
    * - .. container:: card
@@ -95,7 +89,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
 
             **Mitchell Shahen** - Spring 2020 - Spring 2021 |br|
-            
             Co-op and part-time URA Developer
 
      - .. container:: card
@@ -106,8 +99,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Nicholas Paquin
             :class: top-elem
             
-            **Nicholas Alexander Paquin** - Winter 2021
-            
+            **Nicholas Alexander Paquin** - Winter 2021 |br|
             Co-op  Developer
    
      - .. container:: card
@@ -118,8 +110,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Mark Baula
             :class: top-elem
             
-            **Mark Baula** - Winter 2021
-            
+            **Mark Baula** - Winter 2021 |br|
             Co-op  Developer
 
    * - .. container:: card
@@ -130,8 +121,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Amanuel Dawit
             :class: top-elem
 
-            **Amanuel Dawit** - Winter 2021
-            
+            **Amanuel Dawit** - Winter 2021 |br|
             Co-op  Developer
 
      - .. container:: card
@@ -143,7 +133,6 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :class: top-elem
             
             **Zihan Yang** - Fall 2019 - Winter 2020 |br|
-            
             Co-op and part-time URA Developer
             
    
@@ -155,8 +144,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Xinkai Li
             :class: top-elem
             
-            **Xinkai Li** - Spring 2019
-            
+            **Xinkai Li** - Spring 2019 |br|
             Co-op  Developer
 
    * - .. container:: flip-card
@@ -168,8 +156,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                .. image:: contributors/kyle.png
                   :width: 100%
 
-               **Kyle Sprague** - Winter 2023 - Summer 2023
-               
+               **Kyle Sprague** - Winter 2023 - Summer 2023 |br|
                Full-time Developer
 
             .. container:: flip-card-back
