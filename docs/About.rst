@@ -22,8 +22,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Mark Crowley
             :class: top-elem
             
-            **Mark Crowley** - Since time immemorial.
-
+            **Mark Crowley** - Spring 2018 - Present |br|
             Principal Investigator
 
      - .. container:: card
@@ -34,13 +33,21 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Chris Beeler
             :class: top-elem
             
-            **Isaac Tamblyn** - Actually, even before
-            time began. \*( ¯\\_(ツ)_/¯ he's a physicist)\* |br|
+            **Isaac Tamblyn** - Spring 2018 - Present |br|
             Principal Investigator
 
-
-
      - .. container:: card
+
+         .. figure:: contributors/cb.jpeg
+            :width: 100%
+            :align: center
+            :alt: Colin Bellinger
+            :class: top-elem
+            
+            **Colin Bellinger** - Fall 2021 - Present |br|
+            Principle Investigator
+
+   * - .. container:: card
 
          .. figure:: contributors/chris.png
             :width: 100%
@@ -51,7 +58,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Christopher Beeler** - Spring 2018 - Present |br|
             PhD Student - Chemistry Expert
 
-   * - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/siriam.jpg
             :width: 100%
@@ -73,7 +80,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Nouha Chatti** - Spring 2020 - Present |br|
             Master's Student - RL Expert
 
-     - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/mitchell.png
             :width: 100%
@@ -84,7 +91,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             **Mitchell Shahen** - Spring 2020 - Spring 2021 |br|
             Co-op and part-time URA Developer
 
-   * - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/nicholas.png
             :width: 100%
@@ -92,8 +99,7 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Nicholas Paquin
             :class: top-elem
             
-            **Nicholas Alexander Paquin** - Winter 2021
-
+            **Nicholas Alexander Paquin** - Winter 2021 |br|
             Co-op  Developer
    
      - .. container:: card
@@ -104,11 +110,10 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Mark Baula
             :class: top-elem
             
-            **Mark Baula** - Winter 2021
-
+            **Mark Baula** - Winter 2021 |br|
             Co-op  Developer
 
-     - .. container:: card
+   * - .. container:: card
 
          .. figure:: contributors/amanuel.jpg
             :width: 100%
@@ -116,11 +121,10 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Amanuel Dawit
             :class: top-elem
 
-            **Amanuel Dawit** - Winter 2021
-
+            **Amanuel Dawit** - Winter 2021 |br|
             Co-op  Developer
 
-   * - .. container:: card
+     - .. container:: card
 
          .. figure:: contributors/Zihan_Yang.jpg
             :width: 80%
@@ -140,11 +144,10 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
             :alt: Xinkai Li
             :class: top-elem
             
-            **Xinkai Li** - Spring 2019
-
+            **Xinkai Li** - Spring 2019 |br|
             Co-op  Developer
 
-     - .. container:: flip-card
+   * - .. container:: flip-card
 
          .. container:: flip-card-inner
                
@@ -153,9 +156,8 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                .. image:: contributors/kyle.png
                   :width: 100%
 
-               **Kyle Sprague**
-
-               Human
+               **Kyle Sprague** - Winter 2023 - Summer 2023 |br|
+               Full-time Developer
 
             .. container:: flip-card-back
 
@@ -164,7 +166,8 @@ ChemGymRL would not be possible without the dedication and years of hard work pu
                
                My card flips around.
 
+     -
 
-
+     -
 
 
