@@ -1,4 +1,4 @@
-[www.chemgymrl.com](https://www.chemgymrl.com/)
+[chemgymrl.com](https://chemgymrl.com/)
 
 # Installation
 
