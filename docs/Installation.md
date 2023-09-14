@@ -2,7 +2,7 @@
 
 # Installation
 
-Installing the chemgymrl library can be done by installing straight from our git repository. If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
+Installing the chemgymrl library can be done by installing straight from the [chemgymrl github repository](https://github.com/chemgymrl/chemgymrl). If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
  
 ```
 pip install "git+https://github.com/chemgymrl/chemgymrl.git@main"
