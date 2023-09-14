@@ -1,8 +1,8 @@
-[chemgymrl.com](https://chemgymrl.com/)
+[www.chemgymrl.com](https://www.chemgymrl.com/)
 
 # Installation
 
-In this tutorial we will be going over how to install the chemgymrl library. This can be done by installing straight from our git repository. If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
+Installing the chemgymrl library can be done by installing straight from our git repository. If you wish to make a lot of changes to the library and implement custom reactions, extractions etc. we recommend that you simply work out of the repository rather than install it as a library.
  
 ```
 pip install "git+https://github.com/chemgymrl/chemgymrl.git@main"
@@ -22,4 +22,8 @@ Then you can play the benches with the following command:
 python -m chemistrylab.demo
 ```
 
-This demo lets you select the [Extraction Bench Demo](https://chemgymrl.readthedocs.io/en/latest/chemistrylab.benches.html#chemistrylab.benches.extract_bench.WurtzExtractDemo_v0), the [Reaction Bench Demo](https://chemgymrl.readthedocs.io/en/latest/chemistrylab.benches.html#chemistrylab.benches.reaction_bench.FictReactDemo_v0), and the [Distillation Bench Demo](https://chemgymrl.readthedocs.io/en/latest/chemistrylab.benches.html#chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0)
+The program allows you to select 
+- [Extraction Bench Demo](https://docs.chemgymrl.com/en/latest/chemistrylab.benches.html#chemistrylab.benches.extract_bench.WurtzExtractDemo_v0)
+- the [Reaction Bench Demo](https://docs.chemgymrl.com/en/latest/chemistrylab.benches.html#chemistrylab.benches.reaction_bench.FictReactDemo_v0)
+- or the [Distillation Bench Demo](https://docs.chemgymrl.com/en/latest/chemistrylab.benches.html#chemistrylab.benches.distillation_bench.WurtzDistillDemo_v0)
+
