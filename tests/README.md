@@ -1,9 +1,9 @@
 # Testing Environment
 
-## Modules and Files
+Our testing suite is a series of test cases that are used to validate several facets of the ChemGymRL environment including the testing of benches, functions, classes and the lab manager. All these unit tests are currently accessible in the ‘chemgymrl/tests/unit’ directory and can be run independently or all together. To test all available unit tests at once make sure to run the following command:
 
-- all_info : A complementary module to analyze and output the capabilities of each of the three benches.
-- demo_chemistrygym : The demo program to perform the actions and processes of each bench consecutively and test compatability between the benches.
-- demo_manager : Test demo program to test the capabilities of managing the operation of each bench by means of a single environment.
-- test_extract_vessel : A sample pickle file containing the vessel outputs of the extract bench.
-- test_react_vessel : A sample pickle file containing the vessel output upon completing the reaction bench.
+```
+cd tests/unit && python -m unittest discover -p "*test*".py
+```
+
+For more information, see the [ChemGymRL Documentation](https://docs.chemgymrl.com).
