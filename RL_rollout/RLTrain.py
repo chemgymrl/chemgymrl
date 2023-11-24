@@ -191,7 +191,7 @@ if __name__=="__main__":
     if op.dir=="<DEFAULT>":
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y--%H-%M-%S")
-        op.dir="RLMODELS\\"+op.environment+"\\"+op.algorithm+"\\"+dt_string
+        op.dir="RLMODELS/"+op.environment+"/"+op.algorithm+"/"+dt_string
     
     
     #Set up output directory
@@ -216,7 +216,7 @@ if __name__=="__main__":
         #set up environment monitor
         def f(count=[0]):
             env = gym.make(op.environment)
-            dummy= Monitor(env, op.dir+"\\%d.monitor.csv"%count[0], allow_early_resets=True)
+            dummy= Monitor(env, op.dir+"/%d.monitor.csv"%count[0], allow_early_resets=True)
             #the array count is maintained between calls so incrementing it's intial elem works
             count[0]+=1
             return dummy
@@ -304,7 +304,7 @@ if __name__=="__main__":
                 
                 if returns.mean()>best_return:
                     best_return = returns.mean()
-                    model.save(op.dir+"\\best_model")
+                    model.save(op.dir+"/best_model")
                     print("Saving New best Model. . .")
                 sys.stdout.flush()
                 
@@ -319,7 +319,7 @@ if __name__=="__main__":
             
     except Exception as e: print(e);1/0
     
-    model.save(op.dir+"\\model")
+    model.save(op.dir+"/model")
 
     #Clean up the logging
     sys.stdout = old_stdout
