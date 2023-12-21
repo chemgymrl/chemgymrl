@@ -35,10 +35,12 @@ If you run the cell below you will see a graph appear that looks something like 
 ```python
 env = gym.make('GenWurtzReact-v2')
 env.reset()
+env.step([1,1,1,1,1])
 rgb = env.render()
 plt.imshow(rgb)
 plt.axis("off")
 plt.show()
+_ = env.reset()
 ```
 
 ![graph](tutorial_figures/reaction-lesson-1/wurtz_lesson_0.png)
