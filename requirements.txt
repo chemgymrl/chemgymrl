@@ -9,3 +9,4 @@ pillow
 pandas
 myst-parser
 tabulate
+sphinx-rtd-theme
