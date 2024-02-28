@@ -16,7 +16,7 @@ ChemGymRL is a chemistry laboratory environment populated with a collection of c
 
 A manuscript accepted in Digital Discovery that outlines ChemGymRL and its potential uses can be found `here <https://pubs.rsc.org/en/content/articlepdf/2024/DD/D3DD00183K?page=search>`_. Please use the following citation for ChemGymRL:
 
-* C. Beeler, S. Ganapathi Subramanian, K. Sprague, M. Baula, N. Chatti, A. Dawit, X. Li, N. Paquin, M. Shahen, Z. Yang, C. Bellinger, M. Crowley and I. Tamblyn, Digital Discovery, 2024, DOI: 10.1039/D3DD00183K.
+C. Beeler, S. Ganapathi Subramanian, K. Sprague, M. Baula, N. Chatti, A. Dawit, X. Li, N. Paquin, M. Shahen, Z. Yang, C. Bellinger, M. Crowley and I. Tamblyn, Digital Discovery, 2024, DOI: 10.1039/D3DD00183K.
 
 It was created to train Reinforcement Learning agents to perform realistic operations in a virtual chemistry lab environment. Such operations are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
 
