@@ -6,7 +6,7 @@
 
 Please use the following citation for ChemGymRL:
 
-* C. Beeler, S. Ganapathi Subramanian, K. Sprague, M. Baula, N. Chatti, A. Dawit, X. Li, N. Paquin, M. Shahen, Z. Yang, C. Bellinger, M. Crowley and I. Tamblyn, Digital Discovery, 2024, DOI: 10.1039/D3DD00183K.
+_C. Beeler, S. Ganapathi Subramanian, K. Sprague, M. Baula, N. Chatti, A. Dawit, X. Li, N. Paquin, M. Shahen, Z. Yang, C. Bellinger, M. Crowley and I. Tamblyn, Digital Discovery, 2024, DOI: 10.1039/D3DD00183K._
 
 ## License 
 
