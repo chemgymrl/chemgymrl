@@ -6,7 +6,7 @@
 
 Please use the following citation for ChemGymRL:
 
-* Crowley, M., Tamblyn, I., et al, ChemGymRL, April 2021. URL: https://chemgymrl.com/
+* C. Beeler, S. Ganapathi Subramanian, K. Sprague, M. Baula, N. Chatti, A. Dawit, X. Li, N. Paquin, M. Shahen, Z. Yang, C. Bellinger, M. Crowley and I. Tamblyn, Digital Discovery, 2024, DOI: 10.1039/D3DD00183K.
 
 ## License 
 

@@ -12,7 +12,7 @@ Welcome to ChemGymRL's documentation!
   :alt: ChemGymRL
 
 
-ChemGymRL is a chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the Gymnasium API (https://gymnasium.farama.org/) for use with reinforcement learning algorithms. The code can be accessed via the ChemGymRL github repository (https://github.com/chemgymrl/chemgymrl).
+ChemGymRL is a chemistry laboratory environment populated with a collection of chemistry experiment sub-environments, based on the Gymnasium API (https://gymnasium.farama.org/) for use with reinforcement learning algorithms. The code can be accessed via the ChemGymRL github repository (https://github.com/chemgymrl/chemgymrl). A manuscript accepted in Digital Discovery that outlines ChemGymRL and its potential uses can be found `here <https://pubs.rsc.org/en/content/articlepdf/2024/DD/D3DD00183K?page=search>`_.
 
 It was created to train Reinforcement Learning agents to perform realistic operations in a virtual chemistry lab environment. Such operations are virtual variants of experiments and processes that would otherwise be performed in real-world chemistry labs and in industry. The environment supports the training of Reinforcement Learning agents by associating positive and negative rewards based on the procedure and outcomes of actions taken by the agents.
 
